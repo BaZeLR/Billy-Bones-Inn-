@@ -102,6 +102,27 @@ testcase eddie_talk_opens_becky_join_setup:
     run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
     click pos (0.5, 0.5) until eval (int(threads["beckyEddieSex"].num or 0) == 1 and int(Eddie.talked_today or 0) == 1) timeout 20.0
 
+testcase eddie_failed_offer_allows_the_second_authored_attempt:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["beckySex"].advanceTo(1, force_active=True)
+    $ threads["beckyEddieSex"].advanceTo(0, force_active=True)
+    $ Eddie.rel = 3
+    $ Eddie.talked_today = 0
+    $ Eddie.saw_mother_sex = True
+    $ Eddie.seen_with_georgett = True
+    $ event_runtime.fired_keys_today = []
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
+    click pos (0.5, 0.5) until eval (int(Eddie.talked_today or 0) == 1) timeout 20.0
+    assert eval (int(threads["beckyEddieSex"].num or 0) == 0)
+    assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
+    click pos (0.5, 0.5) until eval (int(Eddie.talked_today or 0) == 2) timeout 20.0
+    assert eval (not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+
 testcase becky_from_dinner_runs_eddie_first_join:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0

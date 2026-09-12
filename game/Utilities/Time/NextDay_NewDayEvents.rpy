@@ -65,7 +65,7 @@ label NextDay_NewDayEvents(retlocname=""):
         Becky.home_front_checked_today = False
 
         # К Бекки приходят любовники
-        if Becky.corruption >= 35 and (Becky.last_store_orgasm_day + 2) <= day_value and int(threads["beckyHome"].num or 0) >= 2 and week_value != 7:
+        if Becky.corruption >= 35 and (people_to_int(Becky.sex_stat("last_orgasm_day", -1), -1) + 2) <= day_value and int(threads["beckyHome"].num or 0) >= 2 and week_value != 7:
             if Becky.corruption >= 55 or procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:122:5") == 1:
                 TodaySexEvents_Add('becky', 99, procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:123:6"), 'StoreLover')
         if threads["beckyEddieSex"].completed and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:124:7") <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:

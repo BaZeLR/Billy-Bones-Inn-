@@ -15,7 +15,9 @@ def test_becky_store_lover_event_keeps_original_gates_and_consequences():
         assert f"becky_store_sex_type == {event_type}" in source
     assert 'call PregnancyCheck("becky", "inside", 1, "Легаре")' in source
     assert 'call PregnancyCheck("becky", "inside", 1, gruzchik_name, 1, "Неизвестный грузчик")' in source
-    assert "Becky.mark_store_orgasm_today()" in source
+    assert 'Becky.set_sex_stat("last_orgasm_day", current_game_day())' in source
+    assert "last_store_orgasm_day" not in source
+    assert 'procedural_randint(1, 3, "becky_store_lover_%s_%s" % (int(current_game_day() or 0), int(calendar_v2.clock_minutes() or 0)))' in source
 
 
 def test_becky_store_lover_event_replaces_room_text_and_uses_native_continue():

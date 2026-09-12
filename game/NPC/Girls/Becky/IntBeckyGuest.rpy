@@ -111,7 +111,7 @@ label IntBeckyGuest:
                 else:
                     $ dinnerbeckyorgasm = 0
                     "Вы продолжаете мастурбировать вдовушку прямо под семейным столом. Она сидит вся пунцовая, ее участие в разговоре свелось к репликам типа \"Ага\" и \"Угу\", аппетита у нее тоже поубавилось, но вроде бы пока никто не догадывается о причине."
-                    if (dinnerbecky >= 3 or (panties.get("becky", "") == "" and dinnerbecky > 2)) and procedural_randint(1, 3, "becky_dinner_orgasm_%s_%s" % (int(current_game_day() or 0), dinnerbecky)) == 1:
+                    if (dinnerbecky >= 3 or (Becky.clothing_layer("panties") == "" and dinnerbecky > 2)) and procedural_randint(1, 3, "becky_dinner_orgasm_%s_%s" % (int(current_game_day() or 0), dinnerbecky)) == 1:
                         $ dinnerbeckyorgasm = 1
                     if dinnerbeckyorgasm == 1:
                         "Вдруг по телу Бекки пробежала дрожь наступившего оргазма, она плотно сжала своими ногами вашу руку и прикусила ложку, пытаясь не выпустить наружу сладострастный стон."

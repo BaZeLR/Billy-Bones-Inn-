@@ -37,6 +37,7 @@ def test_eddie_dialogs_are_explicit_sublabels_not_dispatcher():
         "label IntEddieTalkWhores:",
         "label IntEddieTalkGirls:",
         "label IntEddieTalkMomHelper:",
+        "label IntEddieTalkMomStatus:",
         "label IntEddieTalkBruise:",
         "label IntEddieTalkWhoHit:",
         "label IntEddieTalkDestination:",
@@ -72,6 +73,23 @@ def test_eddie_dialog_uses_vscene_and_room_restore_end():
     assert '"Закончить разговор":' in source
     assert "$ main_ui_end_talk_state()" in source
     assert 'Jump("GroceryStore")' not in source
+
+
+def test_eddie_mom_story_uses_event_for_progress_and_direct_label_only_for_status():
+    source = _source(EDDIE_TALK)
+    runtime = _source(ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy")
+
+    menu_block = source.split('"Предложить помочь подкатится к хозяйке лавки."', 1)[1].split(
+        '"Спросить о синяке."', 1
+    )[0]
+    assert 'if int(threads["beckyEddieSex"].num or 0) >= 4:' in menu_block
+    assert "call IntEddieTalkMomStatus" in menu_block
+    assert 'call checkTriggers("talk_eddie", "becky_eddie_sex", 0)' in menu_block
+    assert "call IntEddieTalkMomHelper" not in menu_block
+    eddie_thread = runtime.split('LThreadData(0, "becky", "EddieSex"', 1)[1].split(
+        'LThreadData(0, "becky", "IngaLucasPath"', 1
+    )[0]
+    assert eddie_thread.count('"becky_eddie_sex",\n            120,\n            True,') == 3
 
 
 def test_shop_click_regression_uses_current_oop_and_object_menu_apis():

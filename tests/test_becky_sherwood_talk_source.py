@@ -68,7 +68,7 @@ def test_old_sherwood_topic_thread_records_are_removed_on_load():
 def test_blackwood_quest_has_one_live_offer_label_and_one_static_text_source():
     assert not (ROOT / "game/NPC/Girls/Becky/BeckyEvents.rpy").exists()
     assert QUEST.count("define BECKY_TRADE_OFFER_TEXT =") == 1
-    assert '"[BECKY_TRADE_OFFER_TEXT]"' in QUEST
+    assert 'scene_runtime.text = "\\\"Это правильно, денежки все любят,\\\" согласилась с вами вдова.\\n\\n" + BECKY_TRADE_OFFER_TEXT' in QUEST
     assert 'scene_runtime.text += "\\n\\n" + BECKY_TRADE_OFFER_TEXT' in LABELS
     assert "TradeOfferText" not in BECKY_INIT
 

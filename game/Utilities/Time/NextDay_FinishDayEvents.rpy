@@ -82,14 +82,14 @@ init python:
             elif place == "Priest":
                 pregnancy_check(girl, "inside", 1, "Отец Герхард")
                 if girl == "becky" and procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:99:5") == 1:
-                    Becky.last_store_orgasm_day = dayspassed_val
+                    Becky.set_sex_stat("last_orgasm_day", dayspassed_val)
             elif girl == "becky":
                 if place == "StoreLover":
                     if event_type == 1:
                         pregnancy_check("becky", "inside", 1, "Легаре")
                     if event_type == 2:
                         pregnancy_check("becky", "inside", 1, "", 1, "Неизвестный грузчик")
-                    Becky.last_store_orgasm_day = dayspassed_val
+                    Becky.set_sex_stat("last_orgasm_day", dayspassed_val)
                 elif place == "EddieMom":
                     eddie = people.get_info("eddie")
                     eddie_came_today = _ndf_int(eddie.ensure_sex_state().get("came_today", 0), 0) if eddie is not None else 0
@@ -97,7 +97,7 @@ init python:
                         inside_or_mouth = "inside" if procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:112:6") == 1 else "mouth"
                         pregnancy_check(girl, inside_or_mouth, 1, "eddie")
                         if procedural_randint(1, 5, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:114:7") == 1:
-                            Becky.last_store_orgasm_day = dayspassed_val
+                            Becky.set_sex_stat("last_orgasm_day", dayspassed_val)
             else:
                 pregnancy_check(girl, "", 1, "")
 

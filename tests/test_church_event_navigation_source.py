@@ -27,6 +27,10 @@ def test_completed_church_events_jump_to_the_real_room_without_wrappers():
     assert 'menu:' in combined
     assert '$ calendar_v2.advance_minutes(60)' in combined
 
+    becky_scene = _source(Path("game") / "NPC" / "Girls" / "Becky" / "IntBeckyAfterCermon.rpy")
+    assert '"Вернуться в собор":\n            jump Church' in becky_scene
+    assert '"Вернуться":\n            $ calendar_v2.advance_minutes(60)\n            jump Church' in becky_scene
+
 
 def test_church_room_entry_restores_scene_mode_after_events():
     church = _source(Path("game") / "Town" / "Church" / "Church.rpy")

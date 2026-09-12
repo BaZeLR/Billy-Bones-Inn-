@@ -5,7 +5,7 @@
 
 label BeckyLoversInStore:
     $ renpy.dynamic("becky_store_sex_type", "choose_option", "gruzchik_name", "gruzchik_girl")
-    if CheckIfSexEventExist("becky", 99, "StoreLover") > 0 and procedural_randint(1, 3, "becky_store_lover_%s" % int(current_game_day() or 0)) == 1:
+    if CheckIfSexEventExist("becky", 99, "StoreLover") > 0 and procedural_randint(1, 3, "becky_store_lover_%s_%s" % (int(current_game_day() or 0), int(calendar_v2.clock_minutes() or 0))) == 1:
         $ becky_store_sex_type = GetSexEventFromTable("becky", 99, "StoreLover")
         $ choose_option = 0
         if Becky.store_lover_modest_reaction():
@@ -66,7 +66,7 @@ label BeckyLoversInStore:
                 $ scene_runtime.text = "Вы начали выбирать еду для трактира, но огурец продолжал занимать ваши мысли. Вы запомнили куда его положила вдова, чтобы при покупке его случайно не купить. Или наоборот, стоит купить именно его?"
                 "[scene_runtime.text]"
 
-        $ Becky.mark_store_orgasm_today()
+        $ Becky.set_sex_stat("last_orgasm_day", current_game_day())
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Вернуться к покупкам":

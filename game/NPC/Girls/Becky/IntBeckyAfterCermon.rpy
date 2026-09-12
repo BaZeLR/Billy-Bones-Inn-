@@ -13,7 +13,7 @@ label story_becky_church_after_sermon:
         "Посмотреть":
             jump story_becky_church_after_sermon_look
         "Вернуться в собор":
-            return
+            jump Church
 
 
 label story_becky_church_after_sermon_look:
@@ -134,4 +134,4 @@ label story_becky_church_after_sermon_look:
     menu:
         "Вернуться":
             $ calendar_v2.advance_minutes(60)
-            return
+            jump Church

@@ -42,7 +42,7 @@ def test_church_attendee_actions_restore_the_attendee_menu_picture_and_text():
     assert '$ main_ui_begin_native_scene_state("Разговор с отцом Герхардом")' in becky_talk
     assert 'menu:\n        "Назад":' in becky_talk
     assert "$ main_ui_end_native_scene_state()" in becky_talk
-    assert "jump Church" not in becky_talk
+    assert becky_talk.rstrip().endswith("jump Church")
 
 
 def test_backyard_object_back_restores_dynamic_room_picture_and_text():

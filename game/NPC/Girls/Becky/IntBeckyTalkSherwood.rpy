@@ -39,6 +39,7 @@ label story_becky_sherwood_warn_0(girl_name="becky"):
 
 
 label story_becky_sherwood_road_0(girl_name="becky"):
+    show screen main_ui
     $ scene_runtime.text = "\"Дорожка в Куниделл, случаем не через Шервудский лес проходит?\" невинно осведомились вы."
     $ scene_runtime.location_text = scene_runtime.text
     menu:

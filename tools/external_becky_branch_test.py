@@ -397,6 +397,31 @@ testcase becky_regular_evening_visit_enters_dinner:
     assert eval (scene_runtime.picture == "images/becky/dinner/DinnerStart.jpg")
     assert eval (any(item.caption == "Осмотреть Ребекку" for item in renpy.get_screen("choice").scope["items"]))
 
+testcase becky_dinner_reads_current_wear_panties:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        rooms.enter("BeckyHome")
+        Becky.reset_sex_clothing_state()
+        Becky.set_current_underwear("panties", "simplepanties")
+    run Call("IntBeckyGuest")
+    advance until screen "choice" timeout 20.0
+    $ _grope_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Полапать под столом Бекки")
+    click id ("choice_panel_button_%d" % _grope_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (int(dinnerbecky or 0) == 1 and renpy.get_screen("choice") is not None) timeout 10.0
+    $ _grope_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Полапать под столом Бекки")
+    click id ("choice_panel_button_%d" % _grope_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (int(dinnerbecky or 0) == 2 and renpy.get_screen("choice") is not None) timeout 10.0
+    $ Becky.remove_clothing_layer("panties")
+    assert eval (Becky.clothing_layer("panties") == "")
+    $ _grope_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Полапать под столом Бекки")
+    click id ("choice_panel_button_%d" % _grope_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (int(dinnerbecky or 0) == 3 and renpy.get_screen("choice") is not None) timeout 10.0
+    $ _grope_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Полапать под столом Бекки")
+    click id ("choice_panel_button_%d" % _grope_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (int(dinnerbecky or 0) == 4 and renpy.get_screen("choice") is not None) timeout 10.0
+    assert eval (int(dinnertime or 0) == 4 and Becky.clothing_layer("panties") == "")
+
 testcase inga_grocery_morning_clock_gates:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0

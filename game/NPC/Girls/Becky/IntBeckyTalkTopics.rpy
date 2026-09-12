@@ -145,6 +145,7 @@ label story_becky_talk_eddie_georgett_0(girl_name="becky", tmp_rnd=0):
 
 
 label story_becky_home_invite_talk_0(girl_name="becky", _becky_inga_thread=None, _becky_husband_thread=None, _becky_eddie_thread=None, _becky_husband_unlocked=False, _becky_husband_stage=0, invite_points=0):
+    show screen main_ui
     $ _becky_inga_thread = threads.get("beckyIngaLucasPath", None)
     $ _becky_husband_thread = threads.get("beckyHusbandBackstory", None)
     $ _becky_eddie_thread = threads.get("beckyEddieBackstory", None)

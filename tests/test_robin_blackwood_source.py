@@ -85,6 +85,7 @@ def test_robin_thread_and_mongol_escape_unlock_use_objects():
     runtime = _source(STORY_RUNTIME)
     booklet = _source(CLARA_BOOKLET)
     talk = _source(ROBIN_TALK)
+    blackwood = _source(BLACKWOOD)
 
     assert "define robinThreadList = [" in runtime
     assert '"robin": robinThreadList' in runtime
@@ -94,13 +95,17 @@ def test_robin_thread_and_mongol_escape_unlock_use_objects():
     assert "Robin.blackwood_road_open = True" in booklet
     assert "RobinVar" not in talk
     assert 'vscene "images/Robin/robin1.png"' in talk
+    mongol_pass = blackwood.split("label story_robin_blackwood_mongol_pass:", 1)[1].split(
+        "label story_robin_blackwood_first_robbery:", 1
+    )[0]
+    assert "event_runtime.active_thread" not in mongol_pass
 
 
 def test_robin_v58_migration_consumes_old_map_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V58():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 86" in migration
+    assert "define currentVersion = 87" in migration
     assert "if loaded_version < 59:" in migration
     assert "updateSave_V58()" in migration
     for old_key, field_name in (

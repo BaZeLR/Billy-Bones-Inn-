@@ -32,10 +32,10 @@ label IntEddieTalk:
             "Поинтересоваться у Эдди как ему ваши девочки." if eddie_talk_can_girls(_eddie_name):
                 call IntEddieTalkGirls
             "Предложить помочь подкатится к хозяйке лавки." if eddie_talk_can_mom_helper(_eddie_name):
-                if story_event_available("talk_eddie", "becky_eddie_sex"):
-                    call checkTriggers("talk_eddie", "becky_eddie_sex", 0)
+                if int(threads["beckyEddieSex"].num or 0) >= 4:
+                    call IntEddieTalkMomStatus
                 else:
-                    call IntEddieTalkMomHelper
+                    call checkTriggers("talk_eddie", "becky_eddie_sex", 0)
             "Спросить о синяке." if eddie_talk_can_bruise(_eddie_name):
                 call IntEddieTalkBruise
             "А все таки расскажи, кто это тебе так вмазал?" if eddie_talk_can_who_hit(_eddie_name):
@@ -130,7 +130,13 @@ label IntEddieTalkMomHelper:
             $ scene_runtime.text += "\n\n\"Ну ладно, а я уж подумал было...\""
             $ event_runtime.active_thread.advanceTo(1, force_active=True)
         vscene "images/eddie/portraits/surprised.png"
-    elif int(threads["beckyEddieSex"].num or 0) >= 4 and not threads["beckyEddieSex"].completed:
+    $ Eddie.mark_talked()
+    $ scene_runtime.location_text = scene_runtime.text
+    return
+
+
+label IntEddieTalkMomStatus:
+    if not threads["beckyEddieSex"].completed:
         $ scene_runtime.text = "\"И как тебе ночка с хозяйкой лавки?\" подмигнули вы Эдди, делая рукой неприличный жест."
         $ scene_runtime.text += "\n\n\"Ух, классно, спасибо тебе Стефан, ты настоящий друг. Госпожа Блэнкеншип сказала, что теперь я каждый день могу ее трахать, и даже спать с ней иногда,\" сказал Эдди с блаженной улобкой на лице."
         $ scene_runtime.text += "\n\n\"Но и ты, конечно, всегда будешь желанным гостем в нашем доме,\" быстро поправился он."

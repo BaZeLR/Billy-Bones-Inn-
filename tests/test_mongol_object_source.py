@@ -106,7 +106,7 @@ def test_mongol_v61_migration_consumes_old_map_once():
     migration = read_rel("game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V61():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 86" in migration
+    assert "define currentVersion = 87" in migration
     assert "if loaded_version < 62:" in migration
     assert "updateSave_V61()" in migration
     for old_key, field_name in (

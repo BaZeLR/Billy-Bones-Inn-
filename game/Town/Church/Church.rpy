@@ -289,4 +289,4 @@ label becky_church_talk:
         "Назад":
             pass
     $ main_ui_end_native_scene_state()
-    return
+    jump Church

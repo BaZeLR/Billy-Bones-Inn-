@@ -30,3 +30,12 @@ def test_becky_sex_uses_the_authored_pregnancy_procedure_label():
 
     assert "Becky.apply_pregnancy_check" not in source
     assert source.count('call PregnancyCheck("becky",') == 5
+
+
+def test_becky_dinner_uses_becky_current_wear_panties_state():
+    source = (ROOT / "game/NPC/Girls/Becky/IntBeckyGuest.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+
+    assert 'panties.get("becky"' not in source
+    assert 'Becky.clothing_layer("panties") == "" and dinnerbecky > 2' in source

@@ -68,7 +68,8 @@ def test_becky_kitchen_visit_uses_friendship_and_schedule_as_authority():
     assert "#str(people.location('becky') or '') == 'TavernKitchen'" in visit_event
     assert "#str(people.location('sandra') or '') == 'TavernKitchen'" in visit_event
     assert "label story_becky_sandra_kitchen_visit:" in kitchen
-    assert "Becky.sandra_kitchen_friendship_progress = min(2," in kitchen
+    assert "if Becky.sandra_kitchen_friendship_progress < 2:" in kitchen
+    assert "$ Becky.sandra_kitchen_friendship_progress += 1" in kitchen
     assert "people_to_int(Becky.sandra_kitchen_friendship_progress, 0) >= 2" in kitchen
     assert "Becky.sandra_kitchen_friendship_progress = 3" in kitchen
     assert 'Call("TavernKitchenShareTeaWithSandraAndBecky")' not in kitchen
@@ -109,7 +110,7 @@ def test_church_go_around_action_matches_qsp_and_is_restored_for_loaded_saves():
     assert 'RoomAction(action_id="after_cermon_walk", label="Обойти собор", hook="ui_call", target="ChurchAfterCermon", args=(1,), condition=church_after_cermon_action_visible)' in church
     assert "return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)" in church
 
-    assert "define currentVersion = 86" in migration
+    assert "define currentVersion = 87" in migration
     assert "if loaded_version < 81:" in migration
     v80 = migration.split("def updateSave_V80():", 1)[1].split("# Saved objects must be upgraded", 1)[0]
     assert 'old_room = rooms.get("Church")' in v80

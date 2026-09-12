@@ -121,7 +121,6 @@ label story_robin_blackwood_mongol_pass:
         $ scene_runtime.text = "Без груза и без лошади делать в Куниделле было особенно нечего, но теперь дорога хотя бы стала понятной. Слово Монгола действительно сработало: люди Робина вас пропустили."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
-    $ event_runtime.active_thread.advance()
     $ main_ui_runtime.mode = "scene"
     return True
 

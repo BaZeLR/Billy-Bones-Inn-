@@ -1099,6 +1099,7 @@ define beckyThreadList = [
             "talk_eddie",
             "becky_eddie_sex",
             120,
+            True,
         ),
         (
             "BeckyEddieJoinFirst",
@@ -1121,6 +1122,7 @@ define beckyThreadList = [
             "talk_eddie",
             "becky_eddie_sex",
             120,
+            True,
         ),
         (
             "IntEddieTalkMomHelper",
@@ -1131,6 +1133,7 @@ define beckyThreadList = [
             "talk_eddie",
             "becky_eddie_sex",
             120,
+            True,
         ),
         # The first shared bedroom scene has happened. The final cursor is
         # completed by the later Becky church follow-up, formerly visitedhome 7.

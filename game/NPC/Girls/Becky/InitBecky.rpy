@@ -70,7 +70,6 @@ init python:
             self.admitted_sherwood_stage = 0
             self.robin_robbery_stage = 0
             self.robbery_consolation_count = 0
-            self.last_store_orgasm_day = -1
             self.energy = 100
             self.energy_max = 100
             self.rebellion = 0
@@ -109,6 +108,7 @@ init python:
                 "virginity": False,
                 "breastfeed": 0,
                 "orgasms_given": 0,
+                "last_orgasm_day": -1,
             }
             self.skills = {
                 "cooking": 70,
@@ -274,10 +274,6 @@ init python:
 
         def store_lover_modest_reaction(self):
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
-
-        def mark_store_orgasm_today(self):
-            self.last_store_orgasm_day = people_to_int(current_game_day(), 0)
-            return self.last_store_orgasm_day
 
         def sandra_friendship_stage(self):
             day_value = people_to_int(current_game_day(), 0)

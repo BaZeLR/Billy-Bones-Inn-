@@ -12,6 +12,7 @@ BECKY_TALK = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalk.rpy"
 BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.rpy"
 BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
 BECKY_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "becky.json"
+EDDIE_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "eddie.json"
 GROCERY_ROOM_PICTURE = ROOT / "game" / "images" / "general" / "grocery_shop.png"
 INGA_TALK = ROOT / "game" / "NPC" / "Girls" / "Inga" / "IntIngaTalk.rpy"
 INGA_STORE_ASSETS = ROOT / "game" / "images" / "inga" / "newInga"
@@ -36,6 +37,14 @@ def test_becky_staffs_grocery_store_until_the_store_closes():
     save_sync = _source(ROOT / "game" / "TractirSaveSync.rpy")
     assert "config.after_load_callbacks.append(npc_schedule_after_load)" not in people_runtime
     assert "$ npc_schedule_after_load()" in save_sync
+
+
+def test_grocery_shift_handover_has_one_merchant_at_1230():
+    becky_entries = {row["label"]: row for row in json.loads(_source(BECKY_SCHEDULE))["entries"]}
+    eddie_entries = {row["label"]: row for row in json.loads(_source(EDDIE_SCHEDULE))["entries"]}
+
+    assert eddie_entries["grocery_morning_shift"]["end"] == "12:29"
+    assert becky_entries["grocery_afternoon_shift"]["start"] == "12:30"
 
 
 def test_grocery_uses_merchant_picture_sequences_not_hunter_store():

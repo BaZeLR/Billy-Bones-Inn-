@@ -46,13 +46,24 @@ def test_same_location_events_return_to_their_callers_without_room_reentry():
     cases = (
         ("game/Town/Market/MarketPlace.rpy", "story_city_blind_pirate_fall_0", "jump MarketPlace", "return True"),
         ("game/NPC/Girls/Melissa/MelissaEvents.rpy", "story_melissa_werecat_rumor_0", "jump HunterClub", "return True"),
-        ("game/Town/Church/Church.rpy", "becky_church_talk", "jump Church", "return"),
     )
     for relative_path, label_name, forbidden, ending in cases:
         source = read(relative_path)
         block = source.split(f"label {label_name}", 1)[1].split("\nlabel ", 1)[0]
         assert forbidden not in block
         assert block.rstrip().endswith(ending)
+
+
+def test_becky_church_paths_reenter_the_canonical_room():
+    church = read("game/Town/Church/Church.rpy")
+    becky_talk = church.split("label becky_church_talk", 1)[1].split("\nlabel ", 1)[0]
+    becky_event = read("game/NPC/Girls/Becky/IntBeckyAfterCermon.rpy")
+    event_intro = becky_event.split("label story_becky_church_after_sermon:", 1)[1].split("\nlabel ", 1)[0]
+    event_scene = becky_event.split("label story_becky_church_after_sermon_look:", 1)[1].split("\nlabel ", 1)[0]
+
+    assert becky_talk.rstrip().endswith("jump Church")
+    assert '"Вернуться в собор":\n            jump Church' in event_intro
+    assert event_scene.rstrip().endswith("jump Church")
 
 
 def test_room_entry_uses_iterative_main_ui_owner_without_recursive_reentry():

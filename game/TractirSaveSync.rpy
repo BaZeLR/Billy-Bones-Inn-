@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 86
+define currentVersion = 87
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -716,6 +716,10 @@ init -100 python:
         if loaded_version < 86:
             updateSave_V85()
             loaded_version = 86
+
+        if loaded_version < 87:
+            updateSave_V86()
+            loaded_version = 87
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -1867,9 +1871,10 @@ init -100 python:
             becky_var.pop("ConsoleRobbery", getattr(Becky, "robbery_consolation_count", 0)), 0
         ))
         becky_var.pop("SandraKitchenVisitMonth", None)
-        Becky.last_store_orgasm_day = people_to_int(
-            becky_var.pop("last_store_orgasm_day", getattr(Becky, "last_store_orgasm_day", -1)), -1
-        )
+        Becky.set_sex_stat("last_orgasm_day", max(
+            people_to_int(Becky.sex_stat("last_orgasm_day", -1), -1),
+            people_to_int(becky_var.pop("last_store_orgasm_day", -1), -1),
+        ))
 
         for retired_name in (
             "husbandtalk", "SawIngaFuck", "HomeFrontCheckedDay", "danceinvitehome", "eddietalk",
@@ -2824,6 +2829,15 @@ init -100 python:
             0,
             min(3, people_to_int(getattr(Becky, "sandra_kitchen_friendship_progress", 0), 0)),
         )
+
+    def updateSave_V86():
+        # Becky already owns this fact in her generic sex statistics. Preserve
+        # the newest saved day once, then retire the store-specific mirror.
+        Becky.set_sex_stat("last_orgasm_day", max(
+            people_to_int(Becky.sex_stat("last_orgasm_day", -1), -1),
+            people_to_int(getattr(Becky, "last_store_orgasm_day", -1), -1),
+        ))
+        Becky.__dict__.pop("last_store_orgasm_day", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.
