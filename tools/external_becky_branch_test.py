@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -40,7 +41,10 @@ def is_junction(path: Path) -> bool:
             return bool(probe())
         except OSError:
             return False
-    return False
+    try:
+        return bool(os.lstat(path).st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+    except (AttributeError, OSError):
+        return False
 
 
 def remove_temp_tree(path: Path) -> None:
@@ -396,6 +400,7 @@ testcase becky_regular_evening_visit_enters_dinner:
     assert eval (rooms.current_code == "BeckyHome")
     assert eval (Becky.home_visit_count == _home_visits_before + 1)
     assert eval (scene_runtime.picture == "images/becky/dinner/DinnerInga.jpg")
+    assert eval ("К вашей скромной трапезе из 6 блюд присоединился и Эдди." in scene_runtime.text)
     assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.scene_origin is not None and main_ui_runtime.action_items == [])
     assert eval (any(item.caption == "Осмотреть Ребекку" for item in renpy.get_screen("choice").scope["items"]))
 
