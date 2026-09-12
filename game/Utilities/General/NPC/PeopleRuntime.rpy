@@ -1258,7 +1258,36 @@ init -999 python:
         def tavern_regular_job_schedule_entry(self, weekday_value=None, time_value=None):
             if people_to_int(self.job_value("jobHallAvail", 0), 0) > 0:
                 return None
-            if not self.is_tavern_worker() or not player.tavern_management.is_open_at(weekday_value, time_value):
+            if not self.is_tavern_worker():
+                return None
+            week_value = int(calendar_v2.week if weekday_value is None else weekday_value or 0)
+            minute_value = npc_schedule_clock_minute(time_value)
+            data_owner = getattr(self, "data", None)
+            has_backyard_routine = bool(data_owner is not None and data_owner.image_sequence("tavern", "backyard_laundry"))
+            has_stable_routine = bool(data_owner is not None and data_owner.image_sequence("tavern", "stable_grooming"))
+            if (has_backyard_routine or has_stable_routine) and week_value in (1, 2, 3, 4, 5, 6) and 360 <= minute_value < 720 and people_to_int(self.job_value("jobcleaning", 0), 0) > 0:
+                cleaning_locations = [
+                    {"location": "TavernMain", "weight": 4},
+                ]
+                if has_backyard_routine:
+                    cleaning_locations.append({"location": "Backyard", "weight": 2})
+                if has_stable_routine and player.horse.owns_horse():
+                    cleaning_locations.append({"location": "TavernStable", "weight": 1})
+                return NPCHourScheduleEntry(
+                    npc_id=self.name,
+                    location="TavernMain",
+                    location_choices=cleaning_locations,
+                    weekdays=[1, 2, 3, 4, 5, 6],
+                    start="06:00",
+                    end="11:59",
+                    awake=True,
+                    talkable=True,
+                    working=True,
+                    priority=600,
+                    label="tavern_morning_cleaning",
+                    source="npc_job",
+                )
+            if not player.tavern_management.is_open_at(weekday_value, time_value):
                 return None
             for job_key, location, label in (
                 ("jobkitchen", "TavernKitchen", "tavern_kitchen_shift"),

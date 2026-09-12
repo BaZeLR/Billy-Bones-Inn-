@@ -53,10 +53,31 @@ def test_boar_meat_deposit_is_the_single_owner_of_team_arousal_and_dog_bones():
     assert '"kitchen_deposit_team_arousal_bonus": 5' in item_source
     assert '"kitchen_deposit_outputs": (("dog_bone_001", 3),)' in item_source
     assert 'npc_info.add_arousal(arousal_bonus)' in boar_branch
+    assert "corruption_bonus" not in boar_branch
+    assert "mana_bonus" not in boar_branch
     assert 'properties.get("kitchen_deposit_outputs", ())' in boar_branch
     assert 'player.add_item(output_key, output_total)' in boar_branch
     assert 'tavern_kitchen_apply_deposit_effect(item_key, deposit_count)' in KITCHEN
     assert "kitchen_deposit_outputs" not in BREAKFAST + actions
+
+
+def test_kitchen_food_effects_use_current_tavern_workers_without_permanent_honey_corruption():
+    honey_deposit = KITCHEN.split('if item_key == "honey_comb_001":', 2)[2].split(
+        '\n        if item_key == "boar_meat_001":', 1
+    )[0]
+    daily_effects = KITCHEN.split("def tavern_kitchen_apply_daily_food_effects():", 1)[1].split(
+        "\n    def tavern_kitchen_sandra_can_discuss_breakfasts", 1
+    )[0]
+    item_source = (GAME / "Items/Shops/HunterClubItems.rpy").read_text(encoding="utf-8-sig")
+
+    assert "corruption_delta" not in honey_deposit
+    assert "change_mana" not in honey_deposit
+    assert "corruption_delta" not in daily_effects
+    assert "change_mana" not in daily_effects
+    assert "KitchenHoneyMood" not in KITCHEN
+    assert "TodaySexEvents_Add" not in daily_effects
+    assert '"kitchen_deposit_team_corruption_bonus"' not in item_source
+    assert '"kitchen_deposit_team_mana_bonus"' not in item_source
 
 
 def test_kitchen_food_catalog_and_transfer_quantities_have_one_authority():

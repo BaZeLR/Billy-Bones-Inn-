@@ -137,7 +137,7 @@ init python:
             desc_parts.append(str(routine_visual.get("text", "") or ""))
             desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
             desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
-            desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") in ("Backyard", "TavernStorage")]) or "никто") + ".")
+            desc_parts.append("Во дворе, кладовых и конюшне заняты делами: " + str(_tavern_join_names([name for name in household.resident_ids() if name != "you" and str(people.location(name) or "") in ("Backyard", "TavernStorage", "TavernStable")]) or "никто") + ".")
             desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
         elif not player.tavern_management.isTavernOpen:
             desc_parts.append("Рабочие часы закончились. Посетителей больше не обслуживают, но домочадцы и приглашенные гости могут оставаться в зале.")

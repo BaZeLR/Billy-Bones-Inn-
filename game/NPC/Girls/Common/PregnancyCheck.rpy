@@ -22,10 +22,9 @@ init python:
         if int(is_dude_random or 0) != 0:
             chance /= 10.0
 
-        if girl in ("sandra", "melissa", "amanda") and tavern_kitchen_fertility_bonus_active():
-            chance += max(4.0, float(girl_info.sex_stat("ConceptionChance", 0) or 0) * 0.5)
-
         cycle = girl_decision_cycle_state(girl)
+        if cycle.get("phase") == "fertile" and girl_info.is_tavern_worker() and tavern_kitchen_fertility_bonus_active():
+            chance *= 1.25
         cycle_fertility = max(0.0, min(1.0, float(cycle.get("fertility", 0.45) or 0.0)))
         chance *= 0.55 + cycle_fertility
 

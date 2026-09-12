@@ -242,7 +242,7 @@ init python:
 
     def tavern_household_present_names(room_code=""):
         room_key = str(room_code or "").strip()
-        keys = [name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") == room_key]
+        keys = [name for name in household.resident_ids() if name != "you" and str(people.location(name) or "") == room_key]
         return _tavern_join_names(keys)
 
     def _tavern_job_room(job_type):

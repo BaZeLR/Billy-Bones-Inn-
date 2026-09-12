@@ -195,28 +195,15 @@ init python:
             return ""
         if item_key == "honey_comb_001":
             tavern_kitchen_add_food_effect("honey_days", min(3, max(1, units)))
-            for npc_id in ("sandra", "melissa", "amanda"):
-                npc_info = people.get_info(npc_id)
-                if npc_info is not None:
-                    npc_info.change_social(corruption_delta=2)
-                    npc_info.change_mana(1, "kitchen_honey")
             return "honey"
         if item_key == "boar_meat_001":
             boar_item = get_game_item(item_key)
             properties = dict(getattr(boar_item, "custom_properties", {}) or {}) if boar_item is not None else {}
             arousal_bonus = max(0, int(properties.get("kitchen_deposit_team_arousal_bonus", 0) or 0)) * units
-            corruption_bonus = int(properties.get("kitchen_deposit_team_corruption_bonus", 0) or 0)
-            mana_bonus = int(properties.get("kitchen_deposit_team_mana_bonus", 0) or 0)
             tavern_kitchen_add_food_effect("boar_days", min(3, max(1, units)))
-            for npc_id in ("sandra", "melissa", "amanda"):
-                npc_info = people.get_info(npc_id)
-                if npc_info is None:
-                    continue
-                npc_info.add_arousal(arousal_bonus)
-                if corruption_bonus:
-                    npc_info.change_social(corruption_delta=corruption_bonus)
-                if mana_bonus:
-                    npc_info.change_mana(mana_bonus, "kitchen_boar")
+            for npc_id, npc_info in people.girl_items():
+                if npc_info.is_tavern_worker():
+                    npc_info.add_arousal(arousal_bonus)
             for output_id, output_count in tuple(properties.get("kitchen_deposit_outputs", ()) or ()):
                 output_key = str(output_id or "").strip()
                 output_total = max(0, int(output_count or 0)) * units
@@ -272,17 +259,6 @@ init python:
         effects = tavern_storage_supplies_effects()
         lines = []
         if tavern_kitchen_honey_bonus_active():
-            for npc_id in ("sandra", "melissa", "amanda"):
-                npc_info = people.get_info(npc_id)
-                if npc_info is not None:
-                    npc_info.change_social(corruption_delta=1)
-                    npc_info.change_mana(1, "kitchen_honey_daily")
-            try:
-                add_sex_event = TodaySexEvents_Add
-            except Exception:
-                add_sex_event = None
-            if callable(add_sex_event) and procedural_randint(1, 3, key="tavern_kitchen_honey_mood_%s" % current_game_day()) == 1:
-                add_sex_event(procedural_choice(["sandra", "melissa", "amanda"], key="tavern_kitchen_honey_mood_target_%s" % current_game_day()), 99, 99, "KitchenHoneyMood")
             lines.append("Медовые угощения за день заметно смягчили настроение в доме.")
         if tavern_kitchen_fertility_bonus_active():
             lines.append("Молоко с медом делает общую еду мягче, сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")

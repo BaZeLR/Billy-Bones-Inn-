@@ -303,7 +303,7 @@ init -25 python:
                 if location_key.startswith("talk_") or location_key == "talk" or action_key.endswith("_talk"):
                     if person_key:
                         event_runtime.talk.add(person_key)
-                if action_key and action_key not in ("enter", "sleep"):
+                if action_key and action_key not in ("enter", "sleep", "bedtime", "morning"):
                     event_runtime.options.add(action_key)
                 if missing_item:
                     event_runtime.items.add(str(getattr(evt, "item", "") or ""))
@@ -434,7 +434,7 @@ init python:
         items = []
         for action_key in sorted(action_map.keys()):
             action_name = str(action_key or "").strip()
-            if not action_name or action_name in ("enter", "sleep") or action_name in excluded:
+            if not action_name or action_name in ("enter", "sleep", "bedtime", "morning") or action_name in excluded:
                 continue
             evt = action_map.get(action_name, None)
             if evt is None:

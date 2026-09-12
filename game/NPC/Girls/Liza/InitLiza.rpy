@@ -27,7 +27,13 @@ init python:
             self.schedule_source = "schedules/liza.json"
             self.image_manifest = {
                 "tavern": {
-                    "waitress": ["images/Liza/lizaNew/liza_waitress_main_hall_minidress.png"],
+                    "waitress": [
+                        "images/Liza/lizaNew/liza_waitress_main_hall_minidress.png",
+                        "images/Liza/lizaNew/liza_waitress_main_hall.png",
+                    ],
+                    "hall_cleaning": ["images/Liza/lizaNew/liza_morning_cleaning.png"],
+                    "backyard_laundry": ["images/Liza/lizaNew/liza_backyard_laundry.png"],
+                    "stable_grooming": ["images/Liza/lizaNew/liza_grooming_horse.png"],
                     "intimate_waiting": ["images/Liza/lizaNew/liza_wench_corner_minidress_pantaloons.png"],
                     "wench_serving": ["images/Liza/lizaNew/liza_wench_serving_floor.png"],
                     "wench_tip": ["images/Liza/lizaNew/liza_wench_customer_tip.png"],

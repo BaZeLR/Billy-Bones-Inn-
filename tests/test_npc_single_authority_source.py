@@ -266,8 +266,13 @@ def test_npc_skills_and_tavern_jobs_have_no_global_state_maps():
         assert f"default {map_name} =" not in game_sources
         assert f"{map_name}.get(" not in game_sources
         assert f"{map_name}[" not in game_sources
-    assert 'Sandra.skill_value("cooking", 0)' in service_source
-    assert 'Sandra.job_value("jobkitchen", 0)' in service_source
+    assert "people.girl_items()" in service_source
+    assert "info.is_tavern_worker()" in service_source
+    assert 'info.skill_value("cooking", 0)' in service_source
+    assert 'info.job_value("jobkitchen", 0)' in service_source
+    for hardcoded_worker in ("Sandra", "Melissa", "Amanda", "Liza", "Georgett"):
+        assert f"{hardcoded_worker}.job_value(" not in service_source
+        assert f"{hardcoded_worker}.skill_value(" not in service_source
     assert "store.tavern" not in service_source
     assert "service = player.tavern_management.service" in service_source
     assert "service.kitchen_score = kitchen_score" in service_source

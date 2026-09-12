@@ -271,7 +271,7 @@ label NextDay(retlocname, timepassed):
             "Начать сначала":
                 jump Intro
     else:
-        call checkTriggers("TavernMyRoom", "sleep", 0)
+        call checkTriggers("TavernMyRoom", "morning", 0)
         $ calendar_v2.time_advance_blocked = 0
         $ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru()
         $ renpy.set_return_stack([])

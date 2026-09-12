@@ -380,7 +380,7 @@ def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters
 
     assert 'LThreadData(0, "melissa", "Courtship"' in runtime_source
     assert '"talk_melissa", "melissa_intimacy", 0' not in runtime_source
-    assert runtime_courtship.count('"TavernMyRoom", "sleep", 0') == 4
+    assert runtime_courtship.count('"TavernMyRoom", "bedtime", 0') == 4
     assert runtime_source.count("None, None, 1,") >= 4
     for stage_label in (
         "story_melissa_courtship_amanda_talk_0",

@@ -491,10 +491,11 @@ def test_sandra_weekly_rewards_use_player_system_and_story_thread_authorities():
     assert '$ pregnancy_check(_hse_girl, "tits", 1, "Вы")' in sex_engine
     assert '"sandraWeeklyEvaluationEnabled"' in story_source
     assert '"TavernSandraNightThanksScene"' in story_source
+    assert story_source.count('(6, 6), 0, 1, None, None, None, "TavernMyRoom", "morning"') == 4
     assert 'threads["sandraWeeklyEvaluation"].advance()' in events_source
     assert 'threads["sandraWeeklyEvaluation"].disable()' in events_source
     assert "def disable(self):" in thread_source
-    assert 'call checkTriggers("TavernMyRoom", "sleep", 0)' in next_day_source
+    assert 'call checkTriggers("TavernMyRoom", "morning", 0)' in next_day_source
     assert "nextday_pick_post_sleep_event_label" not in next_day_source
     assert 'SandraVar["NightThanksReady"] = 0' not in room_source
     assert 'Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 2)' not in room_source

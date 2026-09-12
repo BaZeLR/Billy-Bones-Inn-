@@ -26,6 +26,11 @@ init 6 python:
 
     def backyard_dynamic_picture():
         if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
+            for person in girls_by_job("jobcleaning", "Backyard"):
+                person_data = people.get_data(person)
+                routine_pictures = person_data.image_sequence("tavern", "backyard_laundry") if person_data is not None else []
+                if routine_pictures:
+                    return procedural_choice(routine_pictures, "backyard_%s_laundry_routine" % person)
             if str(people.location("melissa") or "") == "Backyard":
                 melissa_backyard = (
                     MelissaStaticData.image_sequence("backyard", "laundry")
@@ -49,9 +54,17 @@ init 6 python:
     def backyard_dynamic_text():
         base_text = backyard_base_text()
         if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
-            names_here = tavern_household_present_names("Backyard")
-            if str(names_here or "").strip() and str(names_here or "") != "никто":
-                base_text += "\n\nДо полудня во дворе возятся: %s." % str(names_here)
+            laundry_workers = []
+            for person in girls_by_job("jobcleaning", "Backyard"):
+                person_data = people.get_data(person)
+                if person_data is not None and person_data.image_sequence("tavern", "backyard_laundry"):
+                    laundry_workers.append(person)
+            if laundry_workers:
+                base_text += "\n\nДо полудня во дворе идет стирка; здесь работают: %s." % _tavern_join_names(laundry_workers)
+            else:
+                names_here = tavern_household_present_names("Backyard")
+                if str(names_here or "").strip() and str(names_here or "") != "никто":
+                    base_text += "\n\nДо полудня во дворе возятся: %s." % str(names_here)
         if backyard_has_dog_booth():
             base_text += "\n\nУ стены возле сарая стоит крепкая собачья будка, которую сколотил Драупнир."
         werecat_text = werecat_visible_text("Backyard")

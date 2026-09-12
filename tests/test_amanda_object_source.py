@@ -532,7 +532,10 @@ def test_amanda_inherits_common_decision_state_and_keeps_custom_fertility_model(
     assert "def morning_issue" not in source
     assert "def morning_sickness_active" not in source
     assert "callable(tavern_kitchen_fertility_bonus_active)" not in source
-    assert 'girl in ("sandra", "melissa", "amanda") and tavern_kitchen_fertility_bonus_active()' in pregnancy
+    assert 'cycle.get("phase") == "fertile"' in pregnancy
+    assert "girl_info.is_tavern_worker()" in pregnancy
+    assert "chance *= 1.25" in pregnancy
+    assert 'girl in ("sandra", "melissa", "amanda")' not in pregnancy
 
 
 def test_amanda_legare_thread_is_wired_to_event_runtime():

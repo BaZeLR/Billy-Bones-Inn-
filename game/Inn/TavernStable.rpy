@@ -27,6 +27,12 @@ init python:
     def tavern_stable_picture():
         hour_now = int(calendar_v2.hour or 0) % 24
         is_day = 6 <= hour_now < 20
+        if hour_now < 12:
+            for person in girls_by_job("jobcleaning", "TavernStable"):
+                person_data = people.get_data(person)
+                routine_pictures = person_data.image_sequence("tavern", "stable_grooming") if person_data is not None else []
+                if routine_pictures:
+                    return procedural_choice(routine_pictures, "tavern_stable_%s_grooming_routine" % person)
         if player.horse.owns_horse():
             if is_day:
                 return "images/tavern/backyard/stables/horse-day.png"
@@ -138,6 +144,13 @@ init python:
         if len(rows) > 0:
             desc_parts.append(str(rows[0].text or ""))
 
+        morning_grooms = []
+        if int(calendar_v2.hour or 0) < 12:
+            for person in girls_by_job("jobcleaning", "TavernStable"):
+                person_data = people.get_data(person)
+                if person_data is not None and person_data.image_sequence("tavern", "stable_grooming"):
+                    morning_grooms.append(people_display_name(person))
+
         if player.horse.owns_horse():
             desc_parts.append("Сейчас в конюшне есть только один конь - %s. Хоть и не дикий, но все-таки жеребец." % str(player.horse.name))
             if player.horse.saddled:
@@ -145,7 +158,12 @@ init python:
             else:
                 desc_parts.append("Седло и сбруя висят рядом, коня можно оседлать перед дорогой.")
         else:
-            desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл, в конюшне нет. Здесь вообще никого, кроме вас, нет.")
+            desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл в конюшне нет.")
+
+        if morning_grooms:
+            desc_parts.append("%s с утра приводит в порядок стойла и конскую сбрую." % ", ".join(morning_grooms))
+        elif not player.horse.owns_horse():
+            desc_parts.append("Здесь вообще никого, кроме вас, нет.")
 
         if Mongol.will_try_to_steal and calendar_v2.is_between_clock(23, 0, 5, 59):
             desc_parts.append("Вдруг со стороны ворот послышалось приглушенное лязгание, как будто кто-то незаметно пытался открыть замок. Вы повернулись на звук, нечаянно задев висящую на столбе на счастье подкову. Та звякнула. Со улицы раздались быстрые удаляющиеся шаги. Вы осторожно выглянули, но никого там не обнаружили. Присмотревшись, вы нашли на мостовой оброненный кусок парусины.\nСтранно, что бы это могло значить?")

@@ -4,45 +4,38 @@
 init python:
     def update_tavern_service_levels():
         service = player.tavern_management.service
-        sandradiv = int(Sandra.job_value("jobkitchen", 0) or 0) + int(Sandra.job_value("jobcleaning", 0) or 0) + int(Sandra.job_value("jobwaitress", 0) or 0)
-        melissadiv = int(Melissa.job_value("jobkitchen", 0) or 0) + int(Melissa.job_value("jobcleaning", 0) or 0) + int(Melissa.job_value("jobwaitress", 0) or 0)
-        amandadiv = int(Amanda.job_value("jobkitchen", 0) or 0) + int(Amanda.job_value("jobcleaning", 0) or 0) + int(Amanda.job_value("jobwaitress", 0) or 0)
+        workers = [info for _key, info in people.girl_items() if info.is_tavern_worker()]
+        worker_divisors = {}
+        for info in workers:
+            worker_divisors[info.name] = max(1, sum([
+                int(info.job_value("jobkitchen", 0) or 0),
+                int(info.job_value("jobcleaning", 0) or 0),
+                int(info.job_value("jobwaitress", 0) or 0),
+            ]))
 
-        if sandradiv == 0:
-            sandradiv = 1
-        if melissadiv == 0:
-            melissadiv = 1
-        if amandadiv == 0:
-            amandadiv = 1
-
-        kitchen_score = (
-            int(Sandra.job_value("jobkitchen", 0) or 0) * float(Sandra.skill_value("cooking", 0) or 0) / sandradiv
-            + int(Melissa.job_value("jobkitchen", 0) or 0) * float(Melissa.skill_value("cooking", 0) or 0) / melissadiv
-            + int(Amanda.job_value("jobkitchen", 0) or 0) * float(Amanda.skill_value("cooking", 0) or 0) / amandadiv
-        )
-        kitchen_max = max(
-            int(Sandra.job_value("jobkitchen", 0) or 0) * float(Sandra.skill_value("cooking", 0) or 0),
-            int(Melissa.job_value("jobkitchen", 0) or 0) * float(Melissa.skill_value("cooking", 0) or 0),
-            int(Amanda.job_value("jobkitchen", 0) or 0) * float(Amanda.skill_value("cooking", 0) or 0),
-        )
+        kitchen_score = sum([
+            int(info.job_value("jobkitchen", 0) or 0) * float(info.skill_value("cooking", 0) or 0) / worker_divisors[info.name]
+            for info in workers
+        ])
+        kitchen_max = max([
+            int(info.job_value("jobkitchen", 0) or 0) * float(info.skill_value("cooking", 0) or 0)
+            for info in workers
+        ] or [0.0])
         kitchen_score = min(kitchen_score, kitchen_max)
 
-        clean_score = (
-            int(Sandra.job_value("jobcleaning", 0) or 0) * float(Sandra.skill_value("cleaning", 0) or 0) / sandradiv
-            + int(Melissa.job_value("jobcleaning", 0) or 0) * float(Melissa.skill_value("cleaning", 0) or 0) / melissadiv
-            + int(Amanda.job_value("jobcleaning", 0) or 0) * float(Amanda.skill_value("cleaning", 0) or 0) / amandadiv
-        )
+        clean_score = sum([
+            int(info.job_value("jobcleaning", 0) or 0) * float(info.skill_value("cleaning", 0) or 0) / worker_divisors[info.name]
+            for info in workers
+        ])
 
-        waitress_score = (
-            int(Sandra.job_value("jobwaitress", 0) or 0) * float(Sandra.skill_value("waitress", 0) or 0) / sandradiv
-            + int(Melissa.job_value("jobwaitress", 0) or 0) * float(Melissa.skill_value("waitress", 0) or 0) / melissadiv
-            + int(Amanda.job_value("jobwaitress", 0) or 0) * float(Amanda.skill_value("waitress", 0) or 0) / amandadiv
-        )
-        waitress_max = max(
-            int(Sandra.job_value("jobwaitress", 0) or 0) * float(Sandra.skill_value("waitress", 0) or 0),
-            int(Melissa.job_value("jobwaitress", 0) or 0) * float(Melissa.skill_value("waitress", 0) or 0),
-            int(Amanda.job_value("jobwaitress", 0) or 0) * float(Amanda.skill_value("waitress", 0) or 0),
-        )
+        waitress_score = sum([
+            int(info.job_value("jobwaitress", 0) or 0) * float(info.skill_value("waitress", 0) or 0) / worker_divisors[info.name]
+            for info in workers
+        ])
+        waitress_max = max([
+            int(info.job_value("jobwaitress", 0) or 0) * float(info.skill_value("waitress", 0) or 0)
+            for info in workers
+        ] or [0.0])
         waitress_score = min(waitress_score, waitress_max)
 
         service.kitchen_score = kitchen_score

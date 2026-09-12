@@ -119,6 +119,23 @@ def test_solved_rat_problem_cannot_emit_breakfast_kitty_dialogue():
     assert dialogue.index("if rat_problem:", dialogue.index('if "amanda" in present_ids:')) < dialogue.index(kitty_line)
 
 
+def test_breakfast_relationship_gain_stops_at_each_npcs_flirt_threshold():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    social = source.split("def tavern_breakfast_apply_social_bonus():", 1)[1].split(
+        "\n    def tavern_sunday_dinner_dialogue_lines", 1
+    )[0]
+    food = source.split("def tavern_breakfast_apply_food_perk", 1)[1].split(
+        "\n    def tavern_breakfast_apply_drink_perk", 1
+    )[0]
+
+    assert 'relationship_requirement_value(npc_id, "flirt", "friend")' in social
+    assert "int(info.rel or 0) < friend_cap" in social
+    assert "info.add_relation(1, cap=friend_cap)" in social
+    assert "info.change_social(friend_delta=1)" not in social
+    assert "return changed_ids" in social
+    assert "tavern_breakfast_apply_group_social(targets, 1, 0, 0, 2)" in food
+
+
 def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     source = SOURCE.read_text(encoding="utf-8-sig")
     sandra_source = (ROOT / "game/NPC/Girls/Sandra/InitSandra.rpy").read_text(encoding="utf-8-sig")

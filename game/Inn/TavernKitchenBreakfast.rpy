@@ -650,7 +650,7 @@ init python:
         if item_key == "boar_meat_001":
             score = 2
         targets = tavern_breakfast_record_group_perk(item_key, score)
-        tavern_breakfast_apply_group_social(targets, 1, 0, 1 if item_key in ("honey_comb_001", "boar_meat_001") else 0, 2)
+        tavern_breakfast_apply_group_social(targets, 1, 0, 0, 2)
         if item_key == "milk_pitcher_001" and int(player.tavern_management.breakfast.blind_pirate_team_pledge or 0) == 1 and int(player.tavern_management.breakfast.milk_team_talk_done or 0) == 0 and tavern_breakfast_blind_pirate_team_present():
             player.tavern_management.breakfast.milk_team_talk_done = 1
             return tavern_breakfast_blind_pirate_milk_text()
@@ -1015,12 +1015,14 @@ init python:
         return lines
 
     def tavern_breakfast_apply_social_bonus():
-        present_ids = tavern_breakfast_present_ids()
-        for npc_id in present_ids:
+        changed_ids = []
+        for npc_id in tavern_breakfast_present_ids():
             info = people.get_info(npc_id)
-            if info is not None:
-                info.change_social(friend_delta=1)
-        return present_ids
+            friend_cap = relationship_requirement_value(npc_id, "flirt", "friend")
+            if info is not None and friend_cap > 0 and int(info.rel or 0) < friend_cap:
+                info.add_relation(1, cap=friend_cap)
+                changed_ids.append(npc_id)
+        return changed_ids
 
     def tavern_sunday_dinner_dialogue_lines():
         lines = []

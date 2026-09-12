@@ -360,6 +360,8 @@ init python:
         lookup = {
             "enter": "Enter",
             "sleep": "Go to sleep",
+            "bedtime": "Go to sleep",
+            "morning": "Wake up",
             "overheard": "Overheard",
             "room_search": "Room search",
             "clara_paintings": "Clara paintings",

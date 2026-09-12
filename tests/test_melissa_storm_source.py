@@ -11,9 +11,15 @@ def source(path):
 def test_sleep_dispatches_hidden_story_event_instead_of_melissa_fallback():
     actions = source("game/Utilities/General/Common/Actions.rpy")
     household = source("game/Inn/HouseholdRuntimeEvents.rpy")
+    events = source("game/Utilities/General/Events/events.rpy")
+    board = source("game/Utilities/General/Screens/StoryThreadBoard.rpy")
 
-    assert 'if story_event_available(_sleep_target, "sleep"):' in actions
-    assert 'call checkTriggers(_sleep_target, "sleep", 0)' in actions
+    assert 'if story_event_available(_sleep_where, "bedtime"):' in actions
+    assert 'call checkTriggers(_sleep_where, "bedtime", 0)' in actions
+    assert 'action_key not in ("enter", "sleep", "bedtime", "morning")' in events
+    assert 'action_name in ("enter", "sleep", "bedtime", "morning")' in events
+    assert '"bedtime": "Go to sleep"' in board
+    assert '"morning": "Wake up"' in board
     assert "melissa_night_wake_event_ready" not in actions + household
     assert "label MelissaNightWakeEvent:" not in household
 

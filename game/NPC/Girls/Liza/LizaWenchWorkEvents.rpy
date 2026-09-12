@@ -4,7 +4,7 @@
 # ================================================================================
 
 label EventLizaWenchStory(eyewitness=0):
-    $ renpy.dynamic("_liza_wench_variant", "_liza_wench_picture", "_liza_wench_result")
+    $ renpy.dynamic("_liza_wench_variant", "_liza_wench_picture", "_liza_wench_result", "_liza_team_job", "_liza_team_skill", "_liza_team_member", "_liza_team_info")
     $ _liza_wench_variant = procedural_randint(1, 4, "liza_wench_story_%s_%s" % (current_game_day(), calendar_v2.time_slot()))
 
     if eyewitness <= 0:
@@ -79,6 +79,18 @@ label EventLizaWenchStory(eyewitness=0):
 
     $ scene_runtime.text = _liza_wench_result
     $ scene_runtime.location_text = scene_runtime.text
+    if _liza_wench_variant == 2:
+        python:
+            for _liza_team_job, _liza_team_skill in (("jobwaitress", "waitress"), ("jobcleaning", "cleaning")):
+                for _liza_team_member in girls_by_job(_liza_team_job):
+                    if _liza_team_member == "liza":
+                        continue
+                    _liza_team_info = people.get_info(_liza_team_member)
+                    if _liza_team_info is not None and _liza_team_info.skill_value(_liza_team_skill, 0) < 100:
+                        _liza_team_info.change_skill(_liza_team_skill, 1)
+                        _liza_team_info.record_skill_gain(_liza_team_skill)
+        $ scene_runtime.text += "\n\nОстальные официантки и уборщицы быстро перенимают ее манеру общаться с гостями: теперь каждая пытается заработать чаевые так же ловко."
+        $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Вернуться к своим делам":
             pass

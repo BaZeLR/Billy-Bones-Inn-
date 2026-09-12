@@ -72,6 +72,9 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "StreetLoverEncounters", None, [
         [AmandaStreetLoverEncounterStreet, AmandaStreetLoverEncounterMarket],
     ], highlight=False, threaded=False),
+    LThreadData(0, "amanda", "UpstairsBedroomRelief", None, [
+        AmandaUpstairsBedroomRelief,
+    ], highlight=False, threaded=False),
 ]
 
 define melissaRevealingDressRequestConditions = [
@@ -130,25 +133,25 @@ define melissaThreadList = [
             "story_melissa_courtship_storm_1",
             None, (20, 23), 1,
             0.25, None, melissaCourtshipBaseConditions, None,
-            "TavernMyRoom", "sleep", 0,
+            "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_mutual_2",
             None, (20, 23), 1,
             1, None, melissaCourtshipBaseConditions, None,
-            "TavernMyRoom", "sleep", 0,
+            "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_touch_him_3",
             None, (20, 23), 1,
             1, None, melissaCourtshipBaseConditions, None,
-            "TavernMyRoom", "sleep", 0,
+            "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_taste_4",
             None, (20, 23), 1,
             1, None, melissaCourtshipBaseConditions, None,
-            "TavernMyRoom", "sleep", 0,
+            "TavernMyRoom", "bedtime", 0,
         ),
     ], highlight=False, threaded=True),
     #
@@ -420,14 +423,20 @@ define melissaThreadList = [
             11,
         ),
     ], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "UpstairsBedroomRelief", None, [
+        MelissaUpstairsBedroomRelief,
+    ], highlight=False, threaded=False),
 ]
 
 define sandraThreadList = [
+    LThreadData(0, "sandra", "UpstairsBedroomRelief", None, [
+        SandraUpstairsBedroomRelief,
+    ], highlight=False, threaded=False),
     LThreadData(0, "sandra", "WeeklyEvaluation", "sandraWeeklyEvaluationEnabled", [
-        ("sandraWeeklyEvaluation_0", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 0),
-        ("sandraWeeklyEvaluation_1", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 1),
-        ("sandraWeeklyEvaluation_2", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 2),
-        ("sandraWeeklyEvaluation_3", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 3),
+        ("sandraWeeklyEvaluation_0", None, (6, 6), 0, 1, None, None, None, "TavernMyRoom", "morning", 0),
+        ("sandraWeeklyEvaluation_1", None, (6, 6), 0, 1, None, None, None, "TavernMyRoom", "morning", 1),
+        ("sandraWeeklyEvaluation_2", None, (6, 6), 0, 1, None, None, None, "TavernMyRoom", "morning", 2),
+        ("sandraWeeklyEvaluation_3", None, (6, 6), 0, 1, None, None, None, "TavernMyRoom", "morning", 3),
         ("TavernSandraNightThanksScene", None, (22, 23), 0, 1, None, None, None, "TavernSandraRoom", "sandra_night_thanks", 0),
     ], highlight=False, threaded=True),
     LThreadData(0, "sandra", "RevealingDressInitiative", None, [

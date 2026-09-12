@@ -264,8 +264,6 @@ init 4 python:
             "loot_kind": "meat",
             "kitchen_depositable": True,
             "kitchen_deposit_team_arousal_bonus": 5,
-            "kitchen_deposit_team_corruption_bonus": 1,
-            "kitchen_deposit_team_mana_bonus": 1,
             "kitchen_deposit_outputs": (("dog_bone_001", 3),),
         },
     )
