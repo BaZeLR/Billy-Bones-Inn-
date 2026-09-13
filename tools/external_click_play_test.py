@@ -4267,6 +4267,23 @@ testcase external_church_service_action_links_work:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
     assert eval (str(scene_runtime.picture or "") == _empty_church_walk_parent_picture and str(scene_runtime.text or "") == _empty_church_walk_parent_text and str(scene_runtime.location_text or "") == _empty_church_walk_parent_text) timeout 5.0
 
+testcase external_church_draupnir_list_renders_donated_rows:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(7, 1, 1100, 10, 0)
+    $ external_calendar_set_weekday(7)
+    $ Becky.gerhard_talk_stage = 1
+    $ player.economy.church_repairs_donated = [0] * len(CHURCH_REPAIR_COSTS)
+    $ player.economy.church_donated_today = 0
+    $ player.economy.church_donated_amount = 0
+    $ player.economy.record_church_donation(0, CHURCH_REPAIR_COSTS[0])
+    run Jump("Church")
+    advance until screen "main_ui" timeout 20.0
+    assert eval ("Посмотреть листок Драупнира" in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
+    $ _draupnir_note_index = [str(item.caption or "") for item in main_ui_runtime.action_items].index("Посмотреть листок Драупнира")
+    click id ("choice_panel_button_%d" % int(_draupnir_note_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Листок на столике") timeout 20.0
+    assert eval (renpy.get_screen("main_ui") is not None) timeout 5.0
+    assert eval ("{s}" in str(scene_runtime.text or "") and "{/s}" in str(scene_runtime.text or "") and "[s]" not in str(scene_runtime.text or "")) timeout 5.0
+
 testcase external_liza_identity_save_migration:
     run Call("InitGameNPCs")
     $ Liza.known = True
@@ -9475,6 +9492,7 @@ def main() -> int:
             "external_melissa_werecat_thread_condition_sequence",
             "external_werecat_intro_load_migration",
             "external_church_service_action_links_work",
+            "external_church_draupnir_list_renders_donated_rows",
             "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",
             "external_becky_church_after_sermon_uses_daily_event_authority",
@@ -9677,6 +9695,7 @@ def main() -> int:
             "external_melissa_werecat_thread_condition_sequence",
             "external_werecat_intro_load_migration",
             "external_church_service_action_links_work",
+            "external_church_draupnir_list_renders_donated_rows",
             "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",
             "external_becky_church_after_sermon_uses_daily_event_authority",

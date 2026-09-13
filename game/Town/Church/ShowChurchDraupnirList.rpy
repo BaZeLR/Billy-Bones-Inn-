@@ -8,7 +8,7 @@ label ShowChurchDraupnirList:
         for IList in range(len(CHURCH_REPAIR_DESCRIPTIONS)):
             entry = "{}. {}: {} мараведи.".format(IList + 1, CHURCH_REPAIR_DESCRIPTIONS[IList], CHURCH_REPAIR_COSTS[IList])
             if player.economy.church_repair_is_donated(IList):
-                entry = "[s]{}[/s]".format(entry)
+                entry = "{s}" + entry + "{/s}"
             StrList.append(entry)
         show_list = "\n".join(StrList)
 

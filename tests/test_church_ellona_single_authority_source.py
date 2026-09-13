@@ -33,6 +33,13 @@ def test_church_donations_are_owned_by_player_economy():
         assert retired not in runtime
 
 
+def test_completed_church_repairs_use_renpy_strikethrough_tags():
+    church = source("game/Town/Church/ShowChurchDraupnirList.rpy")
+
+    assert 'entry = "{s}" + entry + "{/s}"' in church
+    assert 'entry = "[s]{}[/s]".format(entry)' not in church
+
+
 def test_ellona_blessing_and_curse_state_is_owned_by_player_intimacy():
     player = source("game/Utilities/General/Player/Player.rpy")
     prayer = source("game/Town/Temple/EllonaBirthPrayMenu.rpy")
