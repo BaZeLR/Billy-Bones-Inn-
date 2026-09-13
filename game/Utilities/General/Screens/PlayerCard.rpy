@@ -162,13 +162,20 @@ init python:
         return lines
 
     def player_card_portrait_path():
-        for picture_path in (
-            "images/general/player_card.jpg",
-            "images/player_room/player_card.jpg",
-        ):
-            if renpy.loadable(picture_path):
-                return picture_path
-        return "images/rpg_message_bg.png"
+        equipped_weapon = str(player.equipment.weapon or "").strip()
+        cuirass_equipped = str(player.equipment.armor or "").strip() == "old_leather_cuirass_001"
+
+        if equipped_weapon == "rusty_hunter_rifle_001":
+            if cuirass_equipped:
+                return "images/general/player_card_cuirass_rifle.png"
+            return "images/general/player_card_rifle.png"
+        if equipped_weapon == "old_axe_001":
+            if cuirass_equipped:
+                return "images/general/player_card_cuirass_axe.png"
+            return "images/general/player_card_axe.png"
+        if cuirass_equipped:
+            return "images/general/player_card_cuirass.png"
+        return "images/general/player_card_default.png"
 
     def player_card_stat_rows_left():
         state = player_card_state()

@@ -8225,7 +8225,24 @@ testcase external_player_and_girl_cards_render:
     $ _card_return_room = str(rooms.current_code or "")
     click id "main_ui_entity_button_player_you" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "mc") timeout 20.0
     assert eval (len(player_card_stat_rows_left()) > 0 and len(player_card_stat_rows_right()) > 0 and str(player_card_portrait_path() or "") != "") timeout 5.0
-    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card.jpg" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_default.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    screenshot "external_player_card_default.png"
+    $ _card_original_weapon = str(player.equipment.weapon or "")
+    $ _card_original_armor = str(player.equipment.armor or "")
+    $ player.equipment.armor = "old_leather_cuirass_001"
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_cuirass.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    $ player.equipment.weapon = "rusty_hunter_rifle_001"
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_cuirass_rifle.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    $ player.equipment.armor = ""
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_rifle.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    $ player.equipment.weapon = "old_axe_001"
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_axe.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    $ player.equipment.armor = "old_leather_cuirass_001"
+    assert eval (str(player_card_portrait_path() or "") == "images/general/player_card_cuirass_axe.png" and renpy.loadable(player_card_portrait_path())) timeout 5.0
+    $ renpy.restart_interaction()
+    screenshot "external_player_card_cuirass_axe.png"
+    $ player.equipment.weapon = _card_original_weapon
+    $ player.equipment.armor = _card_original_armor
     assert eval (str(main_ui_runtime.action_title or "") == "Действия" and [str(i.caption or "") for i in main_ui_runtime.action_items][-1] == "Назад") timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == _card_return_room and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
     $ _card_keys = ["sandra", "amanda", "melissa", "clara", "becky", "irma", "georgett", "liza"]

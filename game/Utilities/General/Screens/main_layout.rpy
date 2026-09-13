@@ -774,13 +774,13 @@ screen main_ui_player_card_panel():
             vbox:
                 spacing 10
 
-                text _title.upper() size 30 color "#1e130c" xalign 0.5
+                text _title.upper() size 32 color "#1e130c" xalign 0.5
 
                 if _inventory_mode == "profile":
                     hbox:
                         spacing 12
 
-                        add im.Scale(_portrait, 180, 240)
+                        add im.Scale(_portrait, 210, 280)
 
                         hbox:
                             spacing 24
@@ -789,16 +789,16 @@ screen main_ui_player_card_panel():
                                 xminimum 220
                                 spacing 3
                                 for _row in _stats_left:
-                                    text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
+                                    text "%s: %s" % (_row[0], _row[1]) size 20 color "#1e130c"
 
                             vbox:
                                 xminimum 220
                                 spacing 3
                                 for _row in _stats_right:
-                                    text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
+                                    text "%s: %s" % (_row[0], _row[1]) size 20 color "#1e130c"
 
                 for _line in _lines:
-                    text _line size (18 if _inventory_mode in ("inventory", "section") else 16) color "#2d1d12"
+                    text _line size (20 if _inventory_mode in ("inventory", "section") else 18) color "#2d1d12"
 
                 if _inventory_mode in ("inventory", "section") and len(_inventory_rows) > 0:
                     null height 4
