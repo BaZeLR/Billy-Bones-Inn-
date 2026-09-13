@@ -55,7 +55,7 @@ init python:
             current_day = current_game_day()
             if bool(reroll) or self.market_roll_day != current_day:
                 self.market_roll_day = current_day
-                self.market_roll = renpy.random.randint(1, 4) == 1
+                self.market_roll = procedural_randint(1, 4, "mongol_market_%s_%s" % (current_day, int(calendar_v2.clock_minutes() or 0))) == 1
             return self.market_roll
 
         def is_market_visible(self):
