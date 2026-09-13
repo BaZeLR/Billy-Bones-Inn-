@@ -216,13 +216,10 @@ init python:
         dress_desc = str(DressDesc.get(current_dress, current_dress) or current_dress)
         full_desc = str(FullDressDesc.get(current_dress, "") or "").strip()
 
-        lines = [
-            "Основной наряд: %s." % dress_name,
-            "Сейчас на вас: %s." % dress_name.lower(),
-            "Кратко: %s." % dress_desc,
-        ]
-        if full_desc:
-            lines.append(full_desc + ".")
+        lines = ["Сейчас на вас: %s." % dress_name.lower()]
+        dress_details = full_desc or dress_desc
+        if dress_details and dress_details.lower() != dress_name.lower():
+            lines.append(dress_details.rstrip(".") + ".")
         return lines
 
     def player_card_inventory_lines():

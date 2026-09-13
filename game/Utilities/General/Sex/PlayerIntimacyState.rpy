@@ -100,32 +100,15 @@ init python:
         return "Вы уже не можете сдерживаться."
 
     def player_body_state_lines():
-        player_profile = player_body_profile()
         lines = []
         if player_is_naked():
-            lines.append("На вас сейчас нет одежды.")
-        elif player_is_in_nightwear():
-            lines.append("На вас ночная рубашка из ларя, пригодная для сна, но слишком домашняя для трактира.")
-        else:
-            lines.append("На вас дневная одежда.")
-        if player_is_naked():
-            lines.append("Нижний слой: ничего.")
-        elif player_is_in_nightwear():
-            lines.append("Нижний слой: одежда для сна.")
-        else:
-            lines.append("Нижний слой: дневная одежда.")
+            lines.append("На вас сейчас ничего не надето.")
         lines.append(player_arousal_state_line())
         days_wait = player_days_without_sex()
         if days_wait >= 2:
             lines.append("Без секса уже %s дня; тело реагирует быстрее обычного." % days_wait)
         if str(player.intimacy.wake_state_notice or "").strip() and player_intimacy_int(player.intimacy.morning_arousal_day, -1) == current_game_day():
             lines.append(str(player.intimacy.wake_state_notice))
-        try:
-            body_text = bodymodel_profile_summary_text(player_profile)
-            if body_text:
-                lines.append(body_text)
-        except Exception:
-            pass
         return [str(line) for line in lines if str(line or "").strip()]
 
     def player_apply_arousal_trigger(trigger_code="", amount=0):
