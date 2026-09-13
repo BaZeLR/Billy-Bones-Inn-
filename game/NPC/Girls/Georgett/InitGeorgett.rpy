@@ -27,6 +27,11 @@ init python:
             )
             self.birth_date = {"day": 22, "period": 13, "cycle": 1072}
             self.schedule_source = "schedules/georgett.json"
+            self.image_manifest = {
+                "morning": {
+                    "sickness": ["images/georgett/morning_sickness/georgett_morning_sickness.png"],
+                },
+            }
 
     class GeorgettInfo(Girl):
         """Georgette runtime: port work, tavern relocation, church story, pregnancy state."""

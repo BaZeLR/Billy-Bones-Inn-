@@ -2408,7 +2408,11 @@ testcase external_kitchen_entry_morning_sickness_event:
     $ player.tavern_management.breakfast.event_active = False
     $ player.tavern_management.breakfast.present_ids = None
     $ daily_events.rows[:] = []
-    $ daily_events.add("sandra", "TavernKitchen", 1, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
+    $ daily_events.add("sandra", "TavernKitchen", 2, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
+    $ Melissa.storage_rat_help_day = -1
+    $ threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
+    $ werecat_state()["rats_problem_active"] = 0
+    $ werecat_state()["adoption_breakfast_seen"] = 1
     $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
@@ -2419,7 +2423,13 @@ testcase external_kitchen_entry_morning_sickness_event:
     click id _breakfast_action_button pos (0.5, 0.5) until screen "say" timeout 20.0
     advance until screen "choice" timeout 30.0
     assert eval (str(rooms.current_code or "") == "TavernKitchen") timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == SandraStaticData.image_path("morning", "sickness")) timeout 5.0
     assert eval (daily_events.exists("sandra", "MorningSickness", "TavernKitchen") == 0) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until screen "choice" timeout 30.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and bool(player.tavern_management.breakfast.event_active) and str(scene_runtime.picture or "") == str(tavern_kitchen_breakfast_picture() or "")) timeout 30.0
+    assert eval ("тошн" not in str(scene_runtime.text or "").lower() and "задержк" not in str(scene_runtime.text or "").lower()) timeout 5.0
 
 testcase external_actual_barber_actions_click:
     run Call("InitGameNPCs")

@@ -26,6 +26,9 @@ init python:
             self.birth_date = {"day": 1, "period": 1, "cycle": 1082}
             self.schedule_source = "schedules/liza.json"
             self.image_manifest = {
+                "morning": {
+                    "sickness": ["images/Liza/morning_sickness/liza_morning_sickness.png"],
+                },
                 "tavern": {
                     "waitress": [
                         "images/Liza/lizaNew/liza_waitress_main_hall_minidress.png",

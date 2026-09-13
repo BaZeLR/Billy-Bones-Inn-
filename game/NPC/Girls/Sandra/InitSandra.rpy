@@ -27,6 +27,9 @@ init python:
             self.card_image = "images/sandra/sandra_card.jpg"
             self.schedule_source = "schedules/sandra.json"
             self.image_manifest = {
+                "morning": {
+                    "sickness": ["images/sandra/morning_sickness/sandra_morning_sickness.png"],
+                },
                 "portrait": {
                     "default": ["images/sandra/portrait2.jpg"],
                 },

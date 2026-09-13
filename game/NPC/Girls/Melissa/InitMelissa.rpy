@@ -26,6 +26,9 @@ init python:
             self.card_image = "images/melissa/melissa_card.jpg"
             self.schedule_source = "schedules/melissa.json"
             self.image_manifest = {
+                "morning": {
+                    "sickness": ["images/melissa/morning_sickness/melissa_morning_sickness.png"],
+                },
                 "card": {
                     "default": ["images/melissa/melissa_card.jpg"],
                 },

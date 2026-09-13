@@ -2,21 +2,26 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def tavern_breakfast_morning_sickness_girl():
-        if int(calendar_v2.hour or 0) >= 12:
-            return ""
+    def tavern_morning_sickness_girl():
+        current_slot = calendar_v2.time_slot()
         for girl_key, girl_info in people.girl_items():
             if girl_info is None or not girl_info.is_tavern_worker():
                 continue
-            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen"):
+            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen", current_slot):
                 return girl_key
         return ""
 
 label MorningSickness(girl_name):
-    $ renpy.dynamic("CumInsideLastDays", "girl_info", "pregnancy_days", "Zaderzhka", "ZaletOpinion", "MSickAskedDelay", "MSickZaletCommentMade", "girl_display_name")
+    $ renpy.dynamic("CumInsideLastDays", "girl_info", "girl_data", "pregnancy_days", "Zaderzhka", "ZaletOpinion", "MSickAskedDelay", "MSickZaletCommentMade", "girl_display_name", "morning_sickness_picture")
+    $ main_ui_begin_native_scene_state("Утреннее недомогание")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
+    show screen main_ui
     python:
         CumInsideLastDays = int(people.get_info(girl_name).sex_stat("cuminside", 0) or 0)
         girl_info = people.get_info(girl_name)
+        girl_data = people.get_data(girl_name)
+        morning_sickness_picture = girl_data.image_path("morning", "sickness") if girl_data is not None else ""
         pregnancy_days = girl_info.pregnancy_days() if girl_info is not None else 0
 
         if pregnancy_days > 14:
@@ -65,8 +70,12 @@ label MorningSickness(girl_name):
         MSickZaletCommentMade = False
         girl_display_name = people_display_name(girl_name)
 
+    if morning_sickness_picture:
+        vscene morning_sickness_picture
     "Вы мирно шли по своим делам, когда вдруг вам навстречу, зажав рот руками, пробежала бледная [girl_display_name]. Даже не заметив вас, она ломанулась куда-то дальше, скорее всего на свежий воздух."
     call GirlsDesc(girl_name)
+    if morning_sickness_picture:
+        vscene morning_sickness_picture
 
     menu:
         "Проверить, что это с ней":
@@ -76,6 +85,7 @@ label MorningSickness(girl_name):
             "Всего через несколько минут [girl_display_name] вернулась. Здоровый оттенок лица вернулся к ней, хотя некоторая бледность сохранилась.\n\n\"Чего-й то, Стефанчик, меня стошнило слегка,\" поделилась она с вами."
 
     call morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay, MSickZaletCommentMade)
+    $ main_ui_end_native_scene_state()
     return
 
 

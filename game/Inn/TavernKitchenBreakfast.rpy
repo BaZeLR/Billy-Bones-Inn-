@@ -1085,18 +1085,24 @@ init python:
 
 
 label TavernKitchenBreakfast:
-    $ renpy.dynamic("_breakfast_morning_sick_girl", "_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
+    $ renpy.dynamic("_morning_sick_girl", "_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
     if not tavern_breakfast_available():
         $ scene_runtime.text = "Сегодня вы уже завтракали."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
+    $ _morning_sick_girl = str(tavern_morning_sickness_girl() or "")
+    while _morning_sick_girl != "":
+        call check_daily_event(_morning_sick_girl, "MorningSickness", "TavernKitchen", calendar_v2.time_slot())
+        if not _return:
+            $ _morning_sick_girl = ""
+        else:
+            $ _morning_sick_girl = str(tavern_morning_sickness_girl() or "")
     $ player.tavern_management.breakfast.present_ids = list(household_breakfast_attendee_ids() or [])
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = current_game_day()
     $ player.tavern_management.breakfast.day = current_game_day()
     $ player.tavern_management.breakfast.event_active = True
-    $ _breakfast_morning_sick_girl = str(tavern_breakfast_morning_sickness_girl() or "")
     $ calendar_v2.advance_minutes(30)
     vscene tavern_kitchen_breakfast_picture()
     python:
@@ -1120,7 +1126,6 @@ label TavernKitchenBreakfast:
             or household_barber_request_ready("melissa", "breakfast")
             or household_barber_request_ready("amanda", "breakfast")
             or int(player.tavern_management.breakfast.georgett_liza_pending or 0) == 1
-            or str(_breakfast_morning_sick_girl or "").strip() != ""
             or str(tavern_breakfast_morning_issue_girl() or "").strip() != ""
             or str(tavern_breakfast_absent_prompt() or "").strip() != ""
             or ("sandra" in list(tavern_breakfast_present_ids() or []) and tavern_kitchen_sandra_can_discuss_breakfasts())
@@ -1145,8 +1150,6 @@ label TavernKitchenBreakfast:
     if len(list(tavern_recent_barber_ids() or [])) > 0:
         $ player.tavern_management.breakfast.barber_talk_day = current_game_day()
     call stat
-    if _breakfast_morning_sick_girl != "":
-        call check_daily_event(_breakfast_morning_sick_girl, "MorningSickness", "TavernKitchen", 0)
     $ _breakfast_line_index = 0
     while _breakfast_line_index < len(_breakfast_lines):
         $ scene_runtime.text = _breakfast_lines[_breakfast_line_index]
