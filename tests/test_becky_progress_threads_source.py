@@ -63,8 +63,13 @@ def test_becky_eddie_abort_and_sherwood_handoff_use_thread_lifecycle():
 
     assert '"beckySandraKitchenVisitDone"' in advice_thread
     assert '"beckyGerhardAdviceEnabled"' in advice_thread
-    assert '"beckySandraKitchenVisitDone"' in eddie_thread
-    assert '"beckyGerhardAdviceDone"' in eddie_thread
+    eddie_base_conditions, eddie_events = eddie_thread.split("], [", 1)
+    first_join_event = eddie_events.split('"BeckyEddieJoinFirst"', 1)[1].split(
+        '"IntEddieTalkMomHelper"', 1
+    )[0]
+    assert '"beckySandraKitchenVisitDone"' in eddie_base_conditions
+    assert '"beckyGerhardAdviceDone"' not in eddie_base_conditions
+    assert '"beckyGerhardAdviceDone"' in first_join_event
     assert '"beckyEddieSexDone"' in sherwood_thread
     retry = EDDIE_TALK.split('if int(Eddie.rel or 0) < 10:', 1)[1].split(
         'elif Becky.eddie_join_failures > 2:', 1
@@ -79,25 +84,61 @@ def test_becky_eddie_abort_and_sherwood_handoff_use_thread_lifecycle():
     assert 'threads["beckySherwoodTrade"].enable()' in NEXT_DAY
 
 
-def test_unseen_sunday_priest_event_advances_the_same_becky_threads():
+def test_finish_day_does_not_advance_unseen_becky_story_events():
     priest = FINISH_DAY.split('elif place == "Priest":', 1)[1].split(
         'elif girl == "becky":', 1
     )[0]
 
-    assert 'becky_advice_thread = threads["beckyGerhardAdvice"]' in priest
-    assert "if week_val == 7 and becky_advice_thread.enabled" in priest
-    assert "becky_advice_thread.advance()" in priest
-    assert "* 30 <= player.economy.church_donated_amount" in priest
-    assert "becky_advice_thread.advanceTo(becky_advice_thread.data.length, complete_at_end=True)" in priest
-    assert 'becky_eddie_thread = threads["beckyEddieSex"]' in priest
-    assert "becky_eddie_thread.advanceTo(becky_eddie_thread.data.length, complete_at_end=True)" in priest
+    assert 'pregnancy_check(girl, "inside", 1, "Отец Герхард")' in priest
+    assert 'threads["beckyGerhardAdvice"]' not in priest
+    assert 'threads["beckyEddieSex"]' not in priest
+    assert "becky_advice_thread" not in priest
+    assert "becky_eddie_thread" not in priest
 
 
-def test_kitchen_event_solely_owns_advice_transition_and_tea_availability():
+def test_kitchen_event_distinguishes_tea_from_the_story_advancing_tincture():
+    visit_thread = RUNTIME.split('LThreadData(0, "becky", "SandraKitchenVisit"', 1)[1].split(
+        'LThreadData(0, "becky", "Home"', 1
+    )[0]
+    tea_branch = KITCHEN.split(
+        '"Угостить Сандру и Бекки бодрящим чаем" if int(player.item_count("energy_tea_001") or 0) > 0:',
+        1,
+    )[1].split('"Подать горячую медовую настойку"', 1)[0]
+    tincture_branch = KITCHEN.split(
+        '"Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:',
+        1,
+    )[1].split('"Не мешать разговору":', 1)[0]
+
     assert 'threads["beckyGerhardAdvice"].enable()' not in TOPICS
     assert KITCHEN.count('threads["beckyGerhardAdvice"].enable()') == 1
     assert "def tavern_kitchen_can_share_tea_with_sandra_and_becky" not in KITCHEN
-    assert '"Угостить Сандру и Бекки бодрящим чаем":' in KITCHEN
+    assert "energy_tea_001" not in visit_thread
+    assert "libido_tincture_001" not in visit_thread
+
+    assert 'player.remove_item("energy_tea_001", 1)' in tea_branch
+    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' not in tea_branch
+    assert 'threads["beckyGerhardAdvice"].enable()' not in tea_branch
+    assert "_becky_sandra_visit_thread.complete()" not in tea_branch
+
+    assert 'tavern_kitchen_spicy_tincture_apply(("sandra", "becky"))' in tincture_branch
+    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' in tincture_branch
+    assert "Эдди давно" in tincture_branch
+    assert "здоровом доме" in tincture_branch
+    assert "для хозяйства, и для торговли" in tincture_branch
+    assert 'threads["beckyGerhardAdvice"].enable()' in tincture_branch
+    assert "_becky_sandra_visit_thread.complete()" in tincture_branch
+
+
+def test_dinner_bedroom_acceptance_uses_the_requested_fifty_percent_decision():
+    dinner_decision = DINNER.split(
+        'elif not threads["beckyEddieSex"].completed:',
+        1,
+    )[1].split('"Идти в спальню вместе с Бекки и Эдди"', 1)[0]
+
+    assert 'int(threads["beckyDinner"].num or 0) >= 2' in dinner_decision
+    assert 'procedural_randint(1, 2, "becky_dinner_bed_decision_%s" % int(current_game_day() or 0)) == 1' in dinner_decision
+    assert "Becky.corruption + procedural_randint" not in dinner_decision
+    assert 'call BeckyHome("FromDinner")' in dinner_decision
 
 
 def test_v87_rechecks_new_thread_conditions_for_untouched_old_save_stages():

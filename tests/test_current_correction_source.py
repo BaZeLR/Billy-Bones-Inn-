@@ -67,10 +67,20 @@ def test_becky_kitchen_visit_uses_friendship_and_schedule_as_authority():
     assert visit_event.count('"story_becky_sandra_kitchen_visit"') == 3
     assert "#str(people.location('becky') or '') == 'TavernKitchen'" in visit_event
     assert "#str(people.location('sandra') or '') == 'TavernKitchen'" in visit_event
+    assert "energy_tea_001" not in visit_event
+    assert "libido_tincture_001" not in visit_event
     assert "label story_becky_sandra_kitchen_visit:" in kitchen
     assert "_becky_sandra_visit_stage = int(_becky_sandra_visit_thread.num or 0)" in kitchen
     assert "if _becky_sandra_visit_stage < 2:" in kitchen
     assert "$ _becky_sandra_visit_thread.advance()" in kitchen
+    assert 'vscene "images/tavern/kitchen/becky_visit_0.png"' in kitchen
+    assert '"Угостить Сандру и Бекки бодрящим чаем" if int(player.item_count("energy_tea_001") or 0) > 0:' in kitchen
+    assert '"Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:' in kitchen
+    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' in kitchen
+    tea_branch = kitchen.split('"Угостить Сандру и Бекки бодрящим чаем"', 1)[1].split(
+        '"Подать горячую медовую настойку"', 1
+    )[0]
+    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' not in tea_branch
     assert '$ threads["beckyGerhardAdvice"].enable()' in kitchen
     assert "$ _becky_sandra_visit_thread.complete()" in kitchen
     assert 'Call("TavernKitchenShareTeaWithSandraAndBecky")' not in kitchen

@@ -1022,8 +1022,9 @@ define beckyThreadList = [
         ),
     ], highlight=False, threaded=False),
     # Two ordinary visits establish Sandra and Becky as friends. Their third
-    # meeting owns the honey-tea advice that can move the Eddie dilemma to
-    # the church. The thread cursor is the only visit-stage authority.
+    # meeting can turn into frank advice over the honey-spiced tincture and
+    # move the Eddie dilemma to the church. The thread cursor is the only
+    # visit-stage authority.
     LThreadData(0, "becky", "SandraKitchenVisit", [
         "#int(current_game_day() or 0) > 30",
     ], [
@@ -1063,7 +1064,6 @@ define beckyThreadList = [
             [
                 "#str(people.location('becky') or '') == 'TavernKitchen'",
                 "#str(people.location('sandra') or '') == 'TavernKitchen'",
-                "#int(player.item_count('energy_tea_001') or 0) > 0",
             ],
             None,
             "TavernKitchen",
@@ -1180,6 +1180,7 @@ define beckyThreadList = [
             None, None, None,
             1, None,
             [
+                "beckyGerhardAdviceDone",
                 "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDinner'",
             ],
             None,

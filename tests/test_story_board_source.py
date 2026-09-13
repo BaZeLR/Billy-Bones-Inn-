@@ -73,3 +73,14 @@ def test_story_board_gives_the_thread_event_pane_more_readable_space():
     assert source.count("null height STORY_BOARD_EMPTY_ROW_HEIGHT") == 2
     assert "if _pos > 0:" in source
     assert "spacing STORY_BOARD_EMPTY_ROW_HEIGHT" not in source
+
+
+def test_story_board_does_not_open_event_details_for_procedure_only_stages():
+    source = BOARD_PATH.read_text(encoding="utf-8-sig")
+    event_cells = source.split("for _idx in range(len(_tinfo.data.triggers)):", 1)[1].split(
+        "$ _pos += 1", 1
+    )[0]
+
+    assert "if _tinfo.data.triggers[_idx]:" in event_cells
+    assert event_cells.count("_tinfo.getevent(_idx)") == 1
+    assert "else:" in event_cells

@@ -415,10 +415,16 @@ testcase becky_dinner_refusal_keeps_authored_farewell:
     advance until screen "main_ui" timeout 20.0
     python:
         rooms.enter("BeckyHome")
-        threads["beckyDinner"].reset()
+        threads["beckyDinner"].advanceTo(2, force_active=True)
+        threads["beckyEddieSex"].reset()
+        Becky.eddie_home_visit_state = 0
         calendar_v2.week = 1
         calendar_v2.hour = 19
         calendar_v2.minute = 0
+        for _decision_day in range(1, 200):
+            calendar_v2.daysInGame = _decision_day
+            if procedural_randint(1, 2, "becky_dinner_bed_decision_%s" % _decision_day) != 1:
+                break
         main_ui_runtime.mode = "scene"
         main_ui_runtime.scene_origin = None
         main_ui_runtime.action_items = rooms.get("BeckyHome").build_exit_items()
@@ -437,7 +443,37 @@ testcase becky_dinner_refusal_keeps_authored_farewell:
     assert eval (rooms.current_code == "BeckyHome" and main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
     click id "choice_panel_button_0" pos (0.5, 0.5)
     click pos (960, 900) until eval (rooms.current_code == "MarketPlace") timeout 20.0
-    assert eval (calendar_v2.hour == 20 and calendar_v2.minute == 0 and main_ui_runtime.scene_origin is None)
+    assert eval (calendar_v2.hour == 20 and calendar_v2.minute == 0)
+
+testcase becky_dinner_acceptance_enters_her_bedroom:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        rooms.enter("BeckyHome")
+        threads["beckyDinner"].advanceTo(2, force_active=True)
+        threads["beckyEddieSex"].reset()
+        Becky.eddie_home_visit_state = 0
+        calendar_v2.week = 1
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        for _decision_day in range(1, 200):
+            calendar_v2.daysInGame = _decision_day
+            if procedural_randint(1, 2, "becky_dinner_bed_decision_%s" % _decision_day) == 1:
+                break
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.scene_origin = None
+        main_ui_runtime.action_items = rooms.get("BeckyHome").build_exit_items()
+    run Call("IntBeckyGuest")
+    advance until screen "choice" timeout 20.0
+    $ dinnertime = 5
+    $ _eat_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Кушать")
+    click id ("choice_panel_button_%d" % _eat_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (renpy.get_screen("choice") is not None and any(item.caption == "Взять Бекки под руку и идти наверх в спальню" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
+    $ _upstairs_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Взять Бекки под руку и идти наверх в спальню")
+    click id ("choice_panel_button_%d" % _upstairs_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (rooms.current_code == "BeckyHome" and renpy.get_screen("choice") is not None and any(item.caption == "Закончить" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 30.0
+    assert eval (rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDinner")
+    assert eval (int(threads["beckySex"].num or 0) >= 1)
 
 testcase becky_dinner_reads_current_wear_panties:
     run Jump("dev_after_report_checkpoint")
@@ -628,7 +664,7 @@ testcase becky_kitchen_friendship_survives_repeat_visit:
     run Call("checkTriggers", "TavernKitchen", "enter", 0)
     advance until screen "choice" timeout 20.0
     assert eval (threads["beckySandraKitchenVisit"].num == 2 and not threads["beckySandraKitchenVisit"].completed)
-    assert eval (scene_runtime.text.startswith("Зайдя вечером на кухню") and scene_runtime.text == scene_runtime.location_text)
+    assert eval (scene_runtime.text.startswith("Снова встретив Бекки у Сандры") and scene_runtime.text == scene_runtime.location_text)
     screenshot "becky_kitchen_visit.png"
     $ _leave_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Не мешать разговору")
     click id ("choice_panel_button_%d" % _leave_index) pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
@@ -676,7 +712,7 @@ testcase becky_clothes_offer_schedules_one_appointment:
     screenshot "becky_tailor_appointment.png"
     run Hide("dress_shop_catalog_page")
 
-testcase becky_kitchen_visits_then_honey_tea:
+testcase becky_kitchen_visits_distinguish_tea_from_hot_honey:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
     python:
@@ -686,9 +722,10 @@ testcase becky_kitchen_visits_then_honey_tea:
         calendar_v2.minute = 0
         threads["beckySandraKitchenVisit"].reset()
         threads["beckyGerhardAdvice"].reset()
+        threads["beckyGerhardAdvice"].disable()
         Becky.georgett_mentioned = False
-        player.add_item("energy_tea_001", 1)
-        _tea_before = player.item_count("energy_tea_001")
+        player.remove_item("energy_tea_001", player.item_count("energy_tea_001"))
+        player.remove_item("libido_tincture_001", player.item_count("libido_tincture_001"))
         event_runtime.fired_keys_today = []
         rooms.enter("TavernKitchen")
         initStoryEventRuntime(True)
@@ -716,13 +753,43 @@ testcase becky_kitchen_visits_then_honey_tea:
     run Call("checkTriggers", "TavernKitchen", "enter", 0)
     advance until screen "choice" timeout 20.0
     assert eval (threads["beckySandraKitchenVisit"].num == 2)
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Не мешать разговору"])
+    assert eval (str(scene_runtime.picture).endswith("becky_visit_0.png"))
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+    python:
+        calendar_v2.daysInGame = 40
+        calendar_v2.week = 4
+        player.add_item("energy_tea_001", 1)
+        _tea_before = player.item_count("energy_tea_001")
+        event_runtime.evaluation_time = None
+        initStoryEventRuntime(True)
+    run Call("checkTriggers", "TavernKitchen", "enter", 0)
+    advance until screen "choice" timeout 20.0
     $ _tea_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Угостить Сандру и Бекки бодрящим чаем")
-    click id ("choice_panel_button_%d" % _tea_index) pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить разговор") timeout 10.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Выслушать ответ Бекки") timeout 10.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["beckySandraKitchenVisit"].completed) timeout 10.0
-    assert eval (player.item_count("energy_tea_001") == _tea_before - 1 and threads["beckyGerhardAdvice"].enabled)
-    assert eval (str(scene_runtime.picture).endswith("becky_visit_1.png"))
+    click id ("choice_panel_button_%d" % _tea_index) pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Вернуться к разговору") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Вернуться к своим делам") timeout 10.0
+    assert eval (player.item_count("energy_tea_001") == _tea_before - 1 and not threads["beckySandraKitchenVisit"].completed and not threads["beckyGerhardAdvice"].enabled)
+    assert eval (str(scene_runtime.picture).endswith("becky_visit_0.png"))
     screenshot "becky_kitchen_tea.png"
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+    python:
+        calendar_v2.daysInGame = 45
+        calendar_v2.week = 2
+        player.add_item("libido_tincture_001", 1)
+        _tincture_before = player.item_count("libido_tincture_001")
+        event_runtime.evaluation_time = None
+        initStoryEventRuntime(True)
+    run Call("checkTriggers", "TavernKitchen", "enter", 0)
+    advance until screen "choice" timeout 20.0
+    $ _tincture_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Подать горячую медовую настойку")
+    click id ("choice_panel_button_%d" % _tincture_index) pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить разговор") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Выслушать Сандру") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Выслушать решение Бекки") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["beckySandraKitchenVisit"].completed) timeout 10.0
+    assert eval (player.item_count("libido_tincture_001") == _tincture_before - 1 and threads["beckyGerhardAdvice"].enabled)
+    assert eval (str(scene_runtime.picture).endswith("becky_visit_1.png"))
+    screenshot "becky_kitchen_hot_honey.png"
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
 
 testcase becky_regular_invitation_reads_objections_before_unlock:

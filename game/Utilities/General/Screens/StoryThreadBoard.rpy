@@ -622,12 +622,18 @@ screen story_thread_board_panel(person=None, standalone=False):
                         hbox:
                             xpos 20 * _offset
                             for _idx in range(len(_tinfo.data.triggers)):
-                                button style "scene":
-                                    idle_background Solid(story_board_event_color(_tinfo, _idx))
-                                    hover_background Solid("#ffff00")
-                                    action NullAction()
-                                    hovered Show("story_event_screen", None, _tinfo, _idx, _tinfo.getevent(_idx))
-                                    unhovered Hide("story_event_screen")
+                                if _tinfo.data.triggers[_idx]:
+                                    button style "scene":
+                                        idle_background Solid(story_board_event_color(_tinfo, _idx))
+                                        hover_background Solid("#ffff00")
+                                        action NullAction()
+                                        hovered Show("story_event_screen", None, _tinfo, _idx, _tinfo.getevent(_idx))
+                                        unhovered Hide("story_event_screen")
+                                else:
+                                    button style "scene":
+                                        idle_background Solid(story_board_event_color(_tinfo, _idx))
+                                        hover_background Solid(story_board_event_color(_tinfo, _idx))
+                                        action NullAction()
                     $ _pos += 1
 
 

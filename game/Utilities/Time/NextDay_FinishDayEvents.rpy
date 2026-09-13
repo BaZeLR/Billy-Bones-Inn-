@@ -72,15 +72,6 @@ init python:
             elif place == "Priest":
                 pregnancy_check(girl, "inside", 1, "Отец Герхард")
                 if girl == "becky":
-                    becky_advice_thread = threads["beckyGerhardAdvice"]
-                    if week_val == 7 and becky_advice_thread.enabled and not becky_advice_thread.completed:
-                        if _ndf_int(becky_advice_thread.num, 0) == 0:
-                            becky_advice_thread.advance()
-                        if procedural_randint(1, 70, "becky_church_priest_advice_unseen_%s" % dayspassed_val) * 30 <= player.economy.church_donated_amount:
-                            becky_advice_thread.advanceTo(becky_advice_thread.data.length, complete_at_end=True)
-                    becky_eddie_thread = threads["beckyEddieSex"]
-                    if week_val == 7 and becky_advice_thread.completed and not becky_eddie_thread.completed and _ndf_int(becky_eddie_thread.num, 0) >= 4:
-                        becky_eddie_thread.advanceTo(becky_eddie_thread.data.length, complete_at_end=True)
                     if procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:99:5") == 1:
                         Becky.set_sex_stat("last_orgasm_day", dayspassed_val)
             elif girl == "becky":

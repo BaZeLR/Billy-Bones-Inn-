@@ -153,7 +153,7 @@ label IntBeckyGuest:
                     $ scene_runtime.picture = "images/becky/Home/door.jpg"
                     vscene scene_runtime.picture
                 elif not threads["beckyEddieSex"].completed:
-                    if int(threads["beckyDinner"].num or 0) >= 2 and (Becky.corruption + procedural_randint(1, 5, "becky_dinner_bed_gate_%s" % int(current_game_day() or 0)) + dinnerbeckyorgasm * 5 >= 48 or int(threads["beckySex"].num or 0) >= 1):
+                    if int(threads["beckyDinner"].num or 0) >= 2 and procedural_randint(1, 2, "becky_dinner_bed_decision_%s" % int(current_game_day() or 0)) == 1:
                         $ Becky.apply_social_roll(18, 2, 1, 50, 2, 1)
                         "Вы, как бы невзначай, подошли к вдове, взяли ее за руку и слегка потянули в направлении лестницы, ведущей на второй этаж. Щеки Бекки зарделись, а на лице появилось выражение решимости."
                         "Она встала и направилась с вами наверх, бросив через плечо: \"Ингочка, собери пожалуйста со стола. А мы со Стефаном обсудим некоторые дела в моей комнате.\""

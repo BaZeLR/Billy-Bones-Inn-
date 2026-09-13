@@ -152,7 +152,7 @@ testcase eddie_low_relationship_refusal_keeps_the_branch_retryable:
     $ initStoryEventRuntime(True)
     assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
 
-testcase becky_unseen_sunday_priest_event_advances_threads:
+testcase finish_day_does_not_play_unseen_becky_story_events:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
@@ -165,26 +165,31 @@ testcase becky_unseen_sunday_priest_event_advances_threads:
         TodaySexEvents_Add("becky", 99, 99, "Priest")
         player.economy.church_donated_amount = 0
         next_day_finish_day_events()
-    assert eval (int(threads["beckyGerhardAdvice"].num or 0) == 1 and not threads["beckyGerhardAdvice"].completed) timeout 5.0
-    assert eval (not threads["beckyEddieSex"].completed) timeout 5.0
+    assert eval (int(threads["beckyGerhardAdvice"].num or 0) == 0 and not threads["beckyGerhardAdvice"].completed) timeout 5.0
+    assert eval (int(threads["beckyEddieSex"].num or 0) == 4 and not threads["beckyEddieSex"].completed) timeout 5.0
     python:
         TodaySexEvents_Add("becky", 99, 99, "Priest")
         player.economy.church_donated_amount = 2100
         next_day_finish_day_events()
-    assert eval (threads["beckyGerhardAdvice"].completed and threads["beckyGerhardAdvice"].num == threads["beckyGerhardAdvice"].data.length) timeout 5.0
-    assert eval (threads["beckyEddieSex"].completed and threads["beckyEddieSex"].num == threads["beckyEddieSex"].data.length) timeout 5.0
+    assert eval (int(threads["beckyGerhardAdvice"].num or 0) == 0 and not threads["beckyGerhardAdvice"].completed) timeout 5.0
+    assert eval (int(threads["beckyEddieSex"].num or 0) == 4 and not threads["beckyEddieSex"].completed) timeout 5.0
 
 testcase becky_from_dinner_runs_eddie_first_join:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ threads["beckyEddieSex"].advanceTo(1, force_active=True)
-    $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
+    $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDinner"
+    $ threads["beckyGerhardAdvice"].reset()
+    $ threads["beckyGerhardAdvice"].disable()
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("BeckyHome", "enter")) timeout 5.0
     $ threads["beckyGerhardAdvice"].forceEnable()
     $ threads["beckyGerhardAdvice"].advanceTo(threads["beckyGerhardAdvice"].data.length, complete_at_end=True)
     $ Becky.rel = 20
     $ Becky.corruption = 55
     $ Eddie.rel = 10
+    $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
     $ initStoryEventRuntime(True)
     assert eval (not story_event_available("BeckyHome", "enter")) timeout 5.0
     $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDinner"
@@ -298,9 +303,12 @@ testcase becky_final_church_event_completes_before_sherwood_starts:
     advance until screen "choice" timeout 20.0
     assert eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить обход") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (any(item.caption == "Посмотреть" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 10.0
+    assert eval (str(scene_runtime.picture or "") == "images/church/confessionEntry.png") timeout 5.0
     $ _look_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Посмотреть")
     click id ("choice_panel_button_%d" % _look_index) pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/church/talk1.jpg") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Посмотреть еще") timeout 10.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/church/talk2.jpg") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить") timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Смотреть дальше") timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
