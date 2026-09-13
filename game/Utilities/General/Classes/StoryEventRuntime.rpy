@@ -1063,7 +1063,6 @@ define beckyThreadList = [
             [
                 "#str(people.location('becky') or '') == 'TavernKitchen'",
                 "#str(people.location('sandra') or '') == 'TavernKitchen'",
-                "#bool(Becky.georgett_mentioned)",
                 "#int(player.item_count('energy_tea_001') or 0) > 0",
             ],
             None,

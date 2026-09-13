@@ -561,7 +561,7 @@ testcase becky_kitchen_friendship_survives_repeat_visit:
         threads["beckySandraKitchenVisit"].reset()
         threads["beckySandraKitchenVisit"].forceEnable()
         threads["beckySandraKitchenVisit"].advanceTo(2)
-        Becky.georgett_mentioned = True
+        Becky.georgett_mentioned = False
         player.add_item("energy_tea_001", 1)
         event_runtime.fired_keys_today = []
         rooms.enter("TavernKitchen")
@@ -627,7 +627,7 @@ testcase becky_kitchen_visits_then_honey_tea:
         calendar_v2.minute = 0
         threads["beckySandraKitchenVisit"].reset()
         threads["beckyGerhardAdvice"].reset()
-        Becky.georgett_mentioned = True
+        Becky.georgett_mentioned = False
         player.add_item("energy_tea_001", 1)
         _tea_before = player.item_count("energy_tea_001")
         event_runtime.fired_keys_today = []
@@ -640,7 +640,8 @@ testcase becky_kitchen_visits_then_honey_tea:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
     python:
-        calendar_v2.daysInGame = 32
+        calendar_v2.daysInGame = 33
+        calendar_v2.week = 4
         event_runtime.evaluation_time = None
         initStoryEventRuntime(True)
     run Call("checkTriggers", "TavernKitchen", "enter", 0)
@@ -649,7 +650,8 @@ testcase becky_kitchen_visits_then_honey_tea:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
     python:
-        calendar_v2.daysInGame = 33
+        calendar_v2.daysInGame = 38
+        calendar_v2.week = 2
         event_runtime.evaluation_time = None
         initStoryEventRuntime(True)
     run Call("checkTriggers", "TavernKitchen", "enter", 0)
