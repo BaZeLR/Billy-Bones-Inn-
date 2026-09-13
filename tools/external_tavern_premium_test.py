@@ -137,6 +137,42 @@ init python:
         assert set(worker_ids) == set(("amanda", "melissa"))
         return worker_ids
 
+    def external_prepare_liza_premium(stamp="liza-premium-test-week", money=2000):
+        for girl_id, info in people.girl_items():
+            for job_key in EXTERNAL_PREMIUM_JOB_KEYS:
+                info.set_job_value(job_key, 0)
+        Liza.set_job_value("jobwaitress", 1)
+        Liza.set_skill("waitress", 10)
+        Liza.skill_gains_today = {}
+        Liza.rel = 18
+        Liza.corruption = 5
+        Liza.mana = 10
+        Sandra.rel = 10
+        Sandra.asked_today = 0
+        Sandra.talked_today = 0
+        player.set_money(money)
+        player.tavern_management.weekly_chores_last_eval_stamp = str(stamp)
+        player.tavern_management.team_premium_last_eval_stamp = ""
+
+        rooms.enter("TavernSandraRoom")
+        main_ui_runtime.clear_contexts()
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.selected_char = ""
+        main_ui_runtime.girl_key = ""
+        main_ui_runtime.object_id = ""
+        main_ui_runtime.talk_picture = ""
+        main_ui_runtime.action_title = "Комната Сандры"
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = tavern_sandra_room_action_items()
+        scene_runtime.picture = tavern_sandra_room_picture()
+        scene_runtime.text = tavern_sandra_room_text()
+        scene_runtime.location_text = scene_runtime.text
+        renpy.show_screen("main_ui")
+
+        worker_ids = [girl_id for girl_id, info in people.girl_items() if info.is_tavern_worker()]
+        assert worker_ids == ["liza"]
+        return worker_ids
+
 
 testsuite global:
     teardown:
@@ -168,7 +204,15 @@ testcase tavern_team_premium_and_personal_reward:
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Трактирные книги" and main_ui_runtime.action_items == []) timeout 5.0
     assert eval (int(_premium_total_100 or 0) == 200) timeout 5.0
     $ _premium_100_index = next(index for index, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "").startswith("Выдать по 100 мараведи"))
-    click id ("choice_panel_button_%d" % int(_premium_100_index)) pos (0.5, 0.5) until eval ("Выделить еще одну личную премию" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id ("choice_panel_button_%d" % int(_premium_100_index)) pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Раздать премии"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text(_premium_test_workers[0], _premium_test_before[_premium_test_workers[0]]["corruption"])) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == tavern_premium_reaction_picture(_premium_test_workers[0])) timeout 5.0
+    $ _premium_first_reaction = str(scene_runtime.text or "")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"] and str(scene_runtime.text or "") != _premium_first_reaction) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text(_premium_test_workers[1], _premium_test_before[_premium_test_workers[1]]["corruption"])) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == tavern_premium_reaction_picture(_premium_test_workers[1])) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Выделить еще одну личную премию" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (int(player.economy.money or 0) == 1800) timeout 5.0
     assert eval (all(int(people.get_info(girl_id).rel or 0) == _premium_test_before[girl_id]["rel"] + 1 for girl_id in _premium_test_workers)) timeout 5.0
     assert eval (all(int(people.get_info(girl_id).mana or 0) == _premium_test_before[girl_id]["mana"] + 3 for girl_id in _premium_test_workers)) timeout 5.0
@@ -204,6 +248,36 @@ testcase tavern_team_premium_and_personal_reward:
     assert eval ((int(_premium_test_other_info.rel or 0), int(_premium_test_other_info.mana or 0), int(_premium_test_other_info.corruption or 0)) == _premium_repeat_other) timeout 5.0
     assert eval ((int(_premium_test_personal_info.rel or 0), int(_premium_test_personal_info.mana or 0), int(_premium_test_personal_info.corruption or 0)) == _premium_repeat_personal) timeout 5.0
     assert eval (main_ui_runtime.scene_origin is None and str(main_ui_runtime.action_title or "") == str(_premium_repeat_origin["title"] or "") and str(scene_runtime.picture or "") == str(_premium_repeat_origin["picture"] or "")) timeout 5.0
+
+testcase tavern_liza_team_and_personal_premium_are_visible:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        _premium_test_workers = external_prepare_liza_premium("1100:4:7:7", 2000)
+        _liza_before = {
+            "rel": int(Liza.rel or 0),
+            "corruption": int(Liza.corruption or 0),
+            "mana": int(Liza.mana or 0),
+            "skill": int(Liza.skill_value("waitress", 0) or 0),
+        }
+    run Call("TavernSandraLedgerScene")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (any(str(item.caption or "").startswith("Выдать по 200 мараведи") for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
+    $ _premium_200_index = next(index for index, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "").startswith("Выдать по 200 мараведи"))
+    click id ("choice_panel_button_%d" % int(_premium_200_index)) pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Раздать премии"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text("liza", _liza_before["corruption"])) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(LizaStaticData.image_path("tavern", "wench_happy") or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Выделить еще одну личную премию" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _premium_personal_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Выделить еще одну личную премию")
+    click id ("choice_panel_button_%d" % int(_premium_personal_index)) pos (0.5, 0.5) until eval (any("Лизетту" in str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
+    $ _premium_liza_index = next(index for index, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if "Лизетту" in str(item.caption or ""))
+    click id ("choice_panel_button_%d" % int(_premium_liza_index)) pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text("liza", _liza_before["corruption"])) timeout 5.0
+    assert eval (int(Liza.rel or 0) == _liza_before["rel"] + 2 and int(Liza.corruption or 0) == _liza_before["corruption"] + 1) timeout 5.0
+    assert eval (int(Liza.mana or 0) == _liza_before["mana"] + 8 and int(Liza.skill_value("waitress", 0) or 0) == _liza_before["skill"] + 1) timeout 5.0
+    assert eval (int(player.economy.money or 0) == 1600 and str(player.tavern_management.team_premium_last_eval_stamp or "") == "1100:4:7:7") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
 
 testcase tavern_team_premium_defer_then_decline:
     run Jump("dev_after_report_checkpoint")

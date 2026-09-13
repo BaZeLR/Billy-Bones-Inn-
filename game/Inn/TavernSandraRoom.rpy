@@ -16,6 +16,62 @@ define TAVERN_TEAM_PREMIUM_JOB_SKILLS = (
 )
 
 init 6 python:
+    def tavern_premium_reaction_picture(girl_name):
+        girl_key = str(girl_name or "").strip().lower()
+        if girl_key == "liza":
+            picture_path = str(LizaStaticData.image_path("tavern", "wench_happy") or "")
+            if picture_path and renpy.loadable(picture_path):
+                return picture_path
+        return str(girl_card_portrait_path(girl_key) or "")
+
+    def tavern_premium_reaction_text(girl_name, corruption_value=0):
+        girl_key = str(girl_name or "").strip().lower()
+        corruption = int(corruption_value or 0)
+        if girl_key == "sandra":
+            if corruption < 15:
+                return "Сандра дважды пересчитывает премию и строго кивает. \"Вот это хозяйский поступок. Спасибо, Стефан. Когда труд замечают, и спрашивать с людей можно по совести.\""
+            if corruption < 35:
+                return "Сандра прячет редкую улыбку, крепко сжимает ваше предплечье и благодарит уже без обычной хозяйской сухости. Перед тем как отойти, она на миг прижимается плечом теснее, чем требовала бы простая благодарность."
+            if corruption < 60:
+                return "Сандра подходит вплотную, поправляет вам ворот и неожиданно целует в щеку. Ее грудь на мгновение прижимается к вам, а тихое \"спасибо, хозяин\" звучит гораздо теплее любого делового отчета."
+            return "Сандра без стеснения обнимает вас, медленно прижимаясь всем телом. \"Щедрого хозяина надо благодарить так, чтобы он это запомнил,\" шепчет она на ухо, прежде чем с довольной улыбкой отойти."
+        if girl_key == "melissa":
+            if corruption < 15:
+                return "Мелисса сначала решает, что ослышалась, потом крепко зажимает премию в ладони и тихо благодарит. Ее смущенная улыбка говорит яснее слов: такого признания своего труда она не ожидала."
+            if corruption < 35:
+                return "Мелисса радостно обнимает вас, а поняв, насколько тесно прижалась, вспыхивает и отскакивает. \"Это за премию, не воображай лишнего,\" предупреждает она, хотя улыбку спрятать уже не может."
+            if corruption < 60:
+                return "Мелисса обвивает руками вашу шею и оставляет быстрый поцелуй у самого уголка губ. Отстраняясь, она проводит ладонью по вашей груди и шепчет, что хорошего хозяина иногда хочется награждать особенно старательно."
+            return "Мелисса смеется, на несколько мгновений устраивается у вас на колене и прячет премию за вырезом платья. \"Теперь попробуй забрать обратно,\" поддразнивает она, медленно поднимаясь и позволяя вашему взгляду задержаться."
+        if girl_key == "amanda":
+            if corruption < 15:
+                return "Аманда восторженно вскрикивает, бросается вам на шею и едва не опрокидывает лавку. Получив премию, она обещает отработать каждую монету."
+            if corruption < 35:
+                return "Аманда звонко целует вас в щеку и с озорной улыбкой прячет монеты за пазуху. \"За хорошую работу — хорошая премия. А за очень хорошую благодарность что полагается?\" — спрашивает она и сама же убегает от ответа."
+            if corruption < 60:
+                return "Аманда неожиданно целует вас уже в губы, а отступая, нарочно проводит бедром по вашей ноге. \"Это только официальное спасибо,\" заявляет она с совершенно неофициальной улыбкой."
+            return "Аманда усаживается к вам на колено, пересчитывает деньги прямо перед вашим лицом и шепчет на ухо такую непристойную версию благодарности, что сама начинает хихикать. Поднявшись, она еще раз дразняще прижимается бедрами."
+        if girl_key == "liza":
+            if corruption < 15:
+                return "Лизетта принимает премию с изящным поклоном и благодарит так серьезно, будто вы вручаете ей награду перед всем городом. Только лукавый блеск в глазах выдает, насколько она довольна."
+            if corruption < 35:
+                return "Лизетта целует кончики пальцев и переносит поцелуй на вашу щеку. \"За щедрость надо платить хорошим настроением,\" говорит она и демонстративно поправляет вырез рабочего платья."
+            if corruption < 60:
+                return "Лизетта прижимается грудью к вашей руке и медленно целует вас в губы. \"Вот теперь девушки точно поймут, за какого хозяина стоит стараться,\" шепчет она, не спеша отстраняться."
+            return "Лизетта садится рядом так тесно, что ее бедро оказывается поверх вашего, и с улыбкой вкладывает одну монету вам за ворот. \"На счастье, хозяин. Остальное я сохраню для нарядов, которые помогут заработать следующую премию.\""
+        if girl_key == "georgett":
+            if corruption < 15:
+                return "Жоржетта удивленно вскидывает брови, затем благодарит вас с непривычной искренностью. Для женщины, привыкшей заранее договариваться о каждой монете, такая премия оказывается настоящим сюрпризом."
+            if corruption < 35:
+                return "Жоржетта весело целует вас в щеку и обещает, что клиенты сегодня увидят самую приветливую улыбку во всем городе. На прощание она легонько щиплет вас за бок — уже как знакомого, а не нанимателя."
+            if corruption < 60:
+                return "Жоржетта обнимает вас и медленно проводит ладонью по груди. \"Умный хозяин знает, что довольная работница особенно убедительна,\" мурлычет она, оставляя долгий поцелуй у вашего уха."
+            return "Жоржетта прижимается бедрами, целует вас в губы и шепчет, что премия — отличный повод весь день вспоминать о щедром хозяине. Ее ладонь скользит почти неприлично низко, прежде чем она смеясь отступает."
+        name = str(people_display_name(girl_key) or girl_key)
+        if corruption < 35:
+            return "%s принимает премию с искренней благодарностью и обещает, что на этой неделе команда постарается не хуже прежнего." % name
+        return "%s благодарит вас теплым объятием и неожиданно смелым поцелуем, превращая деловую раздачу денег в куда более личный момент." % name
+
     def tavern_upstairs_can_enter_sandra_room():
         return int(Sandra.rel or 0) >= 10 or int(threads["sandraWeeklyEvaluation"].num or 0) > 0
 
@@ -195,7 +251,7 @@ label TavernSandraRoomObjectText(object_id="", action_id=""):
 
 
 label TavernSandraLedgerScene:
-    $ renpy.dynamic("_sandra_ledger_picture", "_ledger_stories", "_ledger_idx", "_premium_eval_stamp", "_premium_workers", "_premium_worker_ids", "_premium_worker_count", "_premium_total_25", "_premium_total_50", "_premium_total_100", "_premium_total_200", "_premium_total_500", "_premium_amount", "_premium_decision", "_premium_total", "_premium_mana_gain", "_premium_skill_gain", "_premium_team_names", "_premium_info", "_premium_job_key", "_premium_skill_key", "_premium_skill_before", "_premium_skill_after", "_premium_candidate", "_premium_person", "_premium_person_info", "_premium_person_corruption", "_premium_picture", "_premium_text")
+    $ renpy.dynamic("_sandra_ledger_picture", "_ledger_stories", "_ledger_idx", "_premium_eval_stamp", "_premium_workers", "_premium_worker_ids", "_premium_worker_count", "_premium_total_25", "_premium_total_50", "_premium_total_100", "_premium_total_200", "_premium_total_500", "_premium_amount", "_premium_decision", "_premium_total", "_premium_mana_gain", "_premium_skill_gain", "_premium_team_names", "_premium_info", "_premium_job_key", "_premium_skill_key", "_premium_skill_before", "_premium_skill_after", "_premium_candidate", "_premium_index", "_premium_person", "_premium_person_info", "_premium_person_corruption", "_premium_picture", "_premium_text")
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()
     $ Sandra.change_social(friend_delta=1, open_delta=1)
@@ -299,6 +355,21 @@ label TavernSandraLedgerScene:
             $ scene_runtime.text = "Вы и Сандра приглашаете работников и раздаете премии: по %d мараведи каждому, всего %d. Деньги сразу поднимают настроение команды, а ваше признание их труда — желание работать лучше и держаться за трактир." % (_premium_amount, _premium_total)
             $ scene_runtime.location_text = scene_runtime.text
             menu:
+                "Раздать премии":
+                    pass
+            $ _premium_index = 0
+            while _premium_index < len(_premium_workers):
+                $ _premium_candidate, _premium_info = _premium_workers[_premium_index]
+                $ _premium_picture = tavern_premium_reaction_picture(_premium_candidate)
+                if _premium_picture:
+                    vscene _premium_picture
+                $ scene_runtime.text = tavern_premium_reaction_text(_premium_candidate, _premium_info.corruption)
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        $ _premium_index += 1
+
+            menu:
                 "Выделить еще одну личную премию" if int(player.economy.money or 0) >= _premium_amount:
                     menu:
                         "Дополнительно наградить Сандру — [_premium_amount] мараведи" if "sandra" in _premium_worker_ids:
@@ -328,56 +399,10 @@ label TavernSandraLedgerScene:
                 $ player.spend_money(_premium_amount)
                 $ _premium_person_info.change_social(friend_delta=1, corruption_delta=1)
                 $ _premium_person_info.reward_need_fulfilled(max(2, _premium_mana_gain), "personal_premium")
-                $ _premium_picture = girl_card_portrait_path(_premium_person)
+                $ _premium_picture = tavern_premium_reaction_picture(_premium_person)
                 if str(_premium_picture or "").strip():
                     vscene _premium_picture
-                if _premium_person == "sandra":
-                    if _premium_person_corruption < 15:
-                        $ _premium_text = "Сандра дважды пересчитывает личную премию и строго кивает. \"Вот это хозяйский поступок. Спасибо, Стефан. Когда труд замечают, и спрашивать с людей можно по совести.\""
-                    elif _premium_person_corruption < 35:
-                        $ _premium_text = "Сандра прячет редкую улыбку, крепко сжимает ваше предплечье и благодарит уже без обычной хозяйской сухости. Перед тем как отойти, она на миг прижимается плечом теснее, чем требовала бы простая благодарность."
-                    elif _premium_person_corruption < 60:
-                        $ _premium_text = "Сандра подходит вплотную, поправляет вам ворот и неожиданно целует в щеку. Ее грудь на мгновение прижимается к вам, а тихое \"спасибо, хозяин\" звучит гораздо теплее любого делового отчета."
-                    else:
-                        $ _premium_text = "Сандра без стеснения обнимает вас, медленно прижимаясь всем телом. \"Щедрого хозяина надо благодарить так, чтобы он это запомнил,\" шепчет она на ухо, прежде чем с довольной улыбкой отойти."
-                elif _premium_person == "melissa":
-                    if _premium_person_corruption < 15:
-                        $ _premium_text = "Мелисса сначала решает, что ослышалась, потом крепко зажимает личную премию в ладони и тихо благодарит. Ее смущенная улыбка говорит яснее слов: такого признания своего труда она не ожидала."
-                    elif _premium_person_corruption < 35:
-                        $ _premium_text = "Мелисса радостно обнимает вас, а поняв, насколько тесно прижалась, вспыхивает и отскакивает. \"Это за премию, не воображай лишнего,\" предупреждает она, хотя улыбку спрятать уже не может."
-                    elif _premium_person_corruption < 60:
-                        $ _premium_text = "Мелисса обвивает руками вашу шею и оставляет быстрый поцелуй у самого уголка губ. Отстраняясь, она проводит ладонью по вашей груди и шепчет, что хорошего хозяина иногда хочется награждать особенно старательно."
-                    else:
-                        $ _premium_text = "Мелисса смеется, на несколько мгновений устраивается у вас на колене и прячет премию за вырезом платья. \"Теперь попробуй забрать обратно,\" поддразнивает она, медленно поднимаясь и позволяя вашему взгляду задержаться."
-                elif _premium_person == "amanda":
-                    if _premium_person_corruption < 15:
-                        $ _premium_text = "Аманда восторженно вскрикивает, бросается вам на шею и едва не опрокидывает лавку. Получив личную премию, она обещает отработать каждую монету."
-                    elif _premium_person_corruption < 35:
-                        $ _premium_text = "Аманда звонко целует вас в щеку и с озорной улыбкой прячет монеты за пазуху. \"За хорошую работу — хорошая премия. А за очень хорошую благодарность что полагается?\" — спрашивает она и сама же убегает от ответа."
-                    elif _premium_person_corruption < 60:
-                        $ _premium_text = "Аманда неожиданно целует вас уже в губы, а отступая, нарочно проводит бедром по вашей ноге. \"Это только официальное спасибо,\" заявляет она с совершенно неофициальной улыбкой."
-                    else:
-                        $ _premium_text = "Аманда усаживается к вам на колено, пересчитывает деньги прямо перед вашим лицом и шепчет на ухо такую непристойную версию благодарности, что сама начинает хихикать. Поднявшись, она еще раз дразняще прижимается бедрами."
-                elif _premium_person == "liza":
-                    if _premium_person_corruption < 15:
-                        $ _premium_text = "Лизетта принимает личную премию с изящным поклоном и благодарит так серьезно, будто вы вручаете ей награду перед всем городом. Только лукавый блеск в глазах выдает, насколько она довольна."
-                    elif _premium_person_corruption < 35:
-                        $ _premium_text = "Лизетта целует кончики пальцев и переносит поцелуй на вашу щеку. \"За щедрость надо платить хорошим настроением,\" говорит она и демонстративно поправляет вырез рабочего платья."
-                    elif _premium_person_corruption < 60:
-                        $ _premium_text = "Лизетта прижимается грудью к вашей руке и медленно целует вас в губы. \"Вот теперь девушки точно поймут, за какого хозяина стоит стараться,\" шепчет она, не спеша отстраняться."
-                    else:
-                        $ _premium_text = "Лизетта садится рядом так тесно, что ее бедро оказывается поверх вашего, и с улыбкой вкладывает одну монету вам за ворот. \"На счастье, хозяин. Остальное я сохраню для нарядов, которые помогут заработать следующую премию.\""
-                elif _premium_person == "georgett":
-                    if _premium_person_corruption < 15:
-                        $ _premium_text = "Жоржетта удивленно вскидывает брови, затем благодарит вас с непривычной искренностью. Для женщины, привыкшей заранее договариваться о каждой монете, личная премия оказывается настоящим сюрпризом."
-                    elif _premium_person_corruption < 35:
-                        $ _premium_text = "Жоржетта весело целует вас в щеку и обещает, что клиенты сегодня увидят самую приветливую улыбку во всем городе. На прощание она легонько щиплет вас за бок — уже как знакомого, а не нанимателя."
-                    elif _premium_person_corruption < 60:
-                        $ _premium_text = "Жоржетта обнимает вас и медленно проводит ладонью по груди. \"Умный хозяин знает, что довольная работница особенно убедительна,\" мурлычет она, оставляя долгий поцелуй у вашего уха."
-                    else:
-                        $ _premium_text = "Жоржетта прижимается бедрами, целует вас в губы и шепчет, что личная премия — отличный повод весь день вспоминать о щедром хозяине. Ее ладонь скользит почти неприлично низко, прежде чем она смеясь отступает."
-                else:
-                    $ _premium_text = "%s принимает дополнительную премию и благодарит вас теплым объятием. В ее улыбке деловая признательность уже смешивается с куда более личным обещанием." % people_display_name(_premium_person)
+                $ _premium_text = tavern_premium_reaction_text(_premium_person, _premium_person_corruption)
                 $ scene_runtime.text = _premium_text
                 $ scene_runtime.location_text = scene_runtime.text
                 menu:
