@@ -206,12 +206,8 @@ testcase tavern_team_premium_and_personal_reward:
     $ _premium_100_index = next(index for index, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "").startswith("Выдать по 100 мараведи"))
     click id ("choice_panel_button_%d" % int(_premium_100_index)) pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Раздать премии"]) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
-    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text(_premium_test_workers[0], _premium_test_before[_premium_test_workers[0]]["corruption"])) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == tavern_premium_reaction_picture(_premium_test_workers[0])) timeout 5.0
-    $ _premium_first_reaction = str(scene_runtime.text or "")
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"] and str(scene_runtime.text or "") != _premium_first_reaction) timeout 20.0
-    assert eval (str(scene_runtime.text or "") == tavern_premium_reaction_text(_premium_test_workers[1], _premium_test_before[_premium_test_workers[1]]["corruption"])) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == tavern_premium_reaction_picture(_premium_test_workers[1])) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == "\n\n".join([tavern_premium_reaction_text(girl_id, _premium_test_before[girl_id]["corruption"]) for girl_id in _premium_test_workers])) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/tavern_crew.jpg") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Выделить еще одну личную премию" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (int(player.economy.money or 0) == 1800) timeout 5.0
     assert eval (all(int(people.get_info(girl_id).rel or 0) == _premium_test_before[girl_id]["rel"] + 1 for girl_id in _premium_test_workers)) timeout 5.0

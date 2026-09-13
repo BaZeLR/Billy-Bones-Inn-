@@ -251,7 +251,7 @@ label TavernSandraRoomObjectText(object_id="", action_id=""):
 
 
 label TavernSandraLedgerScene:
-    $ renpy.dynamic("_sandra_ledger_picture", "_ledger_stories", "_ledger_idx", "_premium_eval_stamp", "_premium_workers", "_premium_worker_ids", "_premium_worker_count", "_premium_total_25", "_premium_total_50", "_premium_total_100", "_premium_total_200", "_premium_total_500", "_premium_amount", "_premium_decision", "_premium_total", "_premium_mana_gain", "_premium_skill_gain", "_premium_team_names", "_premium_info", "_premium_job_key", "_premium_skill_key", "_premium_skill_before", "_premium_skill_after", "_premium_candidate", "_premium_index", "_premium_person", "_premium_person_info", "_premium_person_corruption", "_premium_picture", "_premium_text")
+    $ renpy.dynamic("_sandra_ledger_picture", "_ledger_stories", "_ledger_idx", "_premium_eval_stamp", "_premium_workers", "_premium_worker_ids", "_premium_worker_count", "_premium_total_25", "_premium_total_50", "_premium_total_100", "_premium_total_200", "_premium_total_500", "_premium_amount", "_premium_decision", "_premium_total", "_premium_mana_gain", "_premium_skill_gain", "_premium_team_names", "_premium_info", "_premium_job_key", "_premium_skill_key", "_premium_skill_before", "_premium_skill_after", "_premium_candidate", "_premium_person", "_premium_person_info", "_premium_person_corruption", "_premium_picture", "_premium_text")
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()
     $ Sandra.change_social(friend_delta=1, open_delta=1)
@@ -357,17 +357,22 @@ label TavernSandraLedgerScene:
             menu:
                 "Раздать премии":
                     pass
-            $ _premium_index = 0
-            while _premium_index < len(_premium_workers):
-                $ _premium_candidate, _premium_info = _premium_workers[_premium_index]
-                $ _premium_picture = tavern_premium_reaction_picture(_premium_candidate)
-                if _premium_picture:
-                    vscene _premium_picture
-                $ scene_runtime.text = tavern_premium_reaction_text(_premium_candidate, _premium_info.corruption)
-                $ scene_runtime.location_text = scene_runtime.text
-                menu:
-                    "Продолжить":
-                        $ _premium_index += 1
+            python:
+                _premium_text = "\n\n".join([
+                    tavern_premium_reaction_text(girl_id, info.corruption)
+                    for girl_id, info in _premium_workers
+                ])
+                if _premium_worker_count == 1:
+                    _premium_picture = tavern_premium_reaction_picture(_premium_workers[0][0])
+                else:
+                    _premium_picture = "images/tavern/mainhall/tavern_crew.jpg"
+                scene_runtime.text = _premium_text
+                scene_runtime.location_text = scene_runtime.text
+            if str(_premium_picture or "").strip():
+                vscene _premium_picture
+            menu:
+                "Продолжить":
+                    pass
 
             menu:
                 "Выделить еще одну личную премию" if int(player.economy.money or 0) >= _premium_amount:
