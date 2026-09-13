@@ -284,6 +284,7 @@ label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
         "\"Бекки, как тебе завершение ужина?\" - осведомились вы."
         if procedural_randint(1, 3 + (1 if int(threads["beckySex"].num or 0) >= 2 else 0), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
+            $ threads["ingaGroceryMorning"].enable()
         elif int(threads["beckySex"].num or 0) >= 2:
             if Becky.corruption < 48:
                 "\"Ну я не знаю, все-таки как-то неловко мне было на глазах Эдди и Инги.\""
@@ -311,8 +312,10 @@ label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
                     "\"Ох, и подумать только, я с тобой, на глазах у детей, пошла прямо в спальню. Как вспомню, так коленки до сих пор дрожат.\" - поделилась с вами вдова. \"И внизу мокро,\" добавила она приглушенным голосом."
             else:
                 "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
+                $ threads["ingaGroceryMorning"].enable()
         elif int(threads["beckySex"].num or 0) < 1 and int(threads["beckyDinner"].num or 0) >= 2:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
+            $ threads["ingaGroceryMorning"].enable()
         else:
             "\"Хорошо было, ты еще приходи, не стесняйся.\""
     $ Becky.finish_talk()

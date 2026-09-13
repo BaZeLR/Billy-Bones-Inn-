@@ -1,5 +1,5 @@
-# The morning encounter is an alternative opening of the existing
-# Inga/Lucas thread; its later Becky conversations keep their original stages.
+# This morning encounter advances only Inga's event thread. Becky's HomeFront
+# discovery and its later conversations advance through their own thread.
 label story_inga_grocery_morning_0:
     $ main_ui_begin_native_scene_state("Ранний покупатель")
     show screen main_ui

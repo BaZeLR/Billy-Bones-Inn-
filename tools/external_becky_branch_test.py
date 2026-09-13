@@ -354,6 +354,8 @@ testcase inga_grocery_morning_event_cycle:
         calendar_v2.hour = 7
         calendar_v2.minute = 0
         threads["beckyIngaLucasPath"].reset()
+        threads["ingaGroceryMorning"].reset()
+        threads["ingaGroceryMorning"].enable()
         Inga.known = False
         Inga.acquaintance_stage = 0
         Becky.talked_today = 0
@@ -370,12 +372,14 @@ testcase inga_grocery_morning_event_cycle:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("мгновенно становится тихо" in scene_runtime.text) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Я Ингенборг" in scene_runtime.text) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Хороший завтрак" in scene_runtime.text) timeout 10.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["beckyIngaLucasPath"].num == 1) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (Inga.known and Inga.acquaintance_stage >= 1) timeout 10.0
     assert eval (rooms.current_code == "GroceryStore" and main_ui_runtime.mode == "scene") timeout 5.0
     assert eval (scene_runtime.picture == rooms.get("GroceryStore").bg_picture)
     screenshot "inga_grocery_morning_return.png"
     assert eval (Inga.known and Inga.acquaintance_stage >= 1)
-    assert eval (story_event_available("talk_becky", "becky_talk_inga1"))
+    assert eval (threads["beckyIngaLucasPath"].num == 0)
+    assert eval (threads["ingaGroceryMorning"].completed)
+    assert eval (not story_event_available("talk_becky", "becky_talk_inga1"))
     assert eval (not story_event_available("GroceryStore", "enter") or event_runtime.available["GroceryStore"]["enter"].target != "story_inga_grocery_morning_0")
 
 testcase becky_regular_evening_visit_enters_dinner:
@@ -465,9 +469,12 @@ testcase inga_grocery_morning_clock_gates:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
     python:
-        threads["beckyIngaLucasPath"].reset()
+        Inga.known = False
+        Inga.acquaintance_stage = 0
+        threads["ingaGroceryMorning"].reset()
+        threads["ingaGroceryMorning"].enable()
         initStoryEventRuntime(True)
-        _morning_event = next(evt for evt in threads["beckyIngaLucasPath"].data.triggers[0] if evt.target == "story_inga_grocery_morning_0")
+        _morning_event = threads["ingaGroceryMorning"].data.triggers[0][0]
         calendar_v2.week = 1
         calendar_v2.hour = 5
     assert eval (not _morning_event.checkHour())
@@ -480,6 +487,52 @@ testcase inga_grocery_morning_clock_gates:
         calendar_v2.hour = 7
     assert eval (not _morning_event.checkDay())
 
+testcase becky_homefront_consumes_scheduled_lucas_event_once:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        TodaySexEvents_Clear()
+        TodaySexEvents_Add("inga", 99, 1, "Lucas")
+        Becky.home_front_checked_today = True
+    assert eval (CheckIfSexEventExist("inga", 99, "Lucas") > 0)
+    run Call("BeckyHomeFront", "")
+    advance until screen "choice" timeout 20.0
+    assert eval (CheckIfSexEventExist("inga", 99, "Lucas") == -1)
+
+testcase becky_v89_repairs_only_unwitnessed_grocery_stage:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        threads["beckyIngaLucasPath"].reset()
+        threads["beckyIngaLucasPath"].advanceTo(1, force_active=True)
+        threads["ingaGroceryMorning"].reset()
+        Inga.acquaintance_stage = 1
+        Inga.saw_lucas_sex = False
+        updateSave_V89()
+    assert eval (threads["beckyIngaLucasPath"].num == 0 and threads["ingaGroceryMorning"].completed)
+    python:
+        threads["beckyIngaLucasPath"].advanceTo(1, force_active=True)
+        Inga.saw_lucas_sex = True
+        updateSave_V89()
+    assert eval (threads["beckyIngaLucasPath"].num == 1)
+
+testcase becky_grown_daughter_line_unlocks_inga_encounter:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        threads["beckyDinner"].advanceTo(2, force_active=True)
+        threads["beckySex"].reset()
+        threads["ingaGroceryMorning"].reset()
+        Becky.home_visit_count = 3
+        Becky.talked_today = 0
+    run Call("story_becky_home_last_visit_talk_0", "becky")
+    advance until screen "say" timeout 20.0
+    click pos (960, 900) until eval (threads["ingaGroceryMorning"].enabled) timeout 20.0
+    assert eval (threads["ingaGroceryMorning"].enabled)
+
 testcase inga_grocery_morning_leave_keeps_progress:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
@@ -488,6 +541,10 @@ testcase inga_grocery_morning_leave_keeps_progress:
         calendar_v2.hour = 7
         calendar_v2.minute = 0
         threads["beckyIngaLucasPath"].reset()
+        threads["ingaGroceryMorning"].reset()
+        threads["ingaGroceryMorning"].enable()
+        Inga.known = False
+        Inga.acquaintance_stage = 0
         event_runtime.fired_keys_today = []
         initStoryEventRuntime(True)
     run Jump("GroceryStore")

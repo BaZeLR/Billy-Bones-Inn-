@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 89
+define currentVersion = 90
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -774,6 +774,10 @@ init -100 python:
         if loaded_version < 89:
             updateSave_V88()
             loaded_version = 89
+
+        if loaded_version < 90:
+            updateSave_V89()
+            loaded_version = 90
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2968,6 +2972,28 @@ init -100 python:
         if bool(getattr(Mongol, "will_try_to_steal", False)) and daily_events.exists("", "StableHorseTheft") == 0:
             daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")
         Mongol.__dict__.pop("will_try_to_steal", None)
+
+    def updateSave_V89():
+        # The optional Inga grocery introduction was briefly registered as an
+        # alternative first event in Becky's discovery thread. Repair only the
+        # unambiguous old-save signature: Inga was introduced, but HomeFront
+        # was not witnessed and therefore never legitimately advanced Becky.
+        initThreads()
+        thread_rows = globals().get("threads", {})
+        becky_inga_thread = thread_rows.get("beckyIngaLucasPath", None)
+        inga_morning_thread = thread_rows.get("ingaGroceryMorning", None)
+        if (
+            becky_inga_thread is not None
+            and int(getattr(becky_inga_thread, "num", 0) or 0) == 1
+            and int(getattr(Inga, "acquaintance_stage", 0) or 0) >= 1
+            and not bool(getattr(Inga, "saw_lucas_sex", False))
+        ):
+            becky_inga_thread.reset()
+            if inga_morning_thread is not None:
+                inga_morning_thread.advanceTo(
+                    inga_morning_thread.data.length,
+                    complete_at_end=True,
+                )
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

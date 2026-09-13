@@ -122,6 +122,7 @@ label BeckyHomeFront(arrive_mode=""):
     if Becky.home_front_checked_today and rooms.get("BeckyHomeFront").state["inga_scene_roll"] <= 2:
         $ rooms.get("BeckyHomeFront").state["inga_scene_roll"] = 3
     $ Becky.home_front_checked_today = True
+    $ GetSexEventFromTable("inga", 99, "Lucas")
     if rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 1:
         $ pregnancy_check("inga", "mouthface", 1, "Лукас")
     elif rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 2:
@@ -265,6 +266,7 @@ label becky_homefront_share_with_becky:
     if int(threads["beckyDinner"].num or 0) < 2:
         "\"Но ведь это значит, что дома скорее всего никого нет, так что пошли скорее внутрь, пока они нас не засекли!\" - добавила она."
     $ show_inga_front_fuck_image(rooms.get("BeckyHomeFront").state["inga_scene_roll"], 2)
+    $ Inga.mark_known()
     $ Inga.acquaintance_stage = max(Inga.acquaintance_stage, 1)
     $ Inga.saw_lucas_sex = True
     if _becky_inga_first_discovery and event_runtime.active_thread is _becky_inga_thread:

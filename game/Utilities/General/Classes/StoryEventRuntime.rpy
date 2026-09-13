@@ -1226,14 +1226,9 @@ define beckyThreadList = [
         ),
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "IngaLucasPath", None, [
-        [
-            ("becky_homefront_share_with_becky", None, None, None, 1, None, [
-                "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
-            ], None, "BeckyHomeFront", "inga_discovery", 10),
-            ("story_inga_grocery_morning_0", (1, 6), (6, 7), None, 1, None, [
-                "#people.location('inga') == 'GroceryStore'",
-            ], None, "GroceryStore", "enter", 30),
-        ],
+        ("becky_homefront_share_with_becky", None, None, None, 1, None, [
+            "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
+        ], None, "BeckyHomeFront", "inga_discovery", 10),
         ("story_becky_talk_inga_0", None, None, None, 1, None, [
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_inga1", 20),
@@ -1289,6 +1284,15 @@ define beckyThreadList = [
             130,
         ),
     ], highlight=False, threaded=False),
+]
+define ingaThreadList = [
+    # Becky unlocks this later Inga encounter in her post-visit conversation.
+    # Its cursor belongs to Inga and cannot advance Becky's HomeFront thread.
+    LThreadData(0, "inga", "GroceryMorning", "ingaGroceryMorningEnabled", [
+        ("story_inga_grocery_morning_0", (1, 6), (6, 7), None, 1, None, [
+            "#people.location('inga') == 'GroceryStore'",
+        ], None, "GroceryStore", "enter", 30),
+    ], highlight=False, threaded=True),
 ]
 define eddieThreadList = []
 define irmaThreadList = []
@@ -1985,6 +1989,7 @@ define threadListsByGirl = {
     "robin": robinThreadList,
     "sherwood": sherwoodThreadList,
     "becky": beckyThreadList,
+    "inga": ingaThreadList,
     "eddie": eddieThreadList,
     "irma": irmaThreadList,
     "church": churchThreadList,
@@ -2006,6 +2011,7 @@ define threadList = (
     + robinThreadList
     + sherwoodThreadList
     + beckyThreadList
+    + ingaThreadList
     + eddieThreadList
     + irmaThreadList
     + churchThreadList
