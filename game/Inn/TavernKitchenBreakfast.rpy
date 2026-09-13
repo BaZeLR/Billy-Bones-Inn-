@@ -57,6 +57,8 @@ init python:
             key = str(npc_id or "").strip().lower()
             if key not in ("sandra", "melissa", "amanda", "becky"):
                 continue
+            if key in ("sandra", "melissa", "amanda") and household_morning_issue_type(key) in ("sick", "sleepy"):
+                continue
             if key in seen:
                 continue
             seen.add(key)

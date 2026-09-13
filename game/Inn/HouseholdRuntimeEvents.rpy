@@ -883,7 +883,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
                     "Оставить Мелиссу собираться":
                         pass
 
-            "Пощекотать ее под грудью" if _wake_indecent:
+            "Пощекотать ее под грудью":
                 vscene MelissaStaticData.cycle_image("tavern", "sleep", 4)
                 $ scene_runtime.text = "Вместо второго окрика вы проводите пальцами под ее грудью. Мелисса взвизгивает, пытается перехватить вашу руку и, не удержавшись, валится обратно на кровать. Еще миг она сердито смотрит на вас, а потом не выдерживает и смеется, подтянув ноги к животу."
                 $ scene_runtime.location_text = scene_runtime.text

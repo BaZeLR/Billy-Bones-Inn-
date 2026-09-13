@@ -243,7 +243,7 @@ init python:
         return tavern_kitchen_food_effect_days("milk_days") > 0
 
     def tavern_kitchen_fertility_bonus_active():
-        return tavern_kitchen_honey_bonus_active() and tavern_kitchen_milk_bonus_active()
+        return tavern_kitchen_boar_bonus_active() and tavern_kitchen_honey_bonus_active() and tavern_kitchen_milk_bonus_active()
 
     def tavern_kitchen_daily_product_savings(base_products=0):
         base = max(0, int(base_products or 0))
@@ -261,7 +261,7 @@ init python:
         if tavern_kitchen_honey_bonus_active():
             lines.append("Медовые угощения за день заметно смягчили настроение в доме.")
         if tavern_kitchen_fertility_bonus_active():
-            lines.append("Молоко с медом делает общую еду мягче, сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")
+            lines.append("Кабанье мясо, молоко и мед делают общую еду сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")
         if tavern_kitchen_boar_bonus_active():
             lines.append("Кабанье мясо сделало кухню сытнее: припасов ушло меньше, зато вина гости просили охотнее.")
         for effect_key in list(effects.keys()):

@@ -65,6 +65,22 @@ def test_breakfast_attendance_is_household_rule_not_current_schedule_projection(
     assert "people.ids_at" not in block
 
 
+def test_household_morning_state_accepts_renpy_rollback_mappings_and_uses_monthly_rate():
+    source = read("Inn/menu_tavernstat.rpy")
+    ensure_block = source.split("def _ensure_household_morning_state", 1)[1].split(
+        "def household_morning_issue_type", 1
+    )[0]
+    repair_source = read("Utilities/General/NPC/HouseholdAI_ren.rpy")
+    repair_block = repair_source.split("def repair(self):", 1)[1].split(
+        "def resident_ids", 1
+    )[0]
+
+    assert 'if not hasattr(entry, "get"):' in ensure_block
+    assert '<= 10' in ensure_block
+    assert 'if not hasattr(saved_value, "get"):' in repair_block
+    assert "isinstance(entry, dict)" not in ensure_block
+
+
 def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
     engine = read("NPC/Girls/Melissa/IntMelissaSex.rpy")
     sandra_events = read("NPC/Girls/Sandra/SandraEvents.rpy")

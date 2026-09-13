@@ -23,8 +23,14 @@ init python:
             chance /= 10.0
 
         cycle = girl_decision_cycle_state(girl)
-        if cycle.get("phase") == "fertile" and girl_info.is_tavern_worker() and tavern_kitchen_fertility_bonus_active():
-            chance *= 1.25
+        if (
+            str(dad_name or "").strip().lower() in ("you", "вы")
+            and cycle.get("phase") == "fertile"
+            and girl_info.is_tavern_worker()
+            and npc_friend_level(girl) >= 2
+            and tavern_kitchen_fertility_bonus_active()
+        ):
+            return 300
         cycle_fertility = max(0.0, min(1.0, float(cycle.get("fertility", 0.45) or 0.0)))
         chance *= 0.55 + cycle_fertility
 

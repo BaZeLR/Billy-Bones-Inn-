@@ -12,9 +12,9 @@ init 6 python:
         temp_room = str(Melissa.temp_room_code or "").strip()
         if temp_room and threads["melissaBatProblem"].num < 10:
             return False
-        if str(people.location("melissa") or "") != "TavernMelissaRoom":
-            return False
-        return (not people.is_awake("melissa")) or (household_morning_issue_type("melissa") == "sleepy" and int(calendar_v2.hour or 0) < 12)
+        if household_morning_issue_type("melissa") == "sleepy" and int(calendar_v2.hour or 0) < 12:
+            return True
+        return str(people.location("melissa") or "") == "TavernMelissaRoom" and not people.is_awake("melissa")
 
     def tavern_melissa_room_picture():
         if tavern_melissa_room_can_show_sleeping():

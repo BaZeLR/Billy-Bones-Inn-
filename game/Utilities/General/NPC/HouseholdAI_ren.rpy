@@ -243,7 +243,7 @@ init 5 python:
             self.meta = repaired_meta
             for field_name in self.DICT_FIELDS:
                 saved_value = getattr(self, field_name, None)
-                if not isinstance(saved_value, dict):
+                if not hasattr(saved_value, "get"):
                     saved_value = {}
                 setattr(self, field_name, saved_value)
             return self

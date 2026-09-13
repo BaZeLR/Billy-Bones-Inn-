@@ -103,10 +103,10 @@ init python:
             return {"issue": "", "resolved": 1, "indecent": 0}
         state_key = _household_morning_state_key(key, day_marker)
         entry = household.morning_state.get(state_key)
-        if not isinstance(entry, dict):
+        if not hasattr(entry, "get"):
             issue_code = ""
             indecent_flag = 0
-            if int(calendar_v2.week or 0) != 7 and procedural_randint(1, 100, "household_morning_issue_%s_%s" % (key, current_game_day())) <= 15:
+            if int(calendar_v2.week or 0) != 7 and procedural_randint(1, 100, "household_morning_issue_%s_%s" % (key, current_game_day())) <= 10:
                 issue_code = "sick" if procedural_randint(1, 2, "household_morning_kind_%s_%s" % (key, current_game_day())) == 1 else "sleepy"
                 if issue_code == "sleepy" and _household_sleep_indecent_possible(key) and procedural_randint(1, 100, "household_morning_indecent_%s_%s" % (key, current_game_day())) <= 45:
                     indecent_flag = 1

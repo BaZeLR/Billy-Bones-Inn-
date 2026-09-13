@@ -380,7 +380,8 @@ def test_melissa_sleepy_wake_tickle_uses_thread_owned_handjob_gate():
     assert 'threads["melissaBatProblem"].completed' in gate
     assert 'threads["claraPaintingsPath"].completed' in gate
     assert 'main_ui_begin_native_scene_state("Разбудить Мелиссу")' in wake
-    assert '"Пощекотать ее под грудью" if _wake_indecent:' in wake
+    assert '"Пощекотать ее под грудью":' in wake
+    assert '"Пощекотать ее под грудью" if _wake_indecent:' not in wake
     assert 'MelissaStaticData.cycle_image("tavern", "sleep", 4)' in wake
     assert 'player_apply_arousal_trigger("melissa_wake_tickle"' in wake
     assert '"Предложить помочь рукой" if Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():' in wake
