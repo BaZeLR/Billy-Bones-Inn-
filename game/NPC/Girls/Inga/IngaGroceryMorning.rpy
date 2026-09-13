@@ -2,6 +2,7 @@
 # Inga/Lucas thread; its later Becky conversations keep their original stages.
 label story_inga_grocery_morning_0:
     $ main_ui_begin_native_scene_state("Ранний покупатель")
+    show screen main_ui
     $ scene_runtime.picture = rooms.get("GroceryStore").bg_picture
     vscene scene_runtime.picture
     $ scene_runtime.text = "Лавка уже открыта, но за прилавком никого нет. Из-за занавески доносится приглушенный смех. «Лукас, тише, покупатели услышат!» — шепчет знакомый женский голос."

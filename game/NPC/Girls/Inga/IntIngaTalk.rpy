@@ -41,9 +41,9 @@ label IntIngaTalk(show_menu=True):
                     $ scene_runtime.picture = "images/inga/newInga/inga_store_closeup_unlaced_clean.png"
                     vscene scene_runtime.picture
             "Попросить Ингу позаботиться и о вас" if str(rooms.current_code or "") == "GroceryStore" and npc_friend_level("inga") >= 2 and player.intimacy.can_cum() and Inga.can_have_sex_today():
-                $ scene_runtime.picture = "images/inga/newInga/inga_store_openworkdress.png"
+                $ scene_runtime.picture = "images/inga/StreetSex/minet1.jpg"
                 vscene scene_runtime.picture
-                $ scene_runtime.text = "Инга окидывает вас понимающим взглядом, выходит из-за прилавка и опускается перед вами на колени. Ее теплые губы мягко обхватывают ваш член, а язык начинает неспешную игру."
+                $ scene_runtime.text = "«Знаешь что? Я всё ещё голодна», — говорит Инга с озорной улыбкой. Она выходит из-за прилавка, опускается перед вами на колени, ловко достаёт ваш напряжённый член и начинает страстно сосать."
                 $ scene_runtime.location_text = scene_runtime.text
                 $ Inga.set_cock_position("mouth")
                 menu:
@@ -58,7 +58,7 @@ label IntIngaTalk(show_menu=True):
                         $ Inga.change_social(friend_delta=1, open_delta=1)
                 $ scene_runtime.picture = "images/inga/newInga/inga_store_closeup_unlaced_breakfast.png"
                 vscene scene_runtime.picture
-                $ scene_runtime.text = "«Бедный-бедный хозяин трактира, — поддразнивает Инга. — Разве твои девочки не должны о тебе заботиться?»"
+                $ scene_runtime.text = "«Теперь я сыта и больше не голодна», — говорит Инга с довольной улыбкой. «Бедный-бедный хозяин трактира, — поддразнивает она. — Разве твои девочки не должны о тебе заботиться?»"
                 $ scene_runtime.location_text = scene_runtime.text
                 menu:
                     "Вернуться к разговору":
