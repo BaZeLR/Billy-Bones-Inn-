@@ -8353,6 +8353,29 @@ testcase external_mongol_horse_purchase_once_and_amanda_room_presence:
     assert eval ("amanda" in people.ids_at("TavernAmandaRoom")) timeout 5.0
     assert eval ("amanda" in [str(row.get("id", "") or "") for row in renpy.get_screen("main_ui").scope.get("_char_entries", [])]) timeout 5.0
 
+testcase external_clara_church_fiance_two_beat_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ Clara.rel = max(5, int(Clara.rel or 0))
+    $ threads["claraPaintingsPath"].advanceTo(6, force_active=True)
+    $ external_calendar_set_weekday(7)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 30)
+    $ rooms.enter("Church")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("Church", "clara_paintings")) timeout 5.0
+    run Call("ChurchServiceMenu", True)
+    run Call("ChurchServiceLegare")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/Alber/church/cermon_fiance_clara.png") timeout 5.0
+    assert eval ("незнакомый молодой дворянин" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and str(scene_runtime.picture or "") == "images/Alber/church/cermon_fiance1_clara.png") timeout 20.0
+    assert eval ("столичный брак уже не слух" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к прихожанам"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and int(threads["claraPaintingsPath"].num or 0) == 7 and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+
 testcase external_clara_object_thread_conditions:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -9367,6 +9390,7 @@ def main() -> int:
             "external_player_and_girl_cards_render",
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
+            "external_clara_church_fiance_two_beat_event",
             "external_clara_object_thread_conditions",
             "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",
@@ -9572,6 +9596,7 @@ def main() -> int:
             "external_player_and_girl_cards_render",
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
+            "external_clara_church_fiance_two_beat_event",
             "external_clara_object_thread_conditions",
             "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",

@@ -102,6 +102,7 @@ def test_clara_paintings_events_use_event_checks_not_ready_helpers():
     assert 'Call("checkTriggers", "WineStore", "clara_paintings", 0)' in wine_store
     assert 'Call("checkTriggers", "TavernMain", "clara_paintings", 0)' in tavern_main
     assert 'call checkTriggers("Church", "clara_paintings", 0)' in church
+    assert '"story_clara_paintings_church_6",\n            7, (8, 9), None,' in paintings_thread
     assert 'call preEvent("claraPaintingsPath")' not in labels
     assert '"rule": "thread_step"' in melissa_schedule
     assert '"thread": "claraPaintingsPath"' in melissa_schedule

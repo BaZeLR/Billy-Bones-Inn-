@@ -679,7 +679,7 @@ define claraThreadList = [
         ),
         (
             "story_clara_paintings_church_6",
-            7, (6, 12), None,
+            7, (8, 9), None,
             1,
             None,
             None,
