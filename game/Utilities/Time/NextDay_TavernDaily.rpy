@@ -94,24 +94,22 @@ label NextDay_TavernDaily():
             TotalDay['KidsMoney'] += player.economy.weekly_child_support_money()
         if player.horse.owns_horse():
             TotalDay['HorseFood'] += 3
-        if Mongol.will_try_to_steal:
-            _dog_theft_result = None
-            if dog.prevents_theft("horse"):
-                _dog_theft_result = dog_catch_delinquent_apply("horse")
-            if _dog_theft_result and bool(_dog_theft_result.get("ok", False)):
-                TotalDay['HorseStolen'] = '{b}Ночью какой-то негодяй попытался увести вашего коня, но пес поднял лай, сбил вора с ног и не дал ему уйти. %s{/b}\n' % str(_dog_theft_result.get("text", "") or "")
-                Mongol.will_try_to_steal = False
+        if daily_events.exists("", "StableHorseTheft") > 0:
+            if player.horse.owns_horse():
+                _dog_theft_result = None
+                if dog.prevents_theft("horse"):
+                    _dog_theft_result = dog_catch_delinquent_apply("horse")
+                if _dog_theft_result and bool(_dog_theft_result.get("ok", False)):
+                    TotalDay['HorseStolen'] = '{b}Ночью какой-то негодяй попытался увести вашего коня, но пес поднял лай, сбил вора с ног и не дал ему уйти. %s{/b}\n' % str(_dog_theft_result.get("text", "") or "")
+                else:
+                    TotalDay['HorseStolen'] = '{b}НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.{/b}\n' % player.horse.name.upper()
+                    player.horse.mark_stolen(14)
+            daily_events.delete("", "StableHorseTheft")
+            if str(Mongol.stocks_fate or "") not in ("released", "convicted"):
                 Mongol.theft_asked = False
                 Mongol.asked_about_seen_stolen = False
                 Mongol.seen_with_stolen_horse = False
-                Zimmer.horse_complaint_stage = 0
-            else:
-                TotalDay['HorseStolen'] = '{b}НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.{/b}\n' % player.horse.name.upper()
-                player.horse.mark_stolen(14)
-                Mongol.theft_asked = False
-                Mongol.asked_about_seen_stolen = False
-                Mongol.seen_with_stolen_horse = False
-                Zimmer.horse_complaint_stage = 0
+            Zimmer.horse_complaint_stage = 0
         TotalDay['whorerevenue'] = 0
         for _tavern_worker in people.girl_values():
             _tavern_worker.apply_tavern_job_plan()

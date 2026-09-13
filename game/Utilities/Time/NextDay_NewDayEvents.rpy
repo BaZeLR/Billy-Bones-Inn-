@@ -134,8 +134,8 @@ label NextDay_NewDayEvents(retlocname=""):
                 TodaySexEvents_Add('amanda', 2, 99, 'lovermeet')
 
         # Воровство лошадки
-        if player.horse.owns_horse() and retlocname != 'TavernStable' and player.horse.stolen_days == 0 and procedural_randint(1, 40, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:190:12") == 25:
-            Mongol.will_try_to_steal = True
+        if player.horse.owns_horse() and retlocname != 'TavernStable' and player.horse.stolen_days == 0 and daily_events.exists("", "StableHorseTheft") == 0 and procedural_randint(1, 40, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:190:12") == 25:
+            daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")
 
         # Бекки предлагает подзаработать
         if threads["beckySherwoodTrade"].checkActive() and not threads["beckySherwoodTrade"].enabled and day_value > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 88
+define currentVersion = 89
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -770,6 +770,10 @@ init -100 python:
         if loaded_version < 88:
             updateSave_V87()
             loaded_version = 88
+
+        if loaded_version < 89:
+            updateSave_V88()
+            loaded_version = 89
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2245,16 +2249,20 @@ init -100 python:
         globals().pop("EddieVar", None)
 
     def updateSave_V61():
-        # Mongol owns horse-trade, theft, and personal encounter facts directly.
+        # Mongol owns horse-trade and personal encounter facts directly.
+        # A pending stable theft is a temporary daily event, not Mongol state.
         # The Clara booklet thread remains the sole owner of seen/released stages.
         mongol_var = getattr(Mongol, "var", None)
         if not hasattr(mongol_var, "pop"):
             mongol_var = {}
 
-        Mongol.will_try_to_steal = bool(max(
+        _mongol_pending_stable_theft = bool(max(
             people_to_int(mongol_var.pop("WillTryToSteal", 0), 0),
             people_to_int(getattr(Mongol, "will_try_to_steal", False), 0),
         ))
+        if _mongol_pending_stable_theft and daily_events.exists("", "StableHorseTheft") == 0:
+            daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")
+        Mongol.__dict__.pop("will_try_to_steal", None)
         Mongol.stocks_food_day = max(
             people_to_int(mongol_var.pop("StocksFoodDay", -1), -1),
             people_to_int(getattr(Mongol, "stocks_food_day", -1), -1),
@@ -2953,6 +2961,13 @@ init -100 python:
         Becky.__dict__.pop("priest_advice_stage", None)
         Becky.__dict__.pop("trade_offer_stage", None)
         Robin.__dict__.pop("kunidell_opened", None)
+
+    def updateSave_V88():
+        # Retire the NPC-owned theft flag from saves made after the Mongol
+        # cutover. The pending attempt remains exactly one daily event.
+        if bool(getattr(Mongol, "will_try_to_steal", False)) and daily_events.exists("", "StableHorseTheft") == 0:
+            daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")
+        Mongol.__dict__.pop("will_try_to_steal", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

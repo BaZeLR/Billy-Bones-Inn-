@@ -4668,6 +4668,7 @@ testcase external_mongol_v61_migration:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     python:
+        daily_events.delete("", "StableHorseTheft")
         Mongol.var.update({
             "StocksReleased": 1,
             "WillTryToSteal": 1,
@@ -4698,7 +4699,8 @@ testcase external_mongol_v61_migration:
             Mongol.__dict__.pop(_mongol_field, None)
         globals()["MongolVar"] = {"HorsesBought": 3}
     $ updateSave_V61()
-    assert eval (Mongol.will_try_to_steal and Mongol.stocks_food_day == 40 and Mongol.stocks_arrest_day == 38 and Mongol.guard_captain_known) timeout 5.0
+    assert eval (not hasattr(Mongol, "will_try_to_steal") and daily_events.exists("", "StableHorseTheft") > 0) timeout 5.0
+    assert eval (Mongol.stocks_food_day == 40 and Mongol.stocks_arrest_day == 38 and Mongol.guard_captain_known) timeout 5.0
     assert eval (Mongol.market_roll_day == int(current_game_day() or 0) and Mongol.market_roll and Mongol.asked_about_gypsy and Mongol.asked_price_increase) timeout 5.0
     assert eval (Mongol.zimmer_knows_horse_theft and Mongol.horse_price == 900 and Mongol.discount_asked and Mongol.theft_asked) timeout 5.0
     assert eval (Mongol.asked_about_seen_stolen and Mongol.seen_with_stolen_horse and Mongol.horses_bought == 3) timeout 5.0
@@ -8332,15 +8334,19 @@ testcase external_mongol_horse_purchase_once_and_amanda_room_presence:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval (player.horse.owns_horse() and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (player.horse.owns_horse() and bool(player.horse.saddled) and str(rooms.current_code or "") == "TavernStable") timeout 5.0
-    $ Mongol.will_try_to_steal = True
+    $ daily_events.delete("", "StableHorseTheft")
+    $ daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
     run Jump("TavernStable")
     advance until screen "main_ui" timeout 20.0
-    assert eval (Mongol.will_try_to_steal and "приглушенное лязгание" not in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (daily_events.exists("", "StableHorseTheft") > 0 and "приглушенное лязгание" not in str(scene_runtime.text or "")) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
     run Jump("TavernStable")
-    advance until screen "main_ui" timeout 20.0
-    assert eval (not Mongol.will_try_to_steal and "приглушенное лязгание" in str(scene_runtime.text or "")) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    assert eval (daily_events.exists("", "StableHorseTheft") == 0 and "приглушенное лязгание" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.action_title or "") == "Конюшня") timeout 20.0
+    assert eval ("приглушенное лязгание" not in str(scene_runtime.text or "")) timeout 5.0
     run Jump("TavernAmandaRoom")
     advance until screen "main_ui" timeout 20.0
     assert eval (str(people.location("amanda") or "") == "TavernAmandaRoom") timeout 5.0

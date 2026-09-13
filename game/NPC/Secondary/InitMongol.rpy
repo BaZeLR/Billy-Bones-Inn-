@@ -16,7 +16,7 @@ init python:
             )
 
     class MongolInfo(BaseNPC):
-        """Mongol: horse trader, stocks prisoner, theft and Clara merchant hooks."""
+        """Mongol: horse trader, stocks prisoner, and Clara merchant hooks."""
         talk_label = "MarketPlaceTalkMongol"
         unknown_name = "Мужик в красной рубахе"
 
@@ -24,7 +24,6 @@ init python:
             super().__init__(name, **kwargs)
             self.data = MongolStaticData
             self.known = False
-            self.will_try_to_steal = False
             self.stocks_food_day = -1
             self.stocks_arrest_day = -1
             self.stocks_fate = ""

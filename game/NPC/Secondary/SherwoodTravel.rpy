@@ -29,7 +29,7 @@ init python:
 
 label SherwoodRobbedHorseTakeCode:
     $ player.horse.remove()
-    $ Mongol.will_try_to_steal = False
+    $ daily_events.delete("", "StableHorseTheft")
     $ Robin.knows_big_tits_village = True
     return
 

@@ -23,7 +23,7 @@ def test_mongol_has_own_data_info_and_explicit_state():
     assert "try:" not in source.split("def is_market_visible(self):", 1)[1]
 
     for field_name in (
-        "will_try_to_steal", "stocks_food_day", "stocks_arrest_day",
+        "stocks_food_day", "stocks_arrest_day",
         "stocks_fate", "guard_captain_known", "market_roll_day", "market_roll",
         "asked_about_gypsy", "asked_price_increase",
         "zimmer_knows_horse_theft", "horse_price", "discount_asked",
@@ -31,6 +31,8 @@ def test_mongol_has_own_data_info_and_explicit_state():
         "horses_bought",
     ):
         assert "self.%s =" % field_name in source
+
+    assert "self.will_try_to_steal =" not in source
 
 
 def test_mongol_uses_class_state_not_old_var_bridge():
@@ -41,6 +43,7 @@ def test_mongol_uses_class_state_not_old_var_bridge():
             read_rel("game/Town/Market/MarketPlace.rpy"),
             read_rel("game/Inn/TavernStable.rpy"),
             read_rel("game/Utilities/Time/NextDay_NewDayEvents.rpy"),
+            read_rel("game/Utilities/Time/NextDay_TavernDaily.rpy"),
         ]
     )
 
@@ -55,6 +58,10 @@ def test_mongol_uses_class_state_not_old_var_bridge():
     assert "Mongol.var" not in combined
     assert "Mongol.var_int" not in combined
     assert "Mongol.set_var_int" not in combined
+    assert "will_try_to_steal" not in combined
+    assert 'daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")' in combined
+    assert 'daily_events.exists("", "StableHorseTheft")' in combined
+    assert 'daily_events.delete("", "StableHorseTheft")' in combined
 
 
 def test_mongol_market_flow_uses_class_methods():
@@ -104,13 +111,17 @@ def test_mongol_stocks_progress_uses_thread_stage_without_mirror_flags():
 
 def test_mongol_v61_migration_consumes_old_map_once():
     migration = read_rel("game/TractirSaveSync.rpy")
-    block = migration.split("def updateSave_V61():", 1)[1].split("label before_load:", 1)[0]
+    block = migration.split("def updateSave_V61():", 1)[1].split("def updateSave_V62():", 1)[0]
 
-    assert "define currentVersion = 88" in migration
+    assert "define currentVersion = 89" in migration
     assert "if loaded_version < 62:" in migration
     assert "updateSave_V61()" in migration
+    assert 'mongol_var.pop("WillTryToSteal"' in block
+    assert 'daily_events.exists("", "StableHorseTheft")' in block
+    assert 'daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")' in block
+    assert 'Mongol.__dict__.pop("will_try_to_steal", None)' in block
+
     for old_key, field_name in (
-        ("WillTryToSteal", "will_try_to_steal"),
         ("StocksFoodDay", "stocks_food_day"),
         ("StocksArrestDay", "stocks_arrest_day"),
         ("GuardCaptainKnown", "guard_captain_known"),
@@ -131,3 +142,17 @@ def test_mongol_v61_migration_consumes_old_map_once():
     assert 'mongol_var.pop("StocksSeen", None)' in block
     assert 'mongol_var.pop("StocksReleased", None)' in block
     assert 'globals().pop("MongolVar", None)' in block
+
+
+def test_mongol_v88_migration_retires_theft_flag_into_daily_event():
+    migration = read_rel("game/TractirSaveSync.rpy")
+    block = migration.split("def updateSave_V88():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    assert "if loaded_version < 89:" in migration
+    assert "updateSave_V88()" in migration
+    assert 'getattr(Mongol, "will_try_to_steal", False)' in block
+    assert 'daily_events.exists("", "StableHorseTheft") == 0' in block
+    assert 'daily_events.add("", "TavernStable", 7, "=", 1, 0, "StableHorseTheft", "TavernStableHorseTheftAttempt", "none")' in block
+    assert 'Mongol.__dict__.pop("will_try_to_steal", None)' in block

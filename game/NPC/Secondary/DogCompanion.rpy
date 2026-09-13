@@ -713,17 +713,6 @@ label DogBackyardBuildBooth:
     return
 
 
-label HorseTheftEvent:
-    $ renpy.dynamic("_dog_theft_result")
-    if dog.prevents_theft("horse"):
-        $ _dog_theft_result = dog_catch_delinquent_apply("horse")
-        "[_dog_theft_result['text']]"
-        return
-
-    "Вор уводит лошадь."
-    return
-
-
 define DogStaticData = DogData()
 default dog = DogCompanion()
 

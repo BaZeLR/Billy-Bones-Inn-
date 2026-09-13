@@ -165,9 +165,6 @@ init python:
         elif not player.horse.owns_horse():
             desc_parts.append("Здесь вообще никого, кроме вас, нет.")
 
-        if Mongol.will_try_to_steal and calendar_v2.is_between_clock(23, 0, 5, 59):
-            desc_parts.append("Вдруг со стороны ворот послышалось приглушенное лязгание, как будто кто-то незаметно пытался открыть замок. Вы повернулись на звук, нечаянно задев висящую на столбе на счастье подкову. Та звякнула. Со улицы раздались быстрые удаляющиеся шаги. Вы осторожно выглянули, но никого там не обнаружили. Присмотревшись, вы нашли на мостовой оброненный кусок парусины.\nСтранно, что бы это могло значить?")
-
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
 
 label TavernStable:
@@ -175,19 +172,30 @@ label TavernStable:
     $ _room = rooms.get("TavernStable")
     $ rooms.enter("TavernStable")
     call RoomEnterEventGate(rooms.current_code, False)
+    if calendar_v2.is_between_clock(23, 0, 5, 59) and daily_events.exists("", "StableHorseTheft", "TavernStable", 7) > 0:
+        call check_daily_event("", "StableHorseTheft", "TavernStable", 7)
     $ scene_runtime.picture = tavern_stable_picture() or _room.bg_picture or None
-    $ Mongol.ensure_story_defaults()
     $ scene_runtime.text = tavern_stable_scene_text()
     $ scene_runtime.location_text = scene_runtime.text
     $ _room.mark_visited()
-
-    if Mongol.will_try_to_steal and calendar_v2.is_between_clock(23, 0, 5, 59):
-        $ Mongol.will_try_to_steal = False
     $ main_ui_runtime.action_title = "Конюшня"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_stable_action_items()
     while True:
         call screen main_ui
+
+
+label TavernStableHorseTheftAttempt:
+    $ main_ui_begin_native_scene_state("Ночной шум в конюшне")
+    show screen main_ui
+    vscene tavern_stable_picture()
+    $ scene_runtime.text = "Вдруг со стороны ворот послышалось приглушенное лязгание, как будто кто-то незаметно пытался открыть замок. Вы повернулись на звук, нечаянно задев висящую на столбе на счастье подкову. Та звякнула. Со улицы раздались быстрые удаляющиеся шаги. Вы осторожно выглянули, но никого там не обнаружили. Присмотревшись, вы нашли на мостовой оброненный кусок парусины.\nСтранно, что бы это могло значить?"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ main_ui_end_native_scene_state()
+    return
 
 
 label tavern_stable_object_menu(object_id=""):

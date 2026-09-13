@@ -31,7 +31,8 @@ def test_stable_has_no_builder_restore_or_object_selection_mirror():
 
 def test_stable_theft_event_uses_real_night_clock_not_display_slot():
     source = (GAME / "Inn/TavernStable.rpy").read_text(encoding="utf-8-sig")
-    assert source.count("calendar_v2.is_between_clock(23, 0, 5, 59)") == 2
+    assert source.count("calendar_v2.is_between_clock(23, 0, 5, 59)") == 1
+    assert 'daily_events.exists("", "StableHorseTheft", "TavernStable", 7) > 0' in source
     assert "calendar_v2.time_slot()" not in source
 
 
