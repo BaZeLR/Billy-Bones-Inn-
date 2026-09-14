@@ -5,7 +5,6 @@
 
 label AmandaLoverSex:
     $ renpy.dynamic("amanda_agree_sex", "rand_var", "random_street", "tmp_girl_name", "tmp_guy_known", "tmp_guy_name")
-    $ main_ui_begin_native_scene_state("Аманда")
     python:
         tmp_guy_known = 0
         tmp_guy_name = RandomNameCode("male")
@@ -43,7 +42,6 @@ label AmandaLoverSex:
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            jump StreetTavern
             
         "Послушать о чем они говорят":
             "Вы прислушались к дискуссии:"
@@ -58,7 +56,6 @@ label AmandaLoverSex:
                         call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                     "Пусть себе балуются, а я к трактиру":
                         $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
-                        jump StreetTavern
             
             else:
                 if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
@@ -75,7 +72,6 @@ label AmandaLoverSex:
                                     call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                                 "Пусть себе балуются, а я к трактиру":
                                     $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
-                                    jump StreetTavern
                         else:
                             call amanda_lover_ask_shy_code
                 else:
@@ -91,7 +87,6 @@ label AmandaLoverSex:
                                 call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                             "Пусть себе балуются, а я к трактиру":
                                 $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
-                                jump StreetTavern
 
                     elif Amanda.corruption >= 45:
                         "\"Место он знает! Тоже мне, герой-соблазнитель!\"\n\"А что, я вот тебе, этого, цветочек принес,\" галантно парирует [tmp_guy_name], даря Аманде "
@@ -120,20 +115,23 @@ label AmandaLoverSex:
             if amanda_agree_sex == 0:
                 menu:
                     "Вернуться к трактиру":
-                        jump StreetTavern
+                        pass
         
         "Пусть себе балуются, а я к трактиру":
             $ Amanda.lover_sex_calc(tmp_guy_name)
-            jump StreetTavern
+    $ main_ui_end_native_scene_state()
+    return True
 
 # Supporting functions and scene code
 label amanda_lover_show_sex_scene(scene_type, guy_name):
-    $ renpy.dynamic("amanda_lover_build", "amanda_lover_build_cum_in", "amanda_lover_build_get_in")
-    $ main_ui_begin_native_scene_state("Аманда")
+    $ renpy.dynamic("amanda_lover_build", "amanda_lover_build_cum_in", "amanda_lover_build_get_in", "amanda_scene_discipline", "amanda_scene_discipline_started", "amanda_scene_service_unlocked")
     python:
         amanda_lover_build = Amanda.dynamic_roll(1, 2, "lover_build")
         amanda_lover_build_get_in = Amanda.dynamic_roll(1, 3, "lover_build_get_in")
         amanda_lover_build_cum_in = 1
+        amanda_scene_discipline = threads.get("amandaStreetDiscipline", None)
+        amanda_scene_discipline_started = False
+        amanda_scene_service_unlocked = False
         if scene_type != "minet":
             amanda_lover_build_cum_in = Amanda.dynamic_roll(2, 3, "lover_cum_%s" % scene_type)
 
@@ -199,6 +197,23 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
             "\n\n\"Видишь, я говорил - приходи со мной на сеновал, не пожалеешь!\" гордо заявляет [guy_name], \"а ты еще смеялась, мол я лучше с кузнецом приду!\"\n\"С каким еще кузнецом?! Я такого не говорила, что ты выдумываешь?\"\n\"Ой, я тебя перепута..., впрочем неважно,\" оставил в недоумении свою подругу [guy_name]."
         
         "\n\nВам уже поздно вмешиваться, парочка собирается и идет к выходу. Устраивать скандал сейчас тоже вроде как не с руки, если надо, то можно поговорить с Амандой в более спокойной обстановке."
+
+        if amanda_scene_discipline is not None:
+            if not bool(amanda_scene_discipline.metconds):
+                $ amanda_scene_discipline.forceEnable()
+                $ amanda_scene_discipline.setDay()
+                $ amanda_scene_discipline_started = True
+            elif bool(amanda_scene_discipline.completed) and not Amanda.tavern_service_available("intimate"):
+                $ Amanda.enable_tavern_service("intimate")
+                $ Amanda.assign_tavern_service("intimate", True)
+                $ amanda_scene_service_unlocked = True
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
+
+        if amanda_scene_discipline_started:
+            "Теперь вы видели все собственными глазами. Этот случай придется разобрать с Сандрой за ближайшим общим завтраком."
+        elif amanda_scene_service_unlocked:
+            "Вы застали Аманду второй раз уже после семейного разговора и запрета. На этот раз одним выговором дело не закончится: с завтрашнего дня она будет принимать клиентов в трактире на тех же условиях, что Жоржетта и Лизетта."
     
     # Pregnancy check based on cum location
     if amanda_lover_build_cum_in == 3:
@@ -218,11 +233,13 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
         menu:
             "Обернуться":
                 "Вы обернулись и увидели пару стражников укоризненно смотрящих на вас. \"Воруем?\" спросил первый. \"Или еще только готовимся?\" добавил второй.\nВы попробовали было уверить их в том, что вы ни сном, ни духом ничего такого не планировали."
-                call ArrestCode
+                $ main_ui_end_native_scene_state()
+                call ArrestCode from _call_amanda_lover_arrest
+                $ main_ui_begin_native_scene_state("Аманда на улице")
     
     menu:
-        "Вернуться в трактир":
-            jump StreetTavern
+        "Вернуться":
+            return
 
 # Amanda responds shyly
 label amanda_lover_ask_shy_code:
@@ -267,7 +284,7 @@ label amanda_lover_ask_minet_agree:
         
         "Пусть себе балуются, а я к трактиру":
             $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
-            jump StreetTavern
+            return
         
         "Отправить ее обратно на работу":
             $ Amanda.yell_not_work()
@@ -275,7 +292,7 @@ label amanda_lover_ask_minet_agree:
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            jump StreetTavern
+            return
     return
 
 # Amanda agrees to sex
@@ -289,7 +306,7 @@ label amanda_lover_ask_sex_agree:
             
         "Пусть себе балуются, а я к трактиру":
             $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
-            jump StreetTavern
+            return
             
         "Отправить ее обратно на работу":
             $ Amanda.yell_not_work()
@@ -297,5 +314,5 @@ label amanda_lover_ask_sex_agree:
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            jump StreetTavern
+            return
     return

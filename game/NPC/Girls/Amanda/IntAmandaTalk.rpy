@@ -4,6 +4,8 @@
 label IntAmandaTalk(girl_name="amanda"):
     $ renpy.dynamic("_legare_text", "_can_dress_change", "_dad_phrase", "_amanda_special_entry")
     $ main_ui_begin_talk_state("Разговор с Амандой", girl_name)
+    if str(rooms.current_code or "") == "MarketPlace":
+        $ main_ui_runtime.talk_picture = AmandaStaticData.image_path("market", "talk")
     $ main_ui_runtime.action_title = "Разговор с Амандой"
     $ main_ui_runtime.action_content = None
     if str(scene_runtime.text or "").strip() == "":

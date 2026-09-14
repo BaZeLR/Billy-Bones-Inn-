@@ -72,6 +72,10 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "StreetLoverEncounters", None, [
         [AmandaStreetLoverEncounterStreet, AmandaStreetLoverEncounterMarket],
     ], highlight=False, threaded=False),
+    LThreadData(0, "amanda", "StreetDiscipline", "#False", [
+        AmandaStreetPunishmentBreakfast,
+        AmandaStreetLegareWarningBreakfast,
+    ], highlight=True, threaded=True),
     LThreadData(0, "amanda", "UpstairsBedroomRelief", None, [
         AmandaUpstairsBedroomRelief,
     ], highlight=False, threaded=False),

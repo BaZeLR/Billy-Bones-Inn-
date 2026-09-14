@@ -16,13 +16,14 @@ init -24 python:
             priority,
             daily_key="",
             source_refs=None,
+            event_day=None,
         ):
             super(AmandaEvent, self).__init__(
                 (
                     target,
                     day,
                     hour,
-                    None,
+                    event_day,
                     probability,
                     None,
                     None,
@@ -30,6 +31,7 @@ init -24 python:
                     location,
                     action,
                     priority,
+                    False,
                 ),
                 "",
                 False,
@@ -39,7 +41,7 @@ init -24 python:
             self.source_refs = list(source_refs or [])
 
         def checkConditions(self):
-            return bool(self.checkAmandaConditions())
+            return bool(super(AmandaEvent, self).checkConditions() and self.checkAmandaConditions())
 
         def checkAmandaConditions(self):
             return True
@@ -244,9 +246,40 @@ init -24 python:
             )
 
         def checkAmandaConditions(self):
+            discipline = threads.get("amandaStreetDiscipline", None)
+            discipline_pending = bool(
+                discipline is not None
+                and bool(getattr(discipline, "metconds", False))
+                and not bool(getattr(discipline, "aborted", False))
+                and not bool(getattr(discipline, "completed", False))
+            )
             return (
-                str(rooms.current_code or "") in ("StreetTavern", "MarketPlace")
+                not discipline_pending
+                and str(rooms.current_code or "") in ("StreetTavern", "MarketPlace")
                 and CheckIfSexEventExist("amanda", calendar_v2.time_slot(), "lovermeet") > 0
+            )
+
+
+    class AmandaStreetLoverBreakfastEvent(AmandaEvent):
+        def __init__(self, code_name, target, priority=0):
+            super(AmandaStreetLoverBreakfastEvent, self).__init__(
+                code_name,
+                target,
+                None,
+                (6, 11),
+                1,
+                "TavernKitchen",
+                "enter",
+                priority,
+                event_day=1,
+            )
+
+        def checkAmandaConditions(self):
+            present_ids = list(tavern_breakfast_present_ids() or [])
+            return (
+                tavern_breakfast_available()
+                and "amanda" in present_ids
+                and "sandra" in present_ids
             )
 
 
@@ -262,3 +295,13 @@ init -24 python:
     AmandaStreetLegareSightingMarket = AmandaStreetLegareSightingEvent("MarketPlace")
     AmandaStreetLoverEncounterStreet = AmandaStreetLoverEncounterEvent("StreetTavern")
     AmandaStreetLoverEncounterMarket = AmandaStreetLoverEncounterEvent("MarketPlace")
+    AmandaStreetPunishmentBreakfast = AmandaStreetLoverBreakfastEvent(
+        "street_punishment_breakfast",
+        "story_amanda_street_punishment_breakfast_1",
+        priority=-30,
+    )
+    AmandaStreetLegareWarningBreakfast = AmandaStreetLoverBreakfastEvent(
+        "street_legare_warning_breakfast",
+        "story_amanda_street_legare_warning_breakfast_2",
+        priority=-29,
+    )

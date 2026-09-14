@@ -911,6 +911,14 @@ init python:
         key = people_normalize_id(npc_id)
         if key not in list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids()):
             return False
+        if key == "amanda":
+            discipline = threads.get("amandaStreetDiscipline", None)
+            if (
+                discipline is None
+                or not bool(discipline.completed)
+                or not Amanda.tavern_service_available("intimate")
+            ):
+                return False
         info = people.get_info(key)
         if not isinstance(info, Girl) or key in ("georgett", "liza"):
             return False

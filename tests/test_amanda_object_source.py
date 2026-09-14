@@ -65,7 +65,8 @@ def test_amanda_portrait_path_comes_only_from_static_data():
     card = _source(GIRL_CARD)
 
     assert 'portrait="images/amanda/amanda_portrait.jpg"' in init_source
-    assert street_events.count('call ShowImage("", "", AmandaStaticData.portrait)') == 3
+    assert street_events.count('call ShowImage("", "", AmandaStaticData.portrait)') == 2
+    assert 'vscene AmandaStaticData.image_path("market", "stranger_talk")' in street_events
     assert 'call ShowImage("amanda", "", "amanda_portrait.jpg")' not in street_events
     assert '_amanda_portrait_picture = str(AmandaStaticData.portrait or "")' in portrait
     assert "candidates.append(AmandaStaticData.portrait)" in layout

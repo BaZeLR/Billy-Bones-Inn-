@@ -25,6 +25,7 @@ init python:
                     "sickness": ["images/amanda/morning_sickness/amanda_morning_sickness.png"],
                 },
                 "tavern": {
+                    "angry": ["images/amanda/tavern/angry.jpg"],
                     "hall_cleaning": [
                         "images/amanda/tavern/cleaner.webp",
                         "images/amanda/tavern/cleaning1.jpg",
@@ -38,6 +39,10 @@ init python:
                         "images/amanda/tavern/waitress4.jpg",
                         "images/amanda/tavern/waitress5.jpg",
                     ],
+                },
+                "market": {
+                    "talk": ["images/amanda/market/amanda_market_talk.png"],
+                    "stranger_talk": ["images/amanda/market/amanda_market_stranger.png"],
                 },
                 "grope": {
                     "intro": ["images/amanda/grope/inter.jpg"],

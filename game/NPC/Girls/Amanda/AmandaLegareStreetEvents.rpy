@@ -158,21 +158,26 @@ label story_amanda_street_legare_sighting_0:
 
 
 label story_amanda_street_lover_encounter_0:
+    $ main_ui_begin_native_scene_state("Аманда на улице")
     show screen main_ui
-    call ShowImage("", "", AmandaStaticData.portrait)
+    vscene AmandaStaticData.image_path("market", "stranger_talk")
     "На улице вы заметили Аманду рядом с каким-то молодым горожанином. Он что-то торопливо доказывал, а она смеялась и не спешила уходить."
     menu:
         "Подойти ближе":
             if CheckIfSexEventExist("amanda", calendar_v2.time_slot(), "lovermeet") <= 0:
+                $ main_ui_end_native_scene_state()
                 return False
             $ GetSexEventFromTable("amanda", calendar_v2.time_slot(), "lovermeet")
             jump AmandaLoverSex
         "Окликнуть Аманду и вернуть к работе":
             if CheckIfSexEventExist("amanda", calendar_v2.time_slot(), "lovermeet") <= 0:
+                $ main_ui_end_native_scene_state()
                 return False
             $ GetSexEventFromTable("amanda", calendar_v2.time_slot(), "lovermeet")
             $ Amanda.yell_not_work()
+            $ main_ui_end_native_scene_state()
             return True
         "Не вмешиваться":
             "Вы прошли мимо. Если Аманда решила искать себе приключения, то этот разговор еще можно будет отложить до вечера."
+            $ main_ui_end_native_scene_state()
             return True
