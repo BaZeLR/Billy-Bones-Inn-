@@ -1,33 +1,37 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+# Save ABI: released saves contain these historical store function names.
+# They must exist during init, before Ren'Py unpickles game state.
+init python:
+    def _iebs_set_arousal(who, value):
+        value = min(100, max(0, int(value or 0)))
+        if str(who or "").lower() == "you":
+            player.intimacy.set_arousal(value)
+            return
+        info = people.get_info(who)
+        if info is not None:
+            info.set_arousal(value)
+
+    def _iebs_arousal(who):
+        if str(who or "").lower() == "you":
+            return int(player.intimacy.arousal_value() or 0)
+        info = people.get_info(who)
+        return int(info.arousal_value() or 0) if info is not None else 0
+
+    def _iebs_inc_arousal(who, amount):
+        _iebs_set_arousal(who, _iebs_arousal(who) + int(amount or 0))
+
+    def _iebs_set_eddie_pos(pos):
+        Becky.set_cock_position({1: "pussy", 2: "mouth", 3: "tits"}.get(pos, "none"), "eddie")
+
+
 label IntEddieBeckySex(GirlNameIBS="becky"):
     $ renpy.dynamic("_eddie_fuck_picture")
     $ renpy.dynamic("_cametoday_eddie", "_cancumdaily_eddie")
     python:
         Becky.ensure_sex_state()
         Eddie.set_sex_stat("group_sex", Eddie.sex_stat("group_sex", 0))
-
-        def _iebs_set_arousal(who, value):
-            value = min(100, max(0, int(value or 0)))
-            if str(who or "").lower() == "you":
-                player.intimacy.set_arousal(value)
-                return
-            info = people.get_info(who)
-            if info is not None:
-                info.set_arousal(value)
-
-        def _iebs_arousal(who):
-            if str(who or "").lower() == "you":
-                return int(player.intimacy.arousal_value() or 0)
-            info = people.get_info(who)
-            return int(info.arousal_value() or 0) if info is not None else 0
-
-        def _iebs_inc_arousal(who, amount):
-            _iebs_set_arousal(who, _iebs_arousal(who) + int(amount or 0))
-
-        def _iebs_set_eddie_pos(pos):
-            Becky.set_cock_position({1: "pussy", 2: "mouth", 3: "tits"}.get(pos, "none"), "eddie")
 
     label int_eddie_becky_sex_menu:
         while True:

@@ -28,3 +28,22 @@ def test_eddie_group_sex_session_uses_only_eddie_owned_state():
     assert 'Eddie.set_sex_stat("group_sex", 1 if arrive_mode == "SvalnyiGreh" else 0)' in home
     assert 'int(Eddie.sex_stat("group_sex", 0) or 0)' in sex
     assert sex.count('Eddie.set_sex_stat("group_sex", 0)') == 3
+
+
+def test_eddie_scene_helpers_exist_at_init_for_save_loading():
+    source = (ROOT / "game/NPC/Secondary/IntEddieBeckySex.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    init_block, runtime_block = source.split(
+        'label IntEddieBeckySex(GirlNameIBS="becky"):', 1
+    )
+
+    assert "init python:" in init_block
+    for helper_name in (
+        "_iebs_set_arousal",
+        "_iebs_arousal",
+        "_iebs_inc_arousal",
+        "_iebs_set_eddie_pos",
+    ):
+        assert init_block.count("def %s(" % helper_name) == 1
+        assert "def %s(" % helper_name not in runtime_block
