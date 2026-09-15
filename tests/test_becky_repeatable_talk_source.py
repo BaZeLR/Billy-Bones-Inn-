@@ -67,8 +67,9 @@ def test_talk_dialogue_does_not_fall_through_to_room_navigation():
         "screen main_ui_status_item", 1
     )[0]
 
-    talk_guard = 'elif str(main_ui_runtime.mode or "") in ("event", "talk"):'
+    talk_guard = 'elif str(main_ui_runtime.mode or "") == "talk":'
     assert talk_guard in action_panel
+    assert action_panel.index("elif main_ui_runtime.action_items:") < action_panel.index(talk_guard)
     assert action_panel.index(talk_guard) < action_panel.index("elif rooms.current is not None:")
 MIGRATION = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 

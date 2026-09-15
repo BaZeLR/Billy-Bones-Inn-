@@ -302,12 +302,14 @@ screen current_action_panel(native_choice=None):
             style "mui_hud_button"
             text_style "mui_hud_button_text"
             action Function(main_ui_end_card_state)
-    elif str(main_ui_runtime.mode or "") in ("event", "talk"):
+    elif str(main_ui_runtime.mode or "") == "event":
         null
     elif main_ui_runtime.action_content:
         use expression main_ui_runtime.action_content
     elif main_ui_runtime.action_items:
         use choice_panel(main_ui_runtime.action_items)
+    elif str(main_ui_runtime.mode or "") == "talk":
+        null
     elif str(getattr(rooms.current, "code_name", "") or rooms.current_code or "").strip() == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
         null
     elif rooms.current is not None:
