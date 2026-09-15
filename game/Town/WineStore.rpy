@@ -87,6 +87,8 @@ init python:
             items.append(MenuItem(room_object.name, Call("WineStoreObjectMenu", room_object.object_id)))
         if story_event_available("WineStore", "clara_paintings"):
             items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
+        if story_event_available("WineStore", "clara_education_cards"):
+            items.append(MenuItem("Начать урок карт с Клариссой", Call("checkTriggers", "WineStore", "clara_education_cards", 0)))
         items.extend(rooms.get("WineStore").build_exit_items())
         return items
 

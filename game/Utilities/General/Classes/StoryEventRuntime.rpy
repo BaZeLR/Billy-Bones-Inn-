@@ -1148,16 +1148,116 @@ define claraThreadList = [
             5,
         ),
         (
-            "story_clara_tavern_protection_lessons_6",
+            "story_clara_tavern_visit_close_6",
             [1, 2, 3, 4, 5, 6], (12, 17), None,
             1,
             None,
             [
-                "#int(threads['claraForestSofa'].num or 0) >= 6",
-                "#not bool(threads['claraForestSofa'].aborted)",
+                "#bool(threads['claraPaintingsPath'].completed)",
                 "#str(people.location('clara') or '') == 'TavernMain'",
                 "#str(people.location('melissa') or '') == 'TavernMain'",
             ],
+            None,
+            "TavernMain",
+            "bar_001",
+            6,
+        ),
+    ], highlight=False, threaded=True),
+    # Clarissa owns the warning. It is independent from the ordered visits she
+    # shares with Melissa and therefore remains a separate one-event thread.
+    LThreadData(0, "clara", "AmandaWarning", None, [
+        (
+            "story_clara_warns_amanda_about_legare_0",
+            [1, 2, 3, 4, 5, 6], (12, 17), None,
+            1,
+            None,
+            [
+                "#int(threads['claraPaintingsPath'].num or 0) >= 2",
+                "#Clara.tavern_visit_active()",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
+            ],
+            None,
+            "TavernMain",
+            "enter",
+            5,
+        ),
+    ], highlight=False, threaded=True),
+    # Post-resolution revenge is a Clara-owned sequence. Amanda and Liza are
+    # participants; their schedules and state do not own its cursor.
+    LThreadData(0, "clara", "LegareRevenge", [
+        "#bool(threads['claraPaintingsPath'].completed)",
+        "#bool(threads['claraAmandaWarning'].completed)",
+        "#Liza.can_work_tavern()",
+    ], [
+        (
+            "story_clara_legare_revenge_amanda_tells_liza_0",
+            [1, 2, 3, 4, 5, 6], (10, 17), None,
+            1,
+            None,
+            [
+                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
+                "#room_in_group(str(people.location('liza') or ''), ROOM_GROUP_TAVERN)",
+            ],
+            None,
+            "TavernMain",
+            "enter",
+            7,
+        ),
+        (
+            "story_clara_legare_revenge_request_1",
+            [1, 2, 3, 4, 5, 6], (10, 17), 1,
+            1,
+            None,
+            [
+                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
+                "#room_in_group(str(people.location('liza') or ''), ROOM_GROUP_TAVERN)",
+            ],
+            None,
+            "TavernMain",
+            "enter",
+            7,
+        ),
+        (
+            "story_clara_legare_revenge_fight_2",
+            [1, 2, 3, 4, 5, 6], (6, 17), 1,
+            1,
+            None,
+            [
+                "#str(people.location('alber') or '') == 'WineStore'",
+            ],
+            None,
+            "WineStore",
+            "enter",
+            3,
+        ),
+    ], highlight=False, threaded=True),
+    # The two lessons are their own ordered story: first cards in the Wine
+    # Store cellar, then noble service at the tavern. Existing tavern values
+    # receive the results; no parallel education flag is introduced.
+    LThreadData(0, "clara", "TavernEducation", [
+        "#bool(threads['claraPaintingsPath'].completed)",
+        "#bool(threads['claraTavernVisit'].completed)",
+        "#int(player.tavern_management.client_room_hole or 0) > 0",
+        "#int(player.tavern_management.glory_hole or 0) == 2",
+    ], [
+        (
+            "story_clara_tavern_education_cards_0",
+            [1, 2, 3, 4, 5, 6], (6, 17), None,
+            1,
+            None,
+            None,
+            None,
+            "WineStore",
+            "clara_education_cards",
+            0,
+        ),
+        (
+            "story_clara_tavern_education_manners_1",
+            [1, 2, 3, 4, 5, 6], (12, 17), 1,
+            1,
+            None,
+            None,
             None,
             "TavernMain",
             "bar_001",
@@ -2112,28 +2212,6 @@ define georgettThreadList = [
             "talk_georgett",
             "ask_gerhard",
             30,
-        ),
-    ], highlight=False, threaded=True),
-    #
-    # clara_amanda_warning
-    #
-    # The event is independent from Clara's ordered Melissa-visit sequence.
-    LThreadData(0, "clara", "AmandaWarning", None, [
-        (
-            "story_clara_warns_amanda_about_legare_0",
-            [1, 2, 3, 4, 5, 6], (12, 17), None,
-            1,
-            None,
-            [
-                "#int(threads['claraPaintingsPath'].num or 0) >= 2",
-                "#Clara.tavern_visit_active()",
-                "#str(people.location('clara') or '') == 'TavernMain'",
-                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
-            ],
-            None,
-            "TavernMain",
-            "enter",
-            5,
         ),
     ], highlight=False, threaded=True),
 ]

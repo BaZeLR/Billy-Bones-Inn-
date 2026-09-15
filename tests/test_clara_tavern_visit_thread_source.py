@@ -4,6 +4,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 CLARA_TAVERN_VISIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "ClaraTavernVisitThread.rpy"
+CLARA_POST = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "ClaraPostResolutionThreads.rpy"
 CLARA_BOOKLET = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy"
 TAVERN_MAIN = PROJECT_ROOT / "game" / "Inn" / "TavernMain.rpy"
 TAVERN_BAR = PROJECT_ROOT / "game" / "Inn" / "TavernMainBar001.rpy"
@@ -30,7 +31,8 @@ def test_clara_tavern_visit_thread_is_clara_owned():
     assert '"story_clara_melissa_room_visit_0"' in source
     assert '"story_clara_melissa_room_visit_1"' in source
     assert '"story_clara_melissa_room_visit_2"' in source
-    assert '"story_clara_tavern_protection_lessons_6"' in source
+    assert '"story_clara_tavern_visit_close_6"' in source
+    assert '"clara", "TavernEducation"' in source
     assert '"TavernMain",\n            "bar_001"' in source
     assert '"TavernMelissaRoom",\n            "enter"' in source
     assert "melissaClaraOverheard" not in source
@@ -90,18 +92,17 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
         assert '"evening_tavern_late_event"' not in schedule
 
 
-def test_clara_protection_lesson_stage_keeps_tavern_schedule_active():
+def test_clara_visit_close_stage_keeps_tavern_schedule_active():
     clara_init = read(CLARA_INIT)
     runtime = read(STORY_RUNTIME)
 
     assert 'threads["claraTavernVisit"].num or 0) not in (0, 1, 2, 6)' in clara_init
-    lesson = runtime.split('"story_clara_tavern_protection_lessons_6"', 1)[1].split(
+    close = runtime.split('"story_clara_tavern_visit_close_6"', 1)[1].split(
         "),\n    ], highlight=False, threaded=True)", 1
     )[0]
-    assert "#int(threads['claraForestSofa'].num or 0) >= 6" in lesson
-    assert "#not bool(threads['claraForestSofa'].aborted)" in lesson
-    assert "#str(people.location('clara') or '') == 'TavernMain'" in lesson
-    assert "#str(people.location('melissa') or '') == 'TavernMain'" in lesson
+    assert "#bool(threads['claraPaintingsPath'].completed)" in close
+    assert "#str(people.location('clara') or '') == 'TavernMain'" in close
+    assert "#str(people.location('melissa') or '') == 'TavernMain'" in close
 
 
 def test_room_files_no_longer_own_clara_visit_state():
@@ -181,7 +182,7 @@ def test_clara_visit_media_remains_until_native_continue_then_restores_room():
     assert labels.count("main_ui_begin_native_scene_state(") == 8
     assert labels.count("main_ui_end_native_scene_state()") == 8
     assert labels.count("show screen main_ui") == 8
-    assert labels.count("menu:") == 10
+    assert labels.count("menu:") == 8
     for picture in expected_pictures:
         assert f'vscene "{picture}"' in labels
 
@@ -193,7 +194,7 @@ def test_clara_warns_amanda_through_an_owned_story_event():
     runtime = read(STORY_RUNTIME)
     labels = read(CLARA_TAVERN_VISIT)
     event = runtime.split('LThreadData(0, "clara", "AmandaWarning"', 1)[1].split(
-        'LThreadData(2, "clara", "TavernVisit"', 1
+        'LThreadData(0, "clara", "LegareRevenge"', 1
     )[0]
 
     assert '"story_clara_warns_amanda_about_legare_0"' in event
@@ -217,16 +218,16 @@ def test_third_bar_talk_reveals_clara_and_melissa_as_close_friends():
     assert 'vscene "images/clara/melissa_talk.png"' in third_bar
 
 
-def test_protection_lesson_updates_domain_owners_without_replacing_melissa_sex_rules():
+def test_education_updates_domain_owners_without_replacing_melissa_sex_rules():
     runtime = read(STORY_RUNTIME)
-    labels = read(CLARA_TAVERN_VISIT)
+    labels = read(CLARA_POST)
     melissa_sex = read(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaSex.rpy")
     melissa = read(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "InitMelissa.rpy")
 
-    assert "#int(threads['claraForestSofa'].num or 0) >= 6" in runtime
-    assert 'Sandra.skills["waitress"]' in labels
-    assert 'Amanda.skills["waitress"]' in labels
-    assert 'Melissa.skills["waitress"]' in labels
+    assert '"clara", "TavernEducation"' in runtime
+    assert "#int(player.tavern_management.client_room_hole or 0) > 0" in runtime
+    assert "#int(player.tavern_management.glory_hole or 0) == 2" in runtime
+    assert '_clara_student.skills["waitress"]' in labels
     assert "player.tavern_management.visitors" in labels
     assert "clara_anal_training" not in runtime
     assert "clara_anal_training" not in labels
