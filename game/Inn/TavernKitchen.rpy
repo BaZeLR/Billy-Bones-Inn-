@@ -119,8 +119,14 @@ init python:
         removed = player.remove_item(item_key, deposit_count)
         if not removed:
             return 0
-        stock = tavern_storage_supplies_stock()
-        stock[item_key] = max(0, int(stock.get(item_key, 0) or 0)) + deposit_count
+        item_obj = get_game_item(item_key)
+        properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+        supply_units = max(0, int(properties.get("kitchen_supply_units", 0) or 0))
+        if supply_units > 0:
+            player.tavern_management.productnum += supply_units * deposit_count
+        else:
+            stock = tavern_storage_supplies_stock()
+            stock[item_key] = max(0, int(stock.get(item_key, 0) or 0)) + deposit_count
         tavern_kitchen_apply_deposit_effect(item_key, deposit_count)
         return deposit_count
 
@@ -182,6 +188,12 @@ init python:
                     bones_per_unit = max(0, int(output_count or 0))
                     break
             return "Кабанье мясо идет в общий котел: сытная еда заметно разогревает кровь у трактирной команды. После разделки вы забираете для пса кости x%s." % (bones_per_unit * units)
+        if item_key == "bear_meat_001":
+            bear_item = get_game_item(item_key)
+            properties = dict(getattr(bear_item, "custom_properties", {}) or {}) if bear_item is not None else {}
+            portions = max(0, int(properties.get("kitchen_supply_units", 0) or 0)) * max(1, int(item_count or 1))
+            effect_days = max(0, int(properties.get("kitchen_meat_effect_days", 0) or 0)) * max(1, int(item_count or 1))
+            return "Медвежью тушу разделывают сразу: кухня получает %s порций, а особенно сытная еда будет разогревать кровь команды %s дней." % (portions, effect_days)
         if item_key == "milk_pitcher_001":
             return "Свежее молоко сразу убирают в прохладу: с медом оно отлично пойдет и в кашу, и в сладкие утренние блюда."
         if item_key in ("berries_001", "mushroom_001"):
@@ -210,6 +222,17 @@ init python:
                 if output_key and output_total > 0:
                     player.add_item(output_key, output_total)
             return "boar"
+        if item_key == "bear_meat_001":
+            bear_item = get_game_item(item_key)
+            properties = dict(getattr(bear_item, "custom_properties", {}) or {}) if bear_item is not None else {}
+            arousal_bonus = max(0, int(properties.get("kitchen_deposit_team_arousal_bonus", 0) or 0)) * units
+            effect_days = max(0, int(properties.get("kitchen_meat_effect_days", 0) or 0)) * units
+            if effect_days > 0:
+                tavern_kitchen_add_food_effect("bear_days", effect_days)
+            for npc_id, npc_info in people.girl_items():
+                if npc_info.is_tavern_worker():
+                    npc_info.add_arousal(arousal_bonus)
+            return "bear"
         if item_key == "milk_pitcher_001":
             tavern_kitchen_add_food_effect("milk_days", min(3, max(1, units)))
             return "milk"
@@ -236,6 +259,12 @@ init python:
     def tavern_kitchen_boar_bonus_active():
         return tavern_kitchen_food_effect_days("boar_days") > 0
 
+    def tavern_kitchen_bear_bonus_active():
+        return tavern_kitchen_food_effect_days("bear_days") > 0
+
+    def tavern_kitchen_meat_bonus_active():
+        return tavern_kitchen_boar_bonus_active() or tavern_kitchen_bear_bonus_active()
+
     def tavern_kitchen_honey_bonus_active():
         return tavern_kitchen_food_effect_days("honey_days") > 0
 
@@ -243,14 +272,14 @@ init python:
         return tavern_kitchen_food_effect_days("milk_days") > 0
 
     def tavern_kitchen_fertility_bonus_active():
-        return tavern_kitchen_boar_bonus_active() and tavern_kitchen_honey_bonus_active() and tavern_kitchen_milk_bonus_active()
+        return tavern_kitchen_meat_bonus_active() and tavern_kitchen_honey_bonus_active() and tavern_kitchen_milk_bonus_active()
 
     def tavern_kitchen_daily_product_savings(base_products=0):
         base = max(0, int(base_products or 0))
         if base <= 0 or tavern_kitchen_food_stock_count() <= 0:
             return 0
         savings_percent = 20
-        if tavern_kitchen_boar_bonus_active():
+        if tavern_kitchen_meat_bonus_active():
             savings_percent += 10
         target_units = max(1, (base * savings_percent + 99) // 100)
         return tavern_kitchen_consume_stock_units(min(target_units, tavern_kitchen_food_stock_count()))
@@ -261,8 +290,10 @@ init python:
         if tavern_kitchen_honey_bonus_active():
             lines.append("Медовые угощения за день заметно смягчили настроение в доме.")
         if tavern_kitchen_fertility_bonus_active():
-            lines.append("Кабанье мясо, молоко и мед делают общую еду сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")
-        if tavern_kitchen_boar_bonus_active():
+            lines.append("Мясо, молоко и мед делают общую еду сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")
+        if tavern_kitchen_bear_bonus_active():
+            lines.append("Медвежье мясо сделало кухню сытнее: запасов хватит надолго, а команда стала заметно горячее обычного.")
+        elif tavern_kitchen_boar_bonus_active():
             lines.append("Кабанье мясо сделало кухню сытнее: припасов ушло меньше, зато вина гости просили охотнее.")
         for effect_key in list(effects.keys()):
             effects[effect_key] = max(0, int(effects.get(effect_key, 0) or 0) - 1)
@@ -512,7 +543,7 @@ label AmandaKitchenWindowFavorRepayment:
         $ scene_runtime.location_text = scene_runtime.text
         "[scene_runtime.text]"
         return
-    if int(player.intimacy.came_today or 0) >= int(player.intimacy.can_cum_daily or 0):
+    if not player.intimacy.can_cum():
         $ scene_runtime.text = "Вы уже слишком вымотаны, чтобы требовать такую услугу сейчас. Аманда усмехается и напоминает, что долг никуда не делся."
         $ scene_runtime.location_text = scene_runtime.text
         "[scene_runtime.text]"

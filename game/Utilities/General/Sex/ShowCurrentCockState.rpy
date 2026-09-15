@@ -14,7 +14,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
             _cock_intimacy = player.intimacy
             cur_arousal = _cock_intimacy.arousal_value()
             cur_came = int(_cock_intimacy.came_today or 0)
-            cur_limit = max(1, int(_cock_intimacy.can_cum_daily or 1))
+            cur_limit = int(_cock_intimacy.daily_cum_limit(current_game_day()) or 0)
         else:
             _cock_actor = people.get_info(DudeName)
             if _cock_actor is not None:

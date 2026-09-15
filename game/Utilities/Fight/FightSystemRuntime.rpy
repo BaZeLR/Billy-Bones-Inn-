@@ -187,7 +187,7 @@ init -20 python:
             moves=["bite", "claws", "strike", "roar"],
             skills=["maul", "fear"],
             tactics="press",
-            loot={"bear_fur_brown_001": (1, 1), "bear_claw_001": (1, 2)},
+            loot={"bear_fur_brown_001": (1, 1), "bear_claw_001": (1, 2), "bear_meat_001": 1},
             exploration_reward=4,
         ),
         "giant_grizzly": FightEnemyDefinition(
@@ -195,7 +195,7 @@ init -20 python:
             moves=["bite", "claws", "strike", "roar"],
             skills=["maul", "terror"],
             tactics="break_line",
-            loot={"bear_fur_grizzly_001": (1, 1), "bear_claw_001": (1, 2)},
+            loot={"bear_fur_grizzly_001": (1, 1), "bear_claw_001": (1, 2), "bear_meat_001": 1},
             exploration_reward=6,
         ),
         "street_crook": FightEnemyDefinition(

@@ -55,7 +55,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 return
             python:
                 _cametoday = int(player.intimacy.came_today or 0)
-                _cancumdaily = max(1, int(player.intimacy.can_cum_daily or 1))
+                _cancumdaily = int(player.intimacy.daily_cum_limit(current_game_day()) or 0)
 
             menu:
                 "Осмотреть":

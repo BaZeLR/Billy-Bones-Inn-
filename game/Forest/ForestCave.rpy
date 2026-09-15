@@ -30,6 +30,7 @@ init 6 python:
             "spawn_rules": [
                 {"item_id": "mushroom_001", "frequency": 2, "units": 2},
                 {"item_id": "moss_001", "frequency": 2, "units": 2},
+                {"item_id": "special_mushroom_001", "frequency": 20, "units": 1},
             ],
         },
     )

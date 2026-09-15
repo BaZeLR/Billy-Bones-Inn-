@@ -459,6 +459,7 @@ init -998 python:
             self.ellona_curse_days = 0
             self.ellona_curse_reduction = 0
             self.ellona_grace_blessings = [0, 0, 0, 0, 0, 0]
+            self.temporary_libido = {"item_id": "", "until_day": -1}
 
         def arousal_value(self):
             self.arousal = player_clamp_value(self.arousal, 0, 100)
@@ -471,8 +472,52 @@ init -998 python:
         def add_arousal(self, amount=0, cap=100):
             return self.set_arousal(min(player_to_int(cap, 100), self.arousal_value() + player_to_int(amount, 0)))
 
-        def can_cum(self):
-            return player_to_int(self.came_today, 0) < max(1, player_to_int(self.can_cum_daily, 1))
+        def ensure_temporary_libido_state(self):
+            if not isinstance(getattr(self, "temporary_libido", None), dict):
+                self.temporary_libido = {"item_id": "", "until_day": -1}
+            self.temporary_libido["item_id"] = str(self.temporary_libido.get("item_id", "") or "").strip()
+            self.temporary_libido["until_day"] = player_to_int(self.temporary_libido.get("until_day", -1), -1)
+            return self.temporary_libido
+
+        def apply_consumed_item_effect(self, item_id="", day_value=None):
+            item_key = str(item_id or "").strip()
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            duration = max(0, player_to_int(properties.get("player_libido_days", 0), 0))
+            limit = max(0, player_to_int(properties.get("player_daily_cum_limit", 0), 0))
+            if item_key == "" or duration <= 0 or limit <= 0:
+                return False
+            today = current_game_day() if day_value is None else player_to_int(day_value, 0)
+            state = self.ensure_temporary_libido_state()
+            state["item_id"] = item_key
+            state["until_day"] = max(player_to_int(state.get("until_day", -1), -1), today + duration - 1)
+            return True
+
+        def temporary_libido_active(self, day_value=None):
+            state = self.ensure_temporary_libido_state()
+            item_key = str(state.get("item_id", "") or "").strip()
+            if item_key == "":
+                return False
+            today = current_game_day() if day_value is None else player_to_int(day_value, 0)
+            if today > player_to_int(state.get("until_day", -1), -1):
+                return False
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            return player_to_int(properties.get("player_daily_cum_limit", 0), 0) > 0
+
+        def daily_cum_limit(self, day_value=None):
+            if bool(self.ellona_cursed):
+                return 0
+            limit = max(1, player_to_int(self.can_cum_daily, 1))
+            if self.temporary_libido_active(day_value):
+                item_key = str(self.temporary_libido.get("item_id", "") or "").strip()
+                item_obj = get_game_item(item_key)
+                properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+                limit = max(limit, player_to_int(properties.get("player_daily_cum_limit", 0), 0))
+            return limit
+
+        def can_cum(self, day_value=None):
+            return player_to_int(self.came_today, 0) < self.daily_cum_limit(day_value)
 
         def grant_ellona_grace(self, grace_index):
             self.ellona_grace_blessings[player_to_int(grace_index, 0)] = 1

@@ -69,8 +69,8 @@ def test_team_and_personal_rewards_mutate_only_existing_owners():
 
 def test_premium_stamp_is_player_tavern_owned_and_old_markers_are_consumed_once():
     assert PLAYER.count('self.team_premium_last_eval_stamp = ""') == 1
-    assert "define currentVersion = 90" in SAVE_SYNC
-    assert "def updateSave_V90():" not in SAVE_SYNC
+    assert "define currentVersion = 91" in SAVE_SYNC
+    assert "def updateSave_V91():" not in SAVE_SYNC
 
     repair = SAVE_SYNC.split("def tractir_save_patch_loaded_state():", 1)[1].split("def tractir_save_normalize_tavern_staff_jobs():", 1)[0]
     assert 'startswith("tavern_team_premium:")' in repair

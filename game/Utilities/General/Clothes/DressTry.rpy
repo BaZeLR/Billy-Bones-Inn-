@@ -19,7 +19,7 @@ label DressTry(dress_buyer="You", dress_code=""):
         "Полностью раздеться и думать о высоком" if player.intimacy.had_sex_count >= 3:
             call DressTryNakedThink
 
-        "Полностью раздеться и представить, как вы имеете Ирму" if player.intimacy.had_sex_count >= 5 and player.intimacy.came_today < player.intimacy.can_cum_daily:
+        "Полностью раздеться и представить, как вы имеете Ирму" if player.intimacy.had_sex_count >= 5 and player.intimacy.can_cum():
             call DressTryNakedFantasy
     return
 
@@ -47,7 +47,7 @@ label DressTryNakedThink:
 
 label DressTryNakedFantasy:
     $ scene_runtime.picture = irma_measure_picture_path(3)
-    if Irma.rel < 3 or player.intimacy.came_today >= player.intimacy.can_cum_daily or Irma.extra_fee_refused:
+    if Irma.rel < 3 or not player.intimacy.can_cum() or Irma.extra_fee_refused:
         $ scene_runtime.text = "Вы быстро и решительно сняли с себя все. А сняв, предались приятным грезам о том, как и в каких позах вы хотели бы поиметь смазливую полуэльфийку. Такие мечты не замедлили сказаться на состоянии вашего члена - реагируя на ваши мысли он с готовностью напрягся, приходя в полную боевую. Это не прошло незамеченным Ирмой: снимая с вас мерку, она улыбнулась, спросила \"Это я тебе настолько нравлюсь?\" и, не дожидаясь ответа, измерила и ваш вздыбленный член. Судя по ее выражению лица результат ей скорее всего понравился. Закончив мерять, Ирма сказала, что она начнет шить немедленно, а работа будет готова к утру."
         $ scene_runtime.location_text = scene_runtime.text
         call SlutFriendsIncrease("irma", 5, 1, 1, 0, 0, 0)

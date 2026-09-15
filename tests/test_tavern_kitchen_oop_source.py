@@ -95,7 +95,7 @@ def test_kitchen_food_catalog_and_transfer_quantities_have_one_authority():
     catalog = KITCHEN.split("def tavern_kitchen_depositable_food_ids():", 1)[1].split("\n    def ", 1)[0]
     deposit = KITCHEN.split('def tavern_kitchen_deposit_food(item_id="", quantity=0):', 1)[1].split("\n    def ", 1)[0]
 
-    assert item_sources.count('"kitchen_depositable": True') == 6
+    assert item_sources.count('"kitchen_depositable": True') == 7
     assert "game_item_registry" in catalog
     assert 'properties.get("kitchen_depositable", False)' in catalog
     assert 'return ("berries_001"' not in catalog

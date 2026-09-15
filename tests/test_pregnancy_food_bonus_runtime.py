@@ -13,8 +13,9 @@ class GirlInfo:
     registry_group = "girl"
     mood = "neutral"
 
-    def __init__(self, worker):
+    def __init__(self, worker, temporary_chance=0):
         self.worker = worker
+        self.temporary_chance = temporary_chance
 
     def sex_stat(self, key, default=0):
         return 20 if key == "ConceptionChance" else default
@@ -25,30 +26,34 @@ class GirlInfo:
     def arousal_value(self):
         return 0
 
+    def temporary_conception_permille(self, _day):
+        return self.temporary_chance
 
-def conception_chance(worker, phase, kitchen_bonus, friend_level=2, dad_name="you"):
+
+def conception_chance(worker, phase, kitchen_bonus, friend_level=2, dad_name="you", temporary_chance=0):
     source = SOURCE.read_text(encoding="utf-8-sig")
     start = source.index("    def pregnancy_conception_chance")
     end = source.index("\n    def pregnancy_check", start)
     function_source = textwrap.dedent(source[start:end])
-    info = GirlInfo(worker)
+    info = GirlInfo(worker, temporary_chance)
     namespace = {
         "people": SimpleNamespace(get_info=lambda _girl: info),
         "girl_decision_cycle_state": lambda _girl: {"phase": phase, "fertility": 1.0 if phase == "fertile" else 0.45},
         "tavern_kitchen_fertility_bonus_active": lambda: kitchen_bonus,
         "npc_friend_level": lambda _girl: friend_level,
+        "current_game_day": lambda: 10,
     }
     exec(function_source, namespace)
     return namespace["pregnancy_conception_chance"]("testgirl", dad_name)
 
 
-def kitchen_fertility_bonus(boar, honey, milk):
+def kitchen_fertility_bonus(meat, honey, milk):
     source = (ROOT / "game/Inn/TavernKitchen.rpy").read_text(encoding="utf-8-sig")
     start = source.index("    def tavern_kitchen_fertility_bonus_active")
     end = source.index("\n    def tavern_kitchen_daily_product_savings", start)
     function_source = textwrap.dedent(source[start:end])
     namespace = {
-        "tavern_kitchen_boar_bonus_active": lambda: boar,
+        "tavern_kitchen_meat_bonus_active": lambda: meat,
         "tavern_kitchen_honey_bonus_active": lambda: honey,
         "tavern_kitchen_milk_bonus_active": lambda: milk,
     }
@@ -84,5 +89,10 @@ def test_full_food_bonus_sets_thirty_percent_only_for_friendly_fertile_tavern_wo
         (True, True, True, True),
     ),
 )
-def test_fertility_food_bonus_requires_boar_milk_and_honey(boar, honey, milk, expected):
+def test_fertility_food_bonus_requires_meat_milk_and_honey(boar, honey, milk, expected):
     assert kitchen_fertility_bonus(boar, honey, milk) is expected
+
+
+def test_shared_special_mushroom_overrides_mc_conception_chance_only():
+    assert conception_chance(True, "luteal", False, dad_name="you", temporary_chance=550) == 550
+    assert conception_chance(True, "luteal", False, dad_name="other", temporary_chance=550) == 20

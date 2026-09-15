@@ -268,6 +268,24 @@ init 4 python:
         },
     )
 
+    BearMeatItem = GameItem(
+        object_id="bear_meat_001",
+        name="медвежье мясо",
+        description="Тяжелая туша медведя. На кухне ее хватит примерно на тысячу порций и две недели особенно сытной еды.",
+        price=120,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "animal_loot",
+            "animal_kind": "bear",
+            "loot_kind": "meat",
+            "kitchen_depositable": True,
+            "kitchen_supply_units": 1000,
+            "kitchen_meat_effect_days": 14,
+            "kitchen_deposit_team_arousal_bonus": 5,
+        },
+    )
+
     BearClawItem = GameItem(
         object_id="bear_claw_001",
         name="медвежий коготь",
@@ -345,15 +363,33 @@ init 4 python:
     SpecialMushroomItem = GameItem(
         object_id="special_mushroom_001",
         name="редкий гриб",
-        description="Редкий лесной гриб, который ценится знахарями и поварами.",
+        description="Редкий лесной гриб, который на два дня резко усиливает половое влечение и выносливость.",
+        actions=[
+            ObjectAction(
+                action_id="eat",
+                label="Съесть редкий гриб",
+                hook="call",
+                target="UseFoodItem",
+                args=("special_mushroom_001",),
+            ),
+        ],
         price=12,
         carriable=True,
         stackable=True,
         custom_properties={
             "item_kind": "forest_resource",
             "resource_kind": "special_mushroom",
-            "spawn_zones": ["ForestDarkWoods", "ForestCave"],
-            "spawn_rarity": "редкий",
+            "consume_action": "eat",
+            "consume_minutes": 10,
+            "consume_energy": 2,
+            "consume_fun": 5,
+            "consume_text": "Вы съедаете редкий гриб. По телу быстро разливается жар; в ближайшие два дня сил для близости будет заметно больше.",
+            "player_libido_days": 2,
+            "player_daily_cum_limit": 4,
+            "shared_fertility_days": 2,
+            "shared_conception_permille": 550,
+            "shared_effect_text": "Жар от редкого гриба останется с ней на два дня и резко повысит вероятность зачатия.",
+            "gift_value": 1,
         },
     )
 

@@ -387,7 +387,7 @@ init python:
             score += 2
         if tavern_kitchen_milk_bonus_active():
             score += 1
-        if tavern_kitchen_boar_bonus_active():
+        if tavern_kitchen_meat_bonus_active():
             score += 1
         if int(player.tavern_management.breakfast.spicy_drink_day or -1) == current_game_day():
             score += 2

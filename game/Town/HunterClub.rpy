@@ -65,6 +65,7 @@ init python:
         "white_wolf_skin_001",
         "boar_fang_001",
         "boar_meat_001",
+        "bear_meat_001",
         "bear_claw_001",
         "bear_fur_brown_001",
         "bear_fur_grizzly_001",

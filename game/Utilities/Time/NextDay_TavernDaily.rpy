@@ -26,7 +26,7 @@ label NextDay_TavernDaily():
         _kitchen_stock_used = tavern_kitchen_daily_product_savings(CurDay['products'])
         CurDay['kitchen_stock_used'] = _kitchen_stock_used
         CurDay['products'] = max(0, CurDay['products'] - _kitchen_stock_used)
-        if tavern_kitchen_boar_bonus_active():
+        if tavern_kitchen_meat_bonus_active():
             CurDay['wine'] = max(0, (CurDay['wine'] * 105 + 99) // 100)
         if CurDay['wine'] > player.tavern_management.winenum:
             CurDay['happy'] -= 1
@@ -37,7 +37,7 @@ label NextDay_TavernDaily():
             CurDay['products'] = player.tavern_management.productnum
         player.tavern_management.productnum -= CurDay['products']
         CurDay['revenue'] = round((CurDay['products'] * 8 + CurDay['wine'] * 30) * 0.1, 2)
-        if tavern_kitchen_boar_bonus_active():
+        if tavern_kitchen_meat_bonus_active():
             CurDay['revenue'] = round(CurDay['revenue'] * 1.15, 2)
         _kitchen_effect_lines = tavern_kitchen_apply_daily_food_effects()
         if len(list(_kitchen_effect_lines or [])) > 0:

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 90
+define currentVersion = 91
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -778,6 +778,10 @@ init -100 python:
         if loaded_version < 90:
             updateSave_V89()
             loaded_version = 90
+
+        if loaded_version < 91:
+            updateSave_V90()
+            loaded_version = 91
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2994,6 +2998,33 @@ init -100 python:
                     inga_morning_thread.data.length,
                     complete_at_end=True,
                 )
+
+    def updateSave_V90():
+        # Timed mushroom effects belong to the affected actor. Forest room
+        # definitions own their spawn rules; merge only the new rule into
+        # saved rooms so their state and currently spawned items stay intact.
+        player.intimacy.ensure_temporary_libido_state()
+        for girl_info in people.girl_values():
+            girl_info.ensure_temporary_fertility_state()
+
+        for room_code in ("ForestDarkWoods", "ForestCave"):
+            room_obj = rooms.get(room_code)
+            definition = roomDefinitions.get(room_code, None)
+            if room_obj is None or definition is None:
+                continue
+            definition_rules = list((getattr(definition, "custom_properties", {}) or {}).get("spawn_rules", []) or [])
+            mushroom_rule = next((dict(row) for row in definition_rules if str(row.get("item_id", "") or "") == "special_mushroom_001"), None)
+            if mushroom_rule is None:
+                continue
+            room_properties = getattr(room_obj, "custom_properties", None)
+            if not isinstance(room_properties, dict):
+                room_properties = {}
+                room_obj.custom_properties = room_properties
+            saved_rules = list(room_properties.get("spawn_rules", []) or [])
+            room_properties["spawn_rules"] = [
+                dict(row) for row in saved_rules
+                if str(row.get("item_id", "") or "") != "special_mushroom_001"
+            ] + [mushroom_rule]
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

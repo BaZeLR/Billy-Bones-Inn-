@@ -25,6 +25,7 @@ init 6 python:
                 {"item_id": "mushroom_001", "frequency": 2, "units": 3},
                 {"item_id": "honey_comb_001", "frequency": 5, "units": 1},
                 {"item_id": "lumber_001", "frequency": 3, "units": 1},
+                {"item_id": "special_mushroom_001", "frequency": 20, "units": 1},
             ],
         },
     )

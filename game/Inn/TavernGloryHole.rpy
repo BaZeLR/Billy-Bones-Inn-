@@ -239,7 +239,7 @@ label TavernGloryHoleCheck:
                         call ShowImage("gloryhole", "", "glory1")
                 jump TavernGloryHole_menu
 
-            "Вставить член" if player.tavern_management.glory_hole_session.cock_inserted == 0 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and player.tavern_management.glory_hole_session.current_step == 0 and player.tavern_management.glory_hole_session.menu_blocked == 0:
+            "Вставить член" if player.tavern_management.glory_hole_session.cock_inserted == 0 and player.tavern_management.glory_hole_look == 0 and player.intimacy.can_cum() and player.tavern_management.glory_hole_session.current_step == 0 and player.tavern_management.glory_hole_session.menu_blocked == 0:
                 
                 python hide:
                     session = player.tavern_management.glory_hole_session
@@ -255,7 +255,7 @@ label TavernGloryHoleCheck:
                     call ShowImage("gloryhole", "", "gloryyou")
                 jump TavernGloryHole_menu
 
-            "Наслаждаться процессом" if player.tavern_management.glory_hole_session.cock_inserted == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and player.tavern_management.glory_hole_session.current_step == 1 and player.tavern_management.glory_hole_session.menu_blocked == 0:
+            "Наслаждаться процессом" if player.tavern_management.glory_hole_session.cock_inserted == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.can_cum() and player.tavern_management.glory_hole_session.current_step == 1 and player.tavern_management.glory_hole_session.menu_blocked == 0:
                 
                 "[player.tavern_management.glory_hole_session.player_line2]"
                 if player.tavern_management.glory_hole_session.works:
@@ -264,7 +264,7 @@ label TavernGloryHoleCheck:
                     call ShowImage("gloryhole", "", "gloryyou")
                 jump TavernGloryHole_menu
 
-            "Кончить" if player.tavern_management.glory_hole_session.cock_inserted == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and player.tavern_management.glory_hole_session.current_step == 2 and player.tavern_management.glory_hole_session.menu_blocked == 0:
+            "Кончить" if player.tavern_management.glory_hole_session.cock_inserted == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.can_cum() and player.tavern_management.glory_hole_session.current_step == 2 and player.tavern_management.glory_hole_session.menu_blocked == 0:
                 
                 "[player.tavern_management.glory_hole_session.player_line3]"
                 if player.tavern_management.glory_hole_session.works:

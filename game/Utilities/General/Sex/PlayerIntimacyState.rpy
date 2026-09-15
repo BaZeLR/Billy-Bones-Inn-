@@ -22,7 +22,7 @@ init python:
         return player_intimacy_int(player.intimacy.came_today, 0)
 
     def player_cum_limit():
-        return max(1, player_intimacy_int(player.intimacy.can_cum_daily, 1))
+        return player.intimacy.daily_cum_limit(current_game_day())
 
     def player_set_cum_count(value):
         count = max(0, player_intimacy_int(value, 0))

@@ -18,6 +18,10 @@ init python:
         if chance <= 0.0:
             return 0
         if str(dad_name or "").strip().lower() in ("you", "вы"):
+            temporary_chance = girl_info.temporary_conception_permille(current_game_day())
+            if temporary_chance > 0:
+                return temporary_chance
+        if str(dad_name or "").strip().lower() in ("you", "вы"):
             chance *= 3.0
         if int(is_dude_random or 0) != 0:
             chance /= 10.0

@@ -208,7 +208,7 @@ init python:
             ("Энергия", str(state.condition.energy)),
             ("Настроение", str(state.condition.fun)),
             ("Секс", str(state.intimacy.had_sex_count)),
-            ("Раз за день", str(state.intimacy.can_cum_daily)),
+            ("Раз за день", str(state.intimacy.daily_cum_limit(current_game_day()))),
             ("Сегодня", str(state.intimacy.came_today)),
             ("Без секса", last_sex_text),
             ("Возбуждение", str(state.intimacy.arousal_value())),

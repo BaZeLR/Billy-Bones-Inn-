@@ -29,6 +29,7 @@ def test_inventory_consumption_actions_come_only_from_item_objects():
     assert "player_card_append_fallback_item_actions" not in player_card
     assert 'object_id="berries_001"' in berries and 'target="UseFoodItem"' in berries
     assert 'object_id="drink_ale_001"' in hunter_items and 'target="UseDrinkItem"' in hunter_items
+    assert 'object_id="special_mushroom_001"' in hunter_items and 'target="UseFoodItem"' in hunter_items
     for item_id in ("energy_tea_001", "libido_tincture_001"):
         item_block = crafting_items.split('object_id="%s"' % item_id, 1)[1].split("GameItem(", 1)[0]
         assert 'target="UseDrinkItem"' in item_block

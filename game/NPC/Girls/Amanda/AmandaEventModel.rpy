@@ -88,7 +88,7 @@ init -24 python:
             return (
                 str(people.location("amanda") or "") == "TavernAmandaRoom"
                 and not people.is_awake("amanda")
-                and player.intimacy.came_today < player.intimacy.can_cum_daily
+                and player.intimacy.can_cum()
             )
 
     class AmandaGloryHoleTryEvent(AmandaEvent):

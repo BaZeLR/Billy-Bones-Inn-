@@ -540,6 +540,7 @@ init -46 python:
 
         item_key = str(get_object_id(item_id) or "").strip()
         action_key = str(expected_action or "").strip()
+        consumed_day = None
         if item_key == "" or action_key == "":
             return {
                 "ok": False,
@@ -574,6 +575,7 @@ init -46 python:
                     "action_key": action_key,
                     "item_id": item_key,
                 }
+            consumed_day = current_game_day()
 
         minutes_cost = max(0, int(profile.get("minutes", 0) or 0))
         if minutes_cost > 0:
@@ -584,6 +586,9 @@ init -46 python:
 
         for output_id, output_qty in list(profile.get("outputs", []) or []):
             player.add_item(output_id, output_qty)
+
+        if consume_from_inventory:
+            player.intimacy.apply_consumed_item_effect(item_key, consumed_day)
 
         update_stat_state()
 
@@ -780,6 +785,7 @@ init -46 python:
 
         rule = _social_item_rule(item_key, key)
         info = people.get_info(key)
+        shared_effect_applied = False
 
         if from_gift:
             if info is not None and friend_bonus > 0:
@@ -806,6 +812,8 @@ init -46 python:
                     info.rebel_baseline = max(0, int(info.rebel_baseline or 0) + int(rule.get("neshlush_delta", 0) or 0))
                 if str(custom_props.get("crafted_kind", "") or "") == "soap" and "soap_request_threshold" in rule and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
                     crafting.soap_requests[key] = 1
+            if info is not None and str(getattr(info, "registry_group", "") or "") == "girl":
+                shared_effect_applied = info.apply_shared_item_effect(item_key, current_game_day())
 
         effect_lines = []
         if fun_bonus > 0:
@@ -816,6 +824,8 @@ init -46 python:
             effect_lines.append("Похоже, Кларисса начинает доверять вам заметно больше.")
         if horny_bonus > 0:
             effect_lines.append("От подарка в ее глазах появляется теплый, немного шальной блеск.")
+        if shared_effect_applied and str(custom_props.get("shared_effect_text", "") or "").strip():
+            effect_lines.append(str(custom_props.get("shared_effect_text", "") or "").strip())
         effect_lines.extend(_social_item_effect_lines(key, item_key))
 
         return {

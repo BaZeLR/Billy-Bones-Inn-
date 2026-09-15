@@ -1344,6 +1344,7 @@ init -999 python:
             super().__init__(name, **kwargs)
             self.detailed_sex_history = []
             self.wardrobe = GirlWardrobeState()
+            self.temporary_fertility = {"item_id": "", "until_day": -1}
 
         def update(self):
             super(Girl, self).update()
@@ -1353,7 +1354,49 @@ init -999 python:
                 getattr(self, "sex_state", None),
                 base_clothing,
             )
+            self.ensure_temporary_fertility_state()
             return self
+
+        def ensure_temporary_fertility_state(self):
+            if not isinstance(getattr(self, "temporary_fertility", None), dict):
+                self.temporary_fertility = {"item_id": "", "until_day": -1}
+            self.temporary_fertility["item_id"] = str(self.temporary_fertility.get("item_id", "") or "").strip()
+            self.temporary_fertility["until_day"] = people_to_int(self.temporary_fertility.get("until_day", -1), -1)
+            return self.temporary_fertility
+
+        def apply_shared_item_effect(self, item_id="", day_value=None):
+            item_key = str(item_id or "").strip()
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            duration = max(0, people_to_int(properties.get("shared_fertility_days", 0), 0))
+            chance = max(0, people_to_int(properties.get("shared_conception_permille", 0), 0))
+            if item_key == "" or duration <= 0 or chance <= 0:
+                return False
+            today = current_game_day() if day_value is None else people_to_int(day_value, 0)
+            state = self.ensure_temporary_fertility_state()
+            state["item_id"] = item_key
+            state["until_day"] = max(people_to_int(state.get("until_day", -1), -1), today + duration - 1)
+            return True
+
+        def temporary_fertility_active(self, day_value=None):
+            state = self.ensure_temporary_fertility_state()
+            item_key = str(state.get("item_id", "") or "").strip()
+            if item_key == "":
+                return False
+            today = current_game_day() if day_value is None else people_to_int(day_value, 0)
+            if today > people_to_int(state.get("until_day", -1), -1):
+                return False
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            return people_to_int(properties.get("shared_conception_permille", 0), 0) > 0
+
+        def temporary_conception_permille(self, day_value=None):
+            if not self.temporary_fertility_active(day_value):
+                return 0
+            item_key = str(self.temporary_fertility.get("item_id", "") or "").strip()
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            return max(0, min(1000, people_to_int(properties.get("shared_conception_permille", 0), 0)))
 
         def can_have_sex_today(self):
             return people_to_int(self.fucked_today, 0) < max(0, people_to_int(self.daily_sex_limit, 0))
