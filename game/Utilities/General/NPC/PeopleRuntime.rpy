@@ -1405,7 +1405,7 @@ init -999 python:
             return False
 
         def getLocation(self, wday=None, hour=None):
-            if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
+            if not household_morning_issue_matches(self.name, time_value=hour) and bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
                 return "BarberShop"
             scheduled_location = super(Girl, self).getLocation(wday, hour)
             if scheduled_location == "TavernMain" and people_to_int(self.job_value("jobwhore", 0), 0) > 0:

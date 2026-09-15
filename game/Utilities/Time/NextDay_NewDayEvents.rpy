@@ -17,6 +17,7 @@ label NextDay_NewDayEvents(retlocname=""):
 
         day_value = current_game_day()
         week_value = int(calendar_v2.week or 0)
+        prepare_household_morning_states(day_value)
 
         player.tavern_management.breakfast.today = False
         tavern_kitchen_reset_daily_hearth_state()

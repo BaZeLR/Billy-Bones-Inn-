@@ -15,10 +15,12 @@ def schedule(npc_id):
     return json.loads(read(f"game/NPC/Schedules/{npc_id}.json"))["entries"]
 
 
-def entry_at(entries, weekday, clock):
+def entry_at(entries, weekday, clock, ignored_rules=()):
     minute = int(clock[:2]) * 60 + int(clock[3:])
     matches = []
     for row in entries:
+        if str((row.get("condition") or {}).get("rule", "")) in tuple(ignored_rules or ()):
+            continue
         if weekday not in row.get("weekdays", []):
             continue
         start = int(row["start"][:2]) * 60 + int(row["start"][3:])
@@ -107,9 +109,9 @@ def test_tavern_team_has_complete_sunday_day_schedule():
     for npc_id, locations in expected.items():
         entries = schedule(npc_id)
         for hour in range(6, 23):
-            assert entry_at(entries, 7, f"{hour:02d}:00") is not None
+            assert entry_at(entries, 7, f"{hour:02d}:00", ("household_morning_issue",)) is not None
         for clock, location in locations.items():
-            assert entry_at(entries, 7, clock)["location"] == location
+            assert entry_at(entries, 7, clock, ("household_morning_issue",))["location"] == location
 
 
 def test_church_go_around_action_matches_qsp_and_is_restored_for_loaded_saves():

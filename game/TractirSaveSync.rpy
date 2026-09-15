@@ -40,6 +40,7 @@ init -100 python:
         people.repair()
         rooms.repair()
         household.repair()
+        prepare_household_morning_states(current_game_day())
         globals().pop("AmandaLizaWorkTalk", None)
         retired_threads = globals().get("threads", {})
         if isinstance(retired_threads, dict):

@@ -12,6 +12,36 @@
       "priority": 700
     },
     {
+      "label": "morning_sick",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "06:00",
+      "end": "11:59",
+      "location": "TavernSandraRoom",
+      "awake": true,
+      "talkable": false,
+      "priority": 950,
+      "condition": {
+        "rule": "household_morning_issue",
+        "person": "sandra",
+        "issue": "sick"
+      }
+    },
+    {
+      "label": "morning_sleepy",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "06:00",
+      "end": "11:59",
+      "location": "TavernSandraRoom",
+      "awake": false,
+      "talkable": false,
+      "priority": 950,
+      "condition": {
+        "rule": "household_morning_issue",
+        "person": "sandra",
+        "issue": "sleepy"
+      }
+    },
+    {
       "label": "sunday_morning",
       "weekdays": [7],
       "start": "06:00",

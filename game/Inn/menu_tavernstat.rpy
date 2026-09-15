@@ -76,14 +76,6 @@ init python:
         info = _tavern_person_info(person)
         return _tavern_int(getattr(info, "rel", 0), 0)
 
-    def _tavern_private_room(person):
-        key = str(person or "").strip().lower()
-        return {
-            "sandra": "TavernSandraRoom",
-            "melissa": "TavernMelissaRoom",
-            "amanda": "TavernAmandaRoom",
-        }.get(key, "")
-
     def _household_morning_state_key(person="", day_marker=None):
         return "%s:%s" % (str(person or "").strip().lower(), current_game_day() if day_marker is None else int(day_marker or 0))
 
@@ -118,30 +110,55 @@ init python:
             household.morning_state[state_key] = entry
         return household.morning_state.get(state_key, {"issue": "", "resolved": 1, "indecent": 0})
 
+    def prepare_household_morning_states(day_marker=None):
+        for person in ("sandra", "melissa", "amanda"):
+            _ensure_household_morning_state(person, day_marker)
+
+    def household_morning_issue_matches(person="", issue="", time_value=None):
+        key = str(person or "").strip().lower()
+        if key not in ("sandra", "melissa", "amanda"):
+            return False
+        minute_value = npc_schedule_clock_minute(time_value)
+        if minute_value < 6 * 60 or minute_value >= 12 * 60:
+            return False
+        entry = household.morning_state.get(_household_morning_state_key(key))
+        if not hasattr(entry, "get") or int(entry.get("resolved", 0) or 0) != 0:
+            return False
+        current_issue = str(entry.get("issue", "") or "").strip()
+        expected_issue = str(issue or "").strip()
+        if expected_issue:
+            return current_issue == expected_issue
+        return current_issue in ("sick", "sleepy")
+
     def household_morning_issue_type(person="", time_value=None, hour_value=None):
         key = str(person or "").strip().lower()
-        slot = _tavern_int(calendar_v2.time_slot() if time_value is None else time_value, 0)
-        hour_num = _tavern_int(calendar_v2.hour if hour_value is None else hour_value, 8)
         if key not in ("sandra", "melissa", "amanda"):
             return ""
-        if _tavern_int(calendar_v2.week, 1) == 7 or slot >= 4 or hour_num >= 12:
+        if time_value is not None and _tavern_int(time_value, 0) >= 4:
             return ""
-        entry = _ensure_household_morning_state(key)
-        if int(entry.get("resolved", 0) or 0) != 0:
-            return ""
-        return str(entry.get("issue", "") or "").strip()
+        for issue_code in ("sick", "sleepy"):
+            if household_morning_issue_matches(key, issue_code, hour_value):
+                return issue_code
+        return ""
 
     def household_morning_issue_indecent(person=""):
-        entry = _ensure_household_morning_state(person)
+        key = str(person or "").strip().lower()
+        entry = household.morning_state.get(_household_morning_state_key(key))
+        if not hasattr(entry, "get"):
+            return False
         return int(entry.get("indecent", 0) or 0) == 1 and household_morning_issue_type(person) == "sleepy"
 
     def household_clear_morning_issue(person=""):
         key = str(person or "").strip().lower()
         if key not in ("sandra", "melissa", "amanda"):
             return 0
-        entry = dict(_ensure_household_morning_state(key) or {})
+        state_key = _household_morning_state_key(key)
+        saved_entry = household.morning_state.get(state_key)
+        if not hasattr(saved_entry, "get"):
+            return 0
+        entry = dict(saved_entry or {})
         entry["resolved"] = 1
-        household.morning_state[_household_morning_state_key(key)] = entry
+        household.morning_state[state_key] = entry
         return 1
 
     def household_needs_reconcile(person=""):
