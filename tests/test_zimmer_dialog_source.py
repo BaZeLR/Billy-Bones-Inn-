@@ -98,6 +98,26 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     assert "Mongol.guard_captain_known = True" in source
 
 
+def test_eddie_complaint_opens_the_existing_zimmer_robin_case():
+    source = _source(ZIMMER_TALK)
+    report = source.split("label IntZimmerTalkRobinReport:", 1)[1].split(
+        "label IntZimmerTalkPay100:", 1
+    )[0]
+
+    assert "Robin.robbery_count > 0 or Eddie.asked_fingal_guard_complaint" in source
+    assert "if Robin.robbery_count > 0:" in report
+    assert "рассказ Эдди" in report
+    assert "Zimmer.robin_complaint_stage = 1" in report
+    assert "Eddie.asked_fingal_guard_complaint =" not in report
+
+
+def test_zimmer_talk_exposes_robin_camp_report_as_story_event():
+    source = _source(ZIMMER_TALK)
+
+    assert 'story_event_available("talk_zimmer", "robin_camp_report")' in source
+    assert 'call checkTriggers("talk_zimmer", "robin_camp_report", 0)' in source
+
+
 def test_zimmer_horse_offer_uses_player_owned_resources_and_horse_state():
     source = _source(ZIMMER_TALK)
     purchase = source.split("label IntZimmerTalkHorsePurchase:", 1)[1].split(

@@ -6,6 +6,7 @@ INIT_SECONDARY = ROOT / "game" / "NPC" / "Secondary" / "InitSecondaryNPC.rpy"
 INIT_ROBIN = ROOT / "game" / "NPC" / "Secondary" / "InitRobin.rpy"
 ROBIN_TALK = ROOT / "game" / "NPC" / "Secondary" / "IntRobinTalk.rpy"
 BLACKWOOD = ROOT / "game" / "NPC" / "Secondary" / "SherwoodTravel.rpy"
+ROBIN_CAMP = ROOT / "game" / "NPC" / "Secondary" / "RobinCampDestructionThread.rpy"
 STORY_RUNTIME = ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 CLARA_BOOKLET = ROOT / "game" / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy"
 PEOPLE_RUNTIME = ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
@@ -100,6 +101,56 @@ def test_robin_thread_and_mongol_escape_unlock_use_objects():
         "label story_robin_blackwood_first_robbery:", 1
     )[0]
     assert "event_runtime.active_thread" not in mongol_pass
+
+
+def test_robin_camp_thread_owns_assault_then_report_and_stops_ambush_on_victory():
+    runtime = _source(STORY_RUNTIME)
+    camp = runtime.split('LThreadData(0, "robin", "CampDestruction"', 1)[1].split(
+        'LThreadData(0, "robin", "BlackwoodRoadAmbush"', 1
+    )[0]
+    ambush = runtime.split('LThreadData(0, "robin", "BlackwoodRoadAmbush"', 1)[1].split(
+        "define sherwoodThreadList", 1
+    )[0]
+
+    assert '"#int(Zimmer.robin_complaint_stage or 0) >= 3"' in camp
+    assert camp.index('"story_robin_blackwood_camp_assault_0"') < camp.index(
+        '"story_robin_blackwood_camp_report_1"'
+    )
+    assert '"BlackwoodRoad"' in camp
+    assert '"enter"' in camp
+    assert "-100" in camp
+    assert '"talk_zimmer"' in camp
+    assert '"robin_camp_report"' in camp
+    assert '"#int(threads[\'robinCampDestruction\'].num or 0) == 0"' in ambush
+
+
+def test_robin_camp_fight_advances_only_after_victory():
+    source = _source(ROBIN_CAMP)
+    assault = source.split("label story_robin_blackwood_camp_assault_0:", 1)[1].split(
+        "label story_robin_blackwood_camp_report_1:", 1
+    )[0]
+    victory = assault.split('if _robin_camp_outcome == "victory":', 1)[1].split(
+        'elif _robin_camp_outcome == "defeat":', 1
+    )[0]
+    failure = assault.split('elif _robin_camp_outcome == "defeat":', 1)[1]
+
+    assert 'fight_begin("street_crook", 3, "BlackwoodRoad"' in assault
+    assert 'fight.last_result.get("outcome", "")' in assault
+    assert "$ event_runtime.active_thread.advance()" in victory
+    assert "active_thread.advance" not in failure
+    assert "player.add_money" not in assault
+    assert "player.add_item" not in assault
+
+
+def test_robin_camp_report_closes_zimmer_case_without_parallel_flag():
+    source = _source(ROBIN_CAMP)
+    report = source.split("label story_robin_blackwood_camp_report_1:", 1)[1]
+
+    assert "$ Zimmer.robin_complaint_stage = 4" in report
+    assert "$ Zimmer.mark_talked(1)" in report
+    assert "$ event_runtime.active_thread.advance()" in report
+    assert "default " not in source
+    assert "Robin.var" not in source
 
 
 def test_blackwood_terminal_outcomes_return_directly_to_tavern():

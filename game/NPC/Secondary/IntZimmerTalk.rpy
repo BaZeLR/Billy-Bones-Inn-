@@ -32,7 +32,7 @@ label IntZimmerTalk:
                 call IntZimmerTalkSherwoodStory1
             "И что с лесом теперь?" if int(Zimmer.talked_today or 0) < 2 and Becky.knows_blackwood and Zimmer.sherwood_story_stage == 1:
                 call IntZimmerTalkSherwoodStory2
-            "Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and Robin.robbery_count > 0 and Zimmer.robin_complaint_stage == 0:
+            "Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and (Robin.robbery_count > 0 or Eddie.asked_fingal_guard_complaint) and Zimmer.robin_complaint_stage == 0:
                 call IntZimmerTalkRobinReport
             "Отдать сотню мараведи" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 1 and player.economy.money >= 100:
                 call IntZimmerTalkPay100
@@ -40,6 +40,8 @@ label IntZimmerTalk:
                 call IntZimmerTalkHaggle
             "Узнать как там расследование" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 2:
                 call IntZimmerTalkInvestigation
+            "Сообщить об уничтожении лагеря Робина" if story_event_available("talk_zimmer", "robin_camp_report"):
+                call checkTriggers("talk_zimmer", "robin_camp_report", 0)
             "Спросить о покупке лошади" if int(Zimmer.talked_today or 0) < 2 and int(Luisa.horse_referral_stage or 0) > 0 and not player.horse.owns_horse():
                 call IntZimmerTalkHorsePurchase
             "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 7 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
@@ -106,7 +108,10 @@ label IntZimmerTalkSherwoodStory2:
 label IntZimmerTalkRobinReport:
     $ renpy.dynamic("_zimmer_name")
     $ _zimmer_name = "zimmer"
-    $ scene_runtime.text = "\"Ай-ай молодой человек, какие вы ужасы рассказываете. Грабеж? И где вы говорите это произошло? На Шервудской вырубке? Очень, очень жаль. Мы должны защищать добрых горожан нашего славного Коитополиса, однако ж эта вырубка находится далековато. Так что порядок мы там, сами понимаете, поддерживать не можем. Правда, если вы решите компенсировать нам расходы, связанные с расследованием, мы можем и поискать грабителей. Путь неблизкий, но из сочуствия и уважения к вам я готов таки удовлетворится сотней мараведи.\""
+    if Robin.robbery_count > 0:
+        $ scene_runtime.text = "\"Ай-ай молодой человек, какие вы ужасы рассказываете. Грабеж? И где вы говорите это произошло? На Шервудской вырубке? Очень, очень жаль. Мы должны защищать добрых горожан нашего славного Коитополиса, однако ж эта вырубка находится далековато. Так что порядок мы там, сами понимаете, поддерживать не можем. Правда, если вы решите компенсировать нам расходы, связанные с расследованием, мы можем и поискать грабителей. Путь неблизкий, но из сочуствия и уважения к вам я готов таки удовлетворится сотней мараведи.\""
+    else:
+        $ scene_runtime.text = "Вы передаете Циммерману рассказ Эдди: на Шервудской вырубке его избили, ограбили и отняли лошадь.\n\n\"Ай-ай, молодой человек, какие ужасы вы рассказываете!\" качает головой десятник. \"Однако вырубка находится далековато, и поддерживать там порядок нам непросто. Если вы компенсируете расходы на расследование, мы поищем эту шайку. Из сочувствия к пострадавшему я готов удовлетвориться сотней мараведи.\""
     vscene "images/zimmer/talk.png"
     $ Zimmer.robin_complaint_stage = 1
     $ Zimmer.mark_talked(1)

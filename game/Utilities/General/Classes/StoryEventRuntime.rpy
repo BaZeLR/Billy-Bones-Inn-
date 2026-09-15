@@ -1614,6 +1614,33 @@ define churchThreadList = []
 define mongolThreadList = []
 define cityGuardThreadList = []
 define robinThreadList = [
+    LThreadData(0, "robin", "CampDestruction", [
+        "#int(Zimmer.robin_complaint_stage or 0) >= 3",
+    ], [
+        (
+            "story_robin_blackwood_camp_assault_0",
+            None, (6, 17), None,
+            1,
+            None,
+            ["#str(rooms.current_code or '') == 'BlackwoodRoad'"],
+            None,
+            "BlackwoodRoad",
+            "enter",
+            -100,
+            True,
+        ),
+        (
+            "story_robin_blackwood_camp_report_1",
+            None, None, None,
+            1,
+            None,
+            ["#int(Zimmer.talked_today or 0) < 2"],
+            None,
+            "talk_zimmer",
+            "robin_camp_report",
+            100,
+        ),
+    ], highlight=True, threaded=True),
     LThreadData(0, "robin", "BlackwoodRoadAmbush", None, [
         (
             "story_robin_blackwood_ambush_0",
@@ -1622,6 +1649,7 @@ define robinThreadList = [
             None,
             [
                 "#int(threads['beckySherwoodTrade'].num or 0) >= 2",
+                "#int(threads['robinCampDestruction'].num or 0) == 0",
                 "#str(rooms.current_code or '') == 'BlackwoodRoad'",
             ],
             None,
