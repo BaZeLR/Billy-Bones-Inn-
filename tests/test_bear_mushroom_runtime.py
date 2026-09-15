@@ -346,6 +346,9 @@ def test_all_mc_cum_limit_readers_use_player_intimacy_owner():
 def test_pregnancy_roll_remains_inside_only():
     pregnancy = read("NPC/Girls/Common/PregnancyCheck.rpy")
     roll = pregnancy.split("def pregnancy_check", 1)[1]
+    conception = roll.rsplit("if cum_place == 'inside':", 1)[1]
 
     assert "if cum_place == 'inside':" in roll
-    assert "procedural_randint(1, 1000" in roll.split("if cum_place == 'inside':", 1)[1]
+    assert 'girl_info.add_sex_stat("cuminside", 1)' in conception
+    assert 'girl_info.sex_stat("cuminside", 0)' in conception
+    assert "procedural_random(conception_key)" in conception
