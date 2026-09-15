@@ -448,6 +448,17 @@ def test_amanda_legare_mechanic_is_direct_object_state_without_wrapper_plan():
     assert "label LegareAmandaLetGoCode" not in legare_source
 
 
+def test_repeated_legare_encounter_can_reveal_the_prior_sighting_only():
+    source = _source(AMANDA_AFTER_LEGARE_SEX)
+    prompt = source.split(
+        "if Amanda.player_saw_legare_sex and not Amanda.knows_player_saw_legare_sex:", 1
+    )[1].split('"Вы незаметно последовали за ними', 1)[0]
+
+    assert '"Сказать, что вы все видели":' in prompt
+    assert "$ Amanda.knows_player_saw_legare_sex = True" in prompt
+    assert "$ Amanda.knows_player_is_watching_legare_sex = True" not in prompt
+
+
 def test_amanda_v67_migration_consumes_complete_legare_state_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V67():", 1)[1].split("label before_load:", 1)[0]
