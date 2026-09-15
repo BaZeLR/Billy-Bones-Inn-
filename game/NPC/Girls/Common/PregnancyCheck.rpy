@@ -156,7 +156,11 @@ init python:
                 girl_info.add_sex_stat("cuminside", 1)
                 if girl_info.pregnancy_days() == 0:
                     cur_conc = Min(cur_conc, 800)
-                    if procedural_randint(1, 1000, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:147:4") <= cur_conc:
+                    conception_key = "pregnancy_conception_%s_%s" % (
+                        girl,
+                        girl_info.sex_stat("cuminside", 0),
+                    )
+                    if procedural_random(conception_key) < (float(cur_conc) / 1000.0):
                         girl_info.set_sex_stat("pregnancy", 1)
                         girl_info.set_sex_stat("pregfather", dad)
                         Zalet = 1
