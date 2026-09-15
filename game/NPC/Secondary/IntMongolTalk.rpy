@@ -84,7 +84,7 @@ label ClaraSecretMerchantMenu:
     $ _secret_market_month_key = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
     while True:
         menu:
-            "Купить старинный диван за 600" if threads["claraForestSofa"].num == 6 and not cursed_sofa_installed():
+            "Купить старинный диван за 600" if bool(threads["claraPaintingsPath"].completed) and int(player.tavern_management.client_room_hole or 0) > 0 and int(player.tavern_management.glory_hole or 0) == 2 and int(threads["claraForestSofa"].num or 0) == 6 and not cursed_sofa_installed():
                 call ClaraSecretMerchantBuySofa
                 if people_to_int(Clara.merchant_contact_month_key, -1) == _secret_market_month_key:
                     return
@@ -126,8 +126,8 @@ label ClaraSecretMerchantBuy(item_id="", price_value=0):
 
 
 label ClaraSecretMerchantBuySofa:
-    if threads["claraForestSofa"].num != 6 or cursed_sofa_installed():
-        $ scene_runtime.text = "Монгол разводит руками: старинного дивана среди его тайного товара больше нет."
+    if not bool(threads["claraPaintingsPath"].completed) or int(player.tavern_management.client_room_hole or 0) <= 0 or int(player.tavern_management.glory_hole or 0) != 2 or int(threads["claraForestSofa"].num or 0) != 6 or cursed_sofa_installed():
+        $ scene_runtime.text = "Монгол разводит руками: старинный диван он покажет только после того, как вы выполните все условия Клариссы; уже установленного второго дивана у него тоже нет."
         $ scene_runtime.location_text = scene_runtime.text
         return
     if people_to_int(Clara.merchant_contact_month_key, -1) == (int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)):

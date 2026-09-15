@@ -103,6 +103,39 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
         assert duplicate_flag not in combined
 
 
+def test_sofa_purchase_waits_for_claras_completed_innovations():
+    merchant = source("game/NPC/Secondary/IntMongolTalk.rpy")
+    sofa = source("game/Inn/TavernCursedSofa.rpy")
+    menu = merchant.split("label ClaraSecretMerchantMenu:", 1)[1].split(
+        "label ClaraSecretMerchantBuy(item_id=", 1
+    )[0]
+    guard = merchant.split("label ClaraSecretMerchantBuySofa:", 1)[1]
+
+    for condition in (
+        'bool(threads["claraPaintingsPath"].completed)',
+        "int(player.tavern_management.client_room_hole or 0) > 0",
+        "int(player.tavern_management.glory_hole or 0) == 2",
+        'int(threads["claraForestSofa"].num or 0) == 6',
+        "not cursed_sofa_installed()",
+    ):
+        assert condition in menu
+
+    for rejection in (
+        'not bool(threads["claraPaintingsPath"].completed)',
+        "int(player.tavern_management.client_room_hole or 0) <= 0",
+        "int(player.tavern_management.glory_hole or 0) != 2",
+        'int(threads["claraForestSofa"].num or 0) != 6',
+        "cursed_sofa_installed()",
+    ):
+        assert rejection in guard
+
+    requirements = sofa.split("label CursedSofaRitualRequirements:", 1)[1].split(
+        "label story_clara_sofa_ritual_7:", 1
+    )[0]
+    assert "потайное окошко в стене гостевой комнаты" in requirements
+    assert "подготовить отдельную гостевую комнату" not in requirements
+
+
 def test_sofa_ritual_uses_existing_story_and_npc_state_then_rewards_once():
     runtime = source("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
@@ -184,6 +217,8 @@ def test_legare_confrontation_uses_fight_authority_and_keeps_story_alive():
     assert "call FightLoop" in confrontation
     assert "event_runtime.active_thread.advance()" in confrontation
     assert "event_runtime.active_thread.abort()" not in confrontation
+    assert "amanda_conflict_stage" not in confrontation
+    assert "legare_departure_code" not in confrontation
 
 
 def test_amanda_and_melissa_favors_are_owned_by_their_talk_flows():

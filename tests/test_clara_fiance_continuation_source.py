@@ -95,6 +95,28 @@ def test_clara_fiance_labels_own_choices_and_only_success_advances():
     assert treatment.count("event_runtime.active_thread.complete()") == 1
     assert "main_ui_runtime.action_items" not in treatment
 
+    success = treatment.split('"Нанести мазь по просьбе Клариссы":', 1)[1].split(
+        '"Убрать мазь и вернуться позже":', 1
+    )[0]
+    retry = treatment.split('"Убрать мазь и вернуться позже":', 1)[1]
+    assert success.index('player.remove_item("special_cream_001", 1)') < success.index(
+        "event_runtime.active_thread.complete()"
+    )
+    assert 'player.remove_item("special_cream_001", 1)' not in retry
+    assert "event_runtime.active_thread.complete()" not in retry
+
+    confession = _label(source, "story_clara_paintings_confession_14")
+    assert "Я взрослая женщина и умею говорить, чего хочу" in confession
+    assert "только по моей просьбе" in confession
+    assert "Скажу “стоп”" in treatment
+    assert "она ясно просит продолжать" in treatment
+    assert treatment.index("потайное окошко") < treatment.index("глорихол")
+    assert treatment.index("глорихол") < treatment.index("Монгола")
+    assert treatment.index("Монгола") < treatment.index("старинный диван")
+    assert treatment.index("старинный диван") < treatment.index(
+        "event_runtime.active_thread.complete()"
+    )
+
     for scene_label in (
         "story_clara_paintings_luisa_report_9",
         "story_clara_paintings_sergio_followup_12",

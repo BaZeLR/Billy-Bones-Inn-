@@ -77,7 +77,7 @@ label CursedSofaRitualRequirements:
     if not threads["claraPaintingsPath"].completed:
         $ scene_runtime.text = "Диван ворчит, что Кларисса не придет по собственной воле, пока история с навязанным женихом не разрешена. След ведет к цирюльне и должен быть доведен до конца."
     elif int(player.tavern_management.client_room_hole or 0) <= 0:
-        $ scene_runtime.text = "Диван требует сначала подготовить отдельную гостевую комнату. Без закрытого места Кларисса и Мелисса не согласятся на условие проклятия."
+        $ scene_runtime.text = "Диван требует сначала просверлить потайное окошко в стене гостевой комнаты. Без этого обзорного отверстия Кларисса не считает условленное улучшение трактира законченным."
     elif int(player.tavern_management.glory_hole or 0) != 2:
         $ scene_runtime.text = "Диван ворчит, что трактиру все еще не хватает построенного глорихола: именно он должен отвести лишние взгляды от гостевой комнаты во время ритуала."
     elif not Clara.sex_stat("virginity", True) or not Melissa.sex_stat("virginity", True):

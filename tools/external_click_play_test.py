@@ -6384,6 +6384,8 @@ testcase external_clara_residence_and_ointment_flow:
     assert eval ("Признание Клариссы" in str(main_ui_runtime.action_title or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until screen "choice" timeout 20.0
+    assert eval ("Я взрослая женщина и умею говорить, чего хочу" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Принять условия Клариссы и обещать принести мазь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 15) timeout 20.0
 
     $ player.add_item("special_cream_001", 1)
@@ -6418,8 +6420,12 @@ testcase external_clara_residence_and_ointment_flow:
     assert eval ("Принести Клариссе специальную мазь" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     run Call("checkTriggers", "TavernMelissaRoom", "clara_ointment", 0)
     advance until screen "choice" timeout 20.0
+    assert eval ("Скажу “стоп”" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Нанести мазь по просьбе Клариссы" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until screen "choice" timeout 20.0
+    assert eval ("она ясно просит продолжать" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("потайное окошко" in str(scene_runtime.text or "") and "глорихол" in str(scene_runtime.text or "") and "найдите Монгола" in str(scene_runtime.text or "") and "старинный диван" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (bool(threads["claraPaintingsPath"].completed)) timeout 20.0
     assert eval (int(player.item_count("special_cream_001") or 0) == 0) timeout 5.0
     assert eval ("Принести Клариссе специальную мазь" not in [str(i.caption or "") for i in tavern_melissa_room_action_items()]) timeout 5.0
@@ -8931,6 +8937,12 @@ testcase external_clara_forest_sofa_story_flow:
     $ Clara.merchant_contact_month_key = -1
     $ player.set_money(1000)
     run Call("ClaraSecretMerchantBuySofa")
+    assert eval (_room_item_count_by_id(rooms.get("TavernMain"), "cursed_sofa_001") == 0 and int(player.economy.money or 0) == 1000) timeout 5.0
+    assert eval ("выполните все условия Клариссы" in str(scene_runtime.text or "")) timeout 5.0
+    $ threads["claraPaintingsPath"].advanceTo(threads["claraPaintingsPath"].data.length, complete_at_end=True)
+    $ player.tavern_management.client_room_hole = 1
+    $ player.tavern_management.glory_hole = 2
+    run Call("ClaraSecretMerchantBuySofa")
     assert eval (_room_item_count_by_id(rooms.get("TavernMain"), "cursed_sofa_001") == 1 and int(player.economy.money or 0) == 400) timeout 5.0
     run Call("ClaraSecretMerchantBuySofa")
     assert eval (_room_item_count_by_id(rooms.get("TavernMain"), "cursed_sofa_001") == 1 and int(player.economy.money or 0) == 400) timeout 5.0
@@ -8941,11 +8953,8 @@ testcase external_clara_forest_sofa_story_flow:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 7) timeout 20.0
 
-    $ threads["claraPaintingsPath"].advanceTo(threads["claraPaintingsPath"].data.length, complete_at_end=True)
     $ Clara.set_sex_stat("virginity", True)
     $ Melissa.set_sex_stat("virginity", True)
-    $ player.tavern_management.client_room_hole = 1
-    $ player.tavern_management.glory_hole = 2
     $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
     $ rooms.enter("TavernMain")
