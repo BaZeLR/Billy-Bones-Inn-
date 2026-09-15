@@ -67,7 +67,7 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
     assert "Clara.sync_clara_maps()" not in labels
     assert "Clara.change_social(" in labels
     assert "def tavern_visit_active(self):" in clara_init
-    assert 'threads["claraTavernVisit"].num or 0) not in (0, 1, 2)' in clara_init
+    assert 'threads["claraTavernVisit"].num or 0) not in (0, 1, 2, 6)' in clara_init
     assert "return ((current_game_day() + week_value) % 4) == 0" in clara_init
     assert "def melissa_room_visit_active(self):" in clara_init
     assert 'threads["claraTavernVisit"].num or 0) in (3, 4, 5)' in clara_init
@@ -88,6 +88,20 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
         assert '"priority": 860' in schedule
         assert '"clarissa_visit_room_window"' not in schedule
         assert '"evening_tavern_late_event"' not in schedule
+
+
+def test_clara_protection_lesson_stage_keeps_tavern_schedule_active():
+    clara_init = read(CLARA_INIT)
+    runtime = read(STORY_RUNTIME)
+
+    assert 'threads["claraTavernVisit"].num or 0) not in (0, 1, 2, 6)' in clara_init
+    lesson = runtime.split('"story_clara_tavern_protection_lessons_6"', 1)[1].split(
+        "),\n    ], highlight=False, threaded=True)", 1
+    )[0]
+    assert "#int(threads['claraForestSofa'].num or 0) >= 6" in lesson
+    assert "#not bool(threads['claraForestSofa'].aborted)" in lesson
+    assert "#str(people.location('clara') or '') == 'TavernMain'" in lesson
+    assert "#str(people.location('melissa') or '') == 'TavernMain'" in lesson
 
 
 def test_room_files_no_longer_own_clara_visit_state():

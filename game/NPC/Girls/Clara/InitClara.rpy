@@ -197,7 +197,7 @@ init python:
             return int(player_charisma_breakdown().get("charisma", 0) or 0) >= 70 and int(self.rel or 0) >= 5
 
         def tavern_visit_active(self):
-            if int(threads["claraTavernVisit"].num or 0) not in (0, 1, 2):
+            if int(threads["claraTavernVisit"].num or 0) not in (0, 1, 2, 6):
                 return False
             clock_value = (int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)) % 1440
             if clock_value < 720 or clock_value > 1079:
