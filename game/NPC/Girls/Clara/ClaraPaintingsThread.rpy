@@ -188,119 +188,251 @@ label story_clara_paintings_church_6:
     return
 
 
-label story_clara_paintings_barber_7:
-    $ main_ui_begin_native_scene_state("Жених Клариссы")
+label story_clara_paintings_secret_date_7:
+    $ main_ui_begin_native_scene_state("Тайный визит к Серджио")
     show screen main_ui
-    if int(calendar_v2.time_slot() or 0) == 0:
-        $ scene_runtime.text = "Утром у цирюльни вы замечаете того самого столичного жениха. Он выходит от Серджио слишком быстро и слишком аккуратно поправляет перчатки, будто не хочет, чтобы его здесь запомнили."
-    else:
-        $ scene_runtime.text = "Поздно вечером у закрытой цирюльни мелькает знакомая фигура. Столичный жених Клариссы входит через боковую дверь, а Серджио впускает его без лишних слов."
+    $ scene_runtime.text = "Уже после закрытия цирюльни вы замечаете знакомого столичного дворянина. Оглядевшись, жених Клариссы стучит в боковую дверь. Серджио впускает его без единого вопроса, и за ними сразу щёлкает засов."
     $ scene_runtime.location_text = scene_runtime.text
-    $ event_runtime.active_thread.advance()
     menu:
-        "Осторожно заглянуть внутрь" if int(player.stats.exploration or 0) >= 200:
-            call story_clara_paintings_barber_peek
+        "Осторожно заглянуть внутрь":
+            $ calendar_v2.advance_minutes(15)
+            if int(player.stats.exploration or 0) < 200:
+                $ scene_runtime.text = "Вы обходите цирюльню, но не находите места, откуда можно было бы что-нибудь рассмотреть, не выдав себя. Сегодня придётся уйти ни с чем и попробовать в другой вечер."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+                $ main_ui_end_native_scene_state()
+                return True
 
-        "Промолчать и уйти":
+            $ scene_runtime.text = "Через щель между ставней и рамой вы видите, что Серджио и столичный гость говорят совсем не как мастер и клиент. Осторожные прикосновения быстро становятся откровенными. Теперь вы точно знаете: будущий брак Клариссы держится на лжи, которую можно обратить в её защиту."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Продолжить":
+                    pass
+            $ event_runtime.active_thread.advance()
             $ main_ui_end_native_scene_state()
-            return
-    return
+            return True
+
+        "Не вмешиваться и уйти":
+            $ calendar_v2.advance_minutes(15)
+            $ main_ui_end_native_scene_state()
+            return True
 
 
-label story_clara_paintings_barber_peek:
+label story_clara_paintings_barber_closed_8:
+    $ main_ui_begin_native_scene_state("Закрытая цирюльня")
     show screen main_ui
-    $ scene_runtime.text = "Вы находите узкую щель между ставней и рамой. Внутри Серджио и столичный гость говорят совсем не как мастер и клиент. Слишком много тишины между фразами, слишком много осторожных прикосновений, слишком мало страха быть понятыми друг другом.\n\nДеталей вам хватает, чтобы понять главное: будущий брак Клариссы держится на лжи с обеих сторон. Этот материал может стать для нее оружием, если использовать его осторожно."
+    vscene "images/general/closedVenue default.png"
+    $ scene_runtime.text = "Вы приходите к цирюльне в часы, когда Серджио обычно принимает посетителей, но ставни закрыты, вывеска снята, а дверь заперта. Изнутри не доносится ни голоса, ни звона инструментов. Соседние торговцы только переглядываются и старательно делают вид, что ничего не знают."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Продолжить":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label story_clara_paintings_commission_8:
-    $ main_ui_begin_native_scene_state("Поручение Клариссы")
-    show screen main_ui
-    $ Clara.commission_followup_day = int(current_game_day() or 0) + 1
-    $ scene_runtime.text = "Когда Кларисса заглядывает в трактир, вы тихо говорите ей, что у вас появился материал, который стоит зарисовать. Она сперва настораживается, но, услышав про столичного жениха и цирюльню, становится совершенно серьезной.\n\n\"Не здесь,\" отвечает она. \"Завтра утром зайди в лавку. Если это правда, мне нужно понять, как показать это так, чтобы не выглядеть просто мстительной дурой.\""
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить":
-            pass
-    $ event_runtime.active_thread.advance()
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label story_clara_paintings_commission_followup_9:
-    $ main_ui_begin_native_scene_state("Поручение Клариссы")
-    show screen main_ui
-    $ scene_runtime.text = "Утром в винной лавке Кларисса сразу понимает, зачем вы пришли. Вы пересказываете ей все без лишних украшений. Она не перебивает, только сжимает пальцы на краю стойки.\n\n\"Вечером,\" решает она наконец. \"Если я увижу сама, я смогу нарисовать не слух, а правду. И тогда отецу будет куда сложнее продать меня за красивую столичную легенду.\""
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить":
-            pass
-    $ event_runtime.active_thread.advance()
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label story_clara_paintings_evening_peek_10:
-    $ main_ui_begin_native_scene_state("Кларисса у цирюльни")
-    show screen main_ui
-    $ Clara.murder_day = int(current_game_day() or 0) + 1
-    $ scene_runtime.text = "Вечером вы с Клариссой держитесь в тени напротив цирюльни. Когда боковая дверь снова открывается, она успевает увидеть достаточно: столичного жениха, Серджио, их осторожные жесты и ту особую близость, которую нельзя объяснить случайным визитом.\n\nКларисса сперва каменеет, потом почти злится на себя за облегчение. \"Значит, он тоже живет не той жизнью, которую ему продают,\" шепчет она. \"А меня собирались сделать ширмой для чужих приличий.\""
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить":
+        "Вернуться в квартал ремесленников":
             pass
     $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
     return True
 
 
-label story_clara_paintings_confession_11:
+label story_clara_paintings_luisa_report_9:
+    $ main_ui_begin_native_scene_state("Новости о Клариссе и Серджио")
+    show screen main_ui
+    vscene rooms.get("HunterClub").bg_picture
+    $ scene_runtime.text = "Луиза наклоняется через прилавок и понижает голос: «Слыхал про Клариссу Легаре и цирюльника? Обоих взяли. Богатого Джеймса Леонарда, её столичного жениха, нашли мёртвым у него дома»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    $ scene_runtime.text = "«Утром его обнаружила прислуга: лежал бездыханный, без панталон, а в заднице — огромная деревяшка. Теперь стража трясёт всех, кто с ним встречался. До Клариссы и Серджио добрались первыми»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    $ scene_runtime.text = "MC: И что теперь будет?\n\nЛуиза: А что теперь? Зная Циммера, он отправит обоих на герцогские галеры, а то и хуже — продаст оркам в рабство."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    $ scene_runtime.text = "Хм, интересно. Пожалуй, стоит навестить Циммера, узнать подробности и, может быть, попытаться защитить Клариссу, как я и обещал."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться к разговору с Луизой":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_zimmer_needs_wine_10:
+    $ main_ui_begin_native_scene_state("Дело Клариссы и Серджио")
+    show screen main_ui
+    vscene "images/zimmer/talk.png"
+    $ scene_runtime.text = "MC: Я хочу поговорить о Клариссе Легаре и Серджио.\n\nЦиммерман: «Таки хотите вмешаться в дело об убийстве богатого человека? Разговор долгий, молодой человек, а от долгих разговоров у моих людей пересыхает горло. Принесите ещё один бочонок вина — тогда и посмотрим, что можно сделать»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться к разговору":
+            pass
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_zimmer_wine_10:
+    $ main_ui_begin_native_scene_state("Дело Клариссы и Серджио")
+    show screen main_ui
+    vscene "images/zimmer/talk.png"
+    $ scene_runtime.text = "MC: Я принёс ещё один бочонок вина. Теперь мы можем поговорить о Клариссе и Серджио?\n\nЦиммерман: «Вот теперь разговор становится обстоятельным. Та бочка для ночной стражи была за другое дело; эта — за время, которое я потрачу на ваше»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Передать бочонок и продолжить":
+            $ player.tavern_management.winenum -= 1
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            jump story_clara_paintings_zimmer_puzzle_11
+
+        "Оставить вино при себе и вернуться позже":
+            $ main_ui_end_native_scene_state()
+            return True
+
+
+label story_clara_paintings_zimmer_puzzle_11:
+    $ renpy.dynamic("_clara_case_answer")
+    $ story_event_mark_fired_today(event_runtime.active_thread.getevent(11))
+    $ main_ui_begin_native_scene_state("Показания по делу Джеймса Леонарда")
+    show screen main_ui
+    vscene "images/zimmer/talk.png"
+    $ scene_runtime.text = "MC: Кларисса и Серджио могли скрывать свои отношения, но это ещё не делает их убийцами. Я обещал Клариссе защиту и хочу услышать, на чём держится обвинение.\n\nЦиммерман: «Таки защиту обещали? Хорошо. Тогда слушайте показания и скажите мне, кто из свидетелей врёт. Если увидите то, что проглядели мои люди, я пересмотрю дело»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Выслушать показания":
+            pass
+
+    $ scene_runtime.text = "Богатого Джеймса Леонарда убили в воскресенье днём. В доме были горничная, повар, дворецкий, садовник и жена.\n\n— Горничная: накрывала на стол.\n— Повар: готовил завтрак.\n— Дворецкий: полировал серебро и посуду.\n— Садовник: сажал семена томатов.\n— Жена: читала книгу.\n\nКто это сделал?"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Горничная":
+            $ _clara_case_answer = "maid"
+        "Повар":
+            $ _clara_case_answer = "cook"
+        "Дворецкий":
+            $ _clara_case_answer = "butler"
+        "Садовник":
+            $ _clara_case_answer = "gardener"
+        "Жена":
+            $ _clara_case_answer = "wife"
+        "Вернуться к вопросу позже":
+            $ _clara_case_answer = "later"
+
+    if _clara_case_answer == "later":
+        $ main_ui_end_native_scene_state()
+        return False
+
+    if _clara_case_answer == "cook":
+        vscene "images/zimmer/thank.png"
+        $ scene_runtime.text = "MC: Повар. Леонарда убили в воскресенье днём, а повар утверждает, что готовил завтрак. После полудня завтрак уже не готовят.\n\nЦиммерман некоторое время молчит, затем усмехается: «Таки верно. Показание слишком старательное и совершенно не подходит ко времени смерти. Я прикажу допросить повара заново, а Клариссу и Серджио выпустить»."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+        $ event_runtime.active_thread.advance()
+        $ main_ui_end_native_scene_state()
+        return True
+
+    $ scene_runtime.text = "Циммерман качает головой: «Нет, молодой человек. В этом показании нет противоречия со временем убийства. Подумайте ещё и приходите в другой приёмный час»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться в караулку":
+            pass
+    $ Zimmer.mark_talked(max(0, 2 - int(Zimmer.talked_today or 0)))
+    $ main_ui_end_native_scene_state()
+    return False
+
+
+label story_clara_paintings_sergio_followup_12:
+    $ main_ui_begin_native_scene_state("Благодарность Серджио")
+    show screen main_ui
+    vscene barber_shop_picture_path()
+    $ scene_runtime.text = "Серджио встречает вас без привычной салонной улыбки. «Мне сказали, кто заметил ложь в показаниях. Без вас нас с Клариссой уже везли бы на галеры»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    $ scene_runtime.text = "«Если после всего этого понадобится средство от трещин, ушибов и самых деликатных повреждений, запишите рецепт. А в моей цирюльне отныне платите на четверть меньше»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Записать рецепт и вернуться к разговору":
+            pass
+    $ crafting.special_cream_recipe_unlocked = True
+    $ tractir_progress.sergio_discount_percent = max(25, int(tractir_progress.sergio_discount_percent or 0))
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_tavern_arrival_13:
+    $ main_ui_begin_native_scene_state("Кларисса просит защиты")
+    show screen main_ui
+    vscene "images/clara/tavern_visit.png"
+    $ scene_runtime.text = "Вечером Кларисса появляется в общем зале с небольшим узлом вещей. Вся прежняя уверенность исчезает, когда она просит выполнить обещание и позволить ей остаться под вашей защитой."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    $ scene_runtime.text = "Кларисса: «К Легаре я не вернусь. После ареста в городе мне тоже небезопасно. Если вы не передумали, разрешите пожить здесь. Я могу делить комнату с Мелиссой и помогать трактиру»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Позволить Клариссе поселиться у Мелиссы":
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            return True
+
+        "Попросить её вернуться к разговору позже":
+            $ main_ui_end_native_scene_state()
+            return True
+
+
+label story_clara_paintings_confession_14:
     $ main_ui_begin_native_scene_state("Признание Клариссы")
     show screen main_ui
-    $ Clara.change_social(friend_delta=2)
-    $ Melissa.change_social(friend_delta=1)
-    $ scene_runtime.text = "В комнате Мелиссы Кларисса наконец срывается. Она говорит быстро, будто боится остановиться: про отцовские расчеты, про рисунки, про то, как пыталась использовать чужие тайны, чтобы получить хоть немного свободы.\n\nМелисса слушает мрачно, но не перебивает. Когда Кларисса доходит до того, что использовала доверие подруг, она уже почти плачет.\n\n\"Простите,\" говорит она вам обоим. \"Я предала хороших друзей, потому что решила, будто если сама стану хитрее, меня перестанут продавать как вещь. Но от этого я только стала похожа на тех, от кого хотела сбежать.\"\n\nПосле этого в комнате становится тяжелее, но честнее. Теперь Кларисса больше не прячется за одной только игрой."
+    vscene "images/clara/melissa_talk.png"
+    $ scene_runtime.text = "Поздним вечером Кларисса просит поговорить без посторонних. После истории с женихом она всё ещё испытывает боль и наконец признаётся, что унижения и насилие оставили повреждение, которое само не проходит."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
+
+    $ scene_runtime.text = "Кларисса: «Серджио говорил о специальной мази. Мне стыдно просить, но если вы сумеете её приготовить, я позволю вам помочь. Только без шуток и без спешки»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Обещать принести мазь":
+            pass
     $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
-    return
+    return True
 
 
-label story_clara_paintings_murder_12:
-    $ main_ui_begin_native_scene_state("Смерть жениха Клариссы")
+label story_clara_paintings_ointment_15:
+    $ main_ui_begin_native_scene_state("Лечение Клариссы")
     show screen main_ui
-    $ scene_runtime.text = "У караулки шумно: стражники переговариваются вполголоса, а десятник Циммерман выглядит куда серьезнее обычного. Столичный жених Клариссы найден мертвым.\n\nЦиммерман не спешит называть виновного. Вместо этого он бросает вам странную загадку: \"Кто режет ближе всех, но держит лезвие чистым? Кто слышит тайны, но продает только видимость порядка? Ответишь верно - помогу тебе разобраться и сам.\""
+    vscene tavern_melissa_room_picture()
+    $ scene_runtime.text = "Вы показываете Клариссе приготовленную мазь. Она убеждается, что дверь закрыта, и ещё раз просит действовать осторожно."
     $ scene_runtime.location_text = scene_runtime.text
-    $ event_runtime.active_thread.advance()
     menu:
-        "Ответить: цирюльник держит лезвие, но не обязательно вину":
-            call story_clara_paintings_solve_murder
-
-        "Промолчать и уйти":
+        "Помочь Клариссе":
+            $ player.remove_item("special_cream_001", 1)
+            $ scene_runtime.text = "Когда всё закончено, Кларисса с заметным облегчением приводит одежду в порядок. «Спасибо. Теперь я хотя бы не буду вспоминать о нём при каждом движении. Если когда-нибудь между нами случится что-то ещё, это будет потому, что я сама так решила»."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Продолжить":
+                    pass
+            $ event_runtime.active_thread.complete()
             $ main_ui_end_native_scene_state()
-            return
-    return
+            return True
 
-
-label story_clara_paintings_solve_murder:
-    show screen main_ui
-    $ crafting.special_cream_recipe_unlocked = True
-    $ tractir_progress.sergio_discount_percent = 25
-    $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 3
-    $ Clara.change_social(friend_delta=2)
-    $ Zimmer.change_social(friend_delta=1)
-    $ scene_runtime.text = "Вы отвечаете, что Серджио слишком очевиден как человек с лезвием, а значит, слишком удобен как подозреваемый. Настоящий ответ прячется не в бритве, а в том, кому выгодно было убрать жениха именно сейчас.\n\nЦиммерман долго смотрит на вас, потом коротко кивает. Серджио отпускают из-под подозрения, а город начинает судачить, что хозяин \"Дикого Жеребца\" умеет видеть дальше прямой улики. Десятник теперь считает вас не случайным осведомителем, а другом, которому можно доверить сложное дело.\n\nПозже Серджио передает вам рецепт особой смягчающей мази и обещает обслуживать вас и ваших работниц со скидкой в четверть цены. Рецепт теперь можно найти в книге рецептов, если открыть список доступных приготовлений."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
+        "Убрать мазь и вернуться позже":
+            $ main_ui_end_native_scene_state()
+            return True

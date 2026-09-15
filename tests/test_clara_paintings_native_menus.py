@@ -10,17 +10,18 @@ def test_clara_paintings_story_choices_are_native_label_menus():
 
     assert "main_ui_runtime.action_items" not in source
     assert "MenuItem(" not in source
-    assert source.count("\n    menu:\n") == 23
-    assert source.count('"Продолжить":') == 16
-    assert source.count("main_ui_begin_native_scene_state(") == 13
-    assert source.count("main_ui_end_native_scene_state()") == 16
-    assert source.count("show screen main_ui") == 17
+    assert source.count("\n    menu:\n") == 33
+    assert source.count('"Продолжить":') == 20
+    assert source.count("main_ui_begin_native_scene_state(") == 17
+    assert source.count("main_ui_end_native_scene_state()") == 25
+    assert source.count("show screen main_ui") == 19
     for index in range(1, 6):
         assert f'vscene "images/clara/panishment/panishment{index}.jpg"' in source
     assert '"Ворваться и поставить Легаре на место":' in source
     assert '"Отступить и поддержать Клариссу позже":' in source
-    assert '"Осторожно заглянуть внутрь" if int(player.stats.exploration or 0) >= 200:' in source
-    assert '"Промолчать и уйти":' in source
+    assert '"Осторожно заглянуть внутрь":' in source
+    assert "if int(player.stats.exploration or 0) < 200:" in source
+    assert '"Не вмешиваться и уйти":' in source
     assert "label story_clara_paintings_first_ask_3:" in source
     assert "label story_clara_paintings_second_ask_4:" in source
     assert "label story_clara_paintings_legare_5:" in source

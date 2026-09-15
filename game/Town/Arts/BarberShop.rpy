@@ -35,8 +35,8 @@ init python:
             return 8 * 60 <= current_minutes <= 11 * 60 + 59
         return False
 
-    def barber_shop_is_open():
-        return barber_shop_is_open_at()
+    def barber_shop_is_open(weekday_value=None, time_value=None):
+        return barber_shop_is_open_at(weekday_value, time_value) and not Clara.fiance_case_detained()
 
     def barber_shop_haircut_price(customer_gender="male"):
         if str(customer_gender or "").strip().lower() in ("female", "woman", "girl"):
@@ -79,6 +79,8 @@ init python:
     def barber_shop_status_text():
         discount = barber_shop_discount_percent()
         discount_text = " После истории с убитым женихом Серджио держит слово и делает вам скидку в %d процентов." % discount if discount > 0 else ""
+        if Clara.fiance_case_detained():
+            return "Ставни цирюльни закрыты, вывеска снята, а Серджио нигде не видно." + discount_text
         if barber_shop_is_open():
             return "Сегодня Серджио на месте: ножницы щелкают, бритва поблескивает, а сам хозяин уже готов засыпать вас новостями." + discount_text
         return "Ставни цирюльни прикрыты. Серджио принимает посетителей только {b}по понедельникам и средам после полудня{/b}, а также {b}в субботу утром{/b}." + discount_text
@@ -137,15 +139,16 @@ label BarberShop:
     $ main_ui_runtime.object_id = ""
     $ dress_shop.girl_dress_block = 0
 
+    call RoomEnterEventGate(rooms.current_code, False)
+    if _return:
+        jump ArtisansQuarter
+
     if rooms.get("BarberShop").is_open():
         $ scene_runtime.text = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
     else:
         $ scene_runtime.text = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
     $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
-
-    if story_event_available("BarberShop", "clara_fiance"):
-        call checkTriggers("BarberShop", "clara_fiance", 0)
 
     if not rooms.get("BarberShop").is_open():
         $ main_ui_runtime.action_items = rooms.get("BarberShop").build_exit_items()
@@ -173,6 +176,9 @@ label BarberShopTalk:
         $ _barber_oil_price = int(barber_shop_discounted_price(BARBER_OLIVE_OIL_PRICE) or 0)
         $ _barber_guest_name = barber_shop_pending_npc_name()
         menu:
+            "Поговорить о деле Клариссы и Серджио" if story_event_available("talk_sergio", "clara_fiance_case"):
+                call checkTriggers("talk_sergio", "clara_fiance_case", 0)
+
             "Поболтать с Серджио":
                 $ scene_runtime.text = barber_shop_talk_text()
                 $ scene_runtime.location_text = scene_runtime.text

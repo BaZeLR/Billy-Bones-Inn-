@@ -18,4 +18,4 @@ def test_barber_shop_open_hours_use_calendar_clock_not_display_slot():
     assert "11 * 60 + 59" in body
     assert "time_slot" not in body
     assert "int(time" not in body
-    assert "return barber_shop_is_open_at()" in source
+    assert "return barber_shop_is_open_at(weekday_value, time_value) and not Clara.fiance_case_detained()" in source

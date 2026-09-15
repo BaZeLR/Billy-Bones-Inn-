@@ -363,7 +363,9 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert "jump IntMelissaTalk" in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
     intimacy_call = talk_source.split('call HouseholdSexEngine(girl_name, rooms.current_code)', 1)[1]
     assert intimacy_call.split("\n", 2)[1].strip() == "return"
-    assert 'return bool(info.relationship_allows(action_code))' in sex_source
+    assert 'def intimacy_available(self, action_code="intimacy"):' in init_source
+    assert 'return self.relationship_allows(action_code)' in init_source
+    assert 'return bool(info.intimacy_available(action_code))' in sex_source
     assert '$ _hse_info.mark_fucked()' in sex_source
     assert 'if int(player.intimacy.came_today or 0) == _hse_start_player_cums:' in sex_source
 
@@ -430,7 +432,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 91" in migration_source
+    assert "define currentVersion = 92" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration

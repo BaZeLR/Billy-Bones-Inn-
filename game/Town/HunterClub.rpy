@@ -554,7 +554,10 @@ label HunterClubLuiseTalk:
     $ main_ui_runtime.action_content = None
     $ scene_runtime.text = " Луиза смеряет вас быстрым опытным взглядом и хмыкает: \"Если принес добычу - платила и буду платить. Если пришел за снарягой - смотри товар, только не торгуйся по пустякам.\""
     $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_items = [
+    $ main_ui_runtime.action_items = []
+    if story_event_available("talk_luisa", "clara_fiance_case"):
+        $ main_ui_runtime.action_items.append(MenuItem("Спросить о Клариссе и Серджио", Call("checkTriggers", "talk_luisa", "clara_fiance_case", 0)))
+    $ main_ui_runtime.action_items.extend([
         MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
         MenuItem("Подать добычу", Call("HunterClubSellMenu")),
         MenuItem("Спросить, где купить лошадь", Call("HunterClubAskHorse")),
@@ -567,7 +570,7 @@ label HunterClubLuiseTalk:
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),
             Function(main_ui_restart_interaction),
         ]),
-    ]
+    ])
     return
 
 

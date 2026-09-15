@@ -56,6 +56,7 @@ init 6 python:
         items = []
         for issue_action in list(household_room_issue_action_specs("melissa") or []):
             items.append(MenuItem(str(issue_action.get("label", "") or ""), Call(str(issue_action.get("target", "") or ""), *tuple(issue_action.get("args", ()) or ()))))
+        ointment_index = len(items)
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernMelissaRoom")))
@@ -63,6 +64,14 @@ init 6 python:
             items.append(MenuItem(room_object.name, Call("TavernMelissaRoomObjectMenu", room_object.object_id)))
         for room_exit in rooms.get("TavernMelissaRoom").visible_exits():
             items.append(MenuItem(room_exit.label, movement_actions(room_exit.target)))
+        if story_event_available("TavernMelissaRoom", "clara_ointment"):
+            ointment_event = event_runtime.available["TavernMelissaRoom"]["clara_ointment"]
+            if ointment_event.checkItem():
+                post_event_items = list(items)
+                items.insert(ointment_index, MenuItem("Принести Клариссе специальную мазь", [
+                    SetField(main_ui_runtime, "action_items", post_event_items),
+                    Call("checkTriggers", "TavernMelissaRoom", "clara_ointment", 0),
+                ]))
         return items
 
     TavernMelissaRoomRoomDefinition = Room(

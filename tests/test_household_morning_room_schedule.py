@@ -244,7 +244,7 @@ def test_private_room_rows_override_jobs_church_and_barber_without_new_location_
     )[0]
     assert "not household_morning_issue_matches(self.name, time_value=hour)" in girl_location
     assert girl_location.index("household_morning_issue_matches") < girl_location.index(
-        "barber_shop_is_open_at"
+        "barber_shop_is_open"
     )
     assert "priority=770 if target == \"gloryhole\" else 760" in people
 

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 91
+define currentVersion = 92
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -783,6 +783,10 @@ init -100 python:
         if loaded_version < 91:
             updateSave_V90()
             loaded_version = 91
+
+        if loaded_version < 92:
+            updateSave_V91()
+            loaded_version = 92
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -1804,13 +1808,6 @@ init -100 python:
         Clara.old_water_pump_hint_seen = bool(people_to_int(
             clara_var.pop("old_water_pump_hint_seen", getattr(Clara, "old_water_pump_hint_seen", False)), 0
         ))
-        Clara.commission_followup_day = people_to_int(
-            clara_var.pop("commission_followup_day", getattr(Clara, "commission_followup_day", 999999)), 999999
-        )
-        Clara.murder_day = people_to_int(
-            clara_var.pop("murder_day", getattr(Clara, "murder_day", 999999)), 999999
-        )
-
         if not hasattr(crafting, "special_cream_recipe_unlocked"):
             crafting.special_cream_recipe_unlocked = False
         legacy_special_cream = bool(people_to_int(clara_var.pop("special_cream_recipe_unlocked", 0), 0))
@@ -1835,7 +1832,7 @@ init -100 python:
             "fiance_barber_night_roll_day", "fiance_barber_night_roll", "fiance_barber_secret_seen",
             "commission_started", "commission_followup_done", "peek_done", "confession_done",
             "drawings_betrayal_confessed", "murder_seen", "murder_solved", "anal_unlocked",
-            "virginity_choice_unlocked",
+            "virginity_choice_unlocked", "commission_followup_day", "murder_day",
         ):
             clara_var.pop(retired_name, None)
 
@@ -3026,6 +3023,50 @@ init -100 python:
                 dict(row) for row in saved_rules
                 if str(row.get("item_id", "") or "") != "special_mushroom_001"
             ] + [mushroom_rule]
+
+    def updateSave_V91():
+        # Stages 6 onward of the existing Clarissa paintings thread were
+        # corrected in place. Rebind its data once, then conservatively map
+        # only the old stage index; relationships, inventory and rewards stay
+        # with their existing owners.
+        paintings = threads.get("claraPaintingsPath")
+        old_state = None
+        if paintings is not None:
+            old_state = (
+                int(paintings.num or 0),
+                bool(paintings.completed),
+                bool(paintings.aborted),
+                bool(paintings.metconds),
+                int(paintings.day or 0),
+            )
+
+        initThreads()
+        paintings = threads.get("claraPaintingsPath")
+        if paintings is not None and old_state is not None:
+            old_num, was_completed, was_aborted, was_active, old_day = old_state
+            if was_completed:
+                rewards_received = (
+                    bool(crafting.special_cream_recipe_unlocked)
+                    and int(tractir_progress.sergio_discount_percent or 0) >= 25
+                )
+                mapped_num = 13 if rewards_received else 12
+            elif old_num <= 6:
+                mapped_num = old_num
+            elif old_num <= 10:
+                mapped_num = 7
+            else:
+                mapped_num = 8
+
+            paintings.advanceTo(mapped_num, force_active=bool(was_active or mapped_num > 0))
+            paintings.day = old_day
+            paintings.aborted = bool(was_aborted)
+
+        Clara.__dict__.pop("commission_followup_day", None)
+        Clara.__dict__.pop("murder_day", None)
+        clara_var = getattr(Clara, "var", None)
+        if hasattr(clara_var, "pop"):
+            clara_var.pop("commission_followup_day", None)
+            clara_var.pop("murder_day", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

@@ -77,6 +77,14 @@ label IntClaraTalk(girl_name="clara"):
                 call checkTriggers("WineStore", "clara_truth", 0)
                 $ _clara_repeat_menu = True
 
+            "Спросить, почему вас не пускали в комнату" if story_event_available("talk_clara", "private_games"):
+                call checkTriggers("talk_clara", "private_games", 0)
+                $ _clara_repeat_menu = True
+
+            "Продолжить игры с Клариссой" if household_sex_available(girl_name, "intimacy") and player.intimacy.can_cum() and household_intimacy_room_is_private(girl_name, rooms.current_code):
+                call HouseholdSexEngine(girl_name, rooms.current_code, "sex")
+                $ _clara_repeat_menu = True
+
             "Спросить Клариссу о семье" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
                 $ Clara.mark_asked()
                 $ Clara.mark_talked()

@@ -215,7 +215,7 @@
     {
       "label": "clara_paintings_confession",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
-      "start": "22:00",
+      "start": "20:00",
       "end": "22:59",
       "location": "TavernMelissaRoom",
       "awake": true,
@@ -224,7 +224,7 @@
       "condition": {
         "rule": "thread_step",
         "thread": "claraPaintingsPath",
-        "step": 11
+        "step": 14
       }
     },
     {

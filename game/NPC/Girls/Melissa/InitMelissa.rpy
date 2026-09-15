@@ -351,6 +351,34 @@ init python:
         def date_intimacy_available(self):
             return self.relationship_allows("intimacy")
 
+        def intimacy_available(self, action_code="intimacy"):
+            return self.relationship_allows(action_code)
+
+        def intimacy_engine_stage(self):
+            return self.relationship_stage()
+
+        def intimacy_action_allowed(self, action_code=""):
+            action_key = str(action_code or "").strip().lower()
+            if action_key == "anal":
+                return bool(threads["melissaOintmentIntimacy"].completed)
+            if action_key == "vaginal":
+                return not bool(self.sex_stat("virginity", True))
+            return True
+
+        def intimacy_room_allowed(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            return super(MelissaInfo, self).intimacy_room_allowed(room_key) or self.private_context_active(room_key)
+
+        def intimacy_scene_text(self, scene_code="", full_engine=False):
+            scene_key = str(scene_code or "").strip().lower()
+            if scene_key == "summary":
+                if not bool(full_engine):
+                    return "Сейчас это еще не полноценный секс, а осторожное сближение. Мелисса позволяет поцелуи, ласки и все более смелые прикосновения, но пока ее комнатная история и ухаживания не завершены, дальше заходить рано."
+                return "Мелисса уже готова к полноценной близости, если вы не будете терять ритм и внимание к ее состоянию."
+            if scene_key == "anal" and threads["claraTavernVisit"].completed and int(threads["claraForestSofa"].num or 0) >= 6 and not bool(threads["claraForestSofa"].aborted):
+                return "Вспомнив советы Клариссы, Мелисса сама задает медленный темп и показывает, когда можно продолжить. Вы входите сзади без спешки; она привыкает к новому давлению и не позволяет вам торопиться."
+            return ""
+
         def private_context_active(self, room_code=""):
             room_key = str(room_code or rooms.current_code or "").strip()
             return (
@@ -359,7 +387,7 @@ init python:
             )
 
         def room_is_private(self, room_code=""):
-            return household_intimacy_room_is_private(self.code_name, room_code)
+            return self.intimacy_room_allowed(room_code)
 
         def wet_enough_to_find_place(self):
             wet_value = max(

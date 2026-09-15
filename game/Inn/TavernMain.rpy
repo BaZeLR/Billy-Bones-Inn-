@@ -231,8 +231,6 @@ init python:
             items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", rooms.get("TavernMain").state["client_room_girl"])))
         if tavern_main_closed_text() == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
             items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
-        if tavern_main_closed_text() == "" and story_event_available("TavernMain", "clara_paintings"):
-            items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
         return items
 
 label TavernMain:

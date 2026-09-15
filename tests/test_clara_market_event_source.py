@@ -100,18 +100,19 @@ def test_clara_paintings_events_use_event_checks_not_ready_helpers():
     assert 'story_event_available("talk_melissa", "clara_paintings")' in melissa_talk
     assert 'call checkTriggers("talk_melissa", "clara_paintings", 0)' in melissa_talk
     assert 'Call("checkTriggers", "WineStore", "clara_paintings", 0)' in wine_store
-    assert 'Call("checkTriggers", "TavernMain", "clara_paintings", 0)' in tavern_main
+    assert 'Call("checkTriggers", "TavernMain", "clara_paintings", 0)' not in tavern_main
     assert 'call checkTriggers("Church", "clara_paintings", 0)' in church
     assert '"story_clara_paintings_church_6",\n            7, (8, 9), None,' in paintings_thread
     assert 'call preEvent("claraPaintingsPath")' not in labels
     assert '"rule": "thread_step"' in melissa_schedule
     assert '"thread": "claraPaintingsPath"' in melissa_schedule
-    assert '"step": 11' in melissa_schedule
+    assert '"step": 14' in melissa_schedule
     assert '"thread": "claraPaintingsPath"' in clara_schedule
-    assert '"step": 11' in clara_schedule
+    assert '"step": 14' in clara_schedule
     assert '"location": "TavernMelissaRoom"' in clara_schedule
-    assert '"ArtisansQuarter",\n            "enter",\n            10,' in paintings_thread
+    assert '"ArtisansQuarter",\n            "enter",\n            7,' in paintings_thread
     assert 'if rule_name == "thread_step":' in room_rules
+    assert 'if rule_name == "clara_paintings_resident":' in room_rules
     assert "thread_info.num" in room_rules
 
 
@@ -340,7 +341,7 @@ def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 91" in migration
+    assert "define currentVersion = 92" in migration
     assert "if loaded_version < 74:" in migration
     assert "updateSave_V73()" in migration
     assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block

@@ -2,6 +2,45 @@
   "npc_id": "clara",
   "entries": [
     {
+      "label": "paintings_resident_sleep",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "23:00",
+      "end": "05:59",
+      "location": "TavernMelissaRoom",
+      "awake": false,
+      "talkable": false,
+      "priority": 910,
+      "condition": {
+        "rule": "clara_paintings_resident"
+      }
+    },
+    {
+      "label": "paintings_resident_day",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "06:00",
+      "end": "17:59",
+      "location": "TavernMelissaRoom",
+      "awake": true,
+      "talkable": true,
+      "priority": 100,
+      "condition": {
+        "rule": "clara_paintings_resident"
+      }
+    },
+    {
+      "label": "paintings_resident_evening",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "18:00",
+      "end": "22:59",
+      "location": "TavernMelissaRoom",
+      "awake": true,
+      "talkable": true,
+      "priority": 100,
+      "condition": {
+        "rule": "clara_paintings_resident"
+      }
+    },
+    {
       "label": "sleep_home",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "23:00",
@@ -93,7 +132,7 @@
     {
       "label": "paintings_confession",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
-      "start": "22:00",
+      "start": "20:00",
       "end": "22:59",
       "location": "TavernMelissaRoom",
       "awake": true,
@@ -102,7 +141,7 @@
       "condition": {
         "rule": "thread_step",
         "thread": "claraPaintingsPath",
-        "step": 11
+        "step": 14
       }
     },
     {

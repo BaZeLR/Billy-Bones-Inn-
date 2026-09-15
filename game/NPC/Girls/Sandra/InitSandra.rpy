@@ -212,6 +212,17 @@ init python:
         def date_intimacy_available(self):
             return self.relationship_allows("intimacy")
 
+        def intimacy_available(self, action_code="intimacy"):
+            return self.relationship_allows(action_code)
+
+        def intimacy_engine_stage(self):
+            return 4 if self.relationship_allows("intimacy") else 0
+
+        def intimacy_scene_text(self, scene_code="", full_engine=False):
+            if str(scene_code or "").strip().lower() == "summary":
+                return "Сандра не прячет желания и прямо дает понять, что в этой комнате вы оба можете говорить о своих намерениях открыто."
+            return ""
+
         def mana_profile(self):
             if self.mana_corrupted:
                 return self.mana_reaction_table["corrupted"]

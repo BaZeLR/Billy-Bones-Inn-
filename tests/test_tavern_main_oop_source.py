@@ -24,9 +24,9 @@ def test_tavern_main_preserves_room_objects_exits_clients_and_story_events():
     for token in (
         "rooms.get(\"TavernMain\").build_menu_sections()", 'Call("TavernProstClients", rooms.get(\"TavernMain\").state["client_room_girl"])',
         'story_event_available("TavernMain", "overheard")',
-        'story_event_available("TavernMain", "clara_paintings")',
         '"book_001"', '"fireplace_001"', '"bar_001"',
     ):
         assert token in SOURCE
 
     assert 'Call("checkTriggers", "TavernMain", "clara_tavern_visit", 0)' not in SOURCE
+    assert 'story_event_available("TavernMain", "clara_paintings")' not in SOURCE

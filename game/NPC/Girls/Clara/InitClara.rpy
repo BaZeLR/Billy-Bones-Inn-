@@ -14,6 +14,7 @@ init python:
                 fullname="Кларисса",
                 genitive="Клариссы",
                 dative="Клариссе",
+                portrait="images/clara/portrait.png",
                 description="Кларисса, старшая дочь мессира Легаре, молодая девушка из зажиточного купеческого дома. Это очень приветливая и игривая блондинка чуть младше вас, с большими искрящимися серыми глазами, пухлыми губами и удивительно легкой, грациозной походкой. На ней обычно свободное длинное повседневное платье из легкой ткани, похожее на удобный сарафан; на ярком свету ткань кажется чуть прозрачной. Грудь Клариссы размера B мягко и соблазнительно колышется при каждом движении. От нее пахнет лавандой и дорогими модными духами.",
                 gift_preferences=["dress_thiefdress", "soap_001", "special_mushroom_001", "dress_simplebra", "dress_simplepanties", "dress_blackstockings", "dress_redstockings", "libido_tincture_001", "werecat_caught_cat"],
                 base_clothing={"day_dress": "greenworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"},
@@ -21,6 +22,9 @@ init python:
             self.birth_date = {"day":20, "period":11, "cycle": 1081}
             self.card_image = "images/clara/portrait1.jpg"
             self.schedule_source = "schedules/clara.json"
+            self.image_manifest = {
+                "portrait": {"default": [self.portrait]},
+            }
 
     class ClaraInfo(Girl):
         """Clara runtime: wine store, market booklet, paintings thread, social state."""
@@ -49,8 +53,6 @@ init python:
             self.merchant_contact_unlocked = False
             self.merchant_contact_month_key = -1
             self.old_water_pump_hint_seen = False
-            self.commission_followup_day = 999999
-            self.murder_day = 999999
             self.energy = 100
             self.energy_max = 100
             self.rebellion = 0
@@ -182,7 +184,75 @@ init python:
                 self.day_location_override_code = ""
             return location_key
 
+        def fiance_case_detained(self):
+            thread_info = threads.get("claraPaintingsPath")
+            if thread_info is None or bool(thread_info.completed):
+                return False
+            return 8 <= int(thread_info.num or 0) <= 11
+
+        def paintings_resident(self):
+            thread_info = threads.get("claraPaintingsPath")
+            if thread_info is None:
+                return False
+            return bool(thread_info.completed) or int(thread_info.num or 0) >= 14
+
+        def relationship_allows(self, action_code="talk"):
+            action_key = str(action_code or "talk").strip().lower()
+            if action_key == "talk":
+                return True
+            if action_key == "gift":
+                return relationship_any_gift_allowed(self.code_name)
+            if action_key in ("share", "flirt", "private_talk"):
+                allowed, reason = relationship_social_action_allowed(self.code_name, action_key)
+                return bool(allowed)
+            if action_key in ("intimacy", "sex"):
+                private_thread = threads.get("claraPrivateGames")
+                paintings_thread = threads.get("claraPaintingsPath")
+                allowed, reason = relationship_social_action_allowed(self.code_name, "private_talk")
+                return bool(
+                    private_thread is not None
+                    and bool(private_thread.completed)
+                    and paintings_thread is not None
+                    and bool(paintings_thread.completed)
+                    and allowed
+                    and not self.sex_busy()
+                    and self.can_have_sex_today()
+                )
+            return False
+
+        def intimacy_available(self, action_code="intimacy"):
+            return self.relationship_allows(action_code)
+
+        def intimacy_engine_stage(self):
+            return 4 if self.relationship_allows("intimacy") else 0
+
+        def intimacy_action_allowed(self, action_code=""):
+            action_key = str(action_code or "").strip().lower()
+            if action_key == "anal":
+                return self.relationship_allows("sex")
+            if action_key == "vaginal":
+                return not bool(self.sex_stat("virginity", True))
+            return True
+
+        def intimacy_room_allowed(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            if not super(ClaraInfo, self).intimacy_room_allowed(room_key):
+                return False
+            if room_key == "TavernMelissaRoom":
+                return str(people.location("melissa") or "") != room_key
+            return True
+
+        def intimacy_scene_text(self, scene_code="", full_engine=False):
+            scene_key = str(scene_code or "").strip().lower()
+            if scene_key == "summary":
+                return "Кларисса напоминает о своих правилах: никакой спешки, и вы останавливаетесь, как только она попросит."
+            if scene_key == "anal" and bool(self.sex_stat("virginity", True)):
+                return "Кларисса сама задает осторожный темп и при первой боли просит вас замереть. Переведя дыхание, она тихо поясняет, что прежде позволяла только это: ее девственность осталась нетронутой."
+            return ""
+
         def getLocation(self, wday=None, hour=None):
+            if self.fiance_case_detained():
+                return ""
             scheduled_location = super(ClaraInfo, self).getLocation(wday, hour)
             if scheduled_location == "BarberShop":
                 return scheduled_location

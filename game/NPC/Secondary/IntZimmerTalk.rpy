@@ -19,6 +19,9 @@ label IntZimmerTalk:
     while True:
         $ _clara_booklet_thread = threads.get("claraBookletMarket")
         menu:
+            "Поговорить о деле Клариссы и Серджио" if story_event_available("talk_zimmer", "clara_fiance_case"):
+                call checkTriggers("talk_zimmer", "clara_fiance_case", 0)
+
             "Посмотреть на десятника":
                 call IntZimmerTalkLook
             "Сообщить о краже лошади" if int(Zimmer.talked_today or 0) < 2 and player.horse.stolen_days > 0 and Zimmer.horse_complaint_stage == 0:

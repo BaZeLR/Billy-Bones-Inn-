@@ -202,7 +202,7 @@ def test_clara_rewards_use_their_system_owners_without_wrappers():
     assert "crafting.special_cream_recipe_unlocked = True" in paintings
     assert "unlock_condition=lambda: bool(crafting.special_cream_recipe_unlocked)" in crafting
     assert "self.sergio_discount_percent = 0" in progress
-    assert "tractir_progress.sergio_discount_percent = 25" in paintings
+    assert "tractir_progress.sergio_discount_percent = max(25," in paintings
     assert "int(tractir_progress.sergio_discount_percent or 0)" in barber
 
 
@@ -218,9 +218,14 @@ def test_clara_story_state_uses_explicit_properties_and_one_time_migration():
         "market_day_roll", "market_evening_roll_day", "market_evening_roll",
         "day_location_override_day", "day_location_override_code",
         "merchant_contact_unlocked", "merchant_contact_month_key",
-        "old_water_pump_hint_seen", "commission_followup_day", "murder_day",
+        "old_water_pump_hint_seen",
     ):
         assert f"self.{property_name} =" in clara_class
+
+    assert "self.commission_followup_day =" not in clara_class
+    assert "self.murder_day =" not in clara_class
+    assert 'Clara.__dict__.pop("commission_followup_day", None)' in migration_block
+    assert 'Clara.__dict__.pop("murder_day", None)' in migration_block
 
     assert "STORY_DEFAULTS = {" not in clara_class
     assert "self.var =" not in clara_class

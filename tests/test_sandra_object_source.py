@@ -535,7 +535,9 @@ def test_sandra_object_owns_its_intimacy_unlock_and_date_capability():
     assert 'thread = threads["sandraWeeklyEvaluation"]' in init_source
     assert "def relationship_allows(self, action_code=\"talk\"):" in init_source
     assert 'return self.intimacy_story_ready() and self.can_have_sex_today()' in init_source
-    assert 'if girl in ("melissa", "sandra"):' in sex_source
+    assert 'def intimacy_available(self, action_code="intimacy"):' in init_source
+    assert 'return self.relationship_allows(action_code)' in init_source
+    assert 'return bool(info.intimacy_available(action_code))' in sex_source
     assert "threads[\"sandraWeeklyEvaluation\"]" not in sex_source
     date_gate = breakfast_source.split("def tavern_breakfast_private_date_available", 1)[1].split("def tavern_breakfast_player_perk_score", 1)[0]
     assert "info.date_intimacy_available()" in date_gate

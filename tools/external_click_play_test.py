@@ -5998,7 +5998,7 @@ testcase external_sandra_weekly_thread_progression:
     assert eval (Clara.day_location_override_code == "WineStore") timeout 5.0
     assert eval (Clara.merchant_contact_unlocked) timeout 5.0
     assert eval (Clara.merchant_contact_month_key == 110005) timeout 5.0
-    assert eval (Clara.old_water_pump_hint_seen and Clara.commission_followup_day == 35 and Clara.murder_day == 36 and crafting.special_cream_recipe_unlocked and tractir_progress.sergio_discount_percent == 25) timeout 5.0
+    assert eval (Clara.old_water_pump_hint_seen and not hasattr(Clara, "commission_followup_day") and not hasattr(Clara, "murder_day") and crafting.special_cream_recipe_unlocked and tractir_progress.sergio_discount_percent == 25) timeout 5.0
     assert eval (not any(key in Clara.var for key in ("flirt", "drawings_secret_known", "market_intro_seen", "market_follow_failed_day", "market_follow_failed_hour", "market_day_roll_day", "market_day_roll", "market_evening_roll_day", "market_evening_roll", "day_location_override", "merchant_contact_unlocked", "merchant_contact_month_key", "old_water_pump_hint_seen", "commission_followup_day", "murder_day", "special_cream_recipe_unlocked", "sergio_discount"))) timeout 5.0
     $ threads["sandraRevealingDressInitiative"].reset()
     $ threads["beckyHome"].advanceTo(3, complete_at_end=True)
@@ -6337,9 +6337,9 @@ testcase external_player_intimacy_state_sleep_arousal_and_help:
 
 
 CLARA_AMANDA_SCHEDULE_FLOW_CHECKS = r'''
-testcase external_clara_evening_follow_finishes_in_melissa_room:
+testcase external_clara_residence_and_ointment_flow:
     run Call("InitGameNPCs")
-    $ external_calendar_set_fields(13, 2, 1100, 21, 0)
+    $ external_calendar_set_fields(13, 2, 1100, 19, 0)
     $ external_calendar_set_weekday(3)
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
@@ -6347,39 +6347,201 @@ testcase external_clara_evening_follow_finishes_in_melissa_room:
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
-    $ Clara.murder_day = 999999
-    $ Clara.rel = max(int(Clara.rel or 0), 8)
-    $ player.tavern_management.breakfast.event_active = False
-    $ TavernBreakfastPresentIds = None
     $ threads.clear()
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
-    $ threads["claraPaintingsPath"].advanceTo(10, force_active=True)
+    $ threads["claraPaintingsPath"].advanceTo(13, force_active=True)
+    $ threads["claraPaintingsPath"].day = int(current_game_day() or 0) - 1
+    $ Clara.rel = max(5, int(Clara.rel or 0))
+    $ rooms.enter("TavernMain")
     $ findAvailableEvents(True)
-
-    run Jump("ArtisansQuarter")
+    assert eval (threads["claraPaintingsPath"].checkActive()) timeout 5.0
+    assert eval (threads["claraPaintingsPath"].getevent(13).checkDay() and threads["claraPaintingsPath"].getevent(13).checkHour() and threads["claraPaintingsPath"].getevent(13).checkNumDay(threads["claraPaintingsPath"].day)) timeout 5.0
+    assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
+    run Call("checkTriggers", "TavernMain", "enter", 0)
     advance until screen "choice" timeout 20.0
-    assert eval ("Вечером вы с Клариссой" in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 20.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 5.0
-    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
+    assert eval ("Кларисса просит защиты" in str(main_ui_runtime.action_title or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval ("Позволить Клариссе поселиться у Мелиссы" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 14) timeout 20.0
+
+    $ _clara_stage14_date = calendar_v2.day_number_to_parts(int(threads["claraPaintingsPath"].day or 0) + 1)
+    $ external_calendar_set_fields(_clara_stage14_date["day"], _clara_stage14_date["month"], _clara_stage14_date["year"], 21, 0)
     $ npc_interval_schedule_load_all(True)
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999)])
     assert eval (str(people.location("clara") or "") == "TavernMelissaRoom") timeout 5.0
     assert eval (str(people.location("melissa") or "") == "TavernMelissaRoom") timeout 5.0
-    run Jump("TavernMelissaRoom")
-    advance until screen "main_ui" timeout 20.0
-    assert eval ("Выслушать Клариссу и Мелиссу" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ _clara_room_origin_text = str(scene_runtime.text or "")
-    $ _clara_room_origin_picture = str(scene_runtime.picture or "")
-    run Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)
+    $ rooms.enter("TavernMelissaRoom")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMelissaRoom", "enter")) timeout 5.0
+    run Call("checkTriggers", "TavernMelissaRoom", "enter", 0)
     advance until screen "choice" timeout 20.0
-    assert eval ("Кларисса наконец срывается" in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 12) timeout 20.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 12) timeout 5.0
-    assert eval (str(scene_runtime.text or "") == _clara_room_origin_text and str(scene_runtime.picture or "") == _clara_room_origin_picture) timeout 5.0
+    assert eval ("Признание Клариссы" in str(main_ui_runtime.action_title or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 15) timeout 20.0
+
+    $ player.add_item("special_cream_001", 1)
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
+    assert eval (not story_event_available("TavernMelissaRoom", "clara_ointment")) timeout 5.0
+    assert eval ("Принести Клариссе специальную мазь" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=False, talkable=True)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernMelissaRoom", "clara_ointment")) timeout 5.0
+
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=False)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernMelissaRoom", "clara_ointment")) timeout 5.0
+
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ Clara.set_sex_busy(True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernMelissaRoom", "clara_ointment")) timeout 5.0
+
+    $ Clara.set_sex_busy(False)
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
+    assert eval ("Принести Клариссе специальную мазь" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    run Call("checkTriggers", "TavernMelissaRoom", "clara_ointment", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (bool(threads["claraPaintingsPath"].completed)) timeout 20.0
+    assert eval (int(player.item_count("special_cream_001") or 0) == 0) timeout 5.0
+    assert eval ("Принести Клариссе специальную мазь" not in [str(i.caption or "") for i in tavern_melissa_room_action_items()]) timeout 5.0
+
+testcase external_clara_private_games_use_shared_engine:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(20, 2, 1100, 21, 0)
+    $ rooms.enter("TavernMelissaRoom")
+    $ threads.clear()
+    $ event_runtime.available.clear()
+    $ event_runtime.evaluation_time = None
+    $ initStoryEventRuntime(True)
+    $ threads["claraPaintingsPath"].advanceTo(threads["claraPaintingsPath"].data.length, complete_at_end=True)
+    $ threads["claraTavernVisit"].advanceTo(threads["claraTavernVisit"].data.length, complete_at_end=True)
+    $ Clara.rel = 10
+    $ Clara.openness = 5
+    $ Clara.fucked_today = 0
+    $ Clara.set_sex_busy(False)
+    $ Clara.set_sex_stat("virginity", True)
+    $ Clara.set_arousal(50)
+    $ Clara.remove_clothing_layer("bottom")
+    $ Clara.remove_clothing_layer("panties")
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.set_arousal(50)
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ findAvailableEvents(True)
+    assert eval (str(people.location("clara") or "") == "TavernMelissaRoom") timeout 5.0
+    assert eval (str(people.location("melissa") or "") != "TavernMelissaRoom") timeout 5.0
+    assert eval (story_event_available("talk_clara", "private_games")) timeout 5.0
+
+    run Call("IntClaraTalk", "clara")
+    advance until screen "choice" timeout 20.0
+    $ _clara_private_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить, почему вас не пускали в комнату")
+    click id ("choice_panel_button_%d" % int(_clara_private_index)) pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Выслушать Клариссу" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (bool(threads["claraPrivateGames"].completed)) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and "Остановиться" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(main_ui_runtime.action_title or "") == "Кларисса") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/portrait.png") timeout 5.0
+    assert eval ("Войти в нее" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Войти сзади" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _clara_anal_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Войти сзади")
+    click id ("choice_panel_button_%d" % int(_clara_anal_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Clara.cock_in("ass")) timeout 20.0
+    assert eval (bool(Clara.sex_stat("virginity", True))) timeout 5.0
+    $ _clara_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
+    click id ("choice_panel_button_%d" % int(_clara_stop_index)) pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Закончить близость" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Продолжить игры с Клариссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(Clara.fucked_today or 0) == 1 and int(player.intimacy.came_today or 0) == 0) timeout 5.0
+
+testcase external_melissa_ointment_intimacy_flow:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(21, 2, 1100, 14, 0)
+    $ external_calendar_set_weekday(2)
+    $ rooms.enter("TavernEmptyRoom")
+    $ threads.clear()
+    $ event_runtime.available.clear()
+    $ event_runtime.evaluation_time = None
+    $ initStoryEventRuntime(True)
+    $ threads["melissaCourtship"].advanceTo(threads["melissaCourtship"].data.length, complete_at_end=True)
+    $ threads["amandaStreetDiscipline"].advanceTo(1, force_active=True)
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.event_active = False
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernEmptyRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernEmptyRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ people.get_data("liza").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ findAvailableEvents(True)
+    assert eval (not Melissa.intimacy_action_allowed("anal")) timeout 5.0
+    assert eval (not Melissa.intimacy_action_allowed("vaginal")) timeout 5.0
+    assert eval (not story_event_available("TavernEmptyRoom", "enter")) timeout 5.0
+    $ people.get_data("liza").set_schedule([NPCScheduleEntry(location="TavernEmptyRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernEmptyRoom", "enter")) timeout 5.0
+    run Call("checkTriggers", "TavernEmptyRoom", "enter", 0)
+    advance until eval (renpy.get_screen("choice") is not None and "Продолжить слушать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaOintmentIntimacy"].num or 0) == 1) timeout 20.0
+
+    $ _melissa_ointment_request_date = calendar_v2.day_number_to_parts(int(threads["melissaOintmentIntimacy"].day or 0) + 1)
+    $ external_calendar_set_fields(_melissa_ointment_request_date["day"], _melissa_ointment_request_date["month"], _melissa_ointment_request_date["year"], 21, 0)
+    $ rooms.enter("TavernMyRoom")
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="FridayDance", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernMyRoom", "bedtime")) timeout 5.0
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999, awake=True, talkable=True)])
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMyRoom", "bedtime")) timeout 5.0
+    run Call("checkTriggers", "TavernMyRoom", "bedtime", 0)
+    advance until eval (renpy.get_screen("choice") is not None and "Пообещать помочь, когда мазь будет готова" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaOintmentIntimacy"].num or 0) == 2) timeout 20.0
+
+    $ _melissa_ointment_try_date = calendar_v2.day_number_to_parts(int(threads["melissaOintmentIntimacy"].day or 0) + 1)
+    $ external_calendar_set_fields(_melissa_ointment_try_date["day"], _melissa_ointment_try_date["month"], _melissa_ointment_try_date["year"], 21, 0)
+    $ player.add_item("special_cream_001", 1)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMyRoom", "bedtime")) timeout 5.0
+    run Call("checkTriggers", "TavernMyRoom", "bedtime", 0)
+    advance until eval (renpy.get_screen("choice") is not None and "Осторожно помочь Мелиссе" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (bool(threads["melissaOintmentIntimacy"].completed)) timeout 20.0
+    assert eval (int(player.item_count("special_cream_001") or 0) == 0) timeout 5.0
+    assert eval (Melissa.intimacy_action_allowed("anal")) timeout 5.0
+    assert eval (not Melissa.intimacy_action_allowed("vaginal")) timeout 5.0
 
 '''
 
@@ -8434,6 +8596,82 @@ testcase external_clara_church_fiance_two_beat_event:
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к прихожанам"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and int(threads["claraPaintingsPath"].num or 0) == 7 and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
 
+testcase external_clara_fiance_case_stages_7_to_12:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ Clara.rel = max(5, int(Clara.rel or 0))
+    $ player.stats.exploration = max(200, int(player.stats.exploration or 0))
+    $ threads["claraPaintingsPath"].advanceTo(7, force_active=True)
+    $ threads["claraPaintingsPath"].day = int(current_game_day() or 0) - 1
+    $ external_calendar_set_weekday(3)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 20, 0)
+    $ rooms.enter("ArtisansQuarter")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("ArtisansQuarter", "enter")) timeout 5.0
+    run Call("checkTriggers", "ArtisansQuarter", "enter", 0)
+    advance until eval (renpy.get_screen("choice") is not None and "Осторожно заглянуть внутрь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 8) timeout 20.0
+
+    $ _clara_case_stage8_date = calendar_v2.day_number_to_parts(int(threads["claraPaintingsPath"].day or 0) + 1)
+    $ external_calendar_set_fields(_clara_case_stage8_date["day"], _clara_case_stage8_date["month"], _clara_case_stage8_date["year"], 14, 0)
+    $ external_calendar_set_weekday(3)
+    $ rooms.enter("BarberShop")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("BarberShop", "enter") and Clara.fiance_case_detained()) timeout 5.0
+    run Jump("BarberShop")
+    advance until eval (renpy.get_screen("choice") is not None and "Вернуться в квартал ремесленников" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 9 and str(rooms.current_code or "") == "ArtisansQuarter") timeout 20.0
+
+    $ rooms.enter("HunterClub")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("talk_luisa", "clara_fiance_case")) timeout 5.0
+    run Call("checkTriggers", "talk_luisa", "clara_fiance_case", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 20.0
+
+    $ external_calendar_set_weekday(2)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
+    $ player.tavern_management.winenum = max(1, int(player.tavern_management.winenum or 0))
+    $ rooms.enter("CityGuard")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("talk_zimmer", "clara_fiance_case")) timeout 5.0
+    run Call("checkTriggers", "talk_zimmer", "clara_fiance_case", 0)
+    advance until eval (renpy.get_screen("choice") is not None and "Передать бочонок и продолжить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Выслушать показания" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Повар" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _clara_case_cook_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Повар")
+    click id ("choice_panel_button_%d" % int(_clara_case_cook_index)) pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 12 and not Clara.fiance_case_detained()) timeout 20.0
+
+    $ external_calendar_set_weekday(3)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    $ rooms.enter("BarberShop")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("talk_sergio", "clara_fiance_case")) timeout 5.0
+    run Call("checkTriggers", "talk_sergio", "clara_fiance_case", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 13) timeout 20.0
+    assert eval (crafting.special_cream_recipe_unlocked and int(tractir_progress.sergio_discount_percent or 0) >= 25) timeout 5.0
+
 testcase external_clara_object_thread_conditions:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -8480,25 +8718,46 @@ testcase external_clara_object_thread_conditions:
     advance until screen "choice" timeout 20.0
     assert eval ("Легаре не ее настоящий отец" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 6) timeout 20.0
-    $ Clara.commission_followup_day = int(calendar_v2.daysInGame or 0)
-    $ threads["claraPaintingsPath"].advanceTo(9, force_active=True)
-    $ event_runtime.evaluation_time = None
-    $ findAvailableEvents(True)
-    assert eval (story_event_available("WineStore", "clara_paintings")) timeout 5.0
-    $ external_calendar_set_fields(3, 1, 1100, 21, 0)
-    $ threads["claraPaintingsPath"].advanceTo(10, force_active=True)
+    $ external_calendar_set_fields(3, 1, 1100, 20, 0)
+    $ external_calendar_set_weekday(3)
+    $ player.stats.exploration = 200
+    $ threads["claraPaintingsPath"].advanceTo(7, force_active=True)
+    $ threads["claraPaintingsPath"].day = int(current_game_day() or 0) - 1
     $ rooms.enter("ArtisansQuarter")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    assert eval (int(calendar_v2.week or 0) == 3 and int(calendar_v2.hour or 0) == 20) timeout 5.0
+    assert eval (threads["claraPaintingsPath"].checkActive()) timeout 5.0
+    assert eval (threads["claraPaintingsPath"].getevent(7).checkDay() and threads["claraPaintingsPath"].getevent(7).checkHour() and threads["claraPaintingsPath"].getevent(7).checkNumDay(threads["claraPaintingsPath"].day)) timeout 5.0
     assert eval (story_event_available("ArtisansQuarter", "enter")) timeout 5.0
+
+    $ external_calendar_set_fields(4, 1, 1100, 12, 0)
+    $ threads["claraPaintingsPath"].advanceTo(8, force_active=True)
+    $ household.barber_appointments["amanda"] = 1
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (Clara.fiance_case_detained() and not barber_shop_is_open()) timeout 5.0
+    assert eval (str(Amanda.getLocation() or "") != "BarberShop") timeout 5.0
+    $ household.barber_appointments.pop("amanda", None)
+
+    $ threads["claraPaintingsPath"].advanceTo(9, force_active=True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("talk_luisa", "clara_fiance_case")) timeout 5.0
+
     $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999)])
-    $ external_calendar_set_fields(3, 1, 1100, 22, 0)
-    $ threads["claraPaintingsPath"].advanceTo(11, force_active=True)
+    $ external_calendar_set_fields(5, 1, 1100, 21, 0)
+    $ threads["claraPaintingsPath"].advanceTo(14, force_active=True)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (people.location("clara") == "TavernMelissaRoom" and people.location("melissa") == "TavernMelissaRoom") timeout 5.0
-    assert eval (story_event_available("TavernMelissaRoom", "clara_paintings")) timeout 5.0
+    assert eval (story_event_available("TavernMelissaRoom", "enter")) timeout 5.0
+    $ threads["claraPaintingsPath"].advanceTo(15, force_active=True)
+    $ player.add_item("special_cream_001", 1)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMelissaRoom", "clara_ointment")) timeout 5.0
     $ threads["claraPaintingsPath"].advanceTo(4, force_active=True)
     $ threads["claraForestSofa"].advanceTo(2, force_active=True)
     $ player.horse.__dict__.pop("stolen_purchase_price", None)
@@ -8506,7 +8765,7 @@ testcase external_clara_object_thread_conditions:
     $ Mongol.horse_price = 800
     $ saveVersion = 77
     $ updateSave()
-    assert eval (int(saveVersion or 0) == 78) timeout 5.0
+    assert eval (int(saveVersion or 0) == int(currentVersion or 0)) timeout 5.0
     assert eval (int(threads["claraPaintingsPath"].num or 0) == 5) timeout 5.0
     assert eval (int(threads["claraForestSofa"].num or 0) == 6) timeout 5.0
     assert eval (int(player.horse.stolen_purchase_price or 0) == 800) timeout 5.0
@@ -9449,6 +9708,7 @@ def main() -> int:
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_church_fiance_two_beat_event",
+            "external_clara_fiance_case_stages_7_to_12",
             "external_clara_object_thread_conditions",
             "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",
@@ -9565,7 +9825,9 @@ def main() -> int:
             "external_melissa_finished_intimacy_returns_to_room_and_allows_second_visit",
             "external_amanda_sex_scene_keeps_text_picture_and_finish_menu",
             "external_player_intimacy_state_sleep_arousal_and_help",
-            "external_clara_evening_follow_finishes_in_melissa_room",
+            "external_clara_residence_and_ointment_flow",
+            "external_clara_private_games_use_shared_engine",
+            "external_melissa_ointment_intimacy_flow",
             "external_household_ai_kitchen_event_fires",
             "external_all_room_action_clicks",
             "external_becky_home_guest_citydress_gate_and_arrival",
@@ -9656,6 +9918,7 @@ def main() -> int:
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_church_fiance_two_beat_event",
+            "external_clara_fiance_case_stages_7_to_12",
             "external_clara_object_thread_conditions",
             "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",
@@ -9766,7 +10029,9 @@ def main() -> int:
             "external_melissa_courtship_is_slow_and_daily",
             "external_melissa_finished_intimacy_returns_to_room_and_allows_second_visit",
             "external_player_intimacy_state_sleep_arousal_and_help",
-            "external_clara_evening_follow_finishes_in_melissa_room",
+            "external_clara_residence_and_ointment_flow",
+            "external_clara_private_games_use_shared_engine",
+            "external_melissa_ointment_intimacy_flow",
             "external_household_ai_kitchen_event_fires",
             "external_all_room_action_clicks",
             "external_becky_home_guest_citydress_gate_and_arrival",

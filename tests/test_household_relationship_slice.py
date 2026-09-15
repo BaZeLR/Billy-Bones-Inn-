@@ -81,8 +81,12 @@ def test_household_morning_state_accepts_renpy_rollback_mappings_and_uses_monthl
     assert "isinstance(entry, dict)" not in ensure_block
 
 
-def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
+def test_household_partners_share_one_intimacy_procedure_with_distinct_gates():
     engine = read("NPC/Girls/Melissa/IntMelissaSex.rpy")
+    people_runtime = read("Utilities/General/NPC/PeopleRuntime.rpy")
+    melissa = read("NPC/Girls/Melissa/InitMelissa.rpy")
+    sandra = read("NPC/Girls/Sandra/InitSandra.rpy")
+    clara = read("NPC/Girls/Clara/InitClara.rpy")
     sandra_events = read("NPC/Girls/Sandra/SandraEvents.rpy")
     melissa_talk = read("NPC/Girls/Melissa/IntMelissaTalk.rpy")
     sandra_talk = read("NPC/Girls/Sandra/IntSandraTalk.rpy")
@@ -90,10 +94,32 @@ def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
     assert engine.count("label HouseholdSexEngine(") == 1
     assert "label SandraSexEngine" not in sandra_events
     assert "label IntMelissaSex" not in engine
-    assert 'if girl == "melissa":' in engine
-    assert 'return bool(info.relationship_allows(action_code))' in engine
-    assert 'if girl in ("melissa", "sandra"):' in engine
+    assert 'return bool(info.intimacy_available(action_code))' in engine
+    assert 'if girl == "melissa":' not in engine
+    assert 'if girl == "clara":' not in engine
     assert 'threads["sandraWeeklyEvaluation"]' not in engine
+    assert 'threads["melissaOintmentIntimacy"]' not in engine
+    assert 'threads["claraPrivateGames"]' not in engine
+    for capability in (
+        'def intimacy_available(self, action_code="intimacy"):',
+        "def intimacy_engine_stage(self):",
+        'def intimacy_action_allowed(self, action_code=""):',
+        'def intimacy_room_allowed(self, room_code=""):',
+        'def intimacy_scene_text(self, scene_code="", full_engine=False):',
+    ):
+        assert capability in people_runtime
+    assert "HOUSEHOLD_INTIMACY_PRIVATE_ROOMS = frozenset" in people_runtime
+    assert "HOUSEHOLD_INTIMACY_SECLUDED_ROOMS = frozenset" in people_runtime
+    assert "HOUSEHOLD_INTIMACY_PRIVATE_ROOMS = frozenset" not in engine
+    assert "HOUSEHOLD_INTIMACY_SECLUDED_ROOMS = frozenset" not in engine
+    for owner in (melissa, sandra, clara):
+        assert 'def intimacy_available(self, action_code="intimacy"):' in owner
+        assert "def intimacy_engine_stage(self):" in owner
+    assert "_hse_info.intimacy_engine_stage()" in engine
+    assert '_hse_info.intimacy_action_allowed("vaginal")' in engine
+    assert '_hse_info.intimacy_action_allowed("anal")' in engine
+    assert 'info.intimacy_scene_text("summary", full_engine)' in engine
+    assert '_hse_info.intimacy_scene_text("anal", _hse_full_engine)' in engine
     assert 'call HouseholdSexEngine("sandra", "TavernSandraRoom")' in sandra_events
     assert "call HouseholdSexEngine" in melissa_talk
     assert "call HouseholdSexEngine" in sandra_talk

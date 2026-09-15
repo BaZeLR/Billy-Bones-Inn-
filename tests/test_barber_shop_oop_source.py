@@ -21,8 +21,9 @@ def test_barber_shop_preserves_services_event_and_oop_owners():
         "BarberShopSellLuxurySoap", "BarberShopServePendingGuest",
     ):
         assert f"call {label}" in SOURCE
-    assert 'story_event_available("BarberShop", "clara_fiance")' in SOURCE
-    assert 'call checkTriggers("BarberShop", "clara_fiance", 0)' in SOURCE
+    assert 'call RoomEnterEventGate(rooms.current_code, False)' in SOURCE
+    assert 'story_event_available("talk_sergio", "clara_fiance_case")' in SOURCE
+    assert 'call checkTriggers("talk_sergio", "clara_fiance_case", 0)' in SOURCE
     assert "player.economy.money" in SOURCE
     assert "player.appearance.mark_haircut" in SOURCE
     assert "player.add_item(" in SOURCE
@@ -39,15 +40,16 @@ def test_all_appointed_women_resolve_to_the_open_barber_shop():
 
     girl_block = runtime.split("class Girl(BaseNPC):", 1)[1]
     assert 'household.barber_appointments.get(self.name, 0)' in girl_block
-    assert 'barber_shop_is_open_at(wday, hour)' in girl_block
+    assert 'barber_shop_is_open(wday, hour)' in girl_block
     assert 'return "BarberShop"' in girl_block
     assert '"barber_appointments",' in household
     assert "def repair(self):" in household
 
 
 def test_barber_event_gate_continues_to_the_room_interaction_owner():
-    event_gate = SOURCE.split('if story_event_available("BarberShop", "clara_fiance"):', 1)[1].split("if not rooms.get(\"BarberShop\").is_open():", 1)[0]
+    event_gate = SOURCE.split('call RoomEnterEventGate(rooms.current_code, False)', 1)[1].split("if rooms.get(\"BarberShop\").is_open():", 1)[0]
 
-    assert 'call checkTriggers("BarberShop", "clara_fiance", 0)' in event_gate
+    assert "if _return:" in event_gate
+    assert "jump ArtisansQuarter" in event_gate
     assert "call screen main_ui" not in event_gate
     assert "jump BarberShop" not in event_gate

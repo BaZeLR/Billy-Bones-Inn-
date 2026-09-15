@@ -36,9 +36,10 @@ def test_loaded_household_schema_is_repaired_before_story_schedule_evaluation():
 
 def test_clara_paintings_event_returns_to_trigger_caller_without_room_reentry():
     source = read("game/NPC/Girls/Clara/ClaraPaintingsThread.rpy")
-    block = source.split("label story_clara_paintings_evening_peek_10:", 1)[1].split("\nlabel ", 1)[0]
+    block = source.split("label story_clara_paintings_secret_date_7:", 1)[1].split("\nlabel ", 1)[0]
 
     assert "jump TavernMelissaRoom" not in block
+    assert "jump ArtisansQuarter" not in block
     assert block.rstrip().endswith("return True")
 
 

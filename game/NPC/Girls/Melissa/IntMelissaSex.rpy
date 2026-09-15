@@ -3,52 +3,18 @@
 # participating NPC object; this label owns only the authored scene flow.
 # ================================================================================
 init python:
-    HOUSEHOLD_INTIMACY_PRIVATE_ROOMS = frozenset((
-        "TavernMelissaRoom",
-        "TavernMyRoom",
-        "TavernAmandaRoom",
-        "TavernSandraRoom",
-        "TavernEmptyRoom",
-        "TavernStorage",
-        "Shed",
-    ))
-    HOUSEHOLD_INTIMACY_SECLUDED_ROOMS = frozenset((
-        "Forest",
-        "ForestClearing",
-        "ForestDarkWoods",
-        "ForestWaterfall",
-        "ForestLake",
-        "ForestSpring",
-        "ForestCave",
-        "ForestHiddenPath",
-        "Backyard",
-    ))
-
     def household_intimacy_room_is_private(girl_name="", room_code=""):
         girl = str(girl_name or "").strip().lower()
         room_key = str(room_code or rooms.current_code or "").strip()
-        if room_key in HOUSEHOLD_INTIMACY_PRIVATE_ROOMS or room_key in HOUSEHOLD_INTIMACY_SECLUDED_ROOMS:
-            return True
-        if girl == "melissa":
-            return Melissa.private_context_active(room_key)
-        return False
+        info = people.get_info(girl)
+        return bool(info is not None and info.intimacy_room_allowed(room_key))
 
     def household_sex_available(girl_name="", action_code="intimacy"):
         girl = str(girl_name or "").strip().lower()
         info = people.get_info(girl)
         if info is None:
             return False
-        if girl in ("melissa", "sandra"):
-            return bool(info.relationship_allows(action_code))
-        return False
-
-    def household_sex_relationship_stage(girl_name=""):
-        girl = str(girl_name or "").strip().lower()
-        if girl == "melissa":
-            return Melissa.relationship_stage()
-        if girl == "sandra" and household_sex_available(girl, "intimacy"):
-            return 4
-        return 0
+        return bool(info.intimacy_available(action_code))
 
     def household_sex_has_dildo():
         for item_id in ("dildo_001", "wooden_dildo_001", "glass_dildo_001"):
@@ -68,12 +34,9 @@ init python:
         if info is None or data is None:
             return ""
         lines = []
-        if girl == "melissa" and not bool(full_engine):
-            lines.append("Сейчас это еще не полноценный секс, а осторожное сближение. Мелисса позволяет поцелуи, ласки и все более смелые прикосновения, но пока ее комнатная история и ухаживания не завершены, дальше заходить рано.")
-        elif girl == "melissa":
-            lines.append("Мелисса уже готова к полноценной близости, если вы не будете терять ритм и внимание к ее состоянию.")
-        else:
-            lines.append("Сандра не прячет желания и прямо дает понять, что в этой комнате вы оба можете говорить о своих намерениях открыто.")
+        scene_text = info.intimacy_scene_text("summary", full_engine)
+        if str(scene_text or "").strip():
+            lines.append(scene_text)
         lines.append(bodymodel_profile_summary_text(bodymodel_build_profile(girl, data.fullname, "female")))
         return "\n\n".join([row for row in lines if str(row or "").strip()])
 
@@ -164,7 +127,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
     $ _hse_initial_action = str(initial_action or "sex").strip().lower()
     $ _hse_info = people.get_info(_hse_girl)
     $ _hse_data = people.get_data(_hse_girl)
-    if _hse_girl not in ("melissa", "sandra") or _hse_info is None or _hse_data is None:
+    if _hse_info is None or _hse_data is None:
         return
     if not household_sex_available(_hse_girl, "intimacy"):
         $ scene_runtime.text = "Для такой близости ваши отношения должны зайти дальше."
@@ -194,23 +157,29 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
         $ player.intimacy.add_arousal(30, 100)
         $ _hse_info.add_arousal(5)
         $ scene_runtime.text = "Вы просите ее помочь вам рукой. Она соглашается, устраивается ближе, обхватывает ваш член ладонью и начинает двигать ею в ровном, уверенном ритме."
-        $ scene_runtime.picture = _hse_data.image_path("outfit_reward", "handjob")
+        $ _hse_picture = _hse_data.image_path("outfit_reward", "handjob")
+        if str(_hse_picture or "").strip():
+            $ scene_runtime.picture = _hse_picture
         call HouseholdSexState(_hse_girl, _hse_full_engine)
     elif _hse_initial_action == "blowjob":
         $ _hse_info.set_cock_position("mouth")
         $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "suck", "You", _hse_data.fullname, "female")
         $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "suck", _hse_effect, _hse_full_engine)
-        $ scene_runtime.picture = _hse_data.cycle_image("sexy_times", "blowjob", _hse_info.arousal_value())
+        $ _hse_picture = _hse_data.cycle_image("sexy_times", "blowjob", _hse_info.arousal_value())
+        if str(_hse_picture or "").strip():
+            $ scene_runtime.picture = _hse_picture
         call HouseholdSexState(_hse_girl, _hse_full_engine)
 
     label household_sex_menu:
         while True:
-            $ _hse_stage = household_sex_relationship_stage(_hse_girl)
+            $ _hse_stage = _hse_info.intimacy_engine_stage()
             $ _hse_can_cum = _hse_full_engine and _hse_info.can_have_sex_today() and player.intimacy.arousal_value() >= 100 and player.intimacy.can_cum()
             menu:
                 "Осмотреть её":
                     $ scene_runtime.text = household_sex_scene_summary(_hse_girl, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("portrait", "default")
+                    $ _hse_picture = _hse_data.image_path("portrait", "default")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
 
                 "Распахнуть блузку" if _hse_stage >= 3 and _hse_info.clothing_layer("top") != "" and not _hse_info.layer_raised("top"):
                     $ scene_runtime.text = "Вы медленно распахиваете ее блузку, открывая себе больше простора для рук и губ."
@@ -241,25 +210,33 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                 "Поцеловать [_hse_display]":
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "kiss", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "kiss", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("portrait", "default")
+                    $ _hse_picture = _hse_data.image_path("portrait", "default")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Ласкать грудь" if "fondle" in bodymodel_actions_for_target(_hse_girl, "nipples"):
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "nipples", "fondle", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "nipples", "fondle", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("grope", "tit_ok" if _hse_full_engine else "tits_shy")
+                    $ _hse_picture = _hse_data.image_path("grope", "tit_ok" if _hse_full_engine else "tits_shy")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Лизнуть соски" if "lick" in bodymodel_actions_for_target(_hse_girl, "nipples"):
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "nipples", "lick", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "nipples", "lick", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("grope", "tit_ok")
+                    $ _hse_picture = _hse_data.image_path("grope", "tit_ok")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Погладить ее между ног" if "fondle" in bodymodel_actions_for_target(_hse_girl, "pussy"):
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "pussy", "fondle", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "pussy", "fondle", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("grope", "ass_ok")
+                    $ _hse_picture = _hse_data.image_path("grope", "ass_ok")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Раздвинуть ее бедра" if _hse_full_engine and "spread" in bodymodel_actions_for_target(_hse_girl, "pussy"):
@@ -287,7 +264,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                 "Погладить ягодицы" if "fondle" in bodymodel_actions_for_target(_hse_girl, "ass"):
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "ass", "fondle", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "ass", "fondle", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.image_path("grope", "ass_ok")
+                    $ _hse_picture = _hse_data.image_path("grope", "ass_ok")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Раздвинуть ягодицы" if _hse_full_engine and "spread" in bodymodel_actions_for_target(_hse_girl, "ass"):
@@ -305,28 +284,31 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                     $ player.intimacy.add_arousal(30, 100)
                     $ _hse_info.add_arousal(5)
                     $ scene_runtime.text = "Вы просите ее помочь вам рукой. Она устраивается ближе, обхватывает ваш член ладонью и начинает двигать ею в ровном, уверенном ритме."
-                    $ scene_runtime.picture = _hse_data.image_path("outfit_reward", "handjob")
+                    $ _hse_picture = _hse_data.image_path("outfit_reward", "handjob")
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
                 "Попросить сделать минет" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy():
                     $ _hse_info.set_cock_position("mouth")
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "suck", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "suck", _hse_effect, _hse_full_engine)
-                    $ scene_runtime.picture = _hse_data.cycle_image("sexy_times", "blowjob", _hse_info.arousal_value())
+                    $ _hse_picture = _hse_data.cycle_image("sexy_times", "blowjob", _hse_info.arousal_value())
+                    if str(_hse_picture or "").strip():
+                        $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
-                "Войти в нее" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy() and _hse_info.pussy_visible() and player.intimacy.arousal_value() >= 20 and _hse_info.arousal_value() >= 20:
+                "Войти в нее" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy() and _hse_info.pussy_visible() and player.intimacy.arousal_value() >= 20 and _hse_info.arousal_value() >= 20 and _hse_info.intimacy_action_allowed("vaginal"):
                     $ _hse_info.set_cock_position("pussy")
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "pussy", "insert", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = "Вы входите в нее медленно, оставляя время принять ваш темп и глубину."
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
-                "Войти сзади" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy() and "insert" in bodymodel_actions_for_target(_hse_girl, "ass") and player.intimacy.arousal_value() >= 30 and _hse_info.arousal_value() >= 40:
+                "Войти сзади" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy() and "insert" in bodymodel_actions_for_target(_hse_girl, "ass") and player.intimacy.arousal_value() >= 30 and _hse_info.arousal_value() >= 40 and _hse_info.intimacy_action_allowed("anal"):
                     $ _hse_info.set_cock_position("ass")
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "ass", "insert", "You", _hse_data.fullname, "female")
-                    if _hse_girl == "melissa" and threads["claraTavernVisit"].completed and int(threads["claraForestSofa"].num or 0) >= 6 and not bool(threads["claraForestSofa"].aborted):
-                        $ scene_runtime.text = "Вспомнив советы Клариссы, Мелисса сама задает медленный темп и показывает, когда можно продолжить. Вы входите сзади без спешки; она привыкает к новому давлению и не позволяет вам торопиться."
-                    else:
+                    $ scene_runtime.text = _hse_info.intimacy_scene_text("anal", _hse_full_engine)
+                    if not str(scene_runtime.text or "").strip():
                         $ scene_runtime.text = "Вы входите сзади медленно и без спешки. Она сама показывает, когда можно продолжить, и не позволяет вам торопиться."
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
@@ -339,7 +321,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                             $ _hse_info.set_cum_state("cum_mouth_you", 1)
                             $ _hse_info.set_sex_busy(True)
                             $ _hse_info.set_cock_position("none")
-                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "blowjob_finish")
+                            $ _hse_picture = _hse_data.image_path("sexy_times", "blowjob_finish")
+                            if str(_hse_picture or "").strip():
+                                $ scene_runtime.picture = _hse_picture
                             call HouseholdSexAfterCum
                             if _return:
                                 return
@@ -351,7 +335,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                             $ _hse_info.set_cum_state("cum_tits_you", 1)
                             $ _hse_info.set_sex_busy(True)
                             $ _hse_info.set_cock_position("none")
-                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            $ _hse_picture = _hse_data.image_path("sexy_times", "finish")
+                            if str(_hse_picture or "").strip():
+                                $ scene_runtime.picture = _hse_picture
                             call HouseholdSexAfterCum
                             if _return:
                                 return
@@ -363,7 +349,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                             $ _hse_info.set_cum_state("cum_face_you", 1)
                             $ _hse_info.set_sex_busy(True)
                             $ _hse_info.set_cock_position("none")
-                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            $ _hse_picture = _hse_data.image_path("sexy_times", "finish")
+                            if str(_hse_picture or "").strip():
+                                $ scene_runtime.picture = _hse_picture
                             call HouseholdSexAfterCum
                             if _return:
                                 return
@@ -376,7 +364,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                             $ _hse_info.set_cum_state("cum_inside_you", 1)
                             $ _hse_info.set_sex_busy(True)
                             $ _hse_info.set_cock_position("none")
-                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            $ _hse_picture = _hse_data.image_path("sexy_times", "finish")
+                            if str(_hse_picture or "").strip():
+                                $ scene_runtime.picture = _hse_picture
                             call HouseholdSexAfterCum
                             if _return:
                                 return
@@ -388,7 +378,9 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                             $ player.intimacy.set_arousal(0)
                             $ _hse_info.set_sex_busy(True)
                             $ _hse_info.set_cock_position("none")
-                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            $ _hse_picture = _hse_data.image_path("sexy_times", "finish")
+                            if str(_hse_picture or "").strip():
+                                $ scene_runtime.picture = _hse_picture
                             call HouseholdSexAfterCum
                             if _return:
                                 return

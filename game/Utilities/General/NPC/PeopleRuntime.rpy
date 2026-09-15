@@ -13,6 +13,27 @@
 init -999 python:
     import json
 
+    HOUSEHOLD_INTIMACY_PRIVATE_ROOMS = frozenset((
+        "TavernMelissaRoom",
+        "TavernMyRoom",
+        "TavernAmandaRoom",
+        "TavernSandraRoom",
+        "TavernEmptyRoom",
+        "TavernStorage",
+        "Shed",
+    ))
+    HOUSEHOLD_INTIMACY_SECLUDED_ROOMS = frozenset((
+        "Forest",
+        "ForestClearing",
+        "ForestDarkWoods",
+        "ForestWaterfall",
+        "ForestLake",
+        "ForestSpring",
+        "ForestCave",
+        "ForestHiddenPath",
+        "Backyard",
+    ))
+
     def people_to_int(value, default=0):
         try:
             return int(value)
@@ -893,6 +914,9 @@ init -999 python:
                 "where_id": str(where_id or ""),
             }
 
+        def intimacy_available(self, action_code="intimacy"):
+            return False
+
         def interaction_visible(self, room_code=""):
             return bool(str(room_code or "").strip())
 
@@ -1404,8 +1428,21 @@ init -999 python:
         def date_intimacy_available(self):
             return False
 
+        def intimacy_engine_stage(self):
+            return 0
+
+        def intimacy_action_allowed(self, action_code=""):
+            return True
+
+        def intimacy_room_allowed(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            return room_key in HOUSEHOLD_INTIMACY_PRIVATE_ROOMS or room_key in HOUSEHOLD_INTIMACY_SECLUDED_ROOMS
+
+        def intimacy_scene_text(self, scene_code="", full_engine=False):
+            return ""
+
         def getLocation(self, wday=None, hour=None):
-            if not household_morning_issue_matches(self.name, time_value=hour) and bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
+            if not household_morning_issue_matches(self.name, time_value=hour) and bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open(wday, hour):
                 return "BarberShop"
             scheduled_location = super(Girl, self).getLocation(wday, hour)
             if scheduled_location == "TavernMain" and people_to_int(self.job_value("jobwhore", 0), 0) > 0:

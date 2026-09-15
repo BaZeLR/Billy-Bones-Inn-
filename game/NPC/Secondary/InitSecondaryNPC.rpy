@@ -87,6 +87,11 @@ init python:
             self.var = dict(kwargs.get("var", {}) or {})
             self.ensure_story_defaults()
 
+        def getLocation(self, wday=None, hour=None):
+            if Clara.fiance_case_detained():
+                return ""
+            return super(SergioInfo, self).getLocation(wday, hour)
+
     class GerhardData(PeopleData):
         code_name = "gerhard"
 
