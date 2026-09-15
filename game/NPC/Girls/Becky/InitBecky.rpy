@@ -25,6 +25,7 @@ init python:
                     "libido_tincture_001",
                     "drink_ale_001",
                 ],
+                base_clothing={"day_dress": "openworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "blackstockings", "shoes": "simpleshoes"},
             )
             # Original Becky init only defines age 36. This keeps that age at game start until a canonical birthday is written.
             self.birth_date = {"day": 1, "period": 1, "cycle": 1064}
@@ -125,17 +126,7 @@ init python:
                 "favorite_topics": ["family", "husband", "eddie", "inga", "sherwood"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["openworkdress", "simplebra", "simplepanties", "blackstockings", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "openworkdress",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "blackstockings",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(BeckyInfo, self).update()
             self.data = BeckyStaticData
@@ -270,14 +261,14 @@ init python:
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
 
         def has_bra(self):
-            return str(self.wardrobe.get("current_underwear", {}).get("bra", "") or "") != ""
+            return self.clothing_layer("bra") != ""
 
         def set_default_bra(self, item_id):
-            self.wardrobe.setdefault("current_underwear", {})["bra"] = str(item_id or "")
+            self.set_day_underwear("bra", item_id, True)
             return self
 
         def set_default_panties(self, item_id):
-            self.wardrobe.setdefault("current_underwear", {})["panties"] = str(item_id or "")
+            self.set_day_underwear("panties", item_id, True)
             return self
 
         def friday_dance_base_ready(self):

@@ -78,6 +78,20 @@ init 6 python:
     def tavern_sandra_room_door_locked():
         return bedroom_door_locked("TavernSandraRoom")
 
+    def tavern_sandra_room_nightwear_now():
+        schedule_state = people.schedule_state("sandra")
+        return (
+            str(schedule_state.get("location", "") or "") == "TavernSandraRoom"
+            and (
+                not bool(schedule_state.get("awake", True))
+                or str(schedule_state.get("label", "") or "") == "evening_room"
+                or (
+                    household_morning_issue_type("sandra") == "sleepy"
+                    and int(calendar_v2.hour or 0) < 12
+                )
+            )
+        )
+
     def tavern_sandra_room_picture():
         slot = int(calendar_v2.time_slot())
         if slot >= 4:
@@ -184,6 +198,8 @@ label TavernSandraRoom:
         while True:
             call screen main_ui
     $ rooms.enter("TavernSandraRoom")
+    if tavern_sandra_room_nightwear_now():
+        $ Sandra.wear_night_clothes(0)
     $ scene_runtime.picture = tavern_sandra_room_picture()
     if scene_runtime.picture:
         vscene scene_runtime.picture

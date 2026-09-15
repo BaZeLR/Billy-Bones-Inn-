@@ -24,9 +24,6 @@ init 6 python:
 
 label IntGeorgettSexSetup(GirlNameIGSS="georgett", GirlLocIGSS="street"):
     $ Georgett.sex_setup(GirlLocIGSS)
-    if Georgett.needs_dress_up():
-        call DressUp(GirlNameIGSS)
-        $ Georgett.sex_setup(GirlLocIGSS)
     $ Georgett.set_cock_position("none")
     return
 

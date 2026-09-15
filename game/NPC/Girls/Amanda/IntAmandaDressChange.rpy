@@ -58,7 +58,7 @@ label IntAmandaDressChangeOfferBra(GirlNameIAT="amanda", agreed_to_redress=0):
                 $ scene_runtime.text += '"\n"Ну, наверное ты прав," после небольшого колебания согласилась с вами Аманда, "помоги тогда."\nВы не замедлили оказать ей помощь, запустив руки под платье, расстегнув и затем вытащив лиф. Лишь потом вы поняли что даже и не попробовали отойти куда в сторонку.'
                 $ agreed_to_redress = 1
         if agreed_to_redress == 1:
-            $ Amanda.set_current_underwear("bra", "")
+            $ Amanda.set_day_underwear("bra", "", True)
             $ Amanda.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_bra")
         $ _other_saw = Amanda.dress_change_other_saw_text(GirlNameIAT, agreed_to_redress)
         if str(_other_saw or "").strip() != "":
@@ -74,7 +74,7 @@ label IntAmandaDressChangeOfferPanties(GirlNameIAT="amanda", agreed_to_redress=0
         $ scene_runtime.text = '"Аманда, а чего ты в панталонах-то ходишь?" - поинтересовались вы как бы между делом у Аманды. "Они только тебя стесняют, без них ты и работу будешь сноровистей выполнять, да и сама себя будешь ощущать сексуальнее.'
         if str(people.location("liza") or "") == "TavernMain":
             $ scene_runtime.text += ' Разве ты не знаешь, что Лизетта, твоя лучшая подруга, без них ходит?" добавили вы для пущей убедительности. '
-            if Liza.current_underwear("panties", "") == "":
+            if Liza.preferred_underwear("panties", "") == "":
                 $ scene_runtime.text += '\n\n"И то правда," задумчиво сказала Аманда.'
                 $ tmpLizaComandoBonus = min(10, Amanda.var_int("lizafriends", 0) // 2)
             else:
@@ -102,7 +102,7 @@ label IntAmandaDressChangeOfferPanties(GirlNameIAT="amanda", agreed_to_redress=0
                 $ scene_runtime.text += '\n\n"Эх, Стефан," пошло улыбнулась Аманда. "Ты ведь прекрасно знаешь, что в таком коротком платьичке, да без панталончиков, каждый мою писю увидит. А ведь нагибаться придется, там со стола вытри, здесь кружки поставь. Это ты называешь лучшим обслуживанием?"\n"Именно это, ты все отлично поняла," не смутились вы.\n"Ой, уговорил, языкастый, попробуем!" с готовностью отозвалась Аманда.\nДаже не попытавшись уйти за стойку или еще куда, Аманда сунула руки под короткую юбочку и стянула с себя панталончики, показав на секунду свою щелку.'
                 $ agreed_to_redress = 1
         if agreed_to_redress == 1:
-            $ Amanda.set_current_underwear("panties", "")
+            $ Amanda.set_day_underwear("panties", "", True)
             $ Amanda.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_panties")
         $ _other_saw = Amanda.dress_change_other_saw_text(GirlNameIAT, agreed_to_redress)
         if str(_other_saw or "").strip() != "":
@@ -129,7 +129,7 @@ label IntAmandaDressChangeShameBra(GirlNameIAT="amanda", agreed_to_redress=0):
                 $ scene_runtime.text += '\n\n"Ай-яй, Стефан, значит ты у нас теперь скромник?!" засмеялась Аманда. "Ну а я, представь себе, нет! И я теперь уже взрослая и могу сама выбирать как мне одеваться! Так то!"'
                 $ Amanda.apply_social_chance(7, 1, -1, 0, 0, 0, "dress_shame_bra")
         if agreed_to_redress == 1:
-            $ Amanda.set_current_underwear("bra", "simplebra")
+            $ Amanda.set_day_underwear("bra", "simplebra", True)
             $ Amanda.apply_social_chance(0, 0, 0, 30, 1, -1, "dress_shame_bra")
         $ Amanda.mark_talked()
         $ scene_runtime.location_text = scene_runtime.text
@@ -153,7 +153,7 @@ label IntAmandaDressChangeShamePanties(GirlNameIAT="amanda", agreed_to_redress=0
                 $ scene_runtime.text += '\n\n"Ага, позорила, уж кто бы говорил" засмеялась Аманда. "А чаевые, между прочим, так гораздо лучше дают! И вообще, я теперь уже взрослая и могу сама выбирать как мне одеваться! И ты мне в этом - не указ!"'
                 $ Amanda.apply_social_chance(7, 1, -1, 0, 0, 0, "dress_shame_panties")
         if agreed_to_redress == 1:
-            $ Amanda.set_current_underwear("panties", "simplepanties")
+            $ Amanda.set_day_underwear("panties", "simplepanties", True)
             $ Amanda.apply_social_chance(0, 0, 0, 30, 1, -1, "dress_shame_panties")
         $ Amanda.mark_talked()
         $ scene_runtime.location_text = scene_runtime.text

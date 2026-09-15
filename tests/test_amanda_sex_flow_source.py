@@ -16,6 +16,10 @@ def test_amanda_sex_actions_keep_authored_text_picture_and_native_menu():
     assert "vscene scene_runtime.picture" in source
     assert '"Кончить в ротик" if' in source
     assert '"Закончить":\n                    $ _ias_scene_active = False' in source
+    exit_block = source.split("if not _ias_scene_active:", 1)[1].split("return", 1)[0]
+    assert 'str(Amanda.wardrobe.context or "day") == "night"' in exit_block
+    assert "Amanda.wear_night_clothes(tavern_amanda_room_sleep_dress())" in exit_block
+    assert "call DressUp(GirlNameASDS)" in exit_block
 
 
 def test_reaching_full_arousal_waits_for_an_explicit_finish_choice():

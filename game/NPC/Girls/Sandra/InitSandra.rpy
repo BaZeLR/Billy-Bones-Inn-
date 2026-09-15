@@ -22,6 +22,7 @@ init python:
                 portrait="images/sandra/portrait2.jpg",
                 description="Сандра - женщина в самом соку. У нее темные волосы, зеленые глаза и грудь размера DD. Она была возлюбленной покойного дяди Стефана и опекает своих осиротевших племянниц Мелиссу и Аманду.",
                 gift_preferences=["lavender_herbal_soap_001", "soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"],
+                base_clothing={"day_dress": "workdresszhilet", "bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"},
             )
             self.birth_date = {"day": 1, "period": 1, "cycle": 1066}
             self.card_image = "images/sandra/sandra_card.jpg"
@@ -182,17 +183,7 @@ init python:
                 "favorite_topics": ["job_routine", "food", "money", "family_life", "fashion"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["workdresszhilet", "simplebra", "simplepanties", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "workdresszhilet",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(SandraInfo, self).update()
             self.data = SandraStaticData

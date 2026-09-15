@@ -81,6 +81,7 @@ init python:
                 portrait="images/irma/portraits/portrait2.png",
                 description="Ирма Фараго - молодая женщина, владелица небольшой лавки. Ее хрупкое телосложение, высокая и очень стройная фигура, светлая, почти белоснежная кожа, заостренные, немного резкие черты лица и выбивающиеся из под русых волос слегка заостренные ушки выдают ее полуэльфийское происхождение.",
                 gift_preferences=["lavender_001", "wild_rose_001", "soap_001"],
+                base_clothing={"day_dress": "openworkdress", "bra": "", "panties": "simplepanties", "legs": "redstockings", "shoes": "simpleshoes"},
             )
             self.birth_date = {"day": 12, "period": 6, "cycle": 1078}
             self.card_image = "images/irma/portraits/portrait2.png"
@@ -150,17 +151,7 @@ init python:
                 "favorite_topics": ["fashion", "tailoring", "family", "secrets", "work"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["openworkdress", "simplepanties", "redstockings", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "openworkdress",
-                "current_underwear": {
-                    "bra": "",
-                    "panties": "simplepanties",
-                    "legs": "redstockings",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(IrmaInfo, self).update()
             self.data = IrmaStaticData

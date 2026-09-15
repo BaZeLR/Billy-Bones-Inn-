@@ -22,6 +22,7 @@ init python:
                 default_location="",
                 description="Лизетта Брюно - худенькая молоденькая мулатка, ростом чуть меньше 145 сантиметров. У нее шоколадная кожа, зеленые глаза и маленькие грудки. Ее длинные темные волосы собранны в две косички. У нее стройные длинные ножки и немного оттопыреная попка, привлекающая мужские взгляды.",
                 gift_preferences=["berries_001", "wild_rose_001", "soap_001"],
+                base_clothing={"day_dress": "minidress", "bra": "", "panties": "simplepanties", "legs": "blackstockings", "shoes": "highshoes"},
             )
             self.birth_date = {"day": 1, "period": 1, "cycle": 1082}
             self.schedule_source = "schedules/liza.json"
@@ -118,17 +119,7 @@ init python:
                 "favorite_topics": ["clients", "sex", "pregnancy", "family", "work"],
                 "blocked_topics": ["flirt"],
             }
-            self.wardrobe = {
-                "owned": ["minidress", "simplepanties", "blackstockings", "highshoes"],
-                "gifted": [],
-                "current_dress": "minidress",
-                "current_underwear": {
-                    "bra": "",
-                    "panties": "simplepanties",
-                    "legs": "blackstockings",
-                    "shoes": "highshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(LizaInfo, self).update()
             self.data = LizaStaticData
@@ -140,12 +131,6 @@ init python:
             for key, value in {
                 "location": "street",
                 "lick_pussy": 0,
-                "top_removed": 0,
-                "bottom_removed": 0,
-                "bra_removed": 0,
-                "panties_removed": 0,
-                "top_raised": 0,
-                "bottom_raised": 0,
             }.items():
                 state.setdefault(key, value)
             return state
@@ -154,7 +139,6 @@ init python:
             self.ensure_sex_state()
             self.sex_state["location"] = str(location or "street")
             self.sex_state["somebody_cums"] = 0
-            self.reset_sex_clothing_state()
             self.set_cock_position("none")
             return self.sex_state
 
@@ -201,7 +185,7 @@ init python:
             return bool(self.prostitution_started)
 
         def tavern_intimate_client_limit(self):
-            return 3 + (1 if self.current_underwear("panties", "") == "" else 0)
+            return 3 + (1 if self.preferred_underwear("panties", "") == "" else 0)
 
         def dress_change_other_saw_text(self, agreed_to_redress=0):
             if agreed_to_redress != 1 or int(self.corruption or 0) < 50:

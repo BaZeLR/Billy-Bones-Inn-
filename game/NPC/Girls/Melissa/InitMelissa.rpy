@@ -21,6 +21,7 @@ init python:
                 portrait="images/melissa/melissa_portrait_0.jpg",
                 description="Мелисса - двадцатилетняя осиротевшая племянница Сандры и старшая сестра Аманды по матери; отцы у сестер разные. В ее сложении немного проступают восточные черты. Она немного отличается от остальных работниц трактира. У нее оливкового цвета кожа, черные глаза, волосы цвета вороньего крыла и полные, похожие на мячи груди размера С.",
                 gift_preferences=["lavender_rose_soap_001", "soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"],
+                base_clothing={"day_dress": "workdress", "bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"},
             )
             self.birth_date = {"day": 25, "period": 6, "cycle": 1079}
             self.card_image = "images/melissa/melissa_card.jpg"
@@ -264,17 +265,7 @@ init python:
                 "favorite_topics": ["job_routine", "family_life", "forest", "stories", "food"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["workdress", "simplebra", "simplepanties", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "workdress",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(MelissaInfo, self).update()
             self.data = MelissaStaticData

@@ -297,40 +297,36 @@ init python:
         profile = bodymodel_register_character(profile_id, resolved_name, body_type)
         bodymodel_clear_clothing(profile)
 
+        top_item = ""
+        bottom_item = ""
+        bra_item = ""
+        panties_item = ""
+        legs_item = ""
+        shoes_item = ""
+        top_raised = 0
+        bottom_raised = 0
+
         if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
             appearance = player.appearance
             default_dress = str(getattr(appearance, "current_dress", "") or "")
-            underwear = {}
-            sex_state = {}
-        else:
-            wardrobe = dict(getattr(person, "wardrobe", {}) or {}) if person is not None else {}
-            default_dress = str(person.scene_dress() if person is not None and hasattr(person, "scene_dress") else wardrobe.get("current_dress", "") or "")
-            underwear = dict(wardrobe.get("current_underwear", {}) or {})
-            sex_state = person.ensure_sex_state() if person is not None and hasattr(person, "ensure_sex_state") else {}
+            top_item = str(DressTopPart.get(default_dress, default_dress) or "")
+            bottom_item = str(DressBottomPart.get(default_dress, "") or "")
+        elif isinstance(person, Girl):
+            top_item = str(person.clothing_layer("top") or "")
+            bottom_item = str(person.clothing_layer("bottom") or "")
+            bra_item = str(person.clothing_layer("bra") or "")
+            panties_item = str(person.clothing_layer("panties") or "")
+            legs_item = str(person.clothing_layer("legs") or "")
+            shoes_item = str(person.clothing_layer("shoes") or "")
+            top_raised = int(person.layer_raised("top") or 0)
+            bottom_raised = int(person.layer_raised("bottom") or 0)
 
-        top_default = str(DressTopPart.get(default_dress, default_dress) or "")
-        bottom_default = str(DressBottomPart.get(default_dress, "") or "")
-        top_item = "" if int(sex_state.get("top_removed", 0) or 0) else top_default
-        bottom_item = "" if int(sex_state.get("bottom_removed", 0) or 0) else bottom_default
-        bra_item = "" if int(sex_state.get("bra_removed", 0) or 0) else str(underwear.get("bra", "") or "")
-        panties_item = "" if int(sex_state.get("panties_removed", 0) or 0) else str(underwear.get("panties", "") or "")
-        legs_item = str(underwear.get("legs", "") or "")
-        shoes_item = str(underwear.get("shoes", "") or "")
-
-        bodymodel_set_item(profile, top_item, "lifted" if int(sex_state.get("top_raised", 0) or 0) == 1 else "worn")
-        bodymodel_set_item(profile, bottom_item, "lifted" if int(sex_state.get("bottom_raised", 0) or 0) == 1 else "worn")
+        bodymodel_set_item(profile, top_item, "lifted" if top_raised else "worn")
+        bodymodel_set_item(profile, bottom_item, "lifted" if bottom_raised else "worn")
         bodymodel_set_item(profile, bra_item, "worn")
         bodymodel_set_item(profile, panties_item, "worn")
         bodymodel_set_item(profile, legs_item, "worn")
         bodymodel_set_item(profile, shoes_item, "worn")
-        profile["scene_clothing_state"] = {
-            "top_removed": bool(top_item == "" and top_default != ""),
-            "bottom_removed": bool(bottom_item == "" and bottom_default != ""),
-            "bra_removed": bool(bra_item == "" and str(underwear.get("bra", "") or "") != ""),
-            "panties_removed": bool(panties_item == "" and str(underwear.get("panties", "") or "") != ""),
-            "top_lifted": bool(top_item != "" and int(sex_state.get("top_raised", 0) or 0) == 1),
-            "bottom_lifted": bool(bottom_item != "" and int(sex_state.get("bottom_raised", 0) or 0) == 1),
-        }
 
         bodymodel_update_container_states(profile)
         bodymodel_compute_access(profile)
@@ -402,27 +398,6 @@ init python:
                     if state_name == "lifted":
                         item_name = item_name + " (приподнято)"
                     part_slots.append("%s: %s" % (BODYMODEL_LAYER_LABELS.get(layer_name, layer_name), item_name))
-                scene_state = dict(profile.get("scene_clothing_state", {}) or {})
-                if part_name == "upper":
-                    upper_notes = []
-                    if bool(scene_state.get("top_removed", False)):
-                        upper_notes.append("одежда снята")
-                    elif bool(scene_state.get("top_lifted", False)):
-                        upper_notes.append("одежда приподнята")
-                    if bool(scene_state.get("bra_removed", False)):
-                        upper_notes.append("белье снято")
-                    if upper_notes:
-                        part_slots = upper_notes + part_slots
-                elif part_name == "pelvis":
-                    pelvis_notes = []
-                    if bool(scene_state.get("bottom_removed", False)):
-                        pelvis_notes.append("нижняя одежда снята")
-                    elif bool(scene_state.get("bottom_lifted", False)):
-                        pelvis_notes.append("нижняя одежда приподнята")
-                    if bool(scene_state.get("panties_removed", False)):
-                        pelvis_notes.append("белье снято")
-                    if pelvis_notes:
-                        part_slots = pelvis_notes + part_slots
                 if part_slots:
                     lines.append("%s: %s." % (BODYMODEL_PART_LABELS.get(part_name, part_name), ", ".join(part_slots)))
                 elif part_name == "upper":

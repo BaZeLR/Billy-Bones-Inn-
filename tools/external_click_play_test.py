@@ -659,7 +659,7 @@ testcase external_female_tailor_choose_agree_purchase_flow:
     $ _female_item = get_game_item("dress_modestworkdress")
     $ _female_code = dress_shop_item_code(_female_item)
     assert eval (_female_item is not None and _female_code == "modestworkdress") timeout 5.0
-    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != _female_code]
+    $ Amanda.wardrobe.owned_items = [code for code in list(Amanda.wardrobe.owned_items or []) if str(code or "") != _female_code]
     $ dress_shop.produced = ""
     $ dress_shop.buyer = ""
     $ dress_shop.girl_dress_block = 0
@@ -681,7 +681,7 @@ testcase external_female_tailor_choose_agree_purchase_flow:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 900) until eval (str(rooms.current_code or "") == "ArtisansQuarter") timeout 20.0
     assert eval (str(dress_shop.produced or "") == _female_code) timeout 5.0
-    assert eval (_female_code in _gds_get_dress_list_for_girl("amanda")) timeout 5.0
+    assert eval (Amanda.wardrobe.owns(_female_code)) timeout 5.0
     assert eval (int(player.economy.money or 0) == _female_money_before - int(getattr(_female_item, "price", 0) or 0)) timeout 5.0
     assert eval (int(player.appearance.girl_dresses_bought or 0) == 1) timeout 5.0
     assert eval (renpy.get_screen("dress_shop_catalog_page") is None) timeout 5.0
@@ -697,7 +697,7 @@ testcase external_female_tailor_refusal_returns_to_catalog:
     $ Amanda.rel = 0
     $ _refused_item = get_game_item("dress_openworkdress")
     $ _refused_code = dress_shop_item_code(_refused_item)
-    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != _refused_code]
+    $ Amanda.wardrobe.owned_items = [code for code in list(Amanda.wardrobe.owned_items or []) if str(code or "") != _refused_code]
     $ dress_shop.produced = ""
     $ dress_shop.buyer = ""
     $ player.appearance.girl_dresses_bought = 0
@@ -712,7 +712,7 @@ testcase external_female_tailor_refusal_returns_to_catalog:
     click pos (960, 900) until screen "dress_shop_catalog_page" timeout 20.0
     assert eval (str(renpy.get_screen("dress_shop_catalog_page").scope.get("girl_name", "") or "") == "amanda") timeout 5.0
     assert eval (str(dress_shop.produced or "") == "" and int(player.economy.money or 0) == _refused_money_before) timeout 5.0
-    assert eval (_refused_code not in _gds_get_dress_list_for_girl("amanda") and int(player.appearance.girl_dresses_bought or 0) == 0) timeout 5.0
+    assert eval (not Amanda.wardrobe.owns(_refused_code) and int(player.appearance.girl_dresses_bought or 0) == 0) timeout 5.0
 
 testcase external_all_girl_dress_appointments_use_shared_pipeline:
     run Call("InitGameNPCs")
@@ -756,7 +756,7 @@ testcase external_tavern_outfit_request_purchase_reward_flow:
     $ rooms.enter("TavernMain")
     $ Amanda.rel = 15
     $ Amanda.corruption = 45
-    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != "modestworkdress"]
+    $ Amanda.wardrobe.owned_items = [code for code in list(Amanda.wardrobe.owned_items or []) if str(code or "") != "modestworkdress"]
     $ player.set_money(1000)
     $ player.intimacy.came_today = 0
     $ player.intimacy.can_cum_daily = 3
@@ -781,7 +781,7 @@ testcase external_tavern_outfit_request_purchase_reward_flow:
 
     $ Sandra.rel = 12
     $ Sandra.corruption = 20
-    $ Sandra.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("sandra") if str(code or "") != "modestworkdress"]
+    $ Sandra.wardrobe.owned_items = [code for code in list(Sandra.wardrobe.owned_items or []) if str(code or "") != "modestworkdress"]
     $ household_begin_outfit_request("sandra", "surprise")
     $ _gds_apply_purchase("sandra", "modestworkdress", set_produced=True)
     assert eval (str(household.outfit_requests.get("sandra", "") or "") == "surprise_show" and daily_events.exists("sandra", "OutfitReward", "") == 1) timeout 5.0
@@ -1192,16 +1192,17 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ Georgett.known = True
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
     $ Liza.prostitution_started = False
-    $ Georgett.wardrobe["current_dress"] = "slutdress"
-    $ Georgett.wardrobe["current_underwear"]["bra"] = ""
-    $ Georgett.wardrobe["current_underwear"]["panties"] = ""
+    $ Georgett.wardrobe.set_day_dress("slutdress")
+    $ Georgett.set_day_underwear("bra", "")
+    $ Georgett.set_day_underwear("panties", "")
+    $ Georgett.wear_day_clothes()
     $ Georgett.sex_setup("street")
     assert eval (bool(Georgett.clothing_layer("top")) and bool(Georgett.clothing_layer("bottom"))) timeout 5.0
     assert eval (not Georgett.tits_visible() and not Georgett.pussy_visible()) timeout 5.0
     $ Georgett.set_layer_raised("top", 1)
     $ Georgett.set_layer_raised("bottom", 1)
     assert eval (Georgett.tits_visible() and Georgett.pussy_visible()) timeout 5.0
-    $ Georgett.reset_sex_clothing_state()
+    $ Georgett.wear_day_clothes()
     $ TownStreet.events_today = 2
     $ TownStreet.story_seen_keys.append("%s:PortStreets:%s" % (calendar_v2.daysInGame, calendar_v2.time_slot()))
     $ TodaySexEvents_Clear()
@@ -1264,9 +1265,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
 
     $ player.economy.money = 100
     $ player.intimacy.came_today = player.intimacy.can_cum_daily
-    $ Georgett.wardrobe["current_dress"] = ""
-    $ Georgett.wardrobe["current_underwear"]["bra"] = ""
-    $ Georgett.wardrobe["current_underwear"]["panties"] = ""
+    $ Georgett.wear_night_clothes(2)
     $ Georgett.sex_setup("street")
     $ player.intimacy.set_arousal(0)
     $ Georgett.set_arousal(0)
@@ -1290,9 +1289,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ Georgett.rel = 10
     $ player.intimacy.came_today = 0
     $ player.intimacy.can_cum_daily = 2
-    $ Georgett.wardrobe["current_dress"] = ""
-    $ Georgett.wardrobe["current_underwear"]["bra"] = ""
-    $ Georgett.wardrobe["current_underwear"]["panties"] = ""
+    $ Georgett.wear_night_clothes(2)
     $ Georgett.sex_setup("street")
     $ Georgett.clear_cum("cum_face_you", "cum_face_others", "cum_tits_you", "cum_tits_others", "cum_inside_you", "cum_inside_others")
     $ player.intimacy.set_arousal(100)
@@ -1338,9 +1335,13 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
 testcase external_sexport_finish_does_not_show_advance_time_developer_text:
     $ _history_list = []
     $ external_calendar_set_fields(1, 1, 1100, 12, 0)
+    $ people.register(GeorgettStaticData, Georgett)
+    $ Georgett.wear_day_clothes()
+    $ Georgett.remove_clothing_layer("top")
     $ _sexport_finish_before = int(calendar_v2.clock_minutes() or 0)
     run Call("FinishPaidSexModule", "georgett", "PortStreets")
     assert eval (int(calendar_v2.clock_minutes() or 0) - _sexport_finish_before == 40) timeout 5.0
+    assert eval (Georgett.current_dress() == Georgett.preferred_dress()) timeout 5.0
     assert eval (not any("Advances the game time" in str(h.what or "") for h in _history_list)) timeout 5.0
     assert eval (not any("return_location" in str(h.what or "") for h in _history_list)) timeout 5.0
 
@@ -1379,9 +1380,10 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     $ _liza_talk_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
     $ _liza_talk_end_button_id = "choice_panel_button_%d" % int(_liza_talk_end_index)
     click id _liza_talk_end_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "talk") timeout 20.0
-    $ Liza.wardrobe["current_dress"] = "minidress"
-    $ Liza.wardrobe["current_underwear"]["bra"] = ""
-    $ Liza.wardrobe["current_underwear"]["panties"] = "simplepanties"
+    $ Liza.wardrobe.set_day_dress("minidress")
+    $ Liza.set_day_underwear("bra", "")
+    $ Liza.set_day_underwear("panties", "simplepanties")
+    $ Liza.wear_day_clothes()
     $ player.intimacy.set_arousal(100)
     $ player.intimacy.came_today = player.intimacy.can_cum_daily
     run Call("IntLizaSex", "liza", "street")
@@ -1437,9 +1439,10 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     $ player.intimacy.can_cum_daily = 3
     $ player.intimacy.set_arousal(0)
     $ Liza.fucked_today = 0
-    $ Liza.wardrobe["current_dress"] = "minidress"
-    $ Liza.wardrobe["current_underwear"]["bra"] = ""
-    $ Liza.wardrobe["current_underwear"]["panties"] = "simplepanties"
+    $ Liza.wardrobe.set_day_dress("minidress")
+    $ Liza.set_day_underwear("bra", "")
+    $ Liza.set_day_underwear("panties", "simplepanties")
+    $ Liza.wear_day_clothes()
     $ Liza.clear_cum("cum_face_you", "cum_face_others", "cum_mouth_you", "cum_mouth_others", "cum_tits_you", "cum_tits_others", "cum_inside_you", "cum_inside_others")
     $ _liza_hire_money_before = int(player.economy.money or 0)
     $ _liza_hire_clock_before = int(calendar_v2.clock_minutes() or 0)
@@ -1452,7 +1455,7 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     assert eval (renpy.get_screen("say") is None and "Вы заплатили Лизетте восемь мараведи" in str(scene_runtime.text or "") and "Вы находитесь в переулке. Рядом с вами юная Лизетта." in str(scene_runtime.text or "")) timeout 5.0
     assert eval (int(player.economy.money or 0) == _liza_hire_money_before - 8 and str(main_ui_runtime.action_title or "") == "Лизетта") timeout 5.0
     assert eval (str(main_ui_runtime.selected_char or "") == "" and str(main_ui_runtime.girl_key or "") == "" and str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
-    assert eval (str(scene_runtime.picture or "").lower().startswith("images/liza/portraits/") and renpy.loadable(scene_runtime.picture)) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == _liza_room_picture and Liza.current_dress() == "minidress" and Liza.clothing_layer("panties") == "simplepanties") timeout 5.0
     assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == str(scene_runtime.picture or "")) timeout 5.0
 
     $ _liza_remove_top_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять блузку")
@@ -7004,6 +7007,8 @@ testcase external_player_save_payload_parity:
 label external_player_actual_load_probe:
     call InitGameNPCs
     $ Amanda.rel = 17
+    $ Amanda.wardrobe.add_owned("minidress")
+    $ Amanda.wear_night_clothes(1)
     $ Eddie.fingal_talk_stage = 2
     $ Sandra.rel = 13
     $ Sandra.set_var_int("knowmolodost", 1)
@@ -7044,6 +7049,8 @@ label external_player_actual_load_probe:
     $ player.appearance.days_since_haircut = 99
     $ player.combat.party = []
     $ player.history["external_actual_load_probe"] = "mutated"
+    $ Amanda.wear_day_clothes()
+    $ Amanda.wardrobe.owned_items = ["modestworkdress"]
     $ TavernKitchenHearthObject.state["chopped_wood_stock"] = 0
     $ TavernKitchenHearthObject.state["fire_until_minute"] = 0
     $ TavernMainFireplaceObject.state["chopped_wood_stock"] = 0
@@ -7082,6 +7089,7 @@ testcase external_player_actual_load_parity:
     assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     assert eval (int(saveVersion or 0) == int(currentVersion or 0)) timeout 5.0
     assert eval (people.get_info("amanda") is Amanda and people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
+    assert eval (isinstance(Amanda.wardrobe, GirlWardrobeState) and Amanda.wardrobe.owns("minidress") and Amanda.current_dress() == "" and Amanda.clothing_layer("panties") == "simplepanties" and str(Amanda.wardrobe.context or "") == "night") timeout 5.0
     python:
         _expected_people_after_load = {
             "alber": (Alber, AlberStaticData),
@@ -7123,10 +7131,16 @@ testcase external_people_registry_repairs_stale_amanda_data:
     $ _stale_amanda_data.name = "amanda"
     $ people.definitions["amanda"] = _stale_amanda_data
     $ Amanda.data = _stale_amanda_data
+    $ Amanda.wardrobe = {"owned": ["modestworkdress"], "gifted": ["minidress"], "current_dress": "modestworkdress", "current_underwear": {"bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"}}
+    $ Amanda.sex_state["top_removed"] = 1
     assert eval (not hasattr(people.get_data("amanda"), "image_manifest")) timeout 5.0
     $ people.repair()
     assert eval (people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
     assert eval (len(people.get_data("amanda").image_sequence("tavern", "hall_cleaning")) > 0) timeout 5.0
+    assert eval (isinstance(Amanda.wardrobe, GirlWardrobeState)) timeout 5.0
+    assert eval (Amanda.wardrobe.owns("minidress")) timeout 5.0
+    assert eval (Amanda.clothing_layer("top") == "" and Amanda.clothing_layer("bottom") != "") timeout 5.0
+    assert eval ("top_removed" not in Amanda.sex_state) timeout 5.0
 
 testcase external_player_appearance_v47_migration:
     $ external_calendar_set_fields(23, 2, 1100, 8, 0)
@@ -7676,7 +7690,7 @@ testcase external_becky_classes_are_initialized:
     $ tractir_save_normalize_sex_positions()
     assert eval (Becky.cock_in("pussy", "You") and "CockInPussy" not in globals() and "YouCockInMouth" not in globals()) timeout 5.0
     $ Becky.set_cock_position("none", "You")
-    assert eval (Becky.wardrobe["current_dress"] == "openworkdress" and Becky.wardrobe["current_underwear"]["bra"] == "simplebra" and Becky.wardrobe["current_underwear"]["panties"] == "simplepanties") timeout 5.0
+    assert eval (Becky.current_dress() == "openworkdress" and Becky.clothing_layer("bra") == "simplebra" and Becky.clothing_layer("panties") == "simplepanties") timeout 5.0
     assert eval (all(hasattr(Becky, key) for key in ["eddie_home_visit_state", "trade_offer_stage", "knows_blackwood"])) timeout 5.0
     assert eval (all(not hasattr(Becky, key) for key in ["home_visit_stage", "home_sex_unlocked", "open_oral_stage", "eddie_join_stage"])) timeout 5.0
     assert eval (int(threads["beckyHome"].num or 0) == 0 and int(threads["beckySex"].num or 0) == 0 and int(Becky.trade_offer_stage or 0) == 0) timeout 5.0
@@ -7970,7 +7984,7 @@ testcase external_becky_gift_and_dress_return_to_talk_menu:
     $ Becky.gifted_today = 0
     $ Becky.talked_today = 0
     $ Becky.stats["orgasms_given"] = 2
-    $ Becky.wardrobe["current_underwear"]["bra"] = "simplebra"
+    $ Becky.set_day_underwear("bra", "simplebra", True)
     $ player.add_item("soap_001", 1)
     run Jump("GroceryStore")
     advance until eval (str(rooms.current_code or "") == "GroceryStore" and renpy.get_screen("main_ui") is not None) timeout 20.0

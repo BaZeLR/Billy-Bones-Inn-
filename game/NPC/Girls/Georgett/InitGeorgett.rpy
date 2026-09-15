@@ -24,6 +24,7 @@ init python:
                 default_location="",
                 description="Жоржетта Брюно - молодая женщина, не очень высокого роста, чуть пухленькая и с большой налитой грудью. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки.",
                 gift_preferences=["drink_ale_001", "wild_rose_001", "soap_001", "libido_tincture_001", "ethanol_001"],
+                base_clothing={"day_dress": "slutdress", "bra": "", "panties": "", "legs": "blackstockings", "shoes": "highshoes"},
             )
             self.birth_date = {"day": 22, "period": 13, "cycle": 1072}
             self.schedule_source = "schedules/georgett.json"
@@ -113,17 +114,7 @@ init python:
                 "favorite_topics": ["clients", "sex", "family", "pregnancy", "kids"],
                 "blocked_topics": ["flirt"],
             }
-            self.wardrobe = {
-                "owned": ["slutdress", "blackstockings", "highshoes"],
-                "gifted": [],
-                "current_dress": "slutdress",
-                "current_underwear": {
-                    "bra": "",
-                    "panties": "",
-                    "legs": "blackstockings",
-                    "shoes": "highshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
             self.var = {}
             self.sex_state = {}
             self.ensure_story_defaults()
@@ -141,10 +132,6 @@ init python:
             for key, value in {
                 "location": "street",
                 "lick_pussy": 0,
-                "top_removed": 0,
-                "bottom_removed": 0,
-                "top_raised": 0,
-                "bottom_raised": 0,
             }.items():
                 state.setdefault(key, value)
             state.pop("tits_visible", None)
@@ -180,35 +167,23 @@ init python:
             self.ensure_sex_state()
             self.sex_state["location"] = str(location or "street")
             self.sex_state["somebody_cums"] = 0
-            self.sex_state["top_removed"] = 0
-            self.sex_state["bottom_removed"] = 0
-            self.sex_state["top_raised"] = 0
-            self.sex_state["bottom_raised"] = 0
             return self.sex_state
 
         def sex_location(self):
             return str(self.ensure_sex_state().get("location", "street") or "street")
 
-        def needs_dress_up(self):
-            state = self.ensure_sex_state()
-            return (
-                people_to_int(state.get("top_removed", 0), 0) != 0
-                and people_to_int(state.get("bottom_removed", 0), 0) != 0
-                and str(self.wardrobe.get("current_dress", "") or "") != ""
-            )
-
         def remove_blouse_for_sex(self):
-            self.ensure_sex_state()["top_removed"] = 1
+            self.remove_clothing_layer("top")
             self.set_cock_position("none")
             return self.sex_state
 
         def unbutton_blouse_for_sex(self):
-            self.ensure_sex_state()["top_raised"] = 1
+            self.set_layer_raised("top", 1)
             self.set_cock_position("none")
             return self.sex_state
 
         def raise_skirt_for_sex(self):
-            self.ensure_sex_state()["bottom_raised"] = 1
+            self.set_layer_raised("bottom", 1)
             self.set_cock_position("none")
             return self.sex_state
 

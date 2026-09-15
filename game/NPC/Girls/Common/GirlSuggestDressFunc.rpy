@@ -17,6 +17,7 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
     $ _rn = people_display_name(GirlName)
     $ _rn2 = people_name(GirlName, 'genitive')
     $ _rn3 = people_name(GirlName, 'dative')
+    $ people.get_info(GirlName).wear_day_clothes()
 
     $ dress_shop.girl_dress_block = 1
 
@@ -28,6 +29,7 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
         "Пройти вместе с девушками за занавеску":
             '[_rn] взяла образец и пошла за занавеску. Ирма собрала свои булавки, мелки, мерные веревочки и поспешила за ней. Вы, в свою очередь, подумали, что сидеть в одиночестве будет скучновато, и решили присоединиться к их компании.'
             'По хозяйски отодвинув ширмочку, вы увидели Ирму с булавками в зубах и веревкой в руках, а напротив нее стояла уже начавшая раздеваться [_rn].'
+            $ people.get_info(GirlName).set_layer_raised("top", 1)
             if GirlName == "liza":
                 vscene LizaStaticData.image_path("tailor", "measure")
             if people.get_info(GirlName).clothing_layer("bra") != "":
@@ -53,6 +55,7 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
                             else:
                                 '"Так получается? Знаешь что, ищи себе других, а я не такая!"'
                             '"Да пошел ты!" И с этими словами [_rn] одним движением застегнула платье и была такова.'
+                            $ people.get_info(GirlName).wear_day_clothes()
                             call SlutFriendsIncrease(GirlName, 6, 1, -3, 20, 1, -3)
                             return
                         else:
@@ -103,6 +106,7 @@ label GirlDressBuyWaitPay(GirlName="", DressToBuy=""):
     $ _rn2 = people_name(GirlName, 'genitive')
 
     'Минут пять-десять вы терпеливо слушали ойканье, хихиканье и прочие звуки, доносящиеся из-за ширмочки. Но вот наконец [_rn] выпорхнула обратно, сказав: "Стефанчик, ты просто прелесть! Ирмочка говорит, что мое платье будет готово уже завтра. Я так рада!"'
+    $ people.get_info(GirlName).wear_day_clothes()
     'К вашему разочарованию, благодарность [_rn2] этими словами и ограничилась, по крайней мере на данный момент: довольная девица быстрым и легким шагом направилась к выходу, оставив вас расплачиваться.'
     'Ничего не поделаешь, вы отдали портнихе требуемые [_gds_dress_cost(DressToBuy)] мараведи и тоже поплелись на улицу.'
 
@@ -129,6 +133,8 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
         '"Конечно ничего, что же плохого в том, чтобы восхититься такой красавицей и купить ей подарок?"'
 
     'С помощью загадочно улыбающейся Ирмы, платье было наконец снято.'
+    $ people.get_info(GirlName).remove_clothing_layer("top")
+    $ people.get_info(GirlName).remove_clothing_layer("bottom")
 
     if people.get_info(GirlName).clothing_layer("panties") == "":
         'Панталончиков под ним не оказалось.'
@@ -144,6 +150,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
     menu:
         "Продолжить смотреть":
             'Вы продолжили лицезреть Ирму, снимающую мерку с [_rn2]. Впрочем, увлекательное зрелище снятия мерки вам быстро приелось. На вас же девушки внимания особо не обращали: мысли [_rn2], судя по всему, были всецело заняты новым платьем, а Ирма была слишком сосредоточена на работе. Вскоре они закончили и [_rn] оделась. Получив от портнихи заверение в том, что платье будет готово уже к завтрашнему утру, счастливая [_rn], весело насвистывая, удалилась, оставив вас расплачиваться. С трудом расставшись с кровно заработанными монетками вы удалились в расстроенных чувствах. Впрочем, расставание с мараведи всегда давалось вам тяжело.'
+            $ people.get_info(GirlName).wear_day_clothes()
             call SlutFriendsIncrease(GirlName, 15, 2, 1, 45, 2, 1)
             call GirlDressBuyPay(GirlName, DressToBuy)
 
@@ -157,6 +164,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
                 else:
                     '"Ах, вот зачем ты меня сюда привел! Чтобы я тебе представление устроила?" возмутилась [_rn].'
                 '"Ноги моей здесь не будет!" и с этими словами она быстро накинула на себя платье и вылетела из примерочной.'
+                $ people.get_info(GirlName).wear_day_clothes()
                 call SlutFriendsIncrease(GirlName, 4, 1, -2, 20, 1, -3)
                 return
             else:
@@ -219,6 +227,7 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
                 call SlutFriendsIncrease(GirlName, 6, 2, -1, 45, 1, 1)
 
             'Получив заверения Ирмы что платье будет готово к завтрашнему утру, вы отправились восвояси.'
+            $ people.get_info(GirlName).wear_day_clothes()
             call GirlDressBuyPay(GirlName, DressToBuy)
 
     return
@@ -240,6 +249,8 @@ label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressB
         '"Тем более что Стефан так просит, а ведь он платит!"'
 
     '"Желание клиента для меня закон," отозвалась Ирма. Приободренная этими словами, [_rn] начала распускать шнуровку на платье.'
+    $ people.get_info(GirlName).remove_clothing_layer("top")
+    $ people.get_info(GirlName).remove_clothing_layer("bottom")
 
     if people.get_info(GirlName).clothing_layer("bra") == "" and people.get_info(GirlName).clothing_layer("panties") == "":
         'Вскоре она осталась чем мать родила.'
@@ -265,6 +276,7 @@ label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressB
         'Две монашки заглянули в окно, покачали головами и быстро удалились.'
 
     'Все хорошее имеет тенденцию быстро кончаться, закончилась и примерка. Бросив вам пару многозначительных взглядов, [_rn] оделась и отправилась восвояси, оставив вас расплачиваться.'
+    $ people.get_info(GirlName).wear_day_clothes()
     'Волевым усилием вы одержали победу над страшным зеленым болотным зверем и отдали портнихе требуемые [_gds_dress_cost(DressToBuy)] мараведи.'
 
     call SlutFriendsIncrease(GirlName, 15, 1, 1, 60, 1, 2)

@@ -78,15 +78,15 @@ label story_amanda_street_legare_warning_breakfast_2:
 
     $ Amanda.set_var_int("prohibitwithguys", 1)
     $ Amanda.legare_forbidden = True
-    $ Amanda.wardrobe["current_dress"] = "modestworkdress"
+    $ Amanda.wardrobe.set_day_dress("modestworkdress", True)
     if amanda_scene_warning_reaction == "bad":
-        $ Amanda.set_current_underwear("panties", "")
+        $ Amanda.set_day_underwear("panties", "", True)
         $ Amanda.change_rebellion(4, "street_legare_warning")
         $ Amanda.change_anger(1, "street_legare_warning")
         vscene AmandaStaticData.image_path("tavern", "angry")
         $ scene_runtime.text = "Аманда вскинула подбородок и подчинилась только наполовину. Скромное рабочее платье она надела, но под ним демонстративно оставила себя без панталон: если ей запретили короткий наряд, свой маленький бунт она устроит иначе."
     else:
-        $ Amanda.set_current_underwear("panties", "simplepanties")
+        $ Amanda.set_day_underwear("panties", "simplepanties", True)
         $ Amanda.change_rebellion(-2, "street_legare_warning")
         $ Amanda.change_anger(-1, "street_legare_warning")
         vscene AmandaStaticData.portrait

@@ -839,6 +839,7 @@ label HouseholdAmandaFakeSicknessWake:
             $ tavern_kitchen_set_saved_text(scene_runtime.text)
             call TavernKitchenBreakfastShowText(scene_runtime.text)
         return
+    $ Amanda.wear_night_clothes(tavern_amanda_room_sleep_dress())
     $ calendar_v2.advance_minutes(15)
     if int(Amanda.rel or 0) >= 6 or int(Amanda.talked_today or 0) >= 2:
         $ household_clear_morning_issue("amanda")
@@ -848,6 +849,7 @@ label HouseholdAmandaFakeSicknessWake:
         $ household_clear_morning_issue("amanda")
         $ scene_runtime.text = "Вы резко пресекаете Амандину \"болезнь\" и велите ей подниматься. Она фыркает, жалуется на жестокость и нарочно долго возится с одеждой, но все же встает. Похоже, сегодня это было скорее представление, чем настоящая слабость."
         $ Amanda.change_social(friend_delta=-1)
+    $ Amanda.wear_day_clothes()
     $ scene_runtime.location_text = scene_runtime.text
     if player.tavern_management.breakfast.event_active:
         $ tavern_kitchen_set_saved_text(scene_runtime.text)
@@ -862,6 +864,9 @@ label HouseholdWakeSleepyGirl(girl_name=""):
             call TavernKitchenBreakfastShowText(scene_runtime.text)
         return
     $ _wake_indecent = household_morning_issue_indecent(_wake_girl)
+    $ _wake_info = people.get_info(_wake_girl)
+    if isinstance(_wake_info, Girl):
+        $ _wake_info.wear_night_clothes(tavern_amanda_room_sleep_dress() if _wake_girl == "amanda" else 0)
     if _wake_girl == "melissa":
         $ _wake_started_scene = main_ui_runtime.scene_origin is None
         if _wake_started_scene:
@@ -884,6 +889,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
                         pass
 
             "Пощекотать ее под грудью":
+                $ Melissa.remove_clothing_layer("panties")
                 vscene MelissaStaticData.cycle_image("tavern", "sleep", 4)
                 $ scene_runtime.text = "Вместо второго окрика вы проводите пальцами под ее грудью. Мелисса взвизгивает, пытается перехватить вашу руку и, не удержавшись, валится обратно на кровать. Еще миг она сердито смотрит на вас, а потом не выдерживает и смеется, подтянув ноги к животу."
                 $ scene_runtime.location_text = scene_runtime.text
@@ -936,6 +942,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
                         menu:
                             "Оставить Мелиссу собираться":
                                 pass
+        $ Melissa.wear_day_clothes()
         if _wake_started_scene:
             $ main_ui_end_native_scene_state()
         return
@@ -950,7 +957,6 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     elif _wake_girl == "melissa":
         $ Melissa.change_social(friend_delta=1)
     else:
-        $ _wake_info = people.get_info(_wake_girl)
         if _wake_info is not None:
             $ _wake_info.change_social(friend_delta=1)
     if _wake_girl == "sandra":
@@ -990,4 +996,6 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     if player.tavern_management.breakfast.event_active:
         $ tavern_kitchen_set_saved_text(scene_runtime.text)
         call TavernKitchenBreakfastShowText(scene_runtime.text)
+    if isinstance(_wake_info, Girl):
+        $ _wake_info.wear_day_clothes()
     return

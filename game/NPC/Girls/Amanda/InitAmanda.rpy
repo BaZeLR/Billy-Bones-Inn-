@@ -16,6 +16,7 @@ init python:
                 default_location="",
                 description="Аманда - восемнадцатилетняя осиротевшая племянница Сандры и младшая сестра Мелиссы по матери; отцы у сестер разные. У нее очень светлая кожа, белокурые волосы и голубые глаза. Ее груди небольшие, размера А.",
                 gift_preferences=["wild_rose_001", "rose_honey_soap_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"],
+                base_clothing={"day_dress": "modestworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"},
             )
             self.birth_date = {"day": 10, "period": 9, "cycle": 1081}
             self.card_image = "images/amanda/amanda_card.jpg"
@@ -216,22 +217,12 @@ init python:
                 "favorite_topics": ["fashion", "dances", "gossip", "money", "stories"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["modestworkdress", "simplebra", "simplepanties", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "modestworkdress",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
             self.var = {}
             self.ensure_story_defaults()
 
         def update(self):
-            self.name = people_normalize_id(self.name)
+            super(AmandaInfo, self).update()
             self.data = AmandaStaticData
             self.ensure_story_defaults()
             return self

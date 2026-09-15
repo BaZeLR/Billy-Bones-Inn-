@@ -462,7 +462,10 @@ label HouseholdSexFinish:
     if str(_hse_picture or "").strip():
         $ scene_runtime.picture = _hse_picture
         vscene scene_runtime.picture
-    call DressUp(_hse_girl)
+    if str(_hse_info.wardrobe.context or "day") == "night":
+        $ _hse_info.wear_night_clothes(0)
+    else:
+        call DressUp(_hse_girl)
     menu:
         "Закончить близость":
             pass

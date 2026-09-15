@@ -30,6 +30,235 @@ init -999 python:
     def people_normalize_id(person=""):
         return str(person or "").strip().lower()
 
+    class GirlWardrobeState(object):
+        """One NPC-owned authority for preferred clothes and exact current wear."""
+
+        LAYERS = ("top", "bottom", "bra", "panties", "legs", "shoes")
+        RAISED_LAYERS = ("top", "bottom")
+        LEGACY_SEX_KEYS = (
+            "dress_override",
+            "top_removed", "bottom_removed", "bra_removed", "panties_removed",
+            "top_raised", "bottom_raised",
+        )
+
+        def __init__(self, owned_items=None, day_dress="", day_underwear=None,
+                     current_layers=None, raised_layers=None, context="day"):
+            self.owned_items = self._unique_items(owned_items)
+            self.day_dress = str(day_dress or "")
+            self.day_underwear = self._normalized_underwear(day_underwear)
+            self.current_layers = self._normalized_layers(current_layers)
+            self.raised_layers = self._normalized_raised(raised_layers)
+            self.context = str(context or "day")
+            if current_layers is None:
+                self.wear_day()
+
+        @staticmethod
+        def _unique_items(items=None):
+            result = []
+            for item_id in list(items or []):
+                key = str(item_id or "").strip()
+                if key and key not in result:
+                    result.append(key)
+            return result
+
+        @classmethod
+        def _normalized_underwear(cls, values=None):
+            source = values if hasattr(values, "get") else {}
+            return {
+                key: str(source.get(key, "") or "")
+                for key in ("bra", "panties", "legs", "shoes")
+            }
+
+        @classmethod
+        def _normalized_layers(cls, values=None):
+            source = values if hasattr(values, "get") else {}
+            return {key: str(source.get(key, "") or "") for key in cls.LAYERS}
+
+        @classmethod
+        def _normalized_raised(cls, values=None):
+            source = values if hasattr(values, "get") else {}
+            return {
+                key: 1 if people_to_int(source.get(key, 0), 0) else 0
+                for key in cls.RAISED_LAYERS
+            }
+
+        @staticmethod
+        def _dress_layers(dress_code=""):
+            dress = str(dress_code or "").strip()
+            return (
+                str(DressTopPart.get(dress, "") or ""),
+                str(DressBottomPart.get(dress, "") or ""),
+            )
+
+        @classmethod
+        def from_base(cls, base_clothing=None):
+            base = dict(base_clothing or {})
+            day_dress = str(base.get("day_dress", "") or "")
+            underwear = {
+                "bra": base.get("bra", ""),
+                "panties": base.get("panties", ""),
+                "legs": base.get("legs", ""),
+                "shoes": base.get("shoes", ""),
+            }
+            owned = list(base.get("owned", []) or [])
+            if not owned:
+                owned = [day_dress, underwear["bra"], underwear["panties"], underwear["legs"], underwear["shoes"]]
+            return cls(owned, day_dress, underwear)
+
+        @classmethod
+        def from_saved(cls, saved_state=None, sex_state=None, base_clothing=None):
+            """Convert the retired dictionary split once, then discard its clothing keys."""
+            legacy_sex = sex_state if hasattr(sex_state, "get") and hasattr(sex_state, "pop") else {}
+            if isinstance(saved_state, cls):
+                wardrobe = saved_state.repair()
+            else:
+                payload = saved_state if hasattr(saved_state, "get") else {}
+                base = dict(base_clothing or {})
+                base_state = cls.from_base(base)
+                day_dress = str(payload.get("current_dress", base_state.day_dress) or "")
+                day_underwear = payload.get("current_underwear", base_state.day_underwear)
+                owned = list(payload.get("owned", base_state.owned_items) or [])
+                owned.extend(list(payload.get("gifted", []) or []))
+                wardrobe = cls(owned, day_dress, day_underwear)
+
+                if "dress_override" in legacy_sex:
+                    override = str(legacy_sex.get("dress_override", "") or "")
+                    if override == "nightshirt":
+                        wardrobe.wear_night(0)
+                    elif override == "" and people_to_int(legacy_sex.get("bra_removed", 0), 0):
+                        wardrobe.wear_night(2 if people_to_int(legacy_sex.get("panties_removed", 0), 0) else 1)
+                    else:
+                        wardrobe.wear_temporary(override)
+
+                for layer in ("top", "bottom", "bra", "panties"):
+                    if people_to_int(legacy_sex.get("%s_removed" % layer, 0), 0):
+                        wardrobe.remove(layer)
+                for layer in cls.RAISED_LAYERS:
+                    wardrobe.set_raised(layer, legacy_sex.get("%s_raised" % layer, 0))
+
+            for key in cls.LEGACY_SEX_KEYS:
+                legacy_sex.pop(key, None)
+            return wardrobe
+
+        def repair(self):
+            self.owned_items = self._unique_items(getattr(self, "owned_items", []))
+            self.day_dress = str(getattr(self, "day_dress", "") or "")
+            self.day_underwear = self._normalized_underwear(getattr(self, "day_underwear", {}))
+            self.current_layers = self._normalized_layers(getattr(self, "current_layers", {}))
+            self.raised_layers = self._normalized_raised(getattr(self, "raised_layers", {}))
+            self.context = str(getattr(self, "context", "day") or "day")
+            return self
+
+        def owns(self, item_id=""):
+            key = str(item_id or "").strip()
+            return key == "" or key in self.owned_items
+
+        def add_owned(self, item_id=""):
+            key = str(item_id or "").strip()
+            if key and key not in self.owned_items:
+                self.owned_items.append(key)
+            return key
+
+        def layer(self, layer=""):
+            key = str(layer or "").strip().lower()
+            if key not in self.LAYERS:
+                return ""
+            return str(self.current_layers.get(key, "") or "")
+
+        def set_current(self, layer="", item_id=""):
+            key = str(layer or "").strip().lower()
+            if key not in self.LAYERS:
+                return ""
+            self.current_layers[key] = str(item_id or "")
+            if key in self.RAISED_LAYERS and not self.current_layers[key]:
+                self.raised_layers[key] = 0
+            return self.current_layers[key]
+
+        def remove(self, layer=""):
+            removed = self.layer(layer)
+            self.set_current(layer, "")
+            return removed
+
+        def raised(self, layer=""):
+            key = str(layer or "").strip().lower()
+            return people_to_int(self.raised_layers.get(key, 0), 0) if key in self.RAISED_LAYERS else 0
+
+        def set_raised(self, layer="", value=1):
+            key = str(layer or "").strip().lower()
+            if key not in self.RAISED_LAYERS:
+                return 0
+            self.raised_layers[key] = 1 if people_to_int(value, 0) and self.layer(key) else 0
+            return self.raised_layers[key]
+
+        def current_dress(self):
+            top = self.layer("top")
+            bottom = self.layer("bottom")
+            if not top and not bottom:
+                return ""
+            for dress_code, dress_top in DressTopPart.items():
+                if str(dress_top or "") == top and str(DressBottomPart.get(dress_code, "") or "") == bottom:
+                    return str(dress_code or "")
+            return ""
+
+        def set_day_dress(self, dress_code="", wear_now=False):
+            self.day_dress = str(dress_code or "").strip()
+            if wear_now:
+                self.wear_day()
+            return self.day_dress
+
+        def preferred_underwear(self, layer=""):
+            key = str(layer or "").strip().lower()
+            return str(self.day_underwear.get(key, "") or "")
+
+        def set_day_underwear(self, layer="", item_id="", wear_now=False):
+            key = str(layer or "").strip().lower()
+            if key not in self.day_underwear:
+                return ""
+            self.day_underwear[key] = str(item_id or "")
+            if wear_now:
+                self.set_current(key, item_id)
+            return self.day_underwear[key]
+
+        def wear_day(self):
+            top, bottom = self._dress_layers(self.day_dress)
+            self.current_layers = {
+                "top": top,
+                "bottom": bottom,
+                "bra": self.preferred_underwear("bra"),
+                "panties": self.preferred_underwear("panties"),
+                "legs": self.preferred_underwear("legs"),
+                "shoes": self.preferred_underwear("shoes"),
+            }
+            self.raised_layers = {"top": 0, "bottom": 0}
+            self.context = "day"
+            return self
+
+        def wear_night(self, mode=0):
+            night_mode = max(0, min(2, people_to_int(mode, 0)))
+            top, bottom = self._dress_layers("nightshirt") if night_mode == 0 else ("", "")
+            self.current_layers = {
+                "top": top,
+                "bottom": bottom,
+                "bra": "",
+                "panties": self.preferred_underwear("panties") if night_mode <= 1 else "",
+                "legs": "",
+                "shoes": "",
+            }
+            self.raised_layers = {"top": 0, "bottom": 0}
+            self.context = "night"
+            return self
+
+        def wear_temporary(self, dress_code=""):
+            top, bottom = self._dress_layers(dress_code)
+            self.current_layers["top"] = top
+            self.current_layers["bottom"] = bottom
+            self.raised_layers = {"top": 0, "bottom": 0}
+            self.context = "temporary"
+            return self
+
+        def naked(self):
+            return not any(self.layer(layer) for layer in self.LAYERS)
+
     class PeopleRegistry(object):
         """Single owner for static person definitions and saved NPC instances."""
 
@@ -297,7 +526,7 @@ init -999 python:
         def __init__(self, name, cname="", fullname="", genitive="", dative="",
                     topics=None, portrait="", birth_date=None,
                     default_location="", description="", schedule_entries=None,
-                    gift_preferences=None):
+                    gift_preferences=None, base_clothing=None):
             self.name = people_normalize_id(name)
             self.cname = str(cname or fullname or self.name)
             self.fullname = str(fullname or cname or self.name)
@@ -316,6 +545,7 @@ init -999 python:
             self.interval_schedule_loaded = False
             self.interval_schedule_load_error = ""
             self.gift_preferences = list(gift_preferences or [])
+            self.base_clothing = dict(base_clothing or {})
             self.image_manifest = {}
 
         def image_sequence(self, context="", key="default"):
@@ -883,26 +1113,6 @@ init -999 python:
                 self.set_cock_position("none")
             return state
 
-        def current_underwear(self, key, default=""):
-            wardrobe = getattr(self, "wardrobe", {}) or {}
-            underwear = wardrobe.get("current_underwear", {}) if isinstance(wardrobe, dict) else {}
-            if not isinstance(underwear, dict):
-                return default
-            return str(underwear.get(str(key or ""), default) or "")
-
-        def has_panties(self):
-            return self.current_underwear("panties", "") != ""
-
-        def set_current_underwear(self, key, value=""):
-            if not isinstance(getattr(self, "wardrobe", None), dict):
-                self.wardrobe = {}
-            underwear = self.wardrobe.setdefault("current_underwear", {})
-            if not isinstance(underwear, dict):
-                underwear = {}
-                self.wardrobe["current_underwear"] = underwear
-            underwear[str(key or "")] = str(value or "")
-            return underwear[str(key or "")]
-
         def job_value(self, key, default=0):
             jobs = getattr(self, "jobs", {})
             if not isinstance(jobs, dict):
@@ -1133,6 +1343,17 @@ init -999 python:
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
             self.detailed_sex_history = []
+            self.wardrobe = GirlWardrobeState()
+
+        def update(self):
+            super(Girl, self).update()
+            base_clothing = getattr(getattr(self, "data", None), "base_clothing", {})
+            self.wardrobe = GirlWardrobeState.from_saved(
+                getattr(self, "wardrobe", None),
+                getattr(self, "sex_state", None),
+                base_clothing,
+            )
+            return self
 
         def can_have_sex_today(self):
             return people_to_int(self.fucked_today, 0) < max(0, people_to_int(self.daily_sex_limit, 0))
@@ -1390,74 +1611,52 @@ init -999 python:
             self.var["portstreet_clients_seen_today"] = 1
             return self.set_story_value("seeclients", 1)
 
-        def sex_clothing_state(self):
-            state = getattr(self, "sex_state", None)
-            return state if isinstance(state, dict) else {}
-
         def current_dress(self):
-            wardrobe = getattr(self, "wardrobe", {}) or {}
-            if not isinstance(wardrobe, dict):
-                return ""
-            return str(wardrobe.get("current_dress", "") or "")
+            return self.wardrobe.current_dress()
 
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
+        def preferred_dress(self):
+            return str(self.wardrobe.day_dress or "")
+
+        def current_underwear(self, key, default=""):
+            return self.wardrobe.layer(key)
+
+        def preferred_underwear(self, key, default=""):
+            return self.wardrobe.preferred_underwear(key)
+
+        def set_current_underwear(self, key, value=""):
+            return self.wardrobe.set_current(key, value)
+
+        def set_day_underwear(self, key, value="", wear_now=False):
+            return self.wardrobe.set_day_underwear(key, value, wear_now)
+
+        def has_panties(self):
+            return self.clothing_layer("panties") != ""
 
         def clothing_layer(self, layer):
-            layer_key = str(layer or "").strip().lower()
-            state = self.sex_clothing_state()
-            dress = self.scene_dress()
-            if layer_key == "top":
-                if people_to_int(state.get("top_removed", 0), 0):
-                    return ""
-                return str(DressTopPart.get(dress, "") or "")
-            if layer_key == "bottom":
-                if people_to_int(state.get("bottom_removed", 0), 0):
-                    return ""
-                return str(DressBottomPart.get(dress, "") or "")
-            if layer_key == "bra":
-                if people_to_int(state.get("bra_removed", 0), 0):
-                    return ""
-                return self.current_underwear("bra", "")
-            if layer_key == "panties":
-                if people_to_int(state.get("panties_removed", 0), 0):
-                    return ""
-                return self.current_underwear("panties", "")
-            return ""
+            return self.wardrobe.layer(layer)
 
         def clothing_slut(self, layer):
             return people_to_int(DressPartSlut.get(self.clothing_layer(layer), 0), 0)
 
         def layer_raised(self, layer):
-            layer_key = str(layer or "").strip().lower()
-            if layer_key not in ("top", "bottom"):
-                return 0
-            return people_to_int(self.sex_clothing_state().get("%s_raised" % layer_key, 0), 0)
+            return self.wardrobe.raised(layer)
 
         def set_layer_raised(self, layer, value=1):
-            layer_key = str(layer or "").strip().lower()
-            if layer_key not in ("top", "bottom"):
-                return 0
-            state = self.sex_clothing_state()
-            state["%s_raised" % layer_key] = 1 if people_to_int(value, 0) else 0
-            return state["%s_raised" % layer_key]
+            return self.wardrobe.set_raised(layer, value)
 
         def remove_clothing_layer(self, layer):
-            layer_key = str(layer or "").strip().lower()
-            if layer_key not in ("top", "bottom", "bra", "panties"):
-                return ""
-            removed = self.clothing_layer(layer_key)
-            self.ensure_sex_state()["%s_removed" % layer_key] = 1
-            return removed
+            return self.wardrobe.remove(layer)
 
-        def reset_sex_clothing_state(self):
-            state = self.ensure_sex_state()
-            for key in ("top_removed", "bottom_removed", "bra_removed", "panties_removed", "top_raised", "bottom_raised"):
-                state[key] = 0
-            state.pop("dress_override", None)
+        def wear_day_clothes(self):
+            self.wardrobe.wear_day()
+            return self
+
+        def wear_night_clothes(self, mode=0):
+            self.wardrobe.wear_night(mode)
+            return self
+
+        def wear_temporary_dress(self, dress_code=""):
+            self.wardrobe.wear_temporary(dress_code)
             return self
 
         def tits_visible(self):
@@ -1485,7 +1684,7 @@ init -999 python:
             return state["lick_pussy"]
 
         def lick_pussy_count(self):
-            return people_to_int(self.sex_clothing_state().get("lick_pussy", 0), 0)
+            return people_to_int(self.ensure_sex_state().get("lick_pussy", 0), 0)
 
         def decision_profile(self):
             return build_girl_decision_profile(self.code_name)

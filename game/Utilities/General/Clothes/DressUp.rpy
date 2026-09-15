@@ -1,30 +1,8 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init python:
-    import renpy.exports as renpy
-
-    def dressup_ensure_dress_catalog_entry(code):
-        key = str(code or "").strip()
-        if not key:
-            return
-        item_obj = get_game_item("dress_" + key)
-        if key not in ShortDressName:
-            ShortDressName[key] = str(getattr(item_obj, "name", key) or key)
-        if key not in FullDressDesc:
-            FullDressDesc[key] = str(getattr(item_obj, "description", "") or "")
-
-    def dressup_ensure_dress_parts(code):
-        key = str(code or "").strip()
-        if not key:
-            return
-        if key not in DressTopPart:
-            DressTopPart[key] = ""
-        if key not in DressBottomPart:
-            DressBottomPart[key] = ""
-
 label DressUp(GirlNameDress="", IsNewDayForDress=0):
-    $ renpy.dynamic("_dress_girl_info", "_dress_wardrobe", "_dress_underwear", "TMPAllDressArray", "TMPBraArray", "TMPPantiesArray", "TMPStockingsArray")
+    $ renpy.dynamic("_dress_girl_info", "_dress_wardrobe", "TMPAllDressArray", "TMPBraArray", "TMPPantiesArray", "TMPStockingsArray")
     $ renpy.dynamic("DUCounter", "DecideNoBra", "DecideNoPanties", "DressSlutDesireLevel", "DressSlutDesireLevelTop", "DressSlutDesireLevelBottom")
     $ renpy.dynamic("TmpBottomSlutLevelMax", "TmpBottomSlutLevelMin", "TmpTopSlutLevelMax", "TmpTopSlutLevelMin", "TmpDressName", "TmpDressSelect", "TmpDressSelectMaxCur")
     $ renpy.dynamic("bottom_part", "bottom_slut", "cur_bottom", "cur_default", "cur_top", "dname", "girl_slut", "lname", "top_part", "top_slut")
@@ -35,20 +13,28 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
     if _dress_girl_info is None:
         return
     python:
-        if not isinstance(getattr(_dress_girl_info, "wardrobe", None), dict):
-            _dress_girl_info.wardrobe = {}
         _dress_wardrobe = _dress_girl_info.wardrobe
-        _dress_underwear = _dress_wardrobe.setdefault("current_underwear", {})
-        if not isinstance(_dress_underwear, dict):
-            _dress_underwear = {}
-            _dress_wardrobe["current_underwear"] = _dress_underwear
-        cur_default = str(_dress_wardrobe.get("current_dress", "") or "")
+        cur_default = str(_dress_wardrobe.day_dress or "")
 
         if int(IsNewDayForDress or 0) > 0 and procedural_randint(1, 2, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:82:1") == 1:
-            TMPAllDressArray = list(_dress_wardrobe.get("owned", []) or [])
+            TMPAllDressArray = [
+                str(item_id or "")
+                for item_id in list(_dress_wardrobe.owned_items or [])
+                if str(item_id or "") in DressTopPart and str(item_id or "") in DressBottomPart
+            ]
             TMPBraArray = []
             TMPPantiesArray = []
             TMPStockingsArray = []
+
+            for item_id in list(_dress_wardrobe.owned_items or []):
+                dname = str(item_id or "")
+                lname = dname.lower()
+                if "bra" in lname:
+                    TMPBraArray.append(dname)
+                elif "panties" in lname:
+                    TMPPantiesArray.append(dname)
+                elif "stockings" in lname:
+                    TMPStockingsArray.append(dname)
 
             TmpDressSelect = 0
             TmpDressSelectMaxCur = -10000
@@ -78,40 +64,32 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
 
             for DUCounter, TmpDressName in enumerate(TMPAllDressArray):
                 dname = str(TmpDressName or "")
-                lname = dname.lower()
-                if "bra" in lname:
-                    TMPBraArray.append(dname)
-                elif "panties" in lname:
-                    TMPPantiesArray.append(dname)
-                elif "stockings" in lname:
-                    TMPStockingsArray.append(dname)
+                top_part = DressTopPart.get(dname, "")
+                bottom_part = DressBottomPart.get(dname, "")
+                top_slut = int(DressPartSlut.get(top_part, 0) or 0)
+                bottom_slut = int(DressPartSlut.get(bottom_part, 0) or 0)
+
+                DressSlutDesireLevelTop = top_slut - TmpTopSlutLevelMin
+                if top_slut > TmpTopSlutLevelMax:
+                    DressSlutDesireLevelTop = TmpTopSlutLevelMax - top_slut
+
+                DressSlutDesireLevelBottom = bottom_slut - TmpBottomSlutLevelMin
+                if bottom_slut > TmpBottomSlutLevelMax:
+                    DressSlutDesireLevelBottom = TmpBottomSlutLevelMax - bottom_slut
+
+                if DressSlutDesireLevelTop < 0 or DressSlutDesireLevelBottom < 0:
+                    DressSlutDesireLevel = min(DressSlutDesireLevelTop, DressSlutDesireLevelBottom)
                 else:
-                    top_part = DressTopPart.get(dname, "")
-                    bottom_part = DressBottomPart.get(dname, "")
-                    top_slut = int(DressPartSlut.get(top_part, 0) or 0)
-                    bottom_slut = int(DressPartSlut.get(bottom_part, 0) or 0)
+                    DressSlutDesireLevel = DressSlutDesireLevelTop + DressSlutDesireLevelBottom
 
-                    DressSlutDesireLevelTop = top_slut - TmpTopSlutLevelMin
-                    if top_slut > TmpTopSlutLevelMax:
-                        DressSlutDesireLevelTop = TmpTopSlutLevelMax - top_slut
+                if DressSlutDesireLevel > 0:
+                    DressSlutDesireLevel = min(DressSlutDesireLevel, 4) + procedural_randint(1, 7, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:144:2")
+                else:
+                    DressSlutDesireLevel = min(DressSlutDesireLevel + procedural_randint(1, 5, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:146:3"), 3)
 
-                    DressSlutDesireLevelBottom = bottom_slut - TmpBottomSlutLevelMin
-                    if bottom_slut > TmpBottomSlutLevelMax:
-                        DressSlutDesireLevelBottom = TmpBottomSlutLevelMax - bottom_slut
-
-                    if DressSlutDesireLevelTop < 0 or DressSlutDesireLevelBottom < 0:
-                        DressSlutDesireLevel = min(DressSlutDesireLevelTop, DressSlutDesireLevelBottom)
-                    else:
-                        DressSlutDesireLevel = DressSlutDesireLevelTop + DressSlutDesireLevelBottom
-
-                    if DressSlutDesireLevel > 0:
-                        DressSlutDesireLevel = min(DressSlutDesireLevel, 4) + procedural_randint(1, 7, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:144:2")
-                    else:
-                        DressSlutDesireLevel = min(DressSlutDesireLevel + procedural_randint(1, 5, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:146:3"), 3)
-
-                    if DressSlutDesireLevel > TmpDressSelectMaxCur:
-                        TmpDressSelectMaxCur = DressSlutDesireLevel
-                        TmpDressSelect = DUCounter
+                if DressSlutDesireLevel > TmpDressSelectMaxCur:
+                    TmpDressSelectMaxCur = DressSlutDesireLevel
+                    TmpDressSelect = DUCounter
 
             if TMPAllDressArray:
                 cur_default = TMPAllDressArray[TmpDressSelect]
@@ -140,22 +118,17 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             if girl_slut < 71 and procedural_randint(1, 4, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:177:7") == 1:
                 DecideNoBra = 0
 
-            _dress_underwear["bra"] = ""
-            _dress_underwear["panties"] = ""
-            _dress_underwear["legs"] = ""
+            _dress_wardrobe.set_day_dress(cur_default)
+            _dress_wardrobe.set_day_underwear("bra", "")
+            _dress_wardrobe.set_day_underwear("panties", "")
+            _dress_wardrobe.set_day_underwear("legs", "")
 
             if len(TMPStockingsArray) > 0:
-                _dress_underwear["legs"] = TMPStockingsArray[procedural_randint(0, len(TMPStockingsArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:185:8")]
+                _dress_wardrobe.set_day_underwear("legs", TMPStockingsArray[procedural_randint(0, len(TMPStockingsArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:185:8")])
             if len(TMPBraArray) > 0 and DecideNoBra == 0:
-                _dress_underwear["bra"] = TMPBraArray[procedural_randint(0, len(TMPBraArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:187:9")]
+                _dress_wardrobe.set_day_underwear("bra", TMPBraArray[procedural_randint(0, len(TMPBraArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:187:9")])
             if len(TMPPantiesArray) > 0 and DecideNoPanties == 0:
-                _dress_underwear["panties"] = TMPPantiesArray[procedural_randint(0, len(TMPPantiesArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:189:10")]
+                _dress_wardrobe.set_day_underwear("panties", TMPPantiesArray[procedural_randint(0, len(TMPPantiesArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:189:10")])
 
-        _dress_wardrobe["current_dress"] = cur_default
-        dressup_ensure_dress_catalog_entry(cur_default)
-        dressup_ensure_dress_parts(cur_default)
-        dressup_ensure_dress_catalog_entry(_dress_underwear.get("bra", ""))
-        dressup_ensure_dress_catalog_entry(_dress_underwear.get("panties", ""))
-        dressup_ensure_dress_catalog_entry(_dress_underwear.get("legs", ""))
-        _dress_girl_info.reset_sex_clothing_state()
+        _dress_wardrobe.wear_day()
     return

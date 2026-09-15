@@ -38,7 +38,7 @@ label IntLizaDressChange(GirlNameILT="liza", agreed_to_redress=0):
                     $ agreed_to_redress = 1
 
             if agreed_to_redress == 1:
-                $ Liza.set_current_underwear("panties", "")
+                $ Liza.set_day_underwear("panties", "", True)
                 $ Liza.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_panties")
 
             $ _other_saw = Liza.dress_change_other_saw_text(agreed_to_redress)
@@ -72,7 +72,7 @@ label IntLizaDressChange(GirlNameILT="liza", agreed_to_redress=0):
                     $ Liza.apply_social_chance(7, 1, -1, 0, 0, 0, "dress_change_shame")
 
             if agreed_to_redress == 1:
-                $ Liza.set_current_underwear("panties", "simplepanties")
+                $ Liza.set_day_underwear("panties", "simplepanties", True)
                 $ Liza.apply_social_chance(0, 0, 0, 30, 1, -1, "dress_change_panties")
 
             $ Liza.finish_talk()

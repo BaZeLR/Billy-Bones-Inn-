@@ -28,3 +28,8 @@ def test_body_profiles_are_transient_views_over_owner_state():
     assert "def player_body_profile():" in intimacy
     assert "bodymodel_sync_character" not in game_sources
     assert "bodymodel_sync_profile_arousal" not in game_sources
+    assert 'person.clothing_layer("top")' in body
+    assert 'person.clothing_layer("bottom")' in body
+    assert 'person.clothing_layer("bra")' in body
+    assert 'person.clothing_layer("panties")' in body
+    assert "scene_clothing_state" not in body

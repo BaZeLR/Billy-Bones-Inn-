@@ -115,7 +115,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 "Поднять подол" if Becky.clothing_layer("bottom") != "" and Becky.clothing_slut("bottom") < 4 and not Becky.layer_raised("bottom") and not Becky.sex_busy():
                     if Becky.clothing_layer("panties") != "":
                         "Вы впились поцелуем в губы [people_name(GirlNameIBS, 'genitive')]. Тем временем ваши шаловливые ручки постепенно подняли длинный подол и завернули его за пояс, выставив ее кружевные панталончики на ваше обозрение."
-                    elif Becky.current_underwear("panties", "") == "":
+                    elif Becky.preferred_underwear("panties", "") == "":
                         "Вы прошептали свое пошлое пожелание на ухо разбитной вдовушке. [people_display_name(GirlNameIBS)], немного покраснев, приподняла и заткнула за пояс длинный подол своего платья. Вы были приятно удивленны, не обнаружив и следов нижнего белья под внешне скромным платьем."
                     else:
                         "Вы впились поцелуем в губы [people_name(GirlNameIBS, 'genitive')]. Тем временем ваши шаловливые ручки постепенно подняли длинный подол и завернули его за пояс, выставив ее мокренькое влагалище на ваше обозрение."
@@ -471,6 +471,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     $ _ibs_end_cock_state(GirlNameIBS)
                     $ Becky.set_sex_busy(False)
                     $ Eddie.set_sex_stat("group_sex", 0)
+                    call DressUp(GirlNameIBS)
                     return
 
     label int_becky_sex_after_cum:
@@ -482,6 +483,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
             "Закончить":
                 $ Becky.set_sex_busy(False)
                 $ Eddie.set_sex_stat("group_sex", 0)
+                call DressUp(GirlNameIBS)
                 if str(GirlLocIBS or "").strip().lower() == "home":
                     jump BeckyHomeAfterSex
                 return True

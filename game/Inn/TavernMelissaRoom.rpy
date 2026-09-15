@@ -16,6 +16,18 @@ init 6 python:
             return True
         return str(people.location("melissa") or "") == "TavernMelissaRoom" and not people.is_awake("melissa")
 
+    def tavern_melissa_room_nightwear_now():
+        schedule_state = people.schedule_state("melissa")
+        schedule_label = str(schedule_state.get("label", "") or "")
+        return (
+            str(schedule_state.get("location", "") or "") == "TavernMelissaRoom"
+            and (
+                tavern_melissa_room_can_show_sleeping()
+                or schedule_label in ("evening", "late_evening", "clara_paintings_confession")
+                or (schedule_label == "clara_room_visit" and int(calendar_v2.clock_minutes() or 0) >= 20 * 60 + 30)
+            )
+        )
+
     def tavern_melissa_room_picture():
         if tavern_melissa_room_can_show_sleeping():
             sleep_picture = tavern_melissa_room_sleep_picture()
@@ -79,6 +91,8 @@ init 6 python:
 
 label TavernMelissaRoom:
     $ rooms.enter("TavernMelissaRoom")
+    if tavern_melissa_room_nightwear_now():
+        $ Melissa.wear_night_clothes(0)
     $ scene_runtime.picture = tavern_melissa_room_picture() or rooms.current.bg_picture or None
     if scene_runtime.picture:
         vscene scene_runtime.picture

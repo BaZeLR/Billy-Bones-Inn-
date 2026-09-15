@@ -122,8 +122,8 @@ init python:
         bra = girl_info.clothing_layer("bra") if girl_info is not None else ""
         bottom = girl_info.clothing_layer("bottom") if girl_info is not None else ""
         panties = girl_info.clothing_layer("panties") if girl_info is not None else ""
-        legs = girl_info.current_underwear("legs", "") if girl_info is not None else ""
-        shoes = girl_info.current_underwear("shoes", "") if girl_info is not None else ""
+        legs = girl_info.clothing_layer("legs") if girl_info is not None else ""
+        shoes = girl_info.clothing_layer("shoes") if girl_info is not None else ""
         top_raised = bool(girl_info.layer_raised("top")) if girl_info is not None else False
         bottom_raised = bool(girl_info.layer_raised("bottom")) if girl_info is not None else False
         dress_part_desc = DressPartDesc

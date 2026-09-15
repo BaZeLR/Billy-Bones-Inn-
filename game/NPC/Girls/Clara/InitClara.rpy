@@ -16,6 +16,7 @@ init python:
                 dative="Клариссе",
                 description="Кларисса, старшая дочь мессира Легаре, молодая девушка из зажиточного купеческого дома. Это очень приветливая и игривая блондинка чуть младше вас, с большими искрящимися серыми глазами, пухлыми губами и удивительно легкой, грациозной походкой. На ней обычно свободное длинное повседневное платье из легкой ткани, похожее на удобный сарафан; на ярком свету ткань кажется чуть прозрачной. Грудь Клариссы размера B мягко и соблазнительно колышется при каждом движении. От нее пахнет лавандой и дорогими модными духами.",
                 gift_preferences=["dress_thiefdress", "soap_001", "special_mushroom_001", "dress_simplebra", "dress_simplepanties", "dress_blackstockings", "dress_redstockings", "libido_tincture_001", "werecat_caught_cat"],
+                base_clothing={"day_dress": "greenworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "", "shoes": "simpleshoes"},
             )
             self.birth_date = {"day":20, "period":11, "cycle": 1081}
             self.card_image = "images/clara/portrait1.jpg"
@@ -107,17 +108,7 @@ init python:
                 "favorite_topics": ["fashion", "stories", "gossip", "money", "family_life"],
                 "blocked_topics": [],
             }
-            self.wardrobe = {
-                "owned": ["greenworkdress", "simplebra", "simplepanties", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "greenworkdress",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(ClaraInfo, self).update()
             self.data = ClaraStaticData
@@ -300,7 +291,7 @@ init python:
                 appearance = player.appearance
                 result = appearance.remove_dress(dress_code)
                 if result:
-                    _gds_add_dress_for_girl(self.name, dress_code)
+                    self.wardrobe.add_owned(dress_code)
                 return result
 
             item_id = str(row.get("gift_id", "") or "")

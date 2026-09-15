@@ -280,16 +280,23 @@ init python:
         dressdesc_map = _tavern_dict_value(DressDesc)
         fulldesc_map = _tavern_dict_value(FullDressDesc)
         part_desc_map = _tavern_dict_value(DressPartDesc)
+        short_name_map = _tavern_dict_value(ShortDressName)
 
         info = people.get_info(person)
         dress_code = str(info.current_dress() if info is not None and hasattr(info, "current_dress") else "")
-        if dress_code and dress_code in dressdesc_map:
+        top_raised = bool(info.layer_raised("top")) if info is not None and hasattr(info, "layer_raised") else False
+        bottom_raised = bool(info.layer_raised("bottom")) if info is not None and hasattr(info, "layer_raised") else False
+        if dress_code and not top_raised and not bottom_raised and dress_code in dressdesc_map:
             return str(dressdesc_map[dress_code])
 
         top_code = str(info.clothing_layer("top") if info is not None and hasattr(info, "clothing_layer") else "")
         bottom_code = str(info.clothing_layer("bottom") if info is not None and hasattr(info, "clothing_layer") else "")
         top_line = str(part_desc_map.get(top_code, "")).strip()
         bottom_line = str(part_desc_map.get(bottom_code, "")).strip()
+        if top_line and top_raised:
+            top_line += " (распахнуто)"
+        if bottom_line and bottom_raised:
+            bottom_line += " (поднято)"
         if top_line and bottom_line:
             return top_line + ", " + bottom_line
         if top_line:
@@ -301,7 +308,15 @@ init python:
             return str(fulldesc_map[dress_code])
         if dress_code:
             return dress_code
-        return "обычная рабочая одежда"
+
+        exact_layers = []
+        for layer_key in ("bra", "panties", "legs", "shoes"):
+            layer_code = str(info.clothing_layer(layer_key) if info is not None and hasattr(info, "clothing_layer") else "")
+            if layer_code:
+                exact_layers.append(str(short_name_map.get(layer_code, part_desc_map.get(layer_code, layer_code))).lower())
+        if exact_layers:
+            return ", ".join(exact_layers)
+        return "без одежды"
 
     def _tavern_worker_current_jobs(person):
         current_jobs = []

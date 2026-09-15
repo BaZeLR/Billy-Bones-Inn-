@@ -37,31 +37,10 @@ init python:
             level = 3
         return level
 
-    def _gds_get_dress_list_for_girl(girl_name):
-        info = people.get_info(girl_name)
-        if info is None:
-            return []
-        if not isinstance(getattr(info, "wardrobe", None), dict):
-            info.wardrobe = {}
-        owned = info.wardrobe.setdefault("owned", [])
-        if not isinstance(owned, list):
-            owned = list(owned or [])
-            info.wardrobe["owned"] = owned
-        return owned
-
     def _gds_has_dress_for_girl(girl_name, dress_code):
         dress = str(dress_code or "")
-        if dress == "":
-            return True
-        return dress in _gds_get_dress_list_for_girl(girl_name)
-
-    def _gds_add_dress_for_girl(girl_name, dress_code):
-        dress = str(dress_code or "")
-        if dress == "":
-            return
-        wardrobe = _gds_get_dress_list_for_girl(girl_name)
-        if dress not in wardrobe:
-            wardrobe.append(dress)
+        info = people.get_info(girl_name)
+        return dress == "" or (info is not None and info.wardrobe.owns(dress))
 
     def _gds_dress_cost(dress_code):
         item_obj = get_game_item("dress_" + str(dress_code or ""))
@@ -86,15 +65,18 @@ init python:
         if g == "" or d == "":
             return 0
 
+        girl = people.get_info(g)
+        if girl is None:
+            return 0
+
         cost = _gds_dress_cost(d)
         player.spend_money(cost)
+        girl.wardrobe.add_owned(d)
 
-        _gds_add_dress_for_girl(g, d)
-
-        if set_legsdef or set_legs:
-            girl = people.get_info(g)
-            if girl is not None:
-                girl.set_current_underwear("legs", d)
+        if set_legsdef:
+            girl.set_day_underwear("legs", d, bool(set_legs))
+        elif set_legs:
+            girl.set_current_underwear("legs", d)
 
         player.appearance.girl_dresses_bought = int(player.appearance.girl_dresses_bought or 0) + 1
 

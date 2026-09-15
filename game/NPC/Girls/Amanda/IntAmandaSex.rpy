@@ -42,6 +42,10 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
     label int_amanda_sex_menu:
         while True:
             if not _ias_scene_active:
+                if str(Amanda.wardrobe.context or "day") == "night":
+                    $ Amanda.wear_night_clothes(tavern_amanda_room_sleep_dress())
+                else:
+                    call DressUp(GirlNameASDS)
                 if _ias_started_native_scene:
                     $ main_ui_end_native_scene_state()
                 else:
@@ -109,7 +113,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     if Amanda.clothing_slut("bottom") >= 4:
                         if Amanda.clothing_layer("panties") != "":
                             "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем задрали и без того короткую юбочку Аманды до пояса, выставив ее панталончики на ваше обозрение."
-                        elif Amanda.current_underwear("panties", "") == "":
+                        elif Amanda.preferred_underwear("panties", "") == "":
                             "\"А что, [people_display_name(GirlNameASDS)],\" — спросили вы, — \"юбчишку ты носишь коротенькую, небось под ней и нижнего белья-то нет?\""
                             "\"Угадал,\" — игриво ответила вам [people_display_name(GirlNameASDS)] и заткнула за пояс подол своей юбки, показывая, что под ним и правда ничего не было."
                         else:
@@ -117,7 +121,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     else:
                         if Amanda.clothing_layer("panties") != "":
                             "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем оборочка за оборочкой подняли длинный подол ее платья и завернули его за пояс, выставляя Амандины панталончики на ваше обозрение."
-                        elif Amanda.current_underwear("panties", "") == "":
+                        elif Amanda.preferred_underwear("panties", "") == "":
                             "\"А что, [people_display_name(GirlNameASDS)],\" — скептически спросили вы, — \"юбка у тебя почти до пят, раз ты такая скромница, то небось под ней у тебя еще несколько юбок и уж затем панталончики?\""
                             "\"А вот и не угадал,\" — ответила вам Аманда слегка покраснев. \"Под ней у меня вообще ничего нет. Смотри!\" И она сноровисто приподняла и заткнула за пояс длинный подол своего платья. Вы были приятно удивлены, не обнаружив под ним и следов нижнего белья."
                         else:
@@ -131,7 +135,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     else:
                         if Amanda.clothing_layer("panties") != "":
                             "Вы поцеловали [people_name(GirlNameASDS, 'genitive')] в губы, а затем развязали поясок, и юбка упала к ногам Аманды, выставив ее кружевные панталончики на ваше обозрение."
-                        elif Amanda.current_underwear("panties", "") == "":
+                        elif Amanda.preferred_underwear("panties", "") == "":
                             "\"[people_display_name(GirlNameASDS)], мне кажется что ты будешь куда лучше выглядеть в одних панталонах,\" — нагло заявили вы. — \"А ты как считаешь? Давай заценим!\""
                             "\"Не знаю,\" — ответила вам Аманда слегка покраснев. \"Я ведь под платьем совсем голенькая. Смотри!\" И она сноровисто распустила завязки на платье, которое незамедлительно упало к ее ногам. Вы были приятно удивлены, воочию убедившись в том, что она сказала чистую правду."
                         else:
@@ -502,7 +506,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ Amanda.room_entry_blocked_today = True
                     $ Amanda.set_sex_busy(False)
                     call ShowCurrentSex(GirlNameASDS)
-                    $ Amanda.reset_sex_clothing_state()
+                    call DressUp(GirlNameASDS)
                     $ main_ui_end_native_scene_state()
                     jump TavernMain
 
@@ -525,7 +529,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ _ias_set_arousal(GirlNameASDS, 0)
                     $ Amanda.room_entry_blocked_today = True
                     call ShowCurrentSex(GirlNameASDS)
-                    $ Amanda.reset_sex_clothing_state()
+                    call DressUp(GirlNameASDS)
                     $ calendar_v2.advance_minutes(60)
                     $ Amanda.set_sex_busy(False)
                     $ main_ui_end_native_scene_state()

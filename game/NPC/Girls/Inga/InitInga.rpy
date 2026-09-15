@@ -28,6 +28,7 @@ init python:
                 birth_date={"day": 1, "period": 1, "cycle": 1078},
                 portrait="images/inga/StreetSex/minet1.jpg",
                 gift_preferences=["wild_rose_001", "soap_001", "lavender_001"],
+                base_clothing={"day_dress": "openworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "redstockings", "shoes": "simpleshoes"},
                 schedule_entries=[
                     NPCScheduleEntry(
                         location="GroceryStore",
@@ -115,17 +116,7 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.wardrobe = {
-                "owned": ["openworkdress", "simplebra", "simplepanties", "redstockings", "simpleshoes"],
-                "gifted": [],
-                "current_dress": "openworkdress",
-                "current_underwear": {
-                    "bra": "simplebra",
-                    "panties": "simplepanties",
-                    "legs": "redstockings",
-                    "shoes": "simpleshoes",
-                },
-            }
+            self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)
         def update(self):
             super(IngaInfo, self).update()
             self.data = IngaStaticData

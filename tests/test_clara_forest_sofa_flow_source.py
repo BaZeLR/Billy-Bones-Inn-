@@ -149,7 +149,7 @@ def test_shared_bath_unlocks_bandit_costume_gift_without_a_parallel_flag():
     talk = source("game/NPC/Girls/Clara/IntClaraTalk.rpy")
 
     assert 'dress_code == "thiefdress" and int(threads["claraForestSofa"].num or 0) < 3' in clara
-    assert '_gds_add_dress_for_girl(self.name, dress_code)' in clara
+    assert 'self.wardrobe.add_owned(dress_code)' in clara
     assert '"dress_thiefdress" in _clara_gift_ids' in talk
     for mirror in ("bandit_costume_unlocked", "clara_bandit_dress", "forest_bath_seen"):
         assert mirror not in clara

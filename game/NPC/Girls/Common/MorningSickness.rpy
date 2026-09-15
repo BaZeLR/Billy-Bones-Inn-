@@ -21,6 +21,8 @@ label MorningSickness(girl_name):
         CumInsideLastDays = int(people.get_info(girl_name).sex_stat("cuminside", 0) or 0)
         girl_info = people.get_info(girl_name)
         girl_data = people.get_data(girl_name)
+        if isinstance(girl_info, Girl):
+            girl_info.wear_night_clothes(0)
         morning_sickness_picture = girl_data.image_path("morning", "sickness") if girl_data is not None else ""
         pregnancy_days = girl_info.pregnancy_days() if girl_info is not None else 0
 
@@ -85,6 +87,8 @@ label MorningSickness(girl_name):
             "Всего через несколько минут [girl_display_name] вернулась. Здоровый оттенок лица вернулся к ней, хотя некоторая бледность сохранилась.\n\n\"Чего-й то, Стефанчик, меня стошнило слегка,\" поделилась она с вами."
 
     call morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay, MSickZaletCommentMade)
+    if isinstance(girl_info, Girl):
+        $ girl_info.wear_day_clothes()
     $ main_ui_end_native_scene_state()
     return
 

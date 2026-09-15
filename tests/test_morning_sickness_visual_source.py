@@ -34,6 +34,8 @@ def test_morning_sickness_event_reads_the_npc_manifest_and_restores_its_cg():
     assert label.count("vscene morning_sickness_picture") == 2
     assert '$ scene_runtime.text = ""' in label
     assert '$ scene_runtime.location_text = ""' in label
+    assert "girl_info.wear_night_clothes(0)" in label
+    assert "girl_info.wear_day_clothes()" in label
     assert "images/" not in label
 
 

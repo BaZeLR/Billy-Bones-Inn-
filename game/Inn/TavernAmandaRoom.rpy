@@ -222,11 +222,18 @@ init python:
             and tavern_amanda_room_sleep_scene()
         )
 
+    def tavern_amanda_room_nightwear_now():
+        schedule_state = people.schedule_state("amanda")
+        return (
+            str(schedule_state.get("location", "") or "") == "TavernAmandaRoom"
+            and (
+                tavern_amanda_room_sleep_scene()
+                or str(schedule_state.get("label", "") or "") == "evening_room"
+            )
+        )
+
     def tavern_amanda_current_dress_text():
-        wardrobe = getattr(Amanda, "wardrobe", {}) if Amanda is not None else {}
-        dress_code = ""
-        if isinstance(wardrobe, dict):
-            dress_code = str(wardrobe.get("current_dress", "") or "").strip()
+        dress_code = str(Amanda.current_dress() if Amanda is not None else "").strip()
         if not dress_code:
             return ""
         dress_name = str(ShortDressName.get(dress_code, dress_code) or dress_code).lower()
@@ -252,6 +259,8 @@ label TavernAmandaRoom:
     $ _room = rooms.get("TavernAmandaRoom")
     $ rooms.enter("TavernAmandaRoom")
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
+    if tavern_amanda_room_nightwear_now():
+        $ Amanda.wear_night_clothes(_amanda_sleep_dress)
     call RoomEnterEventGate(rooms.current_code, False)
     if story_event_available(rooms.current_code, "melissa_bats"):
         call checkTriggers(rooms.current_code, "melissa_bats", 0)
@@ -260,8 +269,6 @@ label TavernAmandaRoom:
     if str(_amanda_room_picture or "").strip():
         vscene _amanda_room_picture
     $ _room.mark_visited()
-    if tavern_amanda_room_sleep_scene():
-        call dress_for_night("amanda", _amanda_sleep_dress)
     $ scene_runtime.text = tavern_amanda_room_main_text(_room, _amanda_sleep_dress)
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Комната Аманды"
@@ -324,6 +331,7 @@ label TavernAmandaRoomEnterWithoutKnock:
     $ renpy.dynamic("_amanda_dress_text")
     $ apply_movement_time(5, "TavernAmandaRoom")
     if tavern_amanda_room_sleeping_now():
+        $ Amanda.wear_night_clothes(tavern_amanda_room_sleep_dress())
         $ Amanda.rel = max(0, int(Amanda.rel or 0) - 5)
         $ _amanda_dress_text = tavern_amanda_current_dress_text()
         $ scene_runtime.text = "Вы открываете дверь без стука. Аманда сидит на кровати и торопливо пытается прикрыться, на лице у нее тяжелый румянец.\n\n\"Ох... доброе утро, мессир Стефан. В следующий раз вам стоит постучать,\" выдыхает она, явно сбитая с толку."
@@ -418,6 +426,7 @@ label story_amanda_room_morning_window_0:
     $ renpy.dynamic("_amanda_window_outcome", "_amanda_sleep_dress", "_amanda_room_picture")
     $ _amanda_window_outcome = tavern_amanda_morning_window_outcome()
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
+    $ Amanda.wear_night_clothes(_amanda_sleep_dress)
     $ main_ui_begin_native_scene_state("Аманда у окна")
     show screen main_ui
     $ _amanda_room_picture = tavern_amanda_room_wake_picture(_amanda_sleep_dress)
@@ -459,6 +468,7 @@ label story_amanda_room_morning_window_0:
     menu:
         "Оставить Аманду собираться":
             pass
+    $ Amanda.wear_day_clothes()
     call stat
     $ main_ui_end_native_scene_state()
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
@@ -476,6 +486,7 @@ label story_amanda_room_grope_0:
     $ renpy.dynamic("tmpSexType", "_amanda_sleep_dress", "_amanda_wake_picture", "_grope_sleep_dress", "tmpGropeReact", "tmpRand")
     $ _grope_sleep_dress = tavern_amanda_room_sleep_dress()
     $ _amanda_sleep_dress = _grope_sleep_dress
+    $ Amanda.wear_night_clothes(_grope_sleep_dress)
     "\nОтбросив сомнения вы подошли к спящей девушке и поцеловали ее прямо в губы."
     if _grope_sleep_dress == 2:
         "Одной рукой вы начали массировать ее обнаженный клитор, а другой ласкать сисечки."

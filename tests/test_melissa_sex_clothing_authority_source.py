@@ -16,3 +16,7 @@ def test_household_sex_menu_uses_selected_npc_owned_clothing_state():
     assert "_hse_info.set_layer_raised(" in source
     assert "_hse_info.remove_clothing_layer(" in source
     assert 'people.get_info(_hse_girl)' in source
+    finish = source.split("label HouseholdSexFinish:", 1)[1]
+    assert 'str(_hse_info.wardrobe.context or "day") == "night"' in finish
+    assert "_hse_info.wear_night_clothes(0)" in finish
+    assert "call DressUp(_hse_girl)" in finish

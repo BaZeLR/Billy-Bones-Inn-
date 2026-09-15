@@ -374,7 +374,11 @@ init python:
         score += min(3, max(0, int(getattr(info, "corruption", 0) or 0) // 20))
         if current_game_day() - int(household.barber_visit_last_day.get(key, -99) or -99) <= 14:
             score += 2
-        dress_score = max(info.clothing_slut("top"), info.clothing_slut("bottom"))
+        day_dress = str(info.preferred_dress() or "")
+        dress_score = max(
+            int(DressPartSlut.get(DressTopPart.get(day_dress, ""), 0) or 0),
+            int(DressPartSlut.get(DressBottomPart.get(day_dress, ""), 0) or 0),
+        )
         if dress_score >= 4:
             score += 2
         elif dress_score >= 3:
@@ -1107,6 +1111,16 @@ label TavernKitchenBreakfast:
         else:
             $ _morning_sick_girl = str(tavern_morning_sickness_girl() or "")
     $ player.tavern_management.breakfast.present_ids = list(household_breakfast_attendee_ids() or [])
+    python hide:
+        for _breakfast_girl_id in list(player.tavern_management.breakfast.present_ids or []):
+            _breakfast_girl_info = people.get_info(_breakfast_girl_id)
+            if isinstance(_breakfast_girl_info, Girl):
+                _breakfast_girl_info.wear_day_clothes()
+        for _breakfast_girl_id in ("sandra", "melissa", "amanda"):
+            if _breakfast_girl_id not in list(player.tavern_management.breakfast.present_ids or []):
+                continue
+            if tavern_breakfast_player_perk_score(_breakfast_girl_id) >= 10:
+                people.get_info(_breakfast_girl_id).wear_night_clothes(0)
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = current_game_day()
     $ player.tavern_management.breakfast.day = current_game_day()
@@ -1502,6 +1516,7 @@ label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
     $ _tease_private_elapsed_minutes = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) - _tease_private_start_minutes
     if _tease_private_elapsed_minutes < 30:
         $ calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)
+    $ _tease_private_info.wear_day_clothes()
     $ _tease_private_info.change_social(friend_delta=1, open_delta=1)
     if _tease_private_room == "TavernStorage":
         $ _tease_private_picture = "bg StolyarWorkshop"
@@ -1561,6 +1576,7 @@ label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake", date_ori
             call IntAmandaSex(_outdoor_date_girl, "ForestLake")
         else:
             call HouseholdSexEngine(_outdoor_date_girl, "ForestLake")
+    $ _outdoor_date_info.wear_day_clothes()
     $ calendar_v2.advance_minutes(90 if str(date_code or "") == "lake" else 60)
     $ _outdoor_date_info.mark_asked()
     $ _outdoor_date_info.mark_talked()
@@ -1786,7 +1802,13 @@ label TavernKitchenBreakfastDanceMenu:
 
 
 label TavernKitchenFinishBreakfastEvent:
-    $ renpy.dynamic("_kitchen_scene")
+    $ renpy.dynamic("_kitchen_scene", "_breakfast_clothing_ids")
+    $ _breakfast_clothing_ids = list(player.tavern_management.breakfast.present_ids or [])
+    python hide:
+        for _breakfast_girl_id in _breakfast_clothing_ids:
+            _breakfast_girl_info = people.get_info(_breakfast_girl_id)
+            if isinstance(_breakfast_girl_info, Girl):
+                _breakfast_girl_info.wear_day_clothes()
     $ player.tavern_management.breakfast.event_active = False
     $ player.tavern_management.breakfast.base_text = ""
     $ player.tavern_management.breakfast.base_shown_day = -1

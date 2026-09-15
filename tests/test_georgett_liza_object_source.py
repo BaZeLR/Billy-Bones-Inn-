@@ -129,7 +129,7 @@ def test_georgett_liza_runtime_owns_stats_jobs_story_and_pregnancy():
     for source, name in [(georgett, "georgett"), (liza, "liza")]:
         assert "self.stats = {" in source
         assert "self.jobs = {" in source
-        assert "self.wardrobe = {" in source
+        assert "self.wardrobe = GirlWardrobeState.from_base(self.data.base_clothing)" in source
         assert "def reset_daily" in source
         assert '"pregnancy":' in source
         assert "def pregnancy_stage" not in source

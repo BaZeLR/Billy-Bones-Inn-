@@ -114,9 +114,9 @@ def test_breakfast_events_use_thread_state_and_label_local_values_only():
     assert "Amanda.legare_forbidden = True" in first
     assert "special_cream_001" not in first
     assert 'Amanda.decide("street_legare_warning")' in second
-    assert 'Amanda.wardrobe["current_dress"] = "modestworkdress"' in second
-    assert 'Amanda.set_current_underwear("panties", "")' in second
-    assert 'Amanda.set_current_underwear("panties", "simplepanties")' in second
+    assert 'Amanda.wardrobe.set_day_dress("modestworkdress", True)' in second
+    assert 'Amanda.set_day_underwear("panties", "", True)' in second
+    assert 'Amanda.set_day_underwear("panties", "simplepanties", True)' in second
     assert "virginity" not in source
 
 

@@ -289,7 +289,7 @@ init -44 python:
 
         info = people.get_info(MomName)
         KidGender = str(GetKidData(last_kid)["KidGender"] or "M")
-        bra = str(info.wardrobe.get("current_underwear", {}).get("bra", "") or "")
+        bra = str(info.clothing_layer("bra") or "")
         corruption = _kids_int(info.corruption, 0)
         lines = ["Вы заметили что " + people_name(MomName, "nominative", MomName) + " решила дать " + ("своему сыночку" if KidGender == "M" else "своей дочурке") + " сисю."]
         if corruption > 61:
@@ -321,7 +321,7 @@ init -44 python:
         if not _kids_lactating(GirlName) or info.arousal_value() <= 35:
             return ""
         if not info.tits_visible():
-            if str(info.wardrobe.get("current_underwear", {}).get("bra", "") or "") == "":
+            if str(info.clothing_layer("bra") or "") == "":
                 return "От жамкания из доек вскоре потекло молоко, ее блузка быстро намокла и сосочки стали просвечивать через нее."
             return ""
         info.set_arousal(min(65, info.arousal_value() + 8))

@@ -15,70 +15,9 @@ init python:
         main_ui_runtime.action_items = [MenuItem("Назад", Function(main_ui_end_card_state))]
         main_ui_restart_interaction()
 
-    def girl_card_base_dress_lines(girl_name):
-        key = girl_card_resolved_key(girl_name)
-        dress_code = girl_card_current_dress_code(key)
-        if not dress_code:
-            return []
-
-        short_name = str(_girls_desc_get(ShortDressName, dress_code, dress_code) or dress_code)
-        full_desc = str(_girls_desc_get(FullDressDesc, dress_code, "") or "").strip()
-
-        lines = ["Основной наряд: %s." % short_name]
-        if full_desc:
-            lines.append(full_desc + ".")
-        return lines
-
     def girl_card_info_object(girl_name):
         key = girl_card_resolved_key(girl_name)
         return people.get_info(key)
-
-    def girl_card_current_dress_code(girl_name):
-        key = girl_card_resolved_key(girl_name)
-        info = girl_card_info_object(key)
-        return str(info.current_dress() if info is not None else "").strip()
-
-    def girl_card_current_underwear(girl_name, item_key):
-        key = girl_card_resolved_key(girl_name)
-        info = girl_card_info_object(key)
-        if info is None:
-            return ""
-        if item_key in ("bra", "panties"):
-            return str(info.clothing_layer(item_key) or "").strip()
-        return str(info.current_underwear(item_key, "") or "").strip()
-
-    def girl_card_current_outfit_line(girl_name):
-        key = girl_card_resolved_key(girl_name)
-        info = girl_card_info_object(key)
-        top = info.clothing_layer("top") if info is not None else ""
-        bottom = info.clothing_layer("bottom") if info is not None else ""
-        bra_value = girl_card_current_underwear(key, "bra")
-        panties_value = girl_card_current_underwear(key, "panties")
-        legs_value = girl_card_current_underwear(key, "legs")
-        topraised_value = info.layer_raised("top") if info is not None else 0
-        bottomraised_value = info.layer_raised("bottom") if info is not None else 0
-
-        parts = []
-        if top and not topraised_value:
-            parts.append(str(_girls_desc_get(DressPartDesc, top, top) or top))
-        elif top and topraised_value:
-            parts.append("блузка расстегнута или поднята")
-        if bottom and str(bottom) != "nightshirtbottom":
-            if bottomraised_value:
-                parts.append("юбка задрана")
-            else:
-                parts.append(str(_girls_desc_get(DressPartDesc, bottom, bottom) or bottom))
-        if bra_value and not top:
-            parts.append(str(_girls_desc_get(FullDressDesc, bra_value, bra_value) or bra_value).lower())
-        if panties_value and (not bottom or str(bottom) == "nightshirtbottom"):
-            parts.append(str(_girls_desc_get(FullDressDesc, panties_value, panties_value) or panties_value).lower())
-        if legs_value:
-            parts.append(str(_girls_desc_get(DressPartDesc, legs_value, legs_value) or legs_value))
-
-        if not parts:
-            return "Сейчас на ней нет заметной одежды."
-
-        return "Сейчас на ней: %s." % "; ".join([p for p in parts if str(p or "").strip()])
 
     def girl_card_visual_state_lines(girl_name):
         key = girl_card_resolved_key(girl_name)
@@ -195,8 +134,6 @@ init python:
         key = girl_card_resolved_key(girl_name)
         lines = []
         lines.extend([str(line) for line in _girls_desc_build_lines(key) if str(line or "").strip()])
-        lines.append(girl_card_current_outfit_line(key))
-        lines.extend(girl_card_base_dress_lines(key))
         lines.extend(girl_card_visual_state_lines(key))
         return [str(line) for line in lines if str(line or "").strip()]
 

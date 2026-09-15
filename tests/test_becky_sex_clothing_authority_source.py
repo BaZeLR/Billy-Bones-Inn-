@@ -21,6 +21,7 @@ def test_becky_sex_menu_uses_becky_owned_clothing_state():
     assert "Becky.clothing_slut(" in source
     assert "Becky.set_layer_raised(" in source
     assert "Becky.remove_clothing_layer(" in source
+    assert source.count("call DressUp(GirlNameIBS)") >= 3
 
 
 def test_becky_sex_uses_the_authored_pregnancy_procedure_label():
