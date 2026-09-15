@@ -2840,13 +2840,13 @@ init -100 python:
         Becky.__dict__.pop("eddie_join_stage", None)
 
     def updateSave_V82():
-        # Recover the Lizette friendship already earned under the cumulative
-        # orgasm rule before that rule was wired to the shared sex counter.
+        # Recover only the authored Lizette friendship milestones already met.
         relationship_cap = max(20, people_to_int(getattr(Liza, "relationship_cap", 20), 20))
-        earned_friendship = max(0, people_to_int(Liza.sex_stat("orgasms_given", 0), 0)) * max(
-            0,
-            people_to_int(getattr(Liza, "ORGASM_FRIENDSHIP_GAIN", 0), 0),
-        )
+        earned_friendship = 0
+        orgasm_count = max(0, people_to_int(Liza.sex_stat("orgasms_given", 0), 0))
+        for milestone, gain in dict(getattr(Liza, "ORGASM_FRIENDSHIP_MILESTONES", {}) or {}).items():
+            if orgasm_count >= people_to_int(milestone, 0):
+                earned_friendship += max(0, people_to_int(gain, 0))
         lick_count = max(0, people_to_int(Liza.lick_pussy_count(), 0))
         for milestone, gain in dict(getattr(Liza, "LICK_FRIENDSHIP_MILESTONES", {}) or {}).items():
             if lick_count >= people_to_int(milestone, 0):

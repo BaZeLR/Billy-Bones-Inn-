@@ -268,8 +268,8 @@ def test_georgett_and_liza_friendship_rewards_are_class_values_with_one_owner():
 
     assert "LICK_FRIENDSHIP_MILESTONES = {4: 1}" in georgett_info
     assert "LICK_FRIENDSHIP_MILESTONES = {7: 1}" in liza_info
-    assert "ORGASM_FRIENDSHIP_GAIN = 1" in liza_info
-    assert "ORGASM_FRIENDSHIP_MILESTONES" not in liza_info
+    assert "ORGASM_FRIENDSHIP_GAIN" not in liza_info
+    assert "ORGASM_FRIENDSHIP_MILESTONES = {3: 1}" in liza_info
 
     orgasm_owner = people.split("def record_orgasm_given(self):", 1)[1].split("def record_sex_history", 1)[0]
     lick_owner = people.split("def record_lick_pussy(self):", 1)[1].split("def lick_pussy_count", 1)[0]
