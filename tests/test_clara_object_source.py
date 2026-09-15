@@ -200,7 +200,7 @@ def test_clara_rewards_use_their_system_owners_without_wrappers():
     assert "clara_paintings_special_cream_recipe_unlocked" not in paintings + crafting
     assert "self.special_cream_recipe_unlocked = False" in crafting
     assert "crafting.special_cream_recipe_unlocked = True" in paintings
-    assert "unlock_condition=lambda: bool(crafting.special_cream_recipe_unlocked)" in crafting
+    assert "unlock_condition=special_cream_recipe_available" in crafting
     assert "self.sergio_discount_percent = 0" in progress
     assert "tractir_progress.sergio_discount_percent = max(25," in paintings
     assert "int(tractir_progress.sergio_discount_percent or 0)" in barber

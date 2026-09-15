@@ -1790,7 +1790,8 @@ testcase external_amanda_liza_work_conversation_activates:
     run Jump("Shed")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Событие: Аманда и Лизетта") timeout 5.0
-    assert eval ("lizatalk" in str(scene_runtime.picture or "") and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(LizaStaticData.image_path("tavern", "amanda_work_talk") or "")) timeout 5.0
+    assert eval (len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
 
 testcase external_tavern_random_event_plan_consumes_once:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
