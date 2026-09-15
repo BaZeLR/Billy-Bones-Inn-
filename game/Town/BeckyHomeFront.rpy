@@ -395,6 +395,11 @@ label becky_homefront_approach:
 
     if Inga.acquaintance_stage >= 2 and int(threads["beckyDinner"].num or 0) >= 2:
         menu:
+            "Предложить присоединиться" if story_event_available("BeckyHomeFront", "inga_lucas_share"):
+                call checkTriggers("BeckyHomeFront", "inga_lucas_share", 0)
+                call BeckyHome(rooms.get("BeckyHomeFront").state["arrival_mode"])
+                return
+
             "Зайти в дом":
                 call BeckyHome(rooms.get("BeckyHomeFront").state["arrival_mode"])
                 return

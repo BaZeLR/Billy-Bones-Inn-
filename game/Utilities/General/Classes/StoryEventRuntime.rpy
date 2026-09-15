@@ -1581,6 +1581,32 @@ define ingaThreadList = [
             "#people.location('inga') == 'GroceryStore'",
         ], None, "GroceryStore", "enter", 30),
     ], highlight=False, threaded=True),
+    # Inga owns the one-time consensual continuation with the player and Lucas.
+    # The completed Becky discovery thread is only its prerequisite.
+    LThreadData(0, "inga", "LucasShare", [
+        "#bool(threads['beckyIngaLucasPath'].completed)",
+        "#int(Inga.acquaintance_stage or 0) >= 2",
+        "#int(threads['beckyDinner'].num or 0) >= 2",
+    ], [
+        (
+            "story_inga_lucas_share_0",
+            None, None, None,
+            1,
+            None,
+            [
+                "#str(rooms.current_code or '') == 'BeckyHomeFront'",
+                "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == ''",
+                "#int(rooms.get('BeckyHomeFront').state.get('inga_scene_roll', 0) or 0) == 2",
+                "#player.intimacy.can_cum()",
+                "#Inga.can_have_sex_today()",
+                "#not Inga.sex_busy()",
+            ],
+            None,
+            "BeckyHomeFront",
+            "inga_lucas_share",
+            50,
+        ),
+    ], highlight=True, threaded=True),
 ]
 define eddieThreadList = []
 define irmaThreadList = []
