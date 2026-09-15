@@ -79,19 +79,20 @@ def test_ordinary_talk_has_no_second_profile_or_old_point_authority():
     assert "OldPointSmallTalkMenu" not in old_point
 
 
-def test_all_four_favorite_topic_npcs_use_the_authoritative_talk_label():
-    talk_files = [
-        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "IntAmandaTalk.rpy",
-        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaTalk.rpy",
-        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraTalk.rpy",
-        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "IntClaraTalk.rpy",
-    ]
+def test_all_four_favorite_topic_npcs_return_to_their_owning_talk_menu():
+    talk_files = {
+        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "IntAmandaTalk.rpy": "jump IntAmandaTalk",
+        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaTalk.rpy": "jump IntMelissaTalk",
+        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraTalk.rpy": "jump IntSandraTalk",
+        PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "IntClaraTalk.rpy": "$ _clara_repeat_menu = True",
+    }
 
-    for path in talk_files:
+    for path, return_step in talk_files.items():
         source = path.read_text(encoding="utf-8-sig")
         assert 'call SocialTalkTopicMenu(girl_name, "talk")' in source
         talk_call = source.split('call SocialTalkTopicMenu(girl_name, "talk")', 1)[1]
-        assert "repeat_menu = True" in talk_call.split("\n", 2)[1]
+        first_statement = next(line.strip() for line in talk_call.splitlines() if line.strip())
+        assert first_statement == return_step
 
 
 def test_seen_topics_are_owned_by_each_npc_not_a_global_mirror():
