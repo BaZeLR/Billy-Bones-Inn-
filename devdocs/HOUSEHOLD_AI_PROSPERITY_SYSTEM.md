@@ -321,6 +321,35 @@ Prosperity should not be free. Better clients bring:
 - more reason for Sandra to control the house
 - more reason for Amanda/Melissa to seek rewards, favors, or private attention
 
+### Deferred Bandit-Camp Tavern Continuation (TODO Only)
+
+The canonical post-camp reward list and its exact values are owned by
+`TODO_ROBIN_BLACKWOOD_CUNIDALE.md`, section 2. Do not copy those values into a
+second runtime table or tavern flag set. This section records only the tavern
+side of that future story continuation; none of it is implemented yet.
+
+- Mongol's existing NPC object gains the stableman/servant role and the
+  corresponding tavern schedule only after the Zimmer settlement completes.
+- Mongol's two servant girls join the household through typed NPC objects and
+  use the existing work/chores authority. Their assignments cover cleaning,
+  fire tending, and wood-stock care; reports and room descriptions project the
+  resulting work instead of maintaining parallel completion booleans.
+- While those workers are active and able to work, the same chores are removed
+  from MC's routine responsibility. Sickness, absence, or story interruption
+  must be derived from their NPC state and schedule.
+- The recovered horse, additional horse, and carriage belong to the existing
+  stable/transport domain. Extend that owner for multiple animals and the
+  carriage; do not mirror them in room state, screens, or loose globals.
+- The carriage is a stable object/action that starts authored ride events with
+  eligible tavern ladies. Each ride's relationship and story requirements stay
+  in that lady's event/thread definition.
+- Mongol's backyard and shed-bathroom suggestions are story events. Any later
+  construction state belongs to the existing room/improvement authority and is
+  shown through the affected Room objects.
+- Becky's and Inga's store continuations are unlocked from the completed
+  post-camp story stage, but each NPC continues to own her own availability,
+  relationship conditions, scene flow, and counters.
+
 ## Sandra Route
 
 Sandra is tavern keeper and household authority.

@@ -27,9 +27,29 @@ This document captures the scope explicitly requested in the current session (af
 ### 2. Third Part of Blackwoods (post-camp)
 - Full resolution of the choice made at `zimmer_bandit_camp_choice`.
 - Violent path consequences:
-  - Camp destruction scene + loot / cleanup.
+  - The current camp fight and Zimmer report are only the first playable slice;
+    they do not yet grant the final reward package below.
+  - MC must carry and use one existing crafted fire bottle
+    (`fire_bomb_001`) during the assault. The camp event consumes that item;
+    do not create a second quest-only fire-bottle item or mirror its quantity.
+  - Unique post-camp reward package, granted exactly once:
+    - recover Becky's stolen horse;
+    - receive exactly 2,000 maravedi;
+    - Mongol joins the tavern household as stableman and servant;
+    - one additional horse joins the tavern stable;
+    - Mongol's two servant girls join the household;
+    - a carriage becomes available for rides with tavern ladies.
+  - The two servant girls take responsibility for cleaning, tending the fires,
+    and maintaining the wood stock so MC no longer performs those routine
+    duties while the servants are active and able to work.
+  - Becky unlocks the store intimacy continuation after this resolution. If
+    Inga is present in the store, her corresponding store continuation can also
+    become available through her own event/thread conditions.
+  - Mongol proposes two later tavern improvements: a backyard improvement and
+    a bathroom in the shed. His proposal unlocks their authored order/build
+    events; it does not instantly complete either room improvement.
   - Reaction from Robin's remaining people (if any).
-  - Zimmer payout + possible investigation complications.
+  - Zimmer settlement and possible investigation complications.
   - Long-term effect on Becky trade safety (or new dangers).
 - Peaceful path consequences:
   - Negotiation / deal with Robin.
@@ -48,6 +68,12 @@ This document captures the scope explicitly requested in the current session (af
 - Proper investigation timer (`ZimmerVar['RobinInvestigationDay']`).
 - What happens when the timer expires depending on player choice at the camp.
 - Zimmer's personality reactions (he is already a registered secondary with knowsMC).
+- Extend the existing post-victory Zimmer report into a one-time settlement
+  stage for the exact reward package in section 2. The Zimmer/Robin thread owns
+  the order and completion gate; it must not duplicate money, horse, worker, or
+  tavern-improvement state.
+- The branch is complete only after the camp victory and this settlement have
+  both played. Retreat or defeat grants no part of the package.
 - **Done this session**: Zimmer fully converted to secondary NPC (direct knowsMC["zimmer"], profile, defaults + new flags in game/NPC/Secondary/InitSecondaryNPC.rpy). New thin label `zimmer_guard_mission_update` + integration into RobinBlackwood thread. Reacts to destroy vs peaceful choice at bandit camp and updates mission state. CityGuard location + full IntZimmerTalk (horse theft complaints, Sherwood story, paid Robin investigation) already functional.
 
 ### 5. Technical / Polish
