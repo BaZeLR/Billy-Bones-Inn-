@@ -1,0 +1,10 @@
+Tool: built-in image_gen
+Asset: liza_portrait_proposal.png
+Status: new portrait proposal; no existing asset or gameplay mapping replaced.
+
+Prompt:
+Create a standalone 4:5 waist-up portrait of the same adult (18+) Lizette Bruno from these references. Image 1 is the face and identity reference; image 2 is the dress and tavern reference. Preserve her recognizable face, chocolate-brown skin, green eyes, petite slender build and long dark hair in two braids. Keep her existing opaque embroidered tavern dress. Relaxed confident smile, direct gaze, warm softly blurred tavern background. Match the references' polished 3D painterly style with clearer natural skin and fabric detail. No other people, props, text, nudity or watermark.
+
+References:
+images/Liza/lizaNew/liza_work_happy.png (identity)
+images/Liza/lizaNew/liza_waitress_main_hall_minidress.png (dress and tavern)
