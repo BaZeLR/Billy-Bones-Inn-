@@ -100,21 +100,30 @@ screen say(who, what):
     $ _say_panel_w = int((config.screen_width - 36) * 0.72)
     $ _say_inner_w = _say_panel_w - 48
 
-    window:
-        id "window"
-        xpos 12
-        xsize _say_panel_w
-
+    if renpy.get_screen("main_ui") is not None and what:
+        $ _room = rooms.current
+        $ _room_name = _room.display_name if _room is not None else str(rooms.current_code or "")
         vbox:
-            xpos 24
-            ypos 10
-            xmaximum _say_inner_w
-            spacing 8
-
-            if who is not None:
-                text who id "who" style "say_label"
-
-            text what id "what"
+            xpos 12
+            ypos 12
+            xsize _say_panel_w
+            ymaximum max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278))) - 24
+            yfill True
+            spacing 10
+            use main_ui_left_panel(_room_name, what, resolve_main_ui_picture(_room), True, who)
+    else:
+        window:
+            id "window"
+            xpos 12
+            xsize _say_panel_w
+            vbox:
+                xpos 24
+                ypos 10
+                xmaximum _say_inner_w
+                spacing 8
+                if who is not None:
+                    text who id "who" style "say_label"
+                text what id "what"
 
 
         #if who is not None:

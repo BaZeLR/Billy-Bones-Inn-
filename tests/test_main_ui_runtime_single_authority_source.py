@@ -76,7 +76,7 @@ def test_retired_ui_globals_are_consumed_only_by_one_save_migration():
 
 def test_talk_panel_displays_label_owned_scene_picture_changes():
     runtime = RUNTIME.read_text(encoding="utf-8-sig")
-    panel = runtime.split('screen main_ui_talk_panel(girl_name="", room_name="", desc=""):', 1)[1].split(
+    panel = runtime.split('screen main_ui_talk_panel(', 1)[1].split(
         "screen main_ui_player_card_panel", 1
     )[0]
 

@@ -141,6 +141,22 @@ label, or Python dispatcher. If `main_ui` is used to render choices, those
 choices must still be authored at the event point and must appear in the event
 panel while the event picture/text remains visible.
 
+### Shared text presentation
+
+Native `say` and the event's menu text use the same existing left-panel layout.
+While `say` is visible, `main_ui` does not also draw its static room/talk text.
+Ren'Py still owns the required `what` widget and dialogue interaction.
+The documented character `begin` callback projects the current paragraph into
+`scene_runtime.text` during event/talk mode, so the following native menu keeps
+that paragraph instead of reviving the room description. It does not add a
+text queue, a second scene state, or story progression. Event labels can still
+explicitly set their next menu paragraph. Normal event/talk exit restores the
+existing caller context, including room text and picture.
+
+Regression checks: `tools/external_event_text_test.py` measures rendered text
+counts and coordinates across dialogue, native menus, and return;
+`tools/external_liza_work_test.py` checks the actual glory-hole path.
+
 ## Multi-Picture Events
 
 For linear events with several pictures, keep the scene as a sequence of

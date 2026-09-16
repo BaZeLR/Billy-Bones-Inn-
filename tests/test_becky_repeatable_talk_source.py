@@ -53,7 +53,7 @@ def test_becky_talk_repeats_the_same_native_menu_until_explicit_exit():
 
 
 def test_talk_text_viewport_starts_at_the_first_line():
-    talk_panel = MAIN_LAYOUT.split('screen main_ui_talk_panel(girl_name="", room_name="", desc=""):', 1)[1].split(
+    talk_panel = MAIN_LAYOUT.split('screen main_ui_talk_panel(', 1)[1].split(
         "screen main_ui_player_card_panel", 1
     )[0]
 

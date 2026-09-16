@@ -199,6 +199,15 @@ init python:
             main_ui_restore_context(origin)
         main_ui_restart_interaction()
 
+    def main_ui_dialogue_text(event, interact=True, what="", **kwargs):
+        # Native labels own the paragraph; retain it in the existing UI projection
+        # for their next menu, after Ren'Py hides the say screen.
+        if event == "begin" and interact and what and renpy_module.get_screen("main_ui") is not None:
+            if main_ui_runtime.mode in ("event", "talk"):
+                scene_runtime.text = what
+
+    config.all_character_callbacks.append(main_ui_dialogue_text)
+
     def tractir_after_load_restore_ui():
 
         try:
@@ -439,9 +448,7 @@ screen main_ui():
     $ _room_name = _room.display_name if _room is not None else str(rooms.current_code or "")
     $ _desc = str(_coerce_panel_text_value(scene_runtime.text if scene_runtime.text is not None else scene_runtime.location_text) or "")
     $ _say_displayable = renpy.get_screen("say")
-    $ _say_scope = getattr(_say_displayable, "scope", {}) if _say_displayable is not None else {}
-    $ _say_text = str(_say_scope.get("what", "") or "") if hasattr(_say_scope, "get") else ""
-    $ _desc = "" if _say_text != "" and _say_text == _desc else _desc
+    $ _native_dialogue = _say_displayable is not None and bool(_say_displayable.scope.get("what", ""))
     $ _picture = resolve_main_ui_picture(_room)
     $ current_location = str(rooms.current_code or getattr(_room, "code_name", "") or "")
     $ _npc_ids_here = list(people.ids_at(current_location) or []) if current_location else []
@@ -482,7 +489,11 @@ screen main_ui():
                 ymaximum _usable_h - 24
                 yfill True
                 spacing 10
-                use main_ui_left_panel(_room_name, _desc, _picture)
+                if _native_dialogue:
+                    # The say screen renders the same panel and owns its what widget.
+                    null width int((config.screen_width - 36) * 0.72)
+                else:
+                    use main_ui_left_panel(_room_name, _desc, _picture)
 
             vbox:
                 xmaximum int((config.screen_width - 36) * 0.28)
@@ -656,20 +667,20 @@ screen main_ui():
         use tractir_progress_panel
 
 
-screen main_ui_left_panel(room_name, desc, picture):
-    if str(main_ui_runtime.mode or "scene") == "mc":
+screen main_ui_left_panel(room_name, desc, picture, dialogue=False, who=None):
+    if not dialogue and str(main_ui_runtime.mode or "scene") == "mc":
         use main_ui_player_card_panel()
-    elif str(main_ui_runtime.mode or "scene") == "tavern":
+    elif not dialogue and str(main_ui_runtime.mode or "scene") == "tavern":
         use main_ui_tavern_report_panel()
-    elif str(main_ui_runtime.mode or "scene") == "dog":
+    elif not dialogue and str(main_ui_runtime.mode or "scene") == "dog":
         use main_ui_dog_card_panel()
-    elif str(main_ui_runtime.mode or "scene") == "werecat":
+    elif not dialogue and str(main_ui_runtime.mode or "scene") == "werecat":
         use main_ui_werecat_card_panel()
-    elif str(main_ui_runtime.mode or "scene") == "fight":
+    elif not dialogue and str(main_ui_runtime.mode or "scene") == "fight":
         use main_ui_fight_panel()
     elif str(main_ui_runtime.mode or "scene") == "talk" and str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") != "":
-        use main_ui_talk_panel(str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or ""), room_name, desc)
-    elif str(main_ui_runtime.mode or "scene") in ("char", "event") and str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") != "":
+        use main_ui_talk_panel(str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or ""), room_name, desc, dialogue, who)
+    elif not dialogue and str(main_ui_runtime.mode or "scene") in ("char", "event") and str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") != "":
         use main_ui_girl_card_panel(str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or ""))
     else:
         vbox:
@@ -685,13 +696,22 @@ screen main_ui_left_panel(room_name, desc, picture):
                 use BGIMAGE(picture)
 
             frame:
+                id ("window" if dialogue else "main_ui_scene_text")
+                xpos 0
+                xanchor 0
                 xfill True
                 yminimum 350
                 ymaximum 420
                 padding (12, 10)
                 background "#000000ff"
 
-                if str(rooms.current_code or "") == "DebugBuilderRoom":
+                if dialogue:
+                    vbox:
+                        spacing 8
+                        if who is not None:
+                            text who id "who" style "say_label"
+                        text desc id "what" size 20
+                elif str(rooms.current_code or "") == "DebugBuilderRoom":
                     viewport:
                         xfill True
                         yfill True
@@ -703,13 +723,13 @@ screen main_ui_left_panel(room_name, desc, picture):
                     text desc size 20
 
 
-screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
+screen main_ui_talk_panel(girl_name="", room_name="", desc="", dialogue=False, who=None):
     $ _girl_key = girl_card_resolved_key(girl_name)
     $ _title = str(main_ui_runtime.action_title or ("Разговор с %s" % girl_card_display_name(_girl_key)))
     $ _talk_origin_picture = str(dict(main_ui_runtime.talk_origin or {}).get("picture", "") or "")
     $ _scene_picture = str(scene_runtime.picture or "")
     $ _portrait = _scene_picture if _scene_picture and _scene_picture != _talk_origin_picture else str(main_ui_runtime.talk_picture or main_ui_talk_picture_path(_girl_key) or "")
-    $ _text = str(scene_runtime.text or scene_runtime.location_text or desc or "")
+    $ _text = str(desc or "")
     $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))
     $ _picture_h = int((_usable_h - 24) * 0.68)
 
@@ -729,6 +749,9 @@ screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
                 use BGIMAGE(None)
 
         frame:
+            id ("window" if dialogue else "main_ui_talk_text")
+            xpos 0
+            xanchor 0
             xfill True
             yminimum 260
             ymaximum 420
@@ -743,7 +766,14 @@ screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
                 draggable True
                 mousewheel True
 
-                text _text size 20
+                if dialogue:
+                    vbox:
+                        spacing 8
+                        if who is not None:
+                            text who id "who" style "say_label"
+                        text _text id "what" size 20
+                else:
+                    text _text size 20
 
 
 screen main_ui_player_card_panel():
