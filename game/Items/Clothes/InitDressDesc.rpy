@@ -38,6 +38,14 @@ init python:
         "sailordress": 26,
         "thiefdress": 18,
         "nobbledress": 40,
+        "modestworkdress": 6,
+        "modestnicedress": 10,
+        "workdress": 6,
+        "workdresszhilet": 8,
+        "greenworkdress": 6,
+        "openworkdress": 10,
+        "minidress": 12,
+        "slutdress": 12,
     }
 
     FullDressDesc = {

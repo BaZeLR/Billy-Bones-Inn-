@@ -68,7 +68,7 @@ init -20 python:
 
 
     def tavern_work_liza_talk_ready():
-        return Georgett.can_work_tavern() and Liza.can_work_tavern()
+        return Liza.can_work_tavern()
 
 
     def tavern_work_person_on_property(person=""):

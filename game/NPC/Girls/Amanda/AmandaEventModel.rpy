@@ -100,13 +100,20 @@ init -24 python:
                 (12, 21),
                 1,
                 "TavernGloryHole",
-                "amanda_gloryhole_try",
+                "check_glory_hole",
                 40,
                 source_refs=["AmandaAtGloryHole.txt"],
             )
 
         def checkAmandaConditions(self):
-            return Amanda.var_int("glory_cur_state", 0) >= 1
+            session = player.tavern_management.glory_hole_session
+            return (
+                Amanda.var_int("glory_cur_state", 0) >= 1
+                and session.amanda_present == 1
+                and session.works == 1
+                and session.girl_name == "liza"
+                and session.menu_blocked == 1
+            )
 
 
     class AmandaMorningWindowEpisodeEvent(AmandaEvent):

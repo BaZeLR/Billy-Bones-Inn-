@@ -118,7 +118,7 @@ def test_amanda_liza_conversation_is_one_after_breakfast_multi_room_event():
     room_block = source.split("TAVERN_AMANDA_LIZA_TALK_ROOMS = (", 1)[1].split(")", 1)[0]
     for room_code in ("TavernMain", "TavernEmptyRoom", "Shed", "Backyard", "TavernStable", "TavernStorage"):
         assert f'"{room_code}"' in room_block
-    assert "Georgett.can_work_tavern() and Liza.can_work_tavern()" in source
+    assert 'def tavern_work_liza_talk_ready():\n        return Liza.can_work_tavern()' in source
     assert "bool(player.tavern_management.breakfast.today)" in source
     assert "not bool(player.tavern_management.breakfast.event_active)" in source
     assert "tavern_work_person_on_property(\"amanda\")" in source

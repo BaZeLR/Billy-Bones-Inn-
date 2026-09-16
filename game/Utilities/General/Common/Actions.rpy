@@ -9,7 +9,7 @@ init -46 python:
 
     SOCIAL_ITEM_EFFECT_RULES = {
         "soap": {
-            "targets": ("sandra", "melissa", "amanda"),
+            "targets": ("sandra", "melissa", "amanda", "liza", "georgett"),
             "friend_bonus": 3,
             "horny_bonus": 2,
             "beauty_bonus": 20,
@@ -23,7 +23,7 @@ init -46 python:
             "common_text": "{} сразу заметно хорошеет, становится мягче и послушнее, а чистый запах явно поднимает ей настроение.",
         },
         "luxury_soap": {
-            "targets": ("sandra", "melissa", "amanda", "becky", "clara"),
+            "targets": ("sandra", "melissa", "amanda", "becky", "clara", "liza", "georgett"),
             "friend_bonus": 4,
             "horny_bonus": 2,
             "beauty_bonus": 25,

@@ -1226,9 +1226,9 @@ init -999 python:
             corruption_limit = people_to_int(corruption_limit, 0)
             friend_chance = max(0, people_to_int(friend_chance, 0))
             corruption_chance = max(0, people_to_int(corruption_chance, 0))
-            if friend_delta != 0 and self.rel < friend_limit and (friend_chance <= 1 or procedural_randint(1, friend_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:888:1") == 1):
+            if ((friend_delta > 0 and self.rel < friend_limit) or (friend_delta < 0 and self.rel > friend_limit)) and (friend_chance <= 1 or procedural_randint(1, friend_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:888:1") == 1):
                 self.change_social(friend_delta=friend_delta)
-            if corruption_delta != 0 and self.corruption < corruption_limit and (corruption_chance <= 1 or procedural_randint(1, corruption_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:890:2") == 1):
+            if ((corruption_delta > 0 and self.corruption < corruption_limit) or (corruption_delta < 0 and self.corruption > corruption_limit)) and (corruption_chance <= 1 or procedural_randint(1, corruption_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:890:2") == 1):
                 self.change_social(corruption_delta=corruption_delta)
             if friend_delta > 0 or corruption_delta > 0:
                 self.change_mana(1, reason)
@@ -1366,12 +1366,20 @@ init -999 python:
         mood = "neutral"
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
+            self.mana = 10
+            self.rebellion = 0
+            self.reaction_state = {}
+            self.reaction_log = []
             self.detailed_sex_history = []
             self.wardrobe = GirlWardrobeState()
             self.temporary_fertility = {"item_id": "", "until_day": -1}
 
         def update(self):
             super(Girl, self).update()
+            self.__dict__.setdefault("mana", 10)
+            self.__dict__.setdefault("rebellion", 0)
+            self.__dict__.setdefault("reaction_state", {})
+            self.__dict__.setdefault("reaction_log", [])
             base_clothing = getattr(getattr(self, "data", None), "base_clothing", {})
             self.wardrobe = GirlWardrobeState.from_saved(
                 getattr(self, "wardrobe", None),
@@ -1648,6 +1656,17 @@ init -999 python:
 
         def tavern_intimate_client_limit(self):
             return 3
+
+        def tavern_client_attraction(self):
+            # Beauty already includes care from soap and the barber. Read the
+            # actual worn outfit, not owned gifts or the selected day outfit.
+            outfit_look = max([
+                people_to_int(value, 0)
+                for dress_code, value in DressLookValue.items()
+                if DressTopPart.get(dress_code) == self.clothing_layer("top")
+                and DressBottomPart.get(dress_code) == self.clothing_layer("bottom")
+            ] or [0])
+            return max(0, min(100, people_to_int(self.sex_stat("beauty", 0), 0) + outfit_look))
 
         def tavern_glory_hole_client_limit(self):
             return max(0, people_to_int(player.tavern_management.visitors, 0) // 6)

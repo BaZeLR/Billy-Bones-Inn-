@@ -95,7 +95,7 @@ label TavernGloryHoleCheck:
         if tavern_glory_hole_working_now() and session.girl_name != "":
             session.works = 1
 
-        if GetSexEventFromTable("amanda", 99, "glorytry") > 0:
+        if session.works and session.girl_name == "liza" and GetSexEventFromTable("amanda", 99, "glorytry") > 0:
             session.amanda_present = 1
             Amanda.set_var_int("glorytried", 1)
 
@@ -300,7 +300,8 @@ label TavernGloryHoleCheck:
                 jump TavernGloryHole_menu
 
             "Ваша реакция" if player.tavern_management.glory_hole_session.menu_blocked == 1:
-                call checkTriggers("TavernGloryHole", "amanda_gloryhole_try", 0)
+                $ findAvailableEvents(True)
+                call checkTriggers("TavernGloryHole", "check_glory_hole", 0)
 
             "Вернуться в комнату":
                 $ main_ui_end_native_scene_state()

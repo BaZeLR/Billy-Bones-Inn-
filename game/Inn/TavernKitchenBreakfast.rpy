@@ -924,7 +924,9 @@ init python:
             ):
                 return False
         info = people.get_info(key)
-        if not isinstance(info, Girl) or key in ("georgett", "liza"):
+        if not isinstance(info, Girl):
+            return False
+        if key in ("georgett", "liza") and not info.can_work_tavern():
             return False
         if not info.tavern_service_available("intimate"):
             return True
@@ -1247,6 +1249,12 @@ label TavernKitchenBreakfastMenu:
 
             "Предложить Аманде сходить к Серджио" if household_barber_request_ready("amanda", "breakfast"):
                 call HouseholdBarberRequestEvent("amanda")
+
+            "Предложить Лизетте сходить к Серджио" if household_barber_request_ready("liza", "breakfast"):
+                call HouseholdBarberRequestEvent("liza")
+
+            "Предложить Жоржетте сходить к Серджио" if household_barber_request_ready("georgett", "breakfast"):
+                call HouseholdBarberRequestEvent("georgett")
 
             "Объявить о Жоржетте и Лизетте" if int(player.tavern_management.breakfast.georgett_liza_pending or 0) == 1:
                 call TavernKitchenBreakfastAnnounceGeorgetteLiza
@@ -1933,6 +1941,12 @@ label TavernKitchenSundayDinner(serve_spicy=0):
                     "Предложить Бекки" if tavern_sunday_dinner_can_offer_service("becky", _sunday_present_ids):
                         call TavernKitchenSundayDinnerServiceOffer("becky")
 
+                    "Предложить Лизетте" if tavern_sunday_dinner_can_offer_service("liza", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("liza")
+
+                    "Предложить Жоржетте" if tavern_sunday_dinner_can_offer_service("georgett", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("georgett")
+
                     "Назад к воскресному обеду":
                         pass
 
@@ -2030,11 +2044,21 @@ label TavernKitchenSundayDinner(serve_spicy=0):
 
 
 label TavernKitchenSundayDinnerServiceOffer(girl_name=""):
-    $ renpy.dynamic("_service_offer_info", "_service_offer_name", "_service_offer_intimate", "_service_offer_glory")
+    $ renpy.dynamic("_service_offer_info", "_service_offer_name", "_service_offer_intimate", "_service_offer_glory", "_service_offer_decision")
     $ _service_offer_info = people.get_info(girl_name)
-    if not isinstance(_service_offer_info, Girl):
+    if not isinstance(_service_offer_info, Girl) or not tavern_sunday_dinner_can_offer_service(girl_name):
         return
     $ _service_offer_name = str(people_display_name(girl_name) or girl_name)
+    $ _service_offer_decision = _service_offer_info.decide("tavern_service")
+    if _service_offer_decision["reaction"] not in ("good", "capricious_bad_is_good"):
+        if _service_offer_decision["reaction"] == "neutral":
+            $ scene_runtime.text = _service_offer_name + " просит дать ей время подумать о дополнительной работе. Вы оставляете решение за ней."
+        else:
+            $ scene_runtime.text = _service_offer_name + " отказывается от дополнительной работы: сейчас она к ней не готова. Вы принимаете ее ответ."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Вернуться к обеду":
+                return
     $ _service_offer_intimate = not _service_offer_info.tavern_service_available("intimate")
     $ _service_offer_glory = int(player.tavern_management.glory_hole or 0) == 2 and not _service_offer_info.tavern_service_available("gloryhole")
     if _service_offer_intimate:

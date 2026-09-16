@@ -53,7 +53,7 @@ init python:
             return False
 
     def barber_shop_pending_npc_id():
-        for npc_id in ("sandra", "melissa", "amanda", "becky", "clara"):
+        for npc_id, _npc_info in people.girl_items():
             if int(household.barber_appointments.get(npc_id, 0) or 0) == 1:
                 return npc_id
         return ""

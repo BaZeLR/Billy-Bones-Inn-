@@ -84,7 +84,7 @@ init python:
 
     def _girls_desc_recent_barber_line(girl_key=""):
         key = str(girl_key or "").strip().lower()
-        if key not in ("sandra", "melissa", "amanda", "becky", "clara"):
+        if key not in ("sandra", "melissa", "amanda", "becky", "clara", "liza", "georgett"):
             return ""
         last_day = int(household.barber_visit_last_day.get(key, -99) or -99)
         current_day = int(calendar_v2.daysInGame or 0)

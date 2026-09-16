@@ -124,6 +124,27 @@ init -34 python:
                 "church_obey": -0.4,
             },
         },
+        # Voluntary extra service; role/story/friendship gates stay with the offer.
+        "tavern_service": {
+            "good": {
+                "trust": 1.8,
+                "openness": 0.9,
+                "sexual_openness": 1.0,
+                "mana_value": 0.02,
+                "need_pressure": -1.2,
+                "anger": -1.5,
+                "rebel": -1.2,
+            },
+            "bad": {
+                "anger": 1.7,
+                "rebel": 1.4,
+                "need_pressure": 1.2,
+                "trust": -0.9,
+                "openness": -0.6,
+                "sexual_openness": -0.5,
+                "mana_value": -0.01,
+            },
+        },
         "intimate_help": {
             "good": {
                 "trust": 1.7,
@@ -320,8 +341,8 @@ init -34 python:
             "wetness": girl_decision_ratio(wet_value, 100),
             "anger": girl_decision_ratio(anger_value, 5),
             "rebel": girl_decision_ratio(rebel_value, 5),
-            "mana_value": girl_decision_int(getattr(girl_info, "mana", 0), 0) if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else 0,
-            "mana_bad_probability": girl_info.mana_bad_probability() if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else 0.0,
+            "mana_value": girl_decision_int(getattr(girl_info, "mana", 0), 0) if girl_info is not None else 0,
+            "mana_bad_probability": girl_info.mana_bad_probability() if girl_info is not None else 0.0,
             "player_history": float(player_history),
             "likes_player": 1.0 if friend >= 10 else 0.0,
             "soap_bonus": girl_decision_soap_bonus(girl),
@@ -376,7 +397,8 @@ init -34 python:
         bad_score = girl_decision_score(data, action_key, "bad") - 1.05
         p_good = girl_decision_clamp(girl_decision_sigmoid(good_score))
         p_bad = girl_decision_clamp(girl_decision_sigmoid(bad_score))
-        if str(data.get("girl", "") or "").strip().lower() in GIRL_DECISION_CORE_IDS:
+        # Paid workers' voluntary offer uses morale as a score, not a refusal floor.
+        if action_key != "tavern_service" and str(data.get("girl", "") or "").strip().lower() in GIRL_DECISION_CORE_IDS:
             p_bad = girl_decision_clamp(data.get("mana_bad_probability", 0.0))
             p_good = girl_decision_clamp(p_good * (1.0 - p_bad), 0.0, 1.0 - p_bad)
             p_neutral = max(0.0, 1.0 - p_good - p_bad)

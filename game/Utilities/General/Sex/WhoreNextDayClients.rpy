@@ -56,7 +56,10 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
                     created += 1
         else:
             if max_clients_i > 0:
-                generated_clients = procedural_randint(1, max_clients_i, "port_clients_%s_%s" % (_wnd_girl_name, day_value))
+                generated_clients = max(1, sum(
+                    procedural_randint(1, 100, "port_clients_%s_%s_%s" % (_wnd_girl_name, day_value, client_slot)) <= _wnd_girl.tavern_client_attraction()
+                    for client_slot in range(max_clients_i)
+                ))
             else:
                 generated_clients = 0
             if week_val == 5:

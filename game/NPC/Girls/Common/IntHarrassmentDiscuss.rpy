@@ -47,14 +47,12 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             call HarassDiscussImage(GirlNameMHD, 1)
             $ _discussion_text += "\n\n{} восприняла ваши слова с удивлением и даже некоторым разочарованием.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=-1)
                 $ _girl_info.change_mana(-1, "harass_forbid_attention")
                 $ _girl_info.change_rebellion(1, "harass_forbid_attention")
         else:
             call HarassDiscussImage(GirlNameMHD, 2)
             $ _discussion_text += "\n\n{} восприняла ваши слова с облегчением.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=-1)
                 $ _girl_info.change_mana(1, "harass_forbid_attention")
                 $ _girl_info.change_rebellion(-1, "harass_forbid_attention")
 
@@ -70,14 +68,12 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             call HarassDiscussImage(GirlNameMHD, 2)
             $ _discussion_text += "\n\n{} восприняла ваши слова как должное, заметив что она и сама думает точно также.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=1)
                 $ _girl_info.change_mana(1, "harass_allow_attention")
                 $ _girl_info.change_rebellion(-1, "harass_allow_attention")
         else:
             call HarassDiscussImage(GirlNameMHD, 0)
             $ _discussion_text += "\n\n{} слушала вас с грустным и обиженным выражением лица, но в конце концов согласилась с вашей аргументацией и пообещала стараться.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=1)
                 $ _girl_info.change_mana(-1, "harass_allow_attention")
                 $ _girl_info.change_rebellion(1, "harass_allow_attention")
 
@@ -90,14 +86,12 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             call HarassDiscussImage(GirlNameMHD, 2)
             $ _discussion_text += "\n\n{} восприняла ваши слова как должное, заметив что она и сама думает точно также.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=1)
                 $ _girl_info.change_mana(1, "harass_allow_attention_repeat")
                 $ _girl_info.change_rebellion(-1, "harass_allow_attention_repeat")
         else:
             call HarassDiscussImage(GirlNameMHD, 0)
             $ _discussion_text += "\n\n{} слушала вас с грустным и обиженным выражением лица, но в конце концов согласилась с вашей аргументацией и пообещала стараться.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
-                $ _girl_info.change_social(corruption_delta=1)
                 $ _girl_info.change_mana(-1, "harass_allow_attention_repeat")
                 $ _girl_info.change_rebellion(1, "harass_allow_attention_repeat")
 

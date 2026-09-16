@@ -945,10 +945,17 @@ def test_amanda_gloryhole_try_enters_through_thread_event():
 
     assert "class AmandaGloryHoleTryEvent(AmandaEvent):" in event_model
     assert '"story_amanda_gloryhole_try_0"' in event_model
+    assert 'session.amanda_present == 1' in event_model
+    assert 'session.works == 1' in event_model
+    assert 'session.girl_name == "liza"' in event_model
+    assert 'session.menu_blocked == 1' in event_model
+    assert '"check_glory_hole"' in event_model
     assert "def amanda_gloryhole_try_ready():" not in amanda_glory
     assert "label AmandaAtGloryHoleEventEntry:" not in amanda_glory
     assert "label story_amanda_gloryhole_try_0:" in amanda_glory
-    assert 'call checkTriggers("TavernGloryHole", "amanda_gloryhole_try", 0)' in glory_hole
+    assert 'call checkTriggers("TavernGloryHole", "check_glory_hole", 0)' in glory_hole
+    reaction = glory_hole.split('"Ваша реакция" if', 1)[1].split('"Вернуться в комнату":', 1)[0]
+    assert reaction.index('$ findAvailableEvents(True)') < reaction.index('call checkTriggers("TavernGloryHole", "check_glory_hole", 0)')
     assert "AmandaAtGloryHoleEventEntry" not in glory_hole
     assert "Реакция для этой сцены пока недоступна" not in glory_hole
     assert "ClientsSaw" not in glory_hole
