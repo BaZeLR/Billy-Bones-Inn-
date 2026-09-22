@@ -1175,6 +1175,8 @@ label TavernKitchenBreakfast:
         menu:
             "Продолжить":
                 $ _breakfast_line_index += 1
+    if story_event_available("TavernKitchen", "breakfast"):
+        call checkTriggers("TavernKitchen", "breakfast", 0)
     $ player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")
     $ player.tavern_management.breakfast.base_shown_day = -1
     call TavernKitchenBreakfastMenu

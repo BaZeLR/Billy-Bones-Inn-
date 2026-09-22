@@ -485,6 +485,39 @@ define melissaThreadList = [
 ]
 
 define sandraThreadList = [
+    LThreadData(0, "sandra", "AmandaReconciliation", None, [
+        (
+            "story_sandra_amanda_argument_0",
+            None, None, None,
+            1,
+            None,
+            [
+                "#threads['melissaBatProblem'].num >= 9",
+                "#player.tavern_management.breakfast.event_active",
+                "#'amanda' in tavern_breakfast_present_ids()",
+                "#'sandra' in tavern_breakfast_present_ids()",
+            ],
+            None,
+            "TavernKitchen",
+            "breakfast",
+            0,
+        ),
+        (
+            "story_sandra_amanda_reconciliation_1",
+            None, None, 2,
+            1,
+            None,
+            [
+                "#player.tavern_management.breakfast.event_active",
+                "#'amanda' in tavern_breakfast_present_ids()",
+                "#'sandra' in tavern_breakfast_present_ids()",
+            ],
+            None,
+            "TavernKitchen",
+            "breakfast",
+            1,
+        ),
+    ], highlight=False, threaded=True),
     LThreadData(0, "sandra", "UpstairsBedroomRelief", None, [
         SandraUpstairsBedroomRelief,
     ], highlight=False, threaded=False),

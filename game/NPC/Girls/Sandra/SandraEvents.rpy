@@ -166,6 +166,103 @@ label story_sandra_kitchen_household_respect_0:
     return
 
 
+label story_sandra_amanda_argument_0:
+    $ main_ui_begin_native_scene_state("Завтрак: ссора с Сандрой")
+    show screen main_ui
+    vscene AmandaStaticData.portrait
+    $ scene_runtime.text = "За завтраком Сандра опять вспоминает перепалку из-за потерянного буклета. Аманда утыкается в кружку, но спрятаться за ней не удаётся."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "— Смотри у меня, Аманда. Вздумаешь вести себя как шлюха — получишь розог. А то и брату Герхарду расскажу. Он тебе объяснит, до чего доводят такие забавы! Сначала руки под одеялом, а потом бесы в голове."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene AmandaStaticData.image_path("tavern", "angry")
+    $ scene_runtime.text = "— Ой, тётушка, хватит монашку строить! — взрывается Аманда. — Сама со старым козлом гуляла будь здоров. При мне уже, взрослой, тоже святую не изображала! Он к Мелиссе лип, подглядывал, а виноваты у тебя всегда мы."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "— И вообще, ты нам не мать! — Аманда с грохотом ставит кружку. — Мы взрослые. Сами решим, с кем водиться. А Герхарда своего оставь для церковных дур!"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "Сандра бледнеет. — Не мать, значит… А кормила, лечила, ночами возле вас сидела — это кто был? Очень удобно ты вспомнила, Аманда. — Она отворачивается. Даже ложки за столом затихают."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "— Аманда, извинись, — говорите вы. — Сандра заботилась о тебе как о родной. Спорить можешь, унижать её — нет. Ещё раз такое услышу — сам за розги возьмусь. Ну что за дурная корова: сначала ляпнет, потом думает!"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene AmandaStaticData.portrait
+    $ scene_runtime.text = "Аманда глядит в стол. — Прости, тётушка. Я со злости. Не надо было так говорить… Ты о нас заботилась, я знаю. Больше не буду. — Последние слова она произносит совсем тихо, без привычной ухмылки."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "— Слова назад не засунешь, — отвечает Сандра. — Но извинение я слышала. Дай мне остыть. И ешь уже, каша ни в чём не виновата. — Аманда послушно берётся за ложку; продолжать ссору ей больше не хочется."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_sandra_amanda_reconciliation_1:
+    $ main_ui_begin_native_scene_state("Завтрак: помириться с тётушкой")
+    show screen main_ui
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "За завтраком Сандра сама подвигает Аманде хлеб. — Ладно, хватит дуться. Я тебя простила. Только веди себя по-человечески, договорились? — Аманда кивает и впервые за эти дни смотрит на неё без опаски."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene AmandaStaticData.portrait
+    $ scene_runtime.text = "— Тётушка… А про мужчин тебя спрашивать можно? Без розог и Герхарда? — осторожно начинает Аманда. — Можно, — фыркает Сандра. — Если спрашивать, а не орать на всю кухню, что я старая потаскуха."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "— Вот ты всё говоришь: молодость, красота… А потом что? — спрашивает Аманда. Сандра усмехается: — Потом ум пригодится. У бабы грудь повисла — наклонилась, опять красавица. А у мужика повисло — вот это уже беда. Тут хоть на голове стой!"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene AmandaStaticData.portrait
+    $ scene_runtime.text = "Аманда давится смешком. — Тётушка! А бесы? — Бесы вечно заняты. Им бы твою дурацкую голову в порядок привести. — Вы кашляете в кружку, пряча улыбку. За столом наконец можно дышать спокойно."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene SandraStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "— И ещё запомни, — добавляет Сандра. — Мужик обещает луну — спроси, кто за свечи заплатит. Болтать все горазды. Смотри, как человек с тобой обходится. — Аманда кивает: на этот раз совет она слушает, а не ищет, чем бы уколоть в ответ."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label TavernSandraNightThanksScene:
     if int(threads["sandraWeeklyEvaluation"].num or 0) != 4 or int(calendar_v2.hour or 0) < 22 or int(calendar_v2.hour or 0) > 23:
         $ main_ui_runtime.action_title = "Комната Сандры"

@@ -427,7 +427,7 @@ label story_melissa_bat_problem_breakfast_argument:
     $ scene_runtime.text = "\"Сука! Сука!\" — только и находит что ответить Аманда. Сандра резко требует прекратить перепалку, а Мелисса поднимается из-за стола с таким видом, будто уже решила сама проверить все места, где Аманда могла спрятать пропажу."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Закончить завтрак":
+        "Продолжить":
             pass
     $ calendar_v2.advance_minutes(45)
     $ player.tavern_management.breakfast.today = True
@@ -437,6 +437,8 @@ label story_melissa_bat_problem_breakfast_argument:
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     $ main_ui_end_native_scene_state()
+    if story_event_available("TavernKitchen", "breakfast"):
+        call checkTriggers("TavernKitchen", "breakfast", 0)
     call TavernKitchenFinishBreakfastEvent
     return True
 

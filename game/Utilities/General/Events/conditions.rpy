@@ -109,6 +109,7 @@ init -25 python:
             "people_to_int": people_to_int,
             "player_charisma_breakdown": player_charisma_breakdown,
             "room_in_group": room_in_group,
+            "tavern_breakfast_present_ids": tavern_breakfast_present_ids,
             "tavern_work_planned_for": tavern_work_planned_for,
             "werecat_state": werecat_state,
             "bool": bool,

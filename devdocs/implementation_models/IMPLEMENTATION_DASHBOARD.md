@@ -39,6 +39,15 @@ This is a verified slice, not a claim that every NPC branch is complete.
 - Requested next: two rare mushrooms yield 20 tincture drops; honey preparation and eating one mushroom are alternative forms. A shared twice-monthly limit is required. Dose size and whether the limit is per recipient or global still need confirmation; switching preparations must not bypass the eventual limit.
 - Checks: `test_forest_spring_water_runtime.py` and isolated native `external_forest_spring_water_test.py` cover inventory conservation, failed refill, repeat use, action ownership, and room-context restoration.
 
+### Sandra and Amanda breakfast reconciliation — 2026-09-22
+
+- `sandraAmandaReconciliation` is one two-stage linear thread: argument/apology, then forgiveness and advice at breakfast at least two days later. Its stage and day are the only progression/timing state.
+- The argument follows the existing booklet breakfast (`melissaBatProblem.num >= 9`). Saves already past that point receive it at the next eligible breakfast without replaying the bat quest. Both stages require an active breakfast with Amanda and Sandra present according to the existing attendance accessor.
+- The two authored labels own their pictures, one-paragraph text and Continue buttons. They restore the caller's UI context and do not finish breakfast themselves; the existing breakfast flow remains responsible for that.
+- No new relationship/corruption gains, sexual-history changes, schedule changes or punishment procedure. This implements the requested quarrel/apology and later humorous reconciliation only.
+- Pending separate work: the preceding requested attic disclosure, Amanda's dream visit, booklet-return provenance, and Melissa's sleepover/ointment prerequisites have been inspected but are not corrected by this addition.
+- Verification: 32 new runtime tests (63 with related suites); isolated Ren'Py 8.5.2 playback passed five cases / 71 assertions, including the original booklet-to-breakfast chain and both normal-breakfast stages. Compile/lint exited 0; lint warnings were limited to generated testcases. Independent review found no defects in this scoped diff.
+
 ### System overview
 
 | System | Model Doc | Template | Runtime Owner | Status | Notes |
