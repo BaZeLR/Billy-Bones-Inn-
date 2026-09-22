@@ -321,7 +321,9 @@ def test_melissa_talk_keeps_native_flow_and_room_problem_choices_reachable():
     assert "call PlayerCardGiftToFixedTargetMenu(girl_name)" in talk_menu
     assert "call OldPointKinoAttempt" not in talk_menu
     assert "call OldPointApology" not in talk_menu
-    assert "call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)" in talk_menu
+    assert "if Melissa.can_apologize():" in talk_menu
+    assert "= Melissa.attempt_apology()" in talk_menu
+    assert "call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)" not in talk_menu
     assert "Melissa.change_social(friend_delta=6" not in talk_menu
     assert "RoomProblemAskDay" not in talk_source
     assert "and stage == 3" in household_source

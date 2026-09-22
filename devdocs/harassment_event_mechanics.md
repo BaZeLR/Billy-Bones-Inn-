@@ -1,390 +1,136 @@
-# Harassment Event Mechanics
-
-Source of truth:
-- `game/Inn/PartEventYourFirstReaction.rpy`
-- `game/Inn/PartEventGirlHarrassmentReaction.rpy`
-- `game/Inn/PartEventCustomerHarrassmentReaction.rpy`
-- `game/Inn/PartEventAfterHarrassment.rpy`
-- `game/Inn/IntHarrassmentDiscuss.rpy`
-
-## Overview
-
-This system is one of the game's best examples of layered social simulation.
-
-One player choice can affect:
-- trust / relationship
-- sexual permissiveness
-- work quality
-- tavern public reputation
-- later discipline and management conversations
-
-The event is not resolved by one simple flag. It is computed from:
-- player reaction
-- girl sluttiness
-- existing harassment policy for that girl
-- whether she runs away
-- whether she slaps the customer
-
-## Flow
-
-1. Event fires.
-2. Player chooses a first reaction:
-- ignore
-- watch
-- help
-3. Girl-side reaction is computed.
-4. Customer/public outcome is computed.
-5. After-event conversation with the girl is computed.
-6. Optional follow-up discussion updates longer-term relationship/discipline state.
-
-## First Reaction Layer
-
-Defined in:
-- `PartEventYourFirstReaction`
-
-Player choices:
-- `Не обращать внимания`
-- `Стоять и смотреть`
-- `Вмешаться и помочь <girl>`
-
-This first choice sets:
-- `YourReaction1 = 1` ignore
-- `YourReaction1 = 2` watch
-- `YourReaction1 = 3` help
-
-That value is then passed into the second-stage event logic.
-
-## Core Inputs
-
-Main inputs used by later branches:
-- `sluttiness[girl]`
-- `Friends[girl]`
-- `HarassInstructions[girl]`
-- `JobType`
-- `GirlRunAway`
-- `GirlSlapped`
-
-### Meaning of the important inputs
-
-`sluttiness[girl]`
-- controls how threatening / offensive / acceptable the unwanted touching feels to the girl
-- low values push toward shame, fear, anger, gratitude for protection
-- high values push toward tolerance, passive acceptance, or even approval
-
-`Friends[girl]`
-- governs trust fallout and gratitude chance
-- low friendship leaves more room for positive trust gain from helping
-- positive friendship can also be damaged if the player behaves badly
-
-`HarassInstructions[girl]`
-- current management rule for how the girl is supposed to react
-- important values:
-  - empty string: no explicit instruction
-  - starts with `allow`: player normalized or allowed this kind of treatment
-  - `notallow`: player forbade it
-
-This is what makes the system management-driven, not just emotional.
-
-## Girl-Side Reaction
-
-Defined in:
-- `PartEventGirlHarrassmentReaction`
-
-Main outputs:
-- `GirlRunAway`
-- `GirlSlapped`
-- event text
-- possible `Friends[girl]` changes
-
-### Case A: Player helps (`YourReaction1 == 3`)
-
-Outcome base:
-- player defends the worker
-- girl usually escapes the situation
-
-Common result:
-- `GirlRunAway = 1`
-
-Low sluttiness (`<= 10`)
-- girl slaps the offender
-- `GirlSlapped = 1`
-- if friendship is still low enough, she may thank the player
-- possible trust gain:
-  - `Friends[girl] += 1`
-
-Mid sluttiness (`30+` but not very high)
-- girl may not be upset enough to reward the help
-- text suggests your intervention may have been unnecessary
-
-Very high sluttiness (`>= 60`)
-- girl may actively dislike the intervention
-- she can side with the customer
-- possible trust loss:
-  - `Friends[girl] -= 1`
-- `GirlRunAway = 2`
-
-### Case B: Player watches (`YourReaction1 == 2`)
-
-This is the most trust-sensitive branch.
-
-If policy is strict and sluttiness is low:
-- girl tries to break free
-- often returns to work upset
-
-If no strict policy and sluttiness is moderate:
-- girl may hesitate, see the player watching, and decide to endure it
-
-If policy explicitly allows it:
-- low sluttiness can still lead to fear and flight
-- high sluttiness can produce calm or positive acceptance
-
-Main design meaning:
-- watching is not automatically cruel or helpful
-- it is interpreted through the girl's sexual tolerance and through prior player policy
-
-### Case C: Player ignores (`YourReaction1 == 1`)
-
-This overlaps with the policy/sluttiness checks from the watch path, but with a different emotional framing.
-
-If girl is low-slut or under stricter instruction:
-- she breaks free and may slap or flee
-
-If policy allows it and sluttiness is high:
-- she may accept it calmly
-
-Design meaning:
-- ignoring is often judged more harshly in the later trust phase than simple watching
-
-## Customer / Public Outcome
-
-Defined in:
-- `PartEventCustomerHarrassmentReaction`
-
-This is where work quality and tavern reputation are affected.
-
-### If the girl does not run away
-
-High sluttiness (`>= 50`)
-- on `1/12` chance:
-  - tavern fame rises by `1`
-  - waitress skill may rise by `1` if below `70`
-
-Lower sluttiness
-- on `1/25` chance:
-  - tavern fame rises by `1`
-  - waitress skill may rise by `1`
-- on `1/6` chance, if sluttiness is still under `7`:
-  - sluttiness rises by `1`
-
-Meaning:
-- enduring harassment can train public-service tolerance
-- and very rarely improve reputation among regulars
-- but this can also sexually desensitize the girl
-
-### If the girl runs away and slaps the customer
-
-On `1/2` chance:
-- angry customer leaves
-- tavern fame drops by `1`
-- waitress skill may drop by `1` if it was at least `20`
-
-Also, on `1/2` chance if sluttiness > 0:
-- sluttiness drops by `1`
-- text frames this as pride / regained self-respect
-
-Meaning:
-- good for dignity
-- bad for tavern reputation sometimes
-
-### If the girl runs away without slapping
-
-On `1/8` chance:
-- customer still leaves angry
-- tavern fame drops by `1`
-- waitress skill may drop by `1`
-
-On `1/10` chance if sluttiness > 0:
-- sluttiness drops by `1`
-
-Meaning:
-- refusal still has a reputation risk
-- but less explosive than a slap
-
-## After-Event Trust Fallout
-
-Defined in:
-- `PartEventAfterHarrassment`
-
-This is the most direct trust layer.
-
-### If the player's standing policy was `allow...`
-
-Low sluttiness (`< 18`)
-- girl confronts the player:
-  - "did I really have to endure this?"
-- on `1/3` chance, if friendship > 0:
-  - `Friends[girl] -= 1`
-
-Meaning:
-- even if the player set permissive policy, some girls resent being pushed too far
-
-### If player watched and girl was upset
-
-If:
-- `YourReaction1 == 2`
-- and `(sluttiness < 30 or GirlSlapped > 0)`
-
-Then girl explicitly blames the player for standing there and watching.
-
-On `1/2` chance, if friendship > 0:
-- `Friends[girl] -= 1`
-
-### If player ignored and girl was upset
-
-If:
-- `YourReaction1 == 1`
-- and `(sluttiness < 30 or GirlSlapped > 0)`
-
-Then girl complains that the player was absent and did not help.
-
-On `1/5` chance, if friendship > 0:
-- `Friends[girl] -= 1`
-
-### If girl is already permissive
-
-In higher-slut branches she may:
-- walk by calmly
-- tease the player
-- avoid trust loss entirely
-
-## Work Quality Impact
-
-This system does not directly change all tavern service stats.
-
-The main explicit skill effect is:
-- `waitress[girl]`
-
-Why waitress specifically:
-- these harassment events are tied to floor service and customer contact
-- so the system treats them as part of service professionalism
-
-Net effect pattern:
-- smooth endurance can improve waitress skill
-- public disruption can reduce waitress skill
-
-This is a realistic simulation loop:
-- exposure can toughen a waitress
-- but ugly incidents can also reduce service effectiveness
-
-## Reputation Impact
-
-The main public metric touched here is:
-- `tavernfame`
-
-Possible changes:
-- `+1`
-  - if customers are pleased with how the interaction is absorbed
-- `-1`
-  - if the interaction ends in public conflict and angry departure
-
-So these incidents are not purely private. They can shape the tavern's public standing.
-
-## Longer-Term Management Meaning
-
-The system is not just:
-- protect her
-- ignore her
-
-It also asks:
-- what standard has the player set for this worker?
-- can the worker psychologically endure that standard?
-- does the standard help tavern profit, hurt tavern profit, or damage trust?
-
-That makes `HarassInstructions[girl]` extremely important:
-- it converts the event from one-off moral flavor
-- into real workplace policy simulation
-
-## Concrete Examples
-
-### Example 1: Low-slut waitress, player helps
-
-Inputs:
-- `sluttiness = 5`
-- `Friends = 3`
-- `YourReaction1 = 3`
-
-Likely result:
-- girl runs away
-- slaps customer
-- may thank player
-- friendship can rise by `1`
-- tavern fame may later drop by `1` if customer storms out
-
-Meaning:
-- trust improves
-- tavern reputation may suffer
-
-### Example 2: High-slut waitress, player helps
-
-Inputs:
-- `sluttiness = 65`
-- `YourReaction1 = 3`
-
-Likely result:
-- girl may dislike the intervention
-- friendship can drop by `1`
-- event text frames the player as overreacting
-
-Meaning:
-- protective behavior can backfire if the girl already accepts this conduct
-
-### Example 3: Player watches, no strict instruction, medium sluttiness
-
-Inputs:
-- `HarassInstructions = ""`
-- `sluttiness = 24`
-- `YourReaction1 = 2`
-
-Likely result:
-- she notices the player watching
-- decides to endure it instead of fleeing
-- no immediate trust gain
-- no strong trust loss if she is permissive enough
-
-Meaning:
-- player passivity is normalized by her tolerance level
-
-### Example 4: Player allowed harassment, girl is still too shy
-
-Inputs:
-- `HarassInstructions = "allow..."`
-- `sluttiness = 10`
-
-Likely result:
-- she still feels humiliated
-- after-event confrontation
-- possible `Friends -1`
-
-Meaning:
-- management policy can outrun the girl's real readiness
-
-## Summary
-
-This system computes 4 different consequences at once:
-
-1. Emotional trust:
-- `Friends`
-
-2. Sexual tolerance:
-- `sluttiness`
-
-3. Work professionalism:
-- `waitress`
-
-4. Public tavern outcome:
-- `tavernfame`
-
-That is why it is one of the stronger mechanics in the project:
-- one event
-- one player reaction
-- several interacting social and economic consequences
+# Harassment, Apology, And Personal Favors
+
+## Authority And Scope
+
+The September 17, 2026 user request sets the negative-reaction and apology
+numbers below. These are requested gameplay rules, not claims of original QSP
+parity. Live `.rpy` implements the rules; `textLocRef` is historical reference.
+
+- `game/Utilities/General/NPC/PeopleRuntime.rpy`: each NPC owns `rel`,
+  its relationship cap, anger, and daily interaction counters. Shared
+  `PeopleInfo` mechanics apply to NPC instances; `Girl` owns female favor
+  eligibility.
+- `game/Utilities/General/NPC/RelationshipDynamics.rpy`: existing social
+  readiness and relationship mood.
+- `game/NPC/Girls/Common/OldPointTalkSystem.rpy`: shared returnable interaction
+  labels. NPC talk labels own the visible apology choice.
+- `game/Inn/HouseholdRuntimeEvents.rpy`: existing outfit and barber request
+  scenes and consequences.
+- `daily_events`: pending tailor visits. `household`: existing outfit requests,
+  barber appointments, and request/visit cooldowns.
+
+Do not add relationship maps, pending-apology mirrors, NPC-specific copies of
+the shared rule, refresh/rebuild labels, dispatchers, or Python scene handlers.
+Labels own authored text, media, native `menu:`, consequences, and return flow.
+The right-side HUD remains persistent; screens only display UI.
+
+## Negative Reaction
+
+`PeopleInfo.record_negative_reaction(reason)` applies the universal consequence
+when an authored interaction establishes a negative reaction:
+
+- Friendship falls by 5 through the existing `change_social` owner, clamped at 0.
+- Existing `change_anger(1, reason)` records the anger and its authored cause.
+- A neutral response, unavailable action, or accepted interaction is not a
+  negative reaction merely because no reward occurs.
+
+This covers rejection of unwanted MC touching and a negative response to the
+MC's handling of a harassment incident. Preserve the existing reaction
+thresholds, positive outcomes, and consent boundaries; this rule does not make
+an NPC accept intimacy.
+
+## Apology
+
+`PeopleInfo.can_apologize()` reads the NPC's existing anger, existing relationship
+mood, and legacy low-friendship reconciliation eligibility (`rel < 5`).
+Availability remains limited to fewer than 3 talks that day.
+
+`PeopleInfo.attempt_apology()` is the shared numeric rule:
+
+- Acceptance chance: exactly 50%.
+- If accepted: restore a random integer from 1 through 5 friendship points,
+  respecting the NPC's own relationship cap, and clear the existing anger
+  states.
+- If refused: no friendship reward or extra penalty; anger is not cleared.
+- An attempt still uses the existing interaction/time bookkeeping.
+
+The two rolls use `renpy.random.randint`, documented in the bundled Ren'Py
+8.5.2 SDK (`doc/other.html`, `renpy.random`). This advances between attempts
+and cooperates with rollback. Do not use the calendar-keyed `procedural_randint`
+here: it repeats a fixed outcome at the same calendar position.
+
+There is no new persistent apology state. NPC menus call the same rule, so an
+incident's anger and a later apology do not depend on separate NPC-specific
+implementations.
+
+## Harassment Flow And Owners
+
+1. `game/Utilities/General/NPC/PartEventYourFirstReaction.rpy`: MC chooses
+   ignore (1), watch (2), or help (3).
+2. `game/NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy`: NPC reaction,
+   escape/slap result, and direct relationship consequences.
+3. `game/Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy`:
+   customer outcome, NPC waitress skill, and player-owned tavern fame.
+4. `game/Utilities/General/NPC/PartEventAfterHarrassment.rpy`: after-event
+   complaint and relationship consequence.
+5. `game/NPC/Girls/Common/IntHarrassmentDiscuss.rpy`: authored follow-up
+   conversation and policy choice.
+
+`EventWaitressHarrass` / `EventWaitressHarrassPart2` and
+`EventCleaningHarrass` / `EventCleaningHarrassPart2`, under
+`game/NPC/Girls/Common/`, share these returnable event procedures.
+
+Reaction inputs come from the NPC instance: `corruption`, `rel`, and
+`harass_instruction()`. Escape/slap results and the MC reaction are direct
+procedure arguments, not parallel persistent NPC state.
+
+Existing negative-reaction conditions include low tolerance for permissive
+policy (`corruption < 18`), an upset NPC when the MC watches or ignores
+(`corruption < 30 or GirlSlapped > 0`), and an NPC disliking an intervention at
+`corruption >= 60`. Positive help outcomes and their existing thresholds remain
+separate from the fixed negative-reaction penalty.
+
+Public/customer effects remain owned by the existing customer-result label.
+NPC skills use `NPC.skills["waitress"]`; tavern fame changes through
+`player.change_tavern_fame()`. Do not reinterpret these as apology rewards.
+
+## Tailor And Barber Favors
+
+`Girl.can_request_favor()` is shared eligibility for female NPC instances,
+including current and potential tavern staff; it is not restricted to the
+three household women.
+
+The rule reads existing NPC anger and existing appointment, request, and
+cooldown state. It does not require employment or the MC's gift-offer
+friendship threshold. Request scenes keep their authored choices.
+Accepting a tailor request uses the existing `BuyDressTom` / `BuyDress` daily
+event flow and outfit request state. Accepting a barber request uses the
+existing `household.barber_appointments` and request/visit dates.
+
+Do not create a second favor queue, duplicate schedule, or another pending
+request flag. Existing shop rules, prices, and actual visit outcomes remain
+with their current owners.
+
+## Historical Numeric Reference
+
+These old values explain the migration delta; they are not the current
+September 17 rule:
+
+| Reference | Original numeric behavior |
+| --- | --- |
+| `textLocRef/PartEventAfterHarrassment.txt:14-16` | Permissive policy, `corruption < 18`: -1 friendship on 1/3 chance, only when friendship > 0. |
+| Same file, lines 22-26 | Upset NPC, MC watches: -1 on 1/2 chance, only when friendship > 0. |
+| Same file, lines 30-34 | Upset NPC, MC ignores: -1 on 1/5 chance, only when friendship > 0. |
+| `textLocRef/PartEventGirlHarrassmentReaction.txt:26-28` | Disliked intervention: -1 on 1/3 chance, only when friendship > 0. |
+| `textLocRef/IntAmandaTalk.txt:16-25` and `IntMelissaTalk.txt:16-25` | Reconciliation: 1/3 acceptance, fixed +1 through `SlutFriendsIncrease(..., 6, 1, 1, ...)`; fewer than 3 talks and friendship < 5. |
+| `textLocRef/IntSandraTalk.txt:16-25` | Same reconciliation gate/reward, but 1/2 acceptance. |
+
+Before this change, `OldPointTalkSystem` instead calmed relationship-mood anger
+by 2 deterministically and awarded a fixed +1 only when that anger reached 0.
+Harassment used `anger_with_player`, while this apology's availability read
+relationship-mood anger. The shared NPC rule must read the existing causes
+consistently without adding a mirror.
+
+`dialogue.tab` is a dialogue export with source-label/file locations, not an
+authority for probabilities or numeric consequences. Preserve its text and
+the original TXT files; numeric changes belong in live mechanics.

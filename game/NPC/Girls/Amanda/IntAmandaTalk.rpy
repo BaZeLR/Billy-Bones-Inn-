@@ -37,8 +37,8 @@ label IntAmandaTalk(girl_name="amanda"):
             $ scene_runtime.location_text = scene_runtime.text
             call IntAmandaSex(girl_name, "kitchen", "minet")
             return
-        "Извиниться перед Амандой" if old_point_apology_available(girl_name):
-            call OldPointApology(girl_name)
+        "Извиниться перед Амандой" if Amanda.can_apologize():
+            call IntAmandaReconcile(girl_name)
             jump IntAmandaTalk
         "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden:
             call IntAmandaAllowAlber(girl_name)
@@ -91,21 +91,21 @@ label IntAmandaTalk(girl_name="amanda"):
 
 
 label IntAmandaReconcile(girl_name="amanda"):
+    $ renpy.dynamic("_apology_accepted", "_apology_gain")
+    $ _apology_accepted, _apology_gain = Amanda.attempt_apology()
     $ scene_runtime.text = "Вы подошли к Аманде и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и всем вам нужно дружно работать вместе, чтобы преуспеть."
-    if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaTalk.rpy:procedural_randint:97:1") == 1:
+    if _apology_accepted:
         $ scene_runtime.text += "\n\nАманда благосклонно выслушала вас, трогательно обняла и сказала, что очень к вам привязана!"
-        $ Amanda.rel = max(5, min(20, int(Amanda.rel or 0) + 1))
-        $ Amanda.openness = min(100, int(Amanda.openness or 0) + 1)
-        $ Amanda.anger_with_player = max(0, int(Amanda.anger_with_player or 0) - 3)
         $ Amanda.mood = "softened"
     else:
         $ scene_runtime.text += "\n\nАманда холодно выслушала вас, фыркнула и пошла прочь."
-        $ Amanda.anger_with_player = min(100, int(Amanda.anger_with_player or 0) + 1)
         $ Amanda.mood = "cold"
-    $ Amanda.mark_talked()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Разговор с Амандой"
     $ main_ui_runtime.action_content = None
+    $ calendar_v2.advance_minutes(10)
+    if _apology_accepted:
+        call ReconciliationFavorMenu(girl_name)
     return
 
 

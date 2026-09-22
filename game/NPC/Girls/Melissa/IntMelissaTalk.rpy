@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntMelissaTalk(girl_name="melissa"):
-    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry")
+    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry", "_apology_accepted", "_apology_gain")
     $ _melissa_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "melissa").strip().lower()
     $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
     $ main_ui_runtime.action_title = "Разговор с Мелиссой"
@@ -64,15 +64,16 @@ label IntMelissaTalk(girl_name="melissa"):
             $ scene_runtime.text = str(_melissa_special_entry.get("text", "") or "")
             $ scene_runtime.location_text = scene_runtime.text
             jump IntMelissaTalk
-        "Попробовать помириться с Мелиссой" if int(Melissa.talked_today or 0) < 3 and int(Melissa.rel or 0) < 5:
+        "Попробовать помириться с Мелиссой" if Melissa.can_apologize():
+            $ _apology_accepted, _apology_gain = Melissa.attempt_apology()
             $ scene_runtime.text = "Вы подошли к Мелиссе и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и вы все должны дружно работать вместе, чтобы преуспеть."
-            if procedural_randint(1, 3, key="procedural:NPC/Girls/Melissa/IntMelissaTalk.rpy:reconcile") == 1:
+            if _apology_accepted:
                 $ scene_runtime.text += "\n\nМелисса благосклонно выслушала вас, обняла, поцеловала в щечку и сказала, что ценит вас и все понимает!"
-                call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
             else:
                 $ scene_runtime.text += "\n\nМелисса холодно выслушала вас, презрительно отвернулась и пошла прочь."
-            $ Melissa.mark_talked()
             $ scene_runtime.location_text = scene_runtime.text
+            if _apology_accepted:
+                call ReconciliationFavorMenu(girl_name)
             jump IntMelissaTalk
         "Предложить купить Мелиссе обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists(girl_name, "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
             call IntMelissaDressChange(girl_name)

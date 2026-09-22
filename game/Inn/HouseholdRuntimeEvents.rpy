@@ -466,7 +466,7 @@ label HouseholdSoapRequestFulfillMenu(girl_name=""):
     return
 
 
-label HouseholdBarberRequestEvent(girl_name=""):
+label HouseholdBarberRequestEvent(girl_name="", request_context="breakfast"):
     $ renpy.dynamic("_barber_girl", "_barber_info")
     $ _barber_girl = str(girl_name or "").strip().lower()
     if _barber_girl == "":
@@ -476,9 +476,11 @@ label HouseholdBarberRequestEvent(girl_name=""):
         return
     $ household.barber_request_last_day[_barber_girl] = current_game_day()
     $ _barber_info = people.get_info(_barber_girl)
-    if _barber_info is not None:
+    if _barber_info is not None and request_context != "apology":
         $ _barber_info.mark_talked(1)
-    if _barber_girl == "sandra":
+    if request_context == "apology":
+        $ scene_runtime.text = "Разговор заходит о том, как загладить обиду. %s просит оплатить ей визит к Серджио." % people_display_name(_barber_girl)
+    elif _barber_girl == "sandra":
         $ scene_runtime.text = "За завтраком вы сами поднимаете разговор о Серджио и предлагаете Сандре сходить к цирюльнику. Она сперва щурится с привычным недоверием, а потом все же кивает: \"Если уж ты решил тянуть трактир вверх, дом тоже должен выглядеть аккуратнее. И да, для трактира это тоже не пустяк: ухоженная хозяйка кухни дому только на пользу.\""
     elif _barber_girl == "melissa":
         $ scene_runtime.text = "За завтраком вы осторожно предлагаете Мелиссе сходить к Серджио. Она заметно смущается, но не отказывается: \"После хорошей стрижки и всех его притираний, наверное, даже чувствуешь себя иначе. И если я буду выглядеть аккуратнее, то и в зале, и по дому держаться проще.\""
@@ -494,7 +496,8 @@ label HouseholdBarberRequestEvent(girl_name=""):
         "Пообещать визит к Серджио":
             if _barber_info is not None:
                 $ household.barber_appointments[_barber_girl] = 1
-                $ _barber_info.change_social(friend_delta=1)
+                if request_context != "apology":
+                    $ _barber_info.change_social(friend_delta=1)
             $ scene_runtime.text = "Вы обещаете, что при первом удобном открытом дне Серджио отведете ее к цирюльнику. Просьбу явно услышали с удовольствием."
 
         "Сказать, что пока не до этого":

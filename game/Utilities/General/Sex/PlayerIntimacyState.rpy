@@ -189,7 +189,7 @@ init python:
         reduction = max(1, int(round(float(before) * 0.35))) if before > 0 else 0
         if info is not None:
             info.corruption = max(0, before - reduction)
-            info.rel = max(0, player_intimacy_int(getattr(info, "rel", 0), 0) - 10)
+            info.record_negative_reaction("intimacy_help_insult")
         try:
             relationship_set_anger(key, 2, 1, "intimacy_help_insult")
         except Exception:

@@ -23,7 +23,7 @@ label IntSandraTalk(girl_name="sandra"):
         "Отдать Сандре обещанное мыло" if int(crafting.soap_requests.get(girl_name, 0) or 0) > 0 and soap_total_piece_count() > 0:
             call HouseholdSoapRequestFulfillMenu(girl_name)
             jump IntSandraTalk
-        "Попробовать помириться с Сандрой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
+        "Попробовать помириться с Сандрой" if Sandra.can_apologize():
             call IntSandraReconcile(girl_name)
             jump IntSandraTalk
         "Предложить купить Сандре обновку" if sandra_dress_change_can_buy(girl_name):
@@ -53,16 +53,18 @@ label IntSandraTalk(girl_name="sandra"):
 
 
 label IntSandraReconcile(girl_name="sandra"):
+    $ renpy.dynamic("_apology_accepted", "_apology_gain")
+    $ _apology_accepted, _apology_gain = Sandra.attempt_apology()
     $ scene_runtime.text = "Вы подошли к Сандре и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и вы все должны дружно работать вместе, чтобы преуспеть."
-    if procedural_randint(1, 2, key="procedural:NPC/Girls/Sandra/IntSandraTalk.rpy:procedural_randint:40:1") == 1:
+    if _apology_accepted:
         $ scene_runtime.text += "\n\nСандра благосклонно выслушала вас, обняла и сказала, что она всегда будет вас любить, несмотря ни на что!"
-        call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
     else:
         $ scene_runtime.text += "\n\nСандра холодно выслушала вас, отвернулась и пошла прочь, не говоря ни слова."
-    $ Sandra.mark_talked()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Разговор с Сандрой"
     $ main_ui_runtime.action_content = None
+    if _apology_accepted:
+        call ReconciliationFavorMenu(girl_name)
     return
 
 

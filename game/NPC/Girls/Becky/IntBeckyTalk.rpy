@@ -37,6 +37,8 @@ label IntBeckyTalk(girl_name="becky"):
                 call ShowGirlCard(_becky_name)
             "Поболтать со вдовой Блэнкеншип о разной фигне":
                 call _int_becky_talk_smalltalk(_becky_name)
+            "Извиниться перед Бекки" if Becky.can_apologize():
+                call OldPointApology(_becky_name)
             "Подарить маленький подарок" if social_interaction_allowed_for_npc(_becky_name, "gift"):
                 call PlayerCardGiftToFixedTargetMenu(_becky_name)
             "Поболтать с Бекки о более личных вещах" if Becky.rel >= 3:

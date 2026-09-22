@@ -15,9 +15,8 @@ label CodeAmandaKickFromRoom(reason=""):
         "Двери распахнулись: в комнату ворвалась тетушка Сандра, а за ней Мелисса. Осыпанные ударами, вы с позором ретировались в зал."
         $ Amanda.room_rescue_called = True
         python:
-            Amanda.apply_social_chance(0, 1, -3, 0, 0, 0, "amanda_home")
-            Sandra.apply_social_chance(0, 1, -7, 0, 0, 0, "amanda_home")
-            Melissa.apply_social_chance(0, 1, -5, 0, 0, 0, "amanda_home")
+            Sandra.record_negative_reaction("mc_touch_rejected")
+            Melissa.record_negative_reaction("mc_touch_rejected")
     else:
         if reason == "afterdeny":
             "Аманда дернулась, отпихивая вас обеими руками."
@@ -29,7 +28,8 @@ label CodeAmandaKickFromRoom(reason=""):
     $ Amanda.room_rejection_count += 1
     $ Amanda.room_entry_blocked_today = True
     python:
-        Amanda.apply_social_chance(0, 1, -5, 18, 1, -3, "amanda_home")
+        Amanda.record_negative_reaction("mc_touch_rejected")
+        Amanda.apply_social_chance(0, 0, 0, 18, 1, -3, "amanda_home")
     jump TavernMain
 
 

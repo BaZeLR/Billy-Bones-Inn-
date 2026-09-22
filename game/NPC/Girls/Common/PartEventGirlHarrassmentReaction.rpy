@@ -28,11 +28,10 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
         elif _girl_slut >= 60:
             $ result += f'\nНо {_girl_name} вдруг неожиданно оборвала вас, сказав: "Стефан, душка, зачем же ты ругаешь такого приятного господина? Я совсем не в обиде!" - с этими словами ветреная {_girl_name} страстно, с язычком, поцеловала своего мнимого обидчика и пошла дальше по своим делам, призывно виляя бедрами. Вы остались стоять в оторопении.'
             $ girl_run_away = 2
-            if _girl_friend > 0 and procedural_randint(1,3, key="procedural:NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy:procedural_randint:33:2") == 1:
-                $ result += f'\nПохоже, что ваша реакция не очень-то понравилась {_girl_name3}.'
-                $ _girl_info.change_social(friend_delta=-1)
-                $ _girl_info.change_mana(-1, "harass_blocked_wanted_attention")
-                $ _girl_info.change_rebellion(1, "harass_blocked_wanted_attention")
+            $ result += f'\nПохоже, что ваша реакция не очень-то понравилась {_girl_name3}.'
+            $ _girl_info.record_negative_reaction("harass_blocked_wanted_attention")
+            $ _girl_info.change_mana(-1, "harass_blocked_wanted_attention")
+            $ _girl_info.change_rebellion(1, "harass_blocked_wanted_attention")
         elif _girl_slut >= 30:
             $ result += f'\nНо у вас осталось чувство, что {_girl_name} была вовсе не против, чтобы к ней приставали, и что ваше вмешательство было лишним.'
         else:

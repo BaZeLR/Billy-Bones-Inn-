@@ -534,12 +534,9 @@ label story_amanda_room_grope_0:
         call CodeAmandaListScold
         "Вы открыли рот чтобы оправдаться, но такого шанса вам не дали, не став слушать ваших оправданий Аманда твердо и решительно произнесла: 'Вон отсюда, пока я не закричала.'<br>Вы попробовали еще что-то сказать, но в ответ услышали лишь снова 'Вон!'. Почуствовав твердость в голосе девушки, вы решили попробовать сделать свой заход позже, а пока временно отступить в главный зал.<br>"
         $ Amanda.room_entry_blocked_today = True
-        if Amanda.rel > 5:
-            $ Amanda.change_social(friend_delta=-1)
+        $ Amanda.record_negative_reaction("mc_touch_rejected")
         if Amanda.corruption > 30:
             $ Amanda.change_social(corruption_delta=-1)
-        if Amanda.rel > 5:
-            $ Amanda.change_social(friend_delta=-1)
         jump TavernMain
     elif tmpGropeReact == 3:
         

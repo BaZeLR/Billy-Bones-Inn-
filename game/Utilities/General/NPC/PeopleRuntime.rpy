@@ -63,7 +63,7 @@ init -999 python:
         )
 
         def __init__(self, owned_items=None, day_dress="", day_underwear=None,
-                     current_layers=None, raised_layers=None, context="day"):
+                    current_layers=None, raised_layers=None, context="day"):
             self.owned_items = self._unique_items(owned_items)
             self.day_dress = str(day_dress or "")
             self.day_underwear = self._normalized_underwear(day_underwear)
@@ -1211,6 +1211,33 @@ init -999 python:
             self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
             return self
 
+        def record_negative_reaction(self, reason=""):
+            """A rejected MC interaction has one shared friendship consequence."""
+            before = self.rel
+            self.change_social(friend_delta=-5)
+            self.change_anger(1, reason)
+            return self.rel - before
+
+        def can_apologize(self):
+            return self.talked_today < 3 and (
+                self.rel < 5
+                or people_to_int(getattr(self, "anger_with_player", 0), 0) > 0
+                or relationship_anger(self.name) > 0
+            )
+
+        def attempt_apology(self):
+            """Return (accepted, actual friendship gain); do not own dialogue."""
+            if not self.can_apologize():
+                return (False, 0)
+            self.mark_talked()
+            if renpy.random.randint(1, 2) != 1:
+                return (False, 0)
+            before = self.rel
+            self.change_social(friend_delta=renpy.random.randint(1, 5))
+            self.change_anger(-people_to_int(getattr(self, "anger_with_player", 0), 0), "")
+            relationship_calm(self.name, 5)
+            return (True, self.rel - before)
+
         def reset_openness_from_relationship(self):
             self.openness = 0
             relationship = people_to_int(self.rel, 0)
@@ -1364,6 +1391,26 @@ init -999 python:
         work_socializing_locations = ()
         daily_sex_limit = 2
         mood = "neutral"
+
+        def can_request_favor(self, favor):
+            """Shared care requests, including women not hired yet."""
+            if people_to_int(getattr(self, "anger_with_player", 0), 0) > 0 or relationship_anger(self.name) > 0:
+                return False
+            if favor == "tailor":
+                return (
+                    self.name not in household.outfit_requests
+                    and not daily_events.exists(self.name, "BuyDressTom", "")
+                    and not daily_events.exists(self.name, "BuyDress", "")
+                )
+            if favor == "barber":
+                day = current_game_day()
+                return (
+                    not household.barber_appointments.get(self.name, 0)
+                    and day - household.barber_visit_last_day.get(self.name, -14) >= 14
+                    and day - household.barber_request_last_day.get(self.name, -14) >= 14
+                )
+            return False
+
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
             self.mana = 10

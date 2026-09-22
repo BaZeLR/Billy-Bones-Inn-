@@ -51,7 +51,7 @@ label IntClaraTalk(girl_name="clara"):
                 call OldPointKinoAttempt(girl_name)
                 $ _clara_repeat_menu = True
 
-            "Извиниться перед Клариссой" if old_point_apology_available(girl_name):
+            "Извиниться перед Клариссой" if Clara.can_apologize():
                 call OldPointApology(girl_name)
                 $ _clara_repeat_menu = True
 

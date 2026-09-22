@@ -22,6 +22,8 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
                 call ShowGirlCard(girl_name_ilt)
             "Болтать":
                 call IntLizaTalkSmalltalk(girl_name_ilt, girl_loc_ilt)
+            "Извиниться перед Лизеттой" if Liza.can_apologize():
+                call OldPointApology(girl_name_ilt)
             "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name_ilt, "gift"):
                 call PlayerCardGiftToFixedTargetMenu(girl_name_ilt)
             "Спросить о клиентах" if Liza.can_ask_topic("clients"):
@@ -213,6 +215,7 @@ label IntLizaTalkGrope(girl_name_ilt="liza", girl_loc_ilt=""):
                     scene_runtime.text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % _liza_name2
         else:
             scene_runtime.text = "«Эй, дяденка, не так быстро!» останавливает вас %s. «Мамочка говорит, что ты сначала заплатить должен, а потом уже лапать!»" % _liza_name
+            Liza.record_negative_reaction("mc_touch_rejected")
         scene_runtime.location_text = scene_runtime.text
     if Liza.rel < 5:
         return
