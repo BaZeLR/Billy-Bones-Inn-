@@ -128,6 +128,7 @@ init python:
             stock = tavern_storage_supplies_stock()
             stock[item_key] = max(0, int(stock.get(item_key, 0) or 0)) + deposit_count
         tavern_kitchen_apply_deposit_effect(item_key, deposit_count)
+        Melissa.record_stock_growth()
         return deposit_count
 
     def tavern_kitchen_deposit_all_food():

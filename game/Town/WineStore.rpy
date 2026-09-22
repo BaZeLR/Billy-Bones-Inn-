@@ -258,6 +258,8 @@ label WineStoreBuyStockApply(cost=0, add_amount=0, barrel_count=0):
     else:
         $ player.tavern_management.winenum += int(add_amount or 0)
         $ player.spend_money(int(cost or 0))
+        if int(add_amount or 0) > 0:
+            $ Melissa.record_stock_growth()
         if int(barrel_count or 0) == 1:
             $ scene_runtime.text = "Вы купили бочонок вина. %s говорит вам, что ваш заказ будет доставлен в \"Дикий жеребец\" немедленно." % wine_store_seller_name()
         elif int(barrel_count or 0) == 5:

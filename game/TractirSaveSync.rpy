@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 94
+define currentVersion = 95
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -795,6 +795,10 @@ init -100 python:
         if loaded_version < 94:
             updateSave_V93()
             loaded_version = 94
+
+        if loaded_version < 95:
+            updateSave_V94()
+            loaded_version = 95
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3105,6 +3109,14 @@ init -100 python:
         shed = rooms.get("Shed")
         if not any(exit.target == "ShedWashroom" for exit in shed.exits):
             shed.exits.insert(0, next(exit for exit in ShedRoomDefinition.exits if exit.target == "ShedWashroom"))
+
+    def updateSave_V94():
+        # These new cumulative scores start at adoption, not retroactively.
+        if not hasattr(Melissa, "comfort_cleaning_score"):
+            Melissa.comfort_cleaning_score = 0
+        if not hasattr(Melissa, "household_satisfaction"):
+            Melissa.household_satisfaction = 0
+        initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

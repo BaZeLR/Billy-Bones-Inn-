@@ -301,6 +301,8 @@ label GroceryStoreBuyStockApply(cost=0, add_amount=0, bag_count=0):
     else:
         $ player.tavern_management.productnum += int(add_amount or 0)
         $ player.spend_money(int(cost or 0))
+        if int(add_amount or 0) > 0:
+            $ Melissa.record_stock_growth()
         if int(bag_count or 0) == 1:
             $ scene_runtime.text = "Вы купили мешок продуктов. %s говорит вам, что ваш заказ будет доставлен в \"Дикий жеребец\" немедленно." % _grocer_title
         elif int(bag_count or 0) == 5:

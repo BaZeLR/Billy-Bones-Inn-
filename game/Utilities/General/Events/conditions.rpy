@@ -93,6 +93,7 @@ init -25 python:
             "event_runtime": event_runtime,
             "player": player,
             "threads": threads,
+            "tractir_progress": tractir_progress,
             "ROOM_GROUP_TAVERN": ROOM_GROUP_TAVERN,
             "CheckIfSexEventExist": CheckIfSexEventExist,
             "DaddyAskBuildPhrase": DaddyAskBuildPhrase,

@@ -196,6 +196,8 @@ init python:
             self.private_context_day = -1
             self.private_context_origin = ""
             self.storage_thanks_day = -1
+            self.comfort_cleaning_score = 0
+            self.household_satisfaction = 0
             self.temp_room_code = ""
             self.storage_rat_help_day = -1
             self.bat_attic_check_day = -1
@@ -440,6 +442,29 @@ init python:
                 and repair_day >= 0
                 and current_game_day() >= repair_day
             )
+
+        @property
+        def comfort_components(self):
+            yard_fixed = int(tavern.renovation_complete("backyard"))
+            return {
+                "rats": int(werecat_state()["rats_problem_active"] == 0),
+                "room": int(self.bats_repair_complete()),
+                "yard": yard_fixed,
+                "toilet": yard_fixed,
+                "cleaning": self.comfort_cleaning_score,
+                "bathroom_laundry": 2 * int(tavern.renovation_complete("shed")),
+            }
+
+        @property
+        def comfort(self):
+            return sum(self.comfort_components.values())
+
+        def record_stock_growth(self):
+            # Called only after a successful delivery/deposit, never on load or
+            # a UI read. The actual inventories remain their existing owners.
+            self.household_satisfaction += 2
+            if player.tavern_management.productnum > 100 and player.tavern_management.winenum >= 500:
+                tractir_activate_achievement("melissa_full_storeroom")
 
         def temp_room_active(self, room_code="", hour_value=None, weekday_value=None):
             room_key = str(room_code or "").strip()

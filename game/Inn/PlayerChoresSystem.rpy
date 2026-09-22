@@ -432,6 +432,7 @@ init -45 python:
         if not bool(preview.get("applied", False)):
             return ""
 
+        Melissa.comfort_cleaning_score += 1 if int(player.chores.weekly.get("clean_upstairs_rooms", 0)) > 0 else -1
         player.tavern_management.weekly_chores_last_eval_stamp = str(preview.get("stamp", "") or player.tavern_management.weekly_chores_last_eval_stamp)
         player.chores.last_score = max(0, _pc_to_int(preview.get("chore_score", 0), 0))
         player.chores.last_evaluation = str(preview.get("chore_evaluation", "") or "").strip().lower()
