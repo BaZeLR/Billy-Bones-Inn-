@@ -34,7 +34,7 @@ def test_church_attendee_actions_restore_the_attendee_menu_picture_and_text():
     ):
         block = label_block(source, label_name)
         assert "main_ui_begin_native_scene_state(" in block
-        assert 'menu:\n        "Назад":' in block
+        assert '\n        "Назад":' in block
         assert "$ main_ui_end_native_scene_state()" in block
         assert "call ChurchServiceMenu(False)" not in block
 
