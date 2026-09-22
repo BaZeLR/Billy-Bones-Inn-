@@ -32,6 +32,13 @@ This is a verified slice, not a claim that every NPC branch is complete.
 - Church duplicate actions: not reproduced in fresh native checks or copied available saves; still awaiting the affected church screenshot/save. No speculative church production fix.
 - Pending new features: actual last-period history, moss-cloth requests, and autonomous child-wish/clothing decisions. The requested chance modifier is **±5 percentage points (±50 in the existing per-thousand calculation)**, not a second pregnancy state. These are not implemented by the lifecycle corrections above.
 
+### Spring bottles and mushroom preparations — 2026-09-22
+
+- Spring refill is a `ForestSpring` room action: one inventory `empty_bottle_001` becomes one stackable `spring_water_001`. The returnable label owns feedback and Back; returning restores the room context. No additional water stock or counter.
+- Existing recipes and mushroom effects are unchanged. Water-consuming recipes and the new mushroom preparations are not yet implemented.
+- Requested next: two rare mushrooms yield 20 tincture drops; honey preparation and eating one mushroom are alternative forms. A shared twice-monthly limit is required. Dose size and whether the limit is per recipient or global still need confirmation; switching preparations must not bypass the eventual limit.
+- Checks: `test_forest_spring_water_runtime.py` and isolated native `external_forest_spring_water_test.py` cover inventory conservation, failed refill, repeat use, action ownership, and room-context restoration.
+
 ### System overview
 
 | System | Model Doc | Template | Runtime Owner | Status | Notes |

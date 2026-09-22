@@ -627,6 +627,18 @@ init 4 python:
         },
     )
 
+    SpringWaterItem = GameItem(
+        object_id="spring_water_001",
+        name="бутылка родниковой воды",
+        description="Чистая вода из лесного родника, набранная в стеклянную бутылку. Подходит для приготовления настоев и зелий.",
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "ingredient",
+            "ingredient_kind": "spring_water",
+        },
+    )
+
     CorkItem = GameItem(
         object_id="cork_001",
         name="пробка",

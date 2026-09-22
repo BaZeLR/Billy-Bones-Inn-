@@ -18,6 +18,14 @@ init 6 python:
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
         game_items=[],
+        action_menus=[
+            RoomAction(
+                action_id="fill_spring_water",
+                label="Набрать родниковую воду",
+                hook="call",
+                target="ForestSpringFillBottle",
+            ),
+        ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="19:29", condition=forest_open_hours_visible),
         custom_properties={
             "spawn_rules": [
@@ -48,3 +56,20 @@ label ForestSpring:
     $ main_ui_runtime.action_items = forest_subroom_action_items(rooms.current)
     while True:
         call screen main_ui
+
+
+label ForestSpringFillBottle:
+    if rooms.current_code != "ForestSpring" or forest_after_dusk():
+        return
+    $ main_ui_begin_native_scene_state("Родниковая вода")
+    if player.remove_item("empty_bottle_001", 1):
+        $ player.add_item("spring_water_001", 1)
+        $ scene_runtime.text = "Вы ополаскиваете пустую бутылку и наполняете ее чистой родниковой водой."
+    else:
+        $ scene_runtime.text = "Чтобы набрать родниковой воды, нужна пустая бутылка."
+    "[scene_runtime.text]"
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
+    return
