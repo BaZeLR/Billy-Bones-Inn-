@@ -572,12 +572,14 @@ Authored beats:
 Мелиссой и помогать трактиру».
 
 [Позволить Клариссе поселиться у Мелиссы]
+todo: if accepted she moves into Melissa's room and her schedule changes to TavernMelissaRoom; if deferred she remains at her normal schedule and the thread remains at stage 13, she allso appears in tavern job assigment menu and can be assigned to work in the tavern.
+she also will make drawings at guest room(we see girls posing for her there)
 [Попросить её вернуться к разговору позже]
 ```
 
 Acceptance advances the thread. Deferral does not abort it and does not create
 a residence flag.
-
+after scheduled second Legare's wife dauther will be replace Clara at Winery.(see revenge Legare plot.md)
 ### Stage 14: Clarissa's Confession
 
 ```text

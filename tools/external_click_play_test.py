@@ -1619,6 +1619,8 @@ testcase external_inga_grocery_talk_and_favor:
     $ _inga_sexacts_before = int(Inga.sex_stat("sexacts", 0) or 0)
     run Call("IntIngaTalk", True)
     advance until screen "choice" timeout 20.0
+    assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    screenshot "external_inga_grocery_talk_open.png"
     assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_breakfast.png") timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
@@ -1626,6 +1628,8 @@ testcase external_inga_grocery_talk_and_favor:
     assert eval (int(player.intimacy.arousal_value() or 0) >= 40) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (renpy.get_screen("choice") is not None and "Попросить Ингу позаботиться и о вас" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    screenshot "external_inga_grocery_talk_menu.png"
     assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_clean.png") timeout 5.0
     $ _inga_favor_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить Ингу позаботиться и о вас")
     $ _inga_favor_button_id = "choice_panel_button_%d" % int(_inga_favor_index)

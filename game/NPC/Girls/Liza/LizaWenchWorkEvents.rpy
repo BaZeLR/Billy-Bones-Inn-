@@ -89,7 +89,7 @@ label EventLizaWenchStory(eyewitness=0):
                     if _liza_team_info is not None and _liza_team_info.skill_value(_liza_team_skill, 0) < 100:
                         _liza_team_info.change_skill(_liza_team_skill, 1)
                         _liza_team_info.record_skill_gain(_liza_team_skill)
-        $ scene_runtime.text += "\n\nОстальные официантки и уборщицы быстро перенимают ее манеру общаться с гостями: теперь каждая пытается заработать чаевые так же ловко."
+        $ scene_runtime.text += "\nОстальные официантки и уборщицы быстро перенимают ее манеру общаться с гостями: теперь каждая пытается заработать чаевые так же ловко."
         $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Вернуться к своим делам":

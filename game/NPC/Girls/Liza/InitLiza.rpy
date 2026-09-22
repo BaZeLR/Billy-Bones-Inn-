@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label InitLiza:
     python:
@@ -69,7 +69,7 @@ init python:
             self.data = LizaStaticData
             self.rel = 0
             self.openness = 0
-            self.corruption = 35
+            self.corruption = 9
             self.known = False
             self.witnessed_church_after_sermon = False
             self.discussed_georgett_gerhard = False
@@ -88,14 +88,14 @@ init python:
             self.drunk = 0
             self.stats = {
                 "kids": 0,
-                "beauty": 72,
-                "sexacts": 89,
-                "cuminside": 7,
+                "beauty": 45,
+                "sexacts": 2,
+                "cuminside": 0,
                 "pregnancy": 0,
                 "pregfather": "",
-                "ConceptionChance": 10,
+                "ConceptionChance": 25,
                 "PussyWetStart": 20,
-                "virginity": False,
+                "virginity": True,
                 "breastfeed": 0,
             }
             self.skills = {
@@ -200,7 +200,7 @@ init python:
                 if int(Melissa.corruption or 0) >= 35:
                     text = "Вы заметили, что за вами наблюдала Мелисса. Но увиденное ее совсем не шокировало, скорее позабавило."
                 else:
-                    text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести. У тебя ведь и младшая есть, она еще мала на такое смотреть!"'
+                    text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести.А вдруг Аманда воспримет это,как идею!"'
             elif rand_var == 3:
                 if int(Amanda.corruption or 0) >= 35:
                     text = "Вы заметили, что за вами наблюдала Аманда. Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек."
