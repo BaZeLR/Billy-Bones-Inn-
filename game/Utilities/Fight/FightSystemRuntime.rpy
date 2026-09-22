@@ -180,7 +180,7 @@ init -20 python:
             tactics="charge",
             company_min=1,
             company_max=3,
-            loot={"boar_fang_001": (1, 1), "boar_meat_001": (1, 3)},
+            loot={"boar_fang_001": (1, 1), "boar_meat_001": (1, 3), "boar_skin_001": 1},
         ),
         "brown_bear": FightEnemyDefinition(
             "brown_bear", "Бурый медведь", "beast", 90, 16, 28, 10, 18,
@@ -1209,7 +1209,8 @@ init -20 python:
             return {"ok": True, "text": "В ловушке запутался молодой волк. Шкуру с него еще можно снять.", "loot": {"wolf_skin_001": 1}}
         player.add_item("boar_meat_001", 1)
         player.add_item("boar_fang_001", 1)
-        return {"ok": True, "text": "Ловушка помогла вам завалить кабана. Вы успеваете взять мясо и клык.", "loot": {"boar_meat_001": 1, "boar_fang_001": 1}}
+        player.add_item("boar_skin_001", 1)
+        return {"ok": True, "text": "Ловушка помогла вам завалить кабана. Вы успеваете взять мясо, клык и шкуру.", "loot": {"boar_meat_001": 1, "boar_fang_001": 1, "boar_skin_001": 1}}
 
     def dog_catch_delinquent_apply(event_kind="horse"):
         if not dog.prevents_theft(event_kind):

@@ -63,6 +63,7 @@ init python:
     HUNTER_CLUB_SELL_ITEM_IDS = (
         "wolf_skin_001",
         "white_wolf_skin_001",
+        "boar_skin_001",
         "boar_fang_001",
         "boar_meat_001",
         "bear_meat_001",

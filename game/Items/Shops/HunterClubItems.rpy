@@ -236,6 +236,20 @@ init 4 python:
         },
     )
 
+    BoarSkinItem = GameItem(
+        object_id="boar_skin_001",
+        name="кабанья шкура",
+        description="Грубая прочная шкура лесного кабана. Луиза в охотничьем клубе охотно купит такую добычу.",
+        price=35,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "animal_loot",
+            "animal_kind": "boar",
+            "loot_kind": "skin",
+        },
+    )
+
     BoarFangItem = GameItem(
         object_id="boar_fang_001",
         name="кабаний клык",
