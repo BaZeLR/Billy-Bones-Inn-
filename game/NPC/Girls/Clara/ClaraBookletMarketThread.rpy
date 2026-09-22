@@ -188,6 +188,31 @@ label story_clara_market_booklet_3:
     return True
 
 
+# Event: question Clara in the wine store after witnessing the night deal.
+# Her denial advances the thread; the next event owns the seven-day delay.
+label story_clara_market_booklet_4:
+    $ main_ui_begin_native_scene_state("Ночной разговор с Монголом")
+    show screen main_ui
+    vscene Clara.wine_store_talk_picture()
+    $ scene_runtime.text = "Вы дожидаетесь, пока рядом с прилавком никого не останется. — Кларисса, я видел тебя вечером у конного торга. О чем вы с Монголом договаривались?"
+    menu:
+        "Выслушать ответ":
+            pass
+    $ scene_runtime.text = "— С Монголом? — Она чуть медлит, а затем пожимает плечами. — Да ни о чем особенном. Он спрашивал, не нужен ли нам конь для подвоза бочек. Я сказала, что такие дела решает Легаре. Вот и весь разговор. А ты что подумал?"
+    menu:
+        "Не выдавать, сколько вы услышали":
+            pass
+    $ scene_runtime.text = "Вы делаете вид, что объяснение вас устроило. Но о покупке коня и перевозке бочек той ночью не было ни слова: Кларисса лжет. Пока лучше не показывать ей, что вы знаете о дележе денег и краденых лошадях."
+    menu:
+        "Вернуться к разговору":
+            pass
+    $ calendar_v2.advance_minutes(15)
+    $ event_runtime.active_thread.setDay()
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 # Event: HunterClub rumor reveals Mongol's arrest.
 # Consequence: the stocks arrest day is recorded and the thread advances.
 label story_clara_market_booklet_5:

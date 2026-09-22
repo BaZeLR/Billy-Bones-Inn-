@@ -704,6 +704,7 @@ init -998 python:
             self.purchase_price = 0
             self.stolen_purchase_price = 0
             self.stolen_days = 0
+            self.theft_attempted = False
 
         def owns_horse(self):
             return bool(str(self.name or "").strip())

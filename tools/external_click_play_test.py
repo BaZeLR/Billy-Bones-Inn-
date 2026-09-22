@@ -4661,7 +4661,7 @@ testcase external_clara_booklet_mongol_night_buttons_advance:
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
-    $ threads["claraBookletMarket"].advanceTo(5, force_active=True)
+    $ threads["claraBookletMarket"].advanceTo(6, force_active=True)
     $ findAvailableEvents(True)
     assert eval (story_event_available("menu_CityGuard", "mongol_stocks")) timeout 5.0
     $ event_runtime.active_thread = threads["claraBookletMarket"]
@@ -4671,7 +4671,7 @@ testcase external_clara_booklet_mongol_night_buttons_advance:
     assert eval (Mongol.stocks_food_day == int(calendar_v2.daysInGame or 0)) timeout 5.0
     assert eval (threads["claraBookletMarket"].currentTarget() == "story_clara_market_booklet_8") timeout 5.0
     $ Draupnir.mongol_lockpick_order_day = int(calendar_v2.daysInGame or 0)
-    $ threads["claraBookletMarket"].advanceTo(7, force_active=True)
+    $ threads["claraBookletMarket"].advanceTo(8, force_active=True)
     $ _clara_release_date = calendar_v2.day_number_to_parts(Mongol.stocks_food_day + 1)
     $ rooms.enter("MarketPlace")
     $ external_calendar_set_fields(_clara_release_date["day"], _clara_release_date["month"], _clara_release_date["year"], 20, 0)
@@ -4694,7 +4694,7 @@ testcase external_clara_booklet_mongol_night_buttons_advance:
     $ _clara_release_button_id = "choice_panel_button_%d" % int(_clara_release_index)
     click id _clara_release_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (str(Mongol.stocks_fate or "") == "released") timeout 20.0
-    assert eval (int(threads["claraBookletMarket"].num or 0) == 8) timeout 5.0
+    assert eval (int(threads["claraBookletMarket"].num or 0) == 9) timeout 5.0
     assert eval (threads["claraBookletMarket"].currentTarget() == "story_clara_market_booklet_10") timeout 5.0
     assert eval (not threads["claraBookletMarket"].completed and Robin.mongol_safe_pass and Robin.blackwood_road_open) timeout 5.0
 

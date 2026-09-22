@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 96
+define currentVersion = 97
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -803,6 +803,9 @@ init -100 python:
         if loaded_version < 96:
             updateSave_V95()
             loaded_version = 96
+        if loaded_version < 97:
+            updateSave_V96()
+            loaded_version = 97
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3131,6 +3134,24 @@ init -100 python:
             # Let the actual kitchen count earn it; do not repeat a played reward.
             tractir_progress.activated_achievements.discard("melissa_full_storeroom")
             tractir_progress.achieved.discard("melissa_full_storeroom")
+
+    def updateSave_V96():
+        # Pending intent is not a witnessed/resolved theft attempt. Old saves
+        # can recover only facts that were actually retained, not lost history.
+        if not hasattr(player.horse, "theft_attempted"):
+            player.horse.theft_attempted = bool(
+                int(player.horse.stolen_days or 0) > 0
+                or int(player.horse.stolen_purchase_price or 0) > 0
+            )
+        initThreads()
+        booklet = threads.get("claraBookletMarket")
+        if booklet is not None:
+            old_num = int(booklet.num or 0)
+            was_completed = bool(booklet.completed)
+            # A deal awaiting the rumor now waits for the restored wine-store
+            # question. Already-played arrests and later outcomes stay played.
+            new_num = booklet.data.length if was_completed else old_num + int(old_num >= 4)
+            booklet.advanceTo(new_num, complete_at_end=was_completed)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

@@ -44,7 +44,7 @@ label IntZimmerTalk:
                 call checkTriggers("talk_zimmer", "robin_camp_report", 0)
             "Спросить о покупке лошади" if int(Zimmer.talked_today or 0) < 2 and int(Luisa.horse_referral_stage or 0) > 0 and not player.horse.owns_horse():
                 call IntZimmerTalkHorsePurchase
-            "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 7 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
+            "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 8 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
                 call IntZimmerTalkMongolWineDistraction
             "Закончить разговор":
                 $ main_ui_end_talk_state()

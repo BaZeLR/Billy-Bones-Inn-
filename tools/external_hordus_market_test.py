@@ -115,14 +115,14 @@ testcase external_hordus_first_second_and_recurring_meetings:
     assert eval (scene_runtime.picture == "images/market/mistery_merchant.png") timeout 5.0
     click id (external_hordus_button("Вернуться к своим делам")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
     python:
-        threads["claraBookletMarket"].advanceTo(9, complete_at_end=True)
+        threads["claraBookletMarket"].advanceTo(threads["claraBookletMarket"].data.length, complete_at_end=True)
         calendar_v2.period = 2
         external_hordus_date(1)
         external_hordus_date(HordusStaticData.monthly_visit_days()[0])
     assert eval (event_runtime.available["MarketPlace"]["enter"].target == "story_clara_hordus_market") timeout 5.0
     run Call("checkTriggers", "MarketPlace", "enter", 0)
     advance until eval ("Посмотреть товары Хордуса" in external_hordus_choices()) timeout 20.0
-    assert eval ("Познакомиться с торговцем" not in external_hordus_choices() and threads["claraBookletMarket"].num == 9) timeout 5.0
+    assert eval ("Познакомиться с торговцем" not in external_hordus_choices() and threads["claraBookletMarket"].completed) timeout 5.0
     click id (external_hordus_button("Вернуться к своим делам")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
     assert eval (threads["claraBookletMarket"].completed and Hordus.known) timeout 5.0
 
@@ -176,7 +176,7 @@ testcase external_hordus_sofa_purchase_and_npc_presence:
         player.tavern_management.client_room_hole = 1
         player.tavern_management.glory_hole = 2
         Clara.rel = 5
-        threads["claraBookletMarket"].advanceTo(9, complete_at_end=True)
+        threads["claraBookletMarket"].advanceTo(threads["claraBookletMarket"].data.length, complete_at_end=True)
         threads["claraForestSofa"].advanceTo(6, force_active=True)
         player.set_money(599)
     run Call("IntHordusTalk")

@@ -102,6 +102,7 @@ init python:
         "minidress": "lightblouse",
         "slutdress": "transparentblouse",
         "nightshirt": "nightshirttop",
+        "thiefdress": "thiefshirt",
     }
 
     DressBottomPart = {
@@ -114,6 +115,7 @@ init python:
         "minidress": "miniskirt",
         "slutdress": "ultraminiskirt",
         "nightshirt": "nightshirtbottom",
+        "thiefdress": "thieftrousers",
     }
 
     DressPartDesc = {
@@ -133,6 +135,8 @@ init python:
         "ultraminiskirt": "короткую черную юбченку, еле прикрывающую попу",
         "nightshirttop": "простую белую ночную рубашку",
         "nightshirtbottom": "простую белую ночную рубашку",
+        "thiefshirt": "разноцветную шелковую рубашку с золотым шитьем",
+        "thieftrousers": "разноцветные полосатые штаны",
         "whitestockings": "белыми чулочками из плотной ткани",
         "blackstockings": "кружевными, почти прозрачными черными чулочками",
         "redstockings": "кружевными, почти прозрачными красными чулочками",

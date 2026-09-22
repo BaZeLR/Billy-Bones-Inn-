@@ -96,6 +96,7 @@ label NextDay_TavernDaily():
             TotalDay['HorseFood'] += 3
         if daily_events.exists("", "StableHorseTheft") > 0:
             if player.horse.owns_horse():
+                player.horse.theft_attempted = True
                 _dog_theft_result = None
                 if dog.prevents_theft("horse"):
                     _dog_theft_result = dog_catch_delinquent_apply("horse")

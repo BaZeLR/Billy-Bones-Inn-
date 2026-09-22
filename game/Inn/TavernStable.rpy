@@ -186,6 +186,7 @@ label TavernStable:
 
 
 label TavernStableHorseTheftAttempt:
+    $ player.horse.theft_attempted = True
     $ main_ui_begin_native_scene_state("Ночной шум в конюшне")
     show screen main_ui
     vscene tavern_stable_picture()

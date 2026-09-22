@@ -26,7 +26,7 @@ def test_clara_continuation_has_one_ordered_story_authority():
     ]
     assert all(block.count(stage) == 1 for stage in stages)
     assert [block.index(stage) for stage in stages] == sorted(block.index(stage) for stage in stages)
-    assert "#threads['claraBookletMarket'].completed" in block
+    assert "#int(threads['claraBookletMarket'].num or 0) >= 3" in block
     assert "#int(threads['claraPaintingsPath'].num or 0) >= 2" not in block
     assert "#player.horse.owns_horse()" in block
     assert "#int(player.item_count('clara_pantaloons_001') or 0) > 0" in block
@@ -190,7 +190,7 @@ def test_v77_save_migration_maps_existing_clara_threads_and_horse_claim_once():
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 93" in migration
+    assert int(migration.split("define currentVersion = ", 1)[1].splitlines()[0]) >= 78
     assert "if loaded_version < 78:" in migration
     assert "updateSave_V77()" in migration
     assert "paintings_map = {" in block

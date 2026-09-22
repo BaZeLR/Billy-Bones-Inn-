@@ -4,6 +4,44 @@
 # ================================================================================
 
 
+label story_clara_moon_sabbath:
+    $ main_ui_begin_native_scene_state("Кларисса в полнолуние")
+    show screen main_ui
+    $ renpy.dynamic("_sabbath_wardrobe")
+    $ _sabbath_wardrobe = (dict(Clara.wardrobe.current_layers), dict(Clara.wardrobe.raised_layers), Clara.wardrobe.context)
+    $ Clara.wardrobe.wear_temporary("thiefdress")
+    vscene "images/clara/market_night.png"
+    $ scene_runtime.text = "Субботний рынок уже закрыт. Между опустевшими рядами вы замечаете Клариссу: поверх подаренного вами бандитского костюма накинут плащ, под мышкой зажат сверток с бумагой. Она оглядывается и направляется к лесной дороге. Над крышами поднимается полная луна."
+    menu:
+        "Незаметно проследить за Клариссой":
+            pass
+        "Остаться на рынке":
+            $ Clara.wardrobe.current_layers, Clara.wardrobe.raised_layers, Clara.wardrobe.context = _sabbath_wardrobe
+            $ main_ui_end_native_scene_state()
+            return True
+
+    vscene "images/forest/hidden_path.png"
+    $ scene_runtime.text = "Вы держитесь в тени, позволяя ей уходить вперед на поворотах. Кларисса уверенно выбирает тропу между деревьями. Вскоре в глубине леса появляются огни, доносится музыка. Вы прячетесь за стволом на краю поляны."
+    menu:
+        "Посмотреть, зачем она пришла":
+            pass
+
+    $ scene_runtime.text = "На поляне идет тайный шабаш: пляски у костров сменяются откровенной оргией. Кларисса остается в стороне от участников. Она разворачивает бумагу на коленях и быстро рисует, то поднимая глаза, то снова склоняясь над листом. Теперь вы понимаете, откуда берутся некоторые сюжеты ее рисунков."
+    menu:
+        "Продолжить наблюдение из укрытия":
+            pass
+
+    $ scene_runtime.text = "В этом месяце над поляной сияет %s. Кларисса подписывает законченный набросок и берется за следующий. Вы не окликаете ее и не выходите из укрытия: сегодня вам удалось увидеть то, что она скрывает даже от знакомых покупателей. Пока вас не заметили, вы возвращаетесь той же дорогой к закрытому рынку." % calendar_v2.moon_name_ru()
+    menu:
+        "Вернуться на рынок":
+            pass
+    $ calendar_v2.advance_minutes(60)
+    $ player.change_stat("energy", -5)
+    $ Clara.wardrobe.current_layers, Clara.wardrobe.raised_layers, Clara.wardrobe.context = _sabbath_wardrobe
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label story_clara_forest_follow_0:
     $ main_ui_begin_native_scene_state("Кларисса в лесу")
     show screen main_ui

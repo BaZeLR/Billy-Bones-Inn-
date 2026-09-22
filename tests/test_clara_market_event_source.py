@@ -58,9 +58,13 @@ def test_clara_market_event_checks_are_explicit_tuple_conditions():
     assert "#str(people.location('hordus') or '') == 'MarketPlace'" in clara_thread
     assert "#str(people.location('clara') or '') == 'MarketPlace'" in clara_thread
     assert "market_day_roll" not in clara_thread
-    assert "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)" in clara_thread
-    assert "#bool(Clara.market_evening_roll)" in clara_thread
-    assert clara_thread.count("(18, 22)") == 2
+    shared = events.split("define claraMongolMarketConditions = [", 1)[1].split("define claraThreadList", 1)[0]
+    assert "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)" in shared
+    assert "#bool(Clara.market_evening_roll)" in shared
+    assert "#bool(player.horse.theft_attempted)" in shared
+    assert "#threads['claraPaintingsPath'].done[0]" in shared
+    assert clara_thread.count("claraMongolMarketConditions") == 2
+    assert clara_thread.split('RThreadData', 1)[0].count("(19, 22)") == 2
 
 
 def test_clara_daytime_market_schedule_reuses_hordus_authority():
@@ -348,14 +352,17 @@ def test_clara_market_events_restore_the_calling_picture_and_ui_context():
 
     assert 'main_ui_runtime.mode = "event"' not in labels
     assert 'main_ui_runtime.mode = "scene"' not in labels
-    assert labels.count("main_ui_begin_native_scene_state(") == 9
-    assert labels.count("main_ui_end_native_scene_state()") == 16
+    assert labels.count("main_ui_begin_native_scene_state(") == 10
+    assert labels.count("main_ui_end_native_scene_state()") == 17
     assert labels.index('main_ui_begin_native_scene_state("Кларисса на рынке")') < labels.index('vscene "images/clara/market_day.png"')
     assert labels.index('label story_clara_market_booklet_3:') < labels.index('label story_clara_market_booklet_5:')
-    assert 'label story_clara_market_booklet_4:' not in labels
+    denial = labels.split('label story_clara_market_booklet_4:', 1)[1].split('label story_clara_market_booklet_5:', 1)[0]
+    assert 'main_ui_begin_native_scene_state(' in denial
+    assert 'main_ui_end_native_scene_state()' in denial
+    assert 'jump WineStore' not in denial
 
 
-def test_hunter_rumor_immediately_follows_market_horse_theft_and_owns_mongol_fate():
+def test_hunter_rumor_follows_wine_store_denial_after_seven_days():
     events = _source(Path("game") / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy")
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
     block = events.split('LThreadData(0, "clara", "BookletMarket"', 1)[1].split(
@@ -364,6 +371,7 @@ def test_hunter_rumor_immediately_follows_market_horse_theft_and_owns_mongol_fat
 
     ordered = [
         '"story_clara_market_booklet_3"',
+        '"story_clara_market_booklet_4"',
         '"story_clara_market_booklet_5"',
         '"story_clara_market_booklet_6"',
         '"story_clara_market_booklet_7"',
@@ -372,8 +380,9 @@ def test_hunter_rumor_immediately_follows_market_horse_theft_and_owns_mongol_fat
         '"story_clara_market_booklet_10"',
     ]
     assert [block.index(stage) for stage in ordered] == sorted(block.index(stage) for stage in ordered)
-    assert '"HunterClub",\n            "overheard",\n            3,' in block
-    assert '"WineStore",\n            "clara_talk"' not in block
+    assert '"HunterClub",\n            "overheard",\n            4,' in block
+    assert '"WineStore",\n            "clara_mongol"' in block
+    assert '"story_clara_market_booklet_5",\n            None, None, 7,' in block
     assert 'Mongol.stocks_fate = "released"' in labels
     assert 'Mongol.stocks_fate = "convicted"' in labels
     assert labels.count('event_runtime.active_thread.complete()') == 1
@@ -385,7 +394,7 @@ def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 93" in migration
+    assert int(migration.split("define currentVersion = ", 1)[1].splitlines()[0]) >= 74
     assert "if loaded_version < 74:" in migration
     assert "updateSave_V73()" in migration
     assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block

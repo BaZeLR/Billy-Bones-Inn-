@@ -534,6 +534,14 @@ define sandraThreadList = [
         ),
     ], highlight=False, threaded=True),
 ]
+define claraMongolMarketConditions = [
+    "#bool(player.horse.theft_attempted)",
+    "#int(player.stats.exploration or 0) >= 100",
+    "#threads['claraPaintingsPath'].done[0]",
+    "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
+    "#bool(Clara.market_evening_roll)",
+]
+
 define claraThreadList = [
     LThreadData(0, "clara", "BookletMarket", None, [
         (
@@ -553,13 +561,10 @@ define claraThreadList = [
         ),
         (
             "story_clara_market_booklet_2",
-            [1, 2, 3, 4, 6], (18, 22), None,
+            [1, 2, 3, 4, 6], (19, 22), None,
             1,
             None,
-            [
-                "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
-                "#bool(Clara.market_evening_roll)",
-            ],
+            claraMongolMarketConditions,
             None,
             "MarketPlace",
             "enter",
@@ -567,28 +572,36 @@ define claraThreadList = [
         ),
         (
             "story_clara_market_booklet_3",
-            [1, 2, 3, 4, 6], (18, 22), None,
+            [1, 2, 3, 4, 6], (19, 22), None,
             1,
             None,
-            [
-                "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
-                "#bool(Clara.market_evening_roll)",
-            ],
+            claraMongolMarketConditions,
             None,
             "MarketPlace",
             "enter",
             2,
         ),
         (
-            "story_clara_market_booklet_5",
+            "story_clara_market_booklet_4",
             None, None, None,
+            1,
+            None,
+            ["#str(people.location('clara') or '') == 'WineStore'"],
+            None,
+            "WineStore",
+            "clara_mongol",
+            3,
+        ),
+        (
+            "story_clara_market_booklet_5",
+            None, None, 7,
             1,
             None,
             None,
             None,
             "HunterClub",
             "overheard",
-            3,
+            4,
         ),
         (
             "story_clara_market_booklet_6",
@@ -599,7 +612,7 @@ define claraThreadList = [
             None,
             "menu_CityGuard",
             "mongol_stocks",
-            4,
+            5,
         ),
         (
             "story_clara_market_booklet_7",
@@ -610,7 +623,7 @@ define claraThreadList = [
             None,
             "menu_CityGuard",
             "mongol_stocks",
-            5,
+            6,
         ),
         (
             "story_clara_market_booklet_8",
@@ -623,7 +636,7 @@ define claraThreadList = [
             None,
             "StolyarWorkshop",
             "enter",
-            6,
+            7,
         ),
         (
             "story_clara_market_booklet_9",
@@ -639,7 +652,7 @@ define claraThreadList = [
             None,
             "menu_CityGuard",
             "mongol_stocks",
-            7,
+            8,
         ),
         (
             "story_clara_market_booklet_10",
@@ -650,7 +663,7 @@ define claraThreadList = [
             None,
             "HunterClub",
             "overheard",
-            8,
+            9,
         ),
     ], highlight=False, threaded=True),
     RThreadData(0, "clara", "HordusMarket", None, [1, [
@@ -669,6 +682,23 @@ define claraThreadList = [
             "MarketPlace",
             "enter",
             0,
+        ),
+    ]], highlight=False, threaded=False),
+    RThreadData(0, "clara", "MoonSabbath", None, [1, [
+        (
+            "story_clara_moon_sabbath",
+            6, (19, 22), 1,
+            1, None,
+            [
+                "#calendar_v2.moon_phase_name_en() == 'Full Moon'",
+                "#not rooms.get('MarketPlace').is_open()",
+                "#int(player.stats.exploration or 0) >= 100",
+                "#int(threads['claraForestSofa'].num or 0) >= 3",
+                "#not threads['claraForestSofa'].aborted",
+                "#Clara.wardrobe.owns('thiefdress')",
+            ],
+            None,
+            "MarketPlace", "enter", 5,
         ),
     ]], highlight=False, threaded=False),
     #
@@ -951,7 +981,7 @@ define claraThreadList = [
     # inventory items, the installed sofa belongs to TavernMain, and the final
     # capacity reward belongs to PlayerIntimacy.
     LThreadData(1, "clara", "ForestSofa", [
-        "#threads['claraBookletMarket'].completed",
+        "#int(threads['claraBookletMarket'].num or 0) >= 3",
     ], [
         (
             "story_clara_forest_follow_0",

@@ -65,6 +65,10 @@ label IntClaraTalk(girl_name="clara"):
                 $ main_ui_end_talk_state()
                 return
 
+            "Спросить о ночном разговоре с Монголом" if str(rooms.current_code or "") == "WineStore" and story_event_available("WineStore", "clara_mongol"):
+                call checkTriggers("WineStore", "clara_mongol", 0)
+                $ _clara_repeat_menu = True
+
             "Спросить Клариссу о Легаре" if story_event_available("WineStore", "clara_paintings") and int(threads["claraPaintingsPath"].num or 0) == 5:
                 call checkTriggers("WineStore", "clara_paintings", 0)
                 $ _clara_repeat_menu = True
