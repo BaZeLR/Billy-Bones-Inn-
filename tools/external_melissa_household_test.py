@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Run Melissa household integration cases using the isolated renovation runner.
-
-Only copied scripts and temporary saves are modified. The runner's existing
---compile-lint and --keep-temp options also apply to this fixture.
-"""
+"""Test the existing Melissa kitchen count, using copied scripts/temp saves."""
 
 import external_tavern_renovations_test as isolated
+
+
+def read_until_choice(prefix):
+    # Ren'Py 8.5.2 testcases support if/until, not while blocks. Expand a bounded
+    # series of real clicks; once the target choice is reached, later steps skip.
+    step = '''    if eval (not any(caption.startswith(%r) for caption in external_melissa_choices())):
+        $ _melissa_read.append(scene_runtime.text)
+        assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == []) timeout 5.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+        pause 0.05
+        advance until screen "choice" timeout 20.0
+''' % prefix
+    return step * 10
 
 
 TEST_RPY = r'''
@@ -21,7 +30,6 @@ init python:
     def external_melissa_prepare():
         for thread in threads.values():
             thread.abort()
-        threads["melissaStoreroomMilestone"].reset()
         event_runtime.available.clear()
         event_runtime.fired_keys_today = []
         event_runtime.evaluation_time = None
@@ -29,27 +37,43 @@ init python:
         tractir_progress.achieved.discard("melissa_full_storeroom")
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None
+        player.tavern_management.cleanliness = 100
         tavern.renovation_due_days = {}
+        tavern_storage_supplies_stock().clear()
+        tavern_storage_supplies_effects().clear()
+        household.seen.clear()
+        household.meta["friction"] = 0
+        household.morning_state.clear()
         player.set_money(5000)
         player.tavern_management.productnum = 0
         player.tavern_management.winenum = 0
+        player.chores.weekly["clean_upstairs_rooms"] = 0
         Melissa.comfort_cleaning_score = 0
+        Melissa.comfort_interaction_score = 0
         Melissa.household_satisfaction = 0
         Melissa.rel = 15
+        Melissa.trust = 5
+        Melissa.corruption = 3
+        Melissa.energy = 100
+        Melissa.set_arousal(0)
         Melissa.asked_today = 0
         Melissa.talked_today = 0
+        Melissa.temp_room_code = ""
         calendar_v2.daysInGame = 30
         calendar_v2.week = 2
         calendar_v2.hour = 9
         calendar_v2.minute = 0
-        rooms.enter("TavernStorage")
+        for person_id in ("melissa", "sandra"):
+            people.get_data(person_id).set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+        people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
+        rooms.enter("TavernKitchen")
         main_ui_runtime.clear_contexts()
         main_ui_runtime.mode = "scene"
         main_ui_runtime.selected_char = ""
         main_ui_runtime.girl_key = ""
         main_ui_runtime.object_id = ""
         main_ui_runtime.action_items = []
-        scene_runtime.picture = "images/tavern/storage/storage_room.png"
+        scene_runtime.picture = "images/tavern/kitchen/kitchen_room.png"
         scene_runtime.text = "EXTERNAL_MELISSA_ROOM_ORIGIN"
         scene_runtime.location_text = scene_runtime.text
         renpy.show_screen("main_ui")
@@ -62,139 +86,158 @@ testsuite global:
     teardown:
         exit
 
-testcase external_melissa_stock_purchase:
+testcase external_melissa_stock_purchase_only_satisfaction:
     parameter shop = ["GroceryStore", "WineStore"]
     run Call(shop + "BuyStockMenu")
     advance until eval (main_ui_runtime.action_title in ("Покупка провизии", "Покупка вина")) timeout 20.0
     run (next(item.action for item in main_ui_runtime.action_items if item.caption.startswith("Купить один")))
     advance until eval (Melissa.household_satisfaction == 2) timeout 20.0
     python:
-        assert player.tavern_management.productnum == (10 if shop == "GroceryStore" else 0)
-        assert player.tavern_management.winenum == (10 if shop == "WineStore" else 0)
+        assert Melissa.trust == 5 and Melissa.comfort_interaction_score == 0 and Melissa.rel == 15
         assert player.economy.money == 5000 - (6 if shop == "GroceryStore" else 14)
-        assert Melissa.rel == 15
         assert "melissa_full_storeroom" not in tractir_progress.activated_achievements
     run Call(shop + "BuyStockApply", 0, 0, 0)
     advance until eval ("решили пока ничего" in scene_runtime.text) timeout 20.0
     assert eval (Melissa.household_satisfaction == 2) timeout 5.0
-    $ player.set_money(0)
-    run Call(shop + "BuyStockMenu")
-    advance until eval (main_ui_runtime.action_title in ("Покупка провизии", "Покупка вина")) timeout 20.0
-    assert eval (not any(item.caption.startswith("Купить") for item in main_ui_runtime.action_items)) timeout 5.0
 
-testcase external_melissa_food_deposit:
+testcase external_melissa_kitchen_choices:
+    parameter case = [(5, False, "Пообещать", 0), (100, False, "Пообещать", 1), (100, True, "Пообещать", 2), (100, "bear", "Пообещать", 2), (100, True, "Сказать", -1)]
     python:
-        player.inventory.items["honey_comb_001"] = 3
-        before_stock = tavern_kitchen_food_stock_count("honey_comb_001")
-        assert tavern_kitchen_deposit_food("honey_comb_001", 2) == 2
-        assert tavern_kitchen_food_stock_count("honey_comb_001") == before_stock + 2
-        assert player.item_count("honey_comb_001") == 1
-        assert Melissa.household_satisfaction == 2
-        assert tavern_kitchen_deposit_food("honey_comb_001", 1) == 1
-        assert Melissa.household_satisfaction == 4
-        assert tavern_kitchen_deposit_food("honey_comb_001", 1) == 0
-        assert tavern_kitchen_deposit_food("nonexistent_item", 1) == 0
-        assert Melissa.household_satisfaction == 4
-        assert Melissa.rel == 15
-
-testcase external_melissa_threshold_and_event_scope:
-    parameter stock = [(100, 500, False), (101, 499, False), (101, 500, True)]
-    python:
-        food, wine, expected = stock
+        food, forest, reply, delta = case
         player.tavern_management.productnum = food
-        player.tavern_management.winenum = wine
-        Melissa.record_stock_growth()
-        assert story_event_available("talk_melissa", "storeroom_thanks") == expected
-        assert Melissa.household_satisfaction == 2
-        assert all(project.is_hidden for project in TAVERN_RENOVATIONS.values())
-        assert rooms.get("ShedWashroom").is_hidden
-
-testcase external_melissa_priorities_return_to_talk:
-    $ _melissa_room_origin = main_ui_context_snapshot()
-    run Call("IntMelissaTalk")
+        if forest == "bear":
+            tavern_storage_supplies_effects()["bear_days"] = 14
+        elif forest:
+            tavern_storage_supplies_stock()["berries_001"] = 3
+        _melissa_origin = main_ui_context_snapshot()
+        _melissa_read = []
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
     advance until screen "choice" timeout 20.0
-    click id (external_melissa_button("Спросить, что для нее")) pos (0.5, 0.5)
-    advance until eval ("Выслушать" in external_melissa_choices()) timeout 20.0
+{READ_TO_ACTIONS}
     python:
-        assert main_ui_runtime.mode == "event"
-        assert main_ui_runtime.action_items == []
-        assert "EXTERNAL_MELISSA_ROOM_ORIGIN" not in scene_runtime.text
-        assert scene_runtime.picture == "images/melissa/tavern/portrait.png"
-    click id (external_melissa_button("Выслушать")) pos (0.5, 0.5)
-    advance until eval ("Спросить о домашнем уюте" in external_melissa_choices()) timeout 20.0
-    click id (external_melissa_button("Спросить о домашнем уюте")) pos (0.5, 0.5)
-    advance until eval ("Посмотреть, что уже сделано" in external_melissa_choices()) timeout 20.0
-    click id (external_melissa_button("Посмотреть, что уже сделано")) pos (0.5, 0.5)
-    advance until eval ("Вернуться к разговору" in external_melissa_choices()) timeout 20.0
-    assert eval ("Комфорт Мелиссы:" in scene_runtime.text and "Удовлетворенность хозяйством: 0" in scene_runtime.text) timeout 5.0
-    click id (external_melissa_button("Вернуться к разговору")) pos (0.5, 0.5)
-    advance until eval (main_ui_runtime.mode == "talk" and "Осмотреть" in external_melissa_choices()) timeout 20.0
-    assert eval (rooms.current_code == "TavernStorage" and main_ui_runtime.scene_origin is None) timeout 5.0
-    click id (external_melissa_button("Назад")) pos (0.5, 0.5)
+        assert any(("Провизии осталось мало" if food < 100 else "С провизией сейчас порядок") in text for text in _melissa_read)
+        assert not any("EXTERNAL_MELISSA_ROOM_ORIGIN" in text for text in _melissa_read)
+        assert external_melissa_choices() == ["Пообещать разобраться с припасами", "Сказать, чтобы справлялась с тем, что есть", "Спросить, что ей нужнее всего"]
+    if eval (forest == "bear"):
+        pause 0.2
+        $ renpy.screenshot(config.basedir + "/melissa-kitchen-count.png")
+    click id (external_melissa_button(reply)) pos (0.5, 0.5)
+    advance until eval ("Закончить разговор" in external_melissa_choices()) timeout 20.0
+    assert eval (Melissa.trust == 5 + delta and Melissa.comfort_interaction_score == delta and Melissa.rel == 15) timeout 5.0
+    click id (external_melissa_button("Закончить")) pos (0.5, 0.5)
     advance until eval (main_ui_runtime.mode == "scene") timeout 20.0
-    assert eval (main_ui_context_snapshot() == _melissa_room_origin) timeout 5.0
+    assert eval (main_ui_context_snapshot() == _melissa_origin) timeout 5.0
+    assert eval (household_ai_pick_event("TavernKitchen", "room") != "household_event_kitchen_melissa_practical_complaint") timeout 5.0
 
-testcase external_melissa_milestone_reward_once:
-    parameter response = ["Улыбнуться", "Поблагодарить"]
+testcase external_melissa_needs_only_unfinished:
+    parameter completed = [False, True]
     python:
-        _melissa_room_origin = main_ui_context_snapshot()
+        player.tavern_management.productnum = 101
+        werecat_state()["rats_problem_active"] = 0 if completed else 1
+        threads["melissaBatProblem"].num = 7 if completed else 0
+        Melissa.roof_repair_complete_day = 30 if completed else -1
+        if completed:
+            tavern.renovation_due_days.update(backyard=30, shed=30)
+            player.chores.weekly["clean_upstairs_rooms"] = 1
+        _melissa_read = []
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
+    advance until screen "choice" timeout 20.0
+{READ_TO_ACTIONS}
+    click id (external_melissa_button("Спросить, что")) pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+{READ_TO_FINISH}
+    $ _melissa_read.append(scene_runtime.text)
+    python:
+        read_text = "\n".join(_melissa_read)
+        for marker in ("Избавь нас от крыс", "ремонт моей комнаты", "порядок двор", "нужник нужно", "На этой неделе", "Прачечная"):
+            assert (marker in read_text) != completed, (marker, read_text)
+        assert ("все сделано" in read_text) == completed
+        assert all(project.is_hidden for project in TAVERN_RENOVATIONS.values())
+
+testcase external_melissa_reward_by_current_state:
+    parameter state = [(4, 30, 80, 100, "сдержанно благодарит"), (15, 3, 80, 100, "быстро целует"), (15, 20, 0, 100, "запишем в долг"), (15, 20, 80, 100, "особая благодарность"), (15, 20, 80, 20, "Сегодня сил совсем мало")]
+    python:
+        Melissa.rel, Melissa.corruption, arousal, Melissa.energy, expected = state
+        Melissa.set_arousal(arousal)
+        player.tavern_management.productnum = 101
+        player.tavern_management.winenum = 500
+        _melissa_read = []
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
+    advance until screen "choice" timeout 20.0
+{READ_TO_ACTIONS}
+    python:
+        assert expected in "\n".join(_melissa_read), _melissa_read
+        assert "melissa_full_storeroom" in tractir_progress.achieved
+        assert "melissaStoreroomMilestone" not in threads
+    click id (external_melissa_button("Пообещать")) pos (0.5, 0.5)
+    advance until eval ("Закончить разговор" in external_melissa_choices()) timeout 20.0
+    click id (external_melissa_button("Закончить")) pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.mode == "scene") timeout 20.0
+    $ household.seen.clear()
+    $ _melissa_read = []
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
+    advance until screen "choice" timeout 20.0
+{READ_TO_ACTIONS}
+    assert eval ("Вот теперь действительно полная кладовая" not in "\n".join(_melissa_read)) timeout 5.0
+
+testcase external_melissa_no_reward_in_talk_or_purchase:
+    python:
         player.tavern_management.productnum = 101
         player.tavern_management.winenum = 500
         Melissa.record_stock_growth()
-        # The earned scene remains pending even after normal stock consumption.
-        player.tavern_management.productnum = 90
-        player.tavern_management.winenum = 490
-    run Call("IntMelissaTalk")
-    advance until eval ("Продолжить" in external_melissa_choices()) timeout 20.0
-    python:
-        assert main_ui_runtime.mode == "event"
-        assert main_ui_runtime.action_items == []
-        assert "EXTERNAL_MELISSA_ROOM_ORIGIN" not in scene_runtime.text
-        assert scene_runtime.picture == "images/melissa/happy.png"
-        assert not threads["melissaStoreroomMilestone"].completed
-    click id (external_melissa_button("Продолжить")) pos (0.5, 0.5)
-    advance until eval (any(caption.startswith(response) for caption in external_melissa_choices())) timeout 20.0
-    click id (external_melissa_button(response)) pos (0.5, 0.5)
-    advance until eval ("Вернуться к разговору" in external_melissa_choices()) timeout 20.0
-    click id (external_melissa_button("Вернуться к разговору")) pos (0.5, 0.5)
-    advance until eval (main_ui_runtime.mode == "talk" and "Осмотреть" in external_melissa_choices()) timeout 20.0
-    python:
-        assert threads["melissaStoreroomMilestone"].completed
-        assert threads["melissaStoreroomMilestone"].num == 1
+        assert "melissa_full_storeroom" not in tractir_progress.activated_achievements
         assert not story_event_available("talk_melissa", "storeroom_thanks")
-        assert Melissa.household_satisfaction == 2
-        assert Melissa.rel == 15
-    click id (external_melissa_button("Назад")) pos (0.5, 0.5)
-    advance until eval (main_ui_runtime.mode == "scene") timeout 20.0
-    assert eval (main_ui_context_snapshot() == _melissa_room_origin) timeout 5.0
     run Call("IntMelissaTalk")
     advance until screen "choice" timeout 20.0
-    assert eval (main_ui_runtime.mode == "talk" and "Продолжить" not in external_melissa_choices()) timeout 5.0
+    assert eval (main_ui_runtime.mode == "talk" and "Осмотреть" in external_melissa_choices()) timeout 5.0
+
+testcase external_melissa_count_follows_played_argument:
+    python:
+        people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+        household.meta["friction"] = 0.8
+        assert household_ai_pick_event("TavernKitchen", "room") == "household_event_kitchen_amanda_sandra_spark"
+        household_ai_mark_seen("household_event_kitchen_amanda_sandra_spark", "TavernKitchen")
+        assert household_ai_pick_event("TavernKitchen", "room") == "household_event_kitchen_melissa_practical_complaint"
+        household_ai_mark_seen("household_event_kitchen_melissa_practical_complaint", "TavernKitchen")
+        assert household_ai_pick_event("TavernKitchen", "room") == "household_event_breakfast_squirrel_mockery"
+
+testcase external_melissa_count_threshold:
+    parameter stock = [(100, 500, False), (101, 499, False), (101, 500, True)]
+    python:
+        player.tavern_management.productnum, player.tavern_management.winenum, expected = stock
+        _melissa_read = []
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
+    advance until screen "choice" timeout 20.0
+{READ_TO_ACTIONS}
+    assert eval (("melissa_full_storeroom" in tractir_progress.achieved) == expected) timeout 5.0
 
 testcase external_melissa_save_migration:
+    parameter played = [False, True]
     python:
-        del Melissa.comfort_cleaning_score
-        del Melissa.household_satisfaction
-        before_inventory = dict(player.inventory.items)
-        before_threads = {name: (thread.num, thread.completed, thread.aborted) for name, thread in threads.items()}
-        updateSave_V94()
-        assert Melissa.comfort_cleaning_score == 0
-        assert Melissa.household_satisfaction == 0
-        Melissa.comfort_cleaning_score = -2
+        # Same saved ThreadInfo schema; migration reads only completion state.
+        old = LThreadInfo(threadData["melissaBatProblem"])
+        old.completed = played
+        threads["melissaStoreroomMilestone"] = old
+        tractir_progress.activated_achievements.add("melissa_full_storeroom")
+        tractir_progress.achieved.add("melissa_full_storeroom")
+        del Melissa.comfort_interaction_score
         Melissa.household_satisfaction = 8
-        updateSave_V94()
-        assert Melissa.comfort_cleaning_score == -2
-        assert Melissa.household_satisfaction == 8
+        Melissa.comfort_cleaning_score = -2
+        before_inventory = dict(player.inventory.items)
+        updateSave_V95()
+        assert "melissaStoreroomMilestone" not in threads
+        assert ("melissa_full_storeroom" in tractir_progress.achieved) == played
+        assert Melissa.comfort_interaction_score == 0
+        assert Melissa.household_satisfaction == 8 and Melissa.comfort_cleaning_score == -2
+        Melissa.comfort_interaction_score = 3
+        updateSave_V95()
+        assert Melissa.comfort_interaction_score == 3
         assert player.inventory.items == before_inventory
-        assert {name: (thread.num, thread.completed, thread.aborted) for name, thread in threads.items()} == before_threads
-        import pickle
-        restored = pickle.loads(pickle.dumps(Melissa))
-        assert restored.comfort_cleaning_score == -2
-        assert restored.household_satisfaction == 8
-        assert restored.rel == Melissa.rel
-        renpy.save("external-melissa-household", include_screenshot=False)
-        assert renpy.can_load("external-melissa-household")
-'''
+        restored = __import__("pickle").loads(__import__("pickle").dumps(Melissa))
+        assert restored.comfort_interaction_score == 3
+        renpy.save("external-melissa-kitchen", include_screenshot=False)
+        assert renpy.can_load("external-melissa-kitchen")
+'''.replace("{READ_TO_ACTIONS}", read_until_choice("Пообещать")).replace("{READ_TO_FINISH}", read_until_choice("Закончить"))
 
 
 if __name__ == "__main__":

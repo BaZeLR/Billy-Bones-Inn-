@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 95
+define currentVersion = 96
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -799,6 +799,10 @@ init -100 python:
         if loaded_version < 95:
             updateSave_V94()
             loaded_version = 95
+
+        if loaded_version < 96:
+            updateSave_V95()
+            loaded_version = 96
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3117,6 +3121,16 @@ init -100 python:
         if not hasattr(Melissa, "household_satisfaction"):
             Melissa.household_satisfaction = 0
         initThreads()
+
+    def updateSave_V95():
+        if not hasattr(Melissa, "comfort_interaction_score"):
+            Melissa.comfort_interaction_score = 0
+        misplaced_reward = threads.pop("melissaStoreroomMilestone", None)
+        if misplaced_reward is not None and not misplaced_reward.completed:
+            # A purchase incorrectly queued this before Melissa counted anything.
+            # Let the actual kitchen count earn it; do not repeat a played reward.
+            tractir_progress.activated_achievements.discard("melissa_full_storeroom")
+            tractir_progress.achieved.discard("melissa_full_storeroom")
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

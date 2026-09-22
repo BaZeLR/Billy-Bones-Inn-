@@ -197,6 +197,7 @@ init python:
             self.private_context_origin = ""
             self.storage_thanks_day = -1
             self.comfort_cleaning_score = 0
+            self.comfort_interaction_score = 0
             self.household_satisfaction = 0
             self.temp_room_code = ""
             self.storage_rat_help_day = -1
@@ -452,6 +453,7 @@ init python:
                 "yard": yard_fixed,
                 "toilet": yard_fixed,
                 "cleaning": self.comfort_cleaning_score,
+                "interaction": self.comfort_interaction_score,
                 "bathroom_laundry": 2 * int(tavern.renovation_complete("shed")),
             }
 
@@ -463,8 +465,6 @@ init python:
             # Called only after a successful delivery/deposit, never on load or
             # a UI read. The actual inventories remain their existing owners.
             self.household_satisfaction += 2
-            if player.tavern_management.productnum > 100 and player.tavern_management.winenum >= 500:
-                tractir_activate_achievement("melissa_full_storeroom")
 
         def temp_room_active(self, room_code="", hour_value=None, weekday_value=None):
             room_key = str(room_code or "").strip()

@@ -103,13 +103,6 @@ define melissaCourtshipOpeningConditions = melissaCourtshipBaseConditions + [
 ]
 
 define melissaThreadList = [
-    LThreadData(0, "melissa", "StoreroomMilestone", None, [
-        (
-            "MelissaStoreroomMilestone", None, None, None, 1, None,
-            ["#'melissa_full_storeroom' in tractir_progress.activated_achievements or 'melissa_full_storeroom' in tractir_progress.achieved"],
-            None, "talk_melissa", "storeroom_thanks", 0,
-        ),
-    ], highlight=True, threaded=True),
     LThreadData(0, "melissa", "AmandaRoomShare", None, [[
         MelissaAmandaRoomShare,
     ]], highlight=False, threaded=False),

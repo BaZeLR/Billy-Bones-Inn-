@@ -12,8 +12,6 @@ label IntMelissaTalk(girl_name="melissa"):
         $ scene_runtime.location_text = scene_runtime.text
     if story_event_available(str(rooms.current_code or ""), "melissa_talk"):
         call checkTriggers(rooms.current_code, "melissa_talk", 0)
-    if story_event_available("talk_melissa", "storeroom_thanks"):
-        call checkTriggers("talk_melissa", "storeroom_thanks", 0)
     $ _melissa_special_entry = household_special_talk_entry(girl_name) if int(Melissa.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
     menu:
         "Осмотреть":
@@ -84,7 +82,8 @@ label IntMelissaTalk(girl_name="melissa"):
             $ Melissa.mark_asked()
             $ Melissa.mark_talked()
             $ Melissa.change_social(friend_delta=1, open_delta=1)
-            call MelissaHouseholdPriorities
+            $ scene_runtime.text = "Вы спрашиваете Мелиссу, что для нее сейчас важнее всего. Она на миг задумывается, потом отвечает спокойно и неожиданно открыто.\n\n\"Чтобы в доме было тише и ровнее. Чтобы можно было работать без постоянной ругани и чтобы меня не дергали по пустякам. Но еще мне важно знать, что меня здесь слушают, а не просто считают одной из рабочих рук,\" говорит Мелисса, поднимая на вас внимательный взгляд."
+            $ scene_runtime.location_text = scene_runtime.text
             jump IntMelissaTalk
         "Назад":
             $ main_ui_end_talk_state()

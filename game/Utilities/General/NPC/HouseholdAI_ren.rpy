@@ -165,9 +165,9 @@ init 5 python:
 
         # Breakfast / kitchen chaos.
         if loc == "TavernKitchen":
-            if "amanda" in present and "sandra" in present and friction >= 0.55:
+            if "amanda" in present and "sandra" in present and friction >= 0.55 and not household_ai_seen("household_event_kitchen_amanda_sandra_spark", loc):
                 return "household_event_kitchen_amanda_sandra_spark"
-            if "melissa" in present and "sandra" in present and pressure >= 0.50:
+            if "melissa" in present and "sandra" in present and not household_ai_seen("household_event_kitchen_melissa_practical_complaint", loc):
                 return "household_event_kitchen_melissa_practical_complaint"
             if "amanda" in present and "melissa" in present and friction >= 0.45:
                 return "household_event_breakfast_squirrel_mockery"

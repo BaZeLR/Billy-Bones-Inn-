@@ -1,4 +1,4 @@
-"""Execute Melissa's household owners and the existing weekly/achievement engines."""
+"""Execute Melissa's household owners and the existing weekly chore engine."""
 
 from types import SimpleNamespace
 
@@ -71,9 +71,10 @@ def runtime():
 def test_new_game_starts_without_comfort_or_stock_rewards(runtime):
     assert runtime.melissa.comfort_components == {
         "rats": 0, "room": 0, "yard": 0, "toilet": 0,
-        "cleaning": 0, "bathroom_laundry": 0,
+        "cleaning": 0, "bathroom_laundry": 0, "interaction": 0,
     }
     assert runtime.melissa.comfort == 0
+    assert runtime.melissa.comfort_interaction_score == 0
     assert runtime.melissa.household_satisfaction == 0
 
 
@@ -115,6 +116,20 @@ def test_signed_cleaning_score_is_part_of_comfort(runtime, score):
     runtime.melissa.comfort_cleaning_score = score
     assert runtime.melissa.comfort_components["cleaning"] == score
     assert runtime.melissa.comfort == score
+
+
+@pytest.mark.parametrize("score", [-5, -1, 0, 1, 5])
+def test_signed_interaction_score_is_part_of_comfort(runtime, score):
+    runtime.melissa.comfort_interaction_score = score
+    runtime.melissa.comfort_cleaning_score = 2
+    runtime.rats["rats_problem_active"] = 0
+    for _ in range(3):
+        assert runtime.melissa.comfort_components["interaction"] == score
+        assert runtime.melissa.comfort == score + 3
+    assert runtime.melissa.comfort_interaction_score == score
+    assert runtime.melissa.comfort_cleaning_score == 2
+    assert runtime.melissa.household_satisfaction == 0
+    assert runtime.progress.activated_achievements == set()
 
 
 @pytest.mark.parametrize("cleanings,delta", [(0, -1), (1, 1), (3, 1), (8, 1)])
@@ -161,32 +176,43 @@ def test_weekly_cleaning_handles_sunday_finished_after_midnight(runtime):
     assert runtime.melissa.comfort_cleaning_score == 1
 
 
-@pytest.mark.parametrize("food,wine,unlocked", [
-    (100, 499, False), (100, 500, False), (101, 499, False), (101, 500, True),
+@pytest.mark.parametrize("food,wine", [
+    (100, 499), (100, 500), (101, 499), (101, 500),
 ])
-def test_stock_growth_uses_inventory_boundaries_and_separate_score(runtime, food, wine, unlocked):
+def test_stock_growth_records_only_satisfaction(runtime, food, wine):
     runtime.player.tavern_management.productnum = food
     runtime.player.tavern_management.winenum = wine
-    relationship = (runtime.melissa.rel, runtime.melissa.openness, runtime.melissa.corruption)
-    runtime.melissa.record_stock_growth()
-    assert runtime.melissa.household_satisfaction == 2
-    assert runtime.melissa.comfort == 0
-    assert (runtime.melissa.rel, runtime.melissa.openness, runtime.melissa.corruption) == relationship
-    assert (runtime.player.tavern_management.productnum, runtime.player.tavern_management.winenum) == (food, wine)
-    assert runtime.progress.activated_achievements == ({"melissa_full_storeroom"} if unlocked else set())
+    runtime.melissa.openness = 7
+    runtime.melissa.trust = 9
+    runtime.melissa.comfort_interaction_score = -2
+    relationship = (
+        runtime.melissa.rel, runtime.melissa.openness,
+        runtime.melissa.corruption, runtime.melissa.trust,
+    )
+    for count in range(1, 4):
+        runtime.melissa.record_stock_growth()
+        assert runtime.melissa.household_satisfaction == 2 * count
+        assert runtime.melissa.comfort == -2
+        assert (
+            runtime.melissa.rel, runtime.melissa.openness,
+            runtime.melissa.corruption, runtime.melissa.trust,
+        ) == relationship
+        assert (runtime.player.tavern_management.productnum, runtime.player.tavern_management.winenum) == (food, wine)
+        assert runtime.progress.activated_achievements == set()
+        assert runtime.progress.achieved == set()
 
 
-def test_existing_achievement_engine_deduplicates_stock_rewards(runtime):
+def test_stock_growth_preserves_existing_achievement_progress(runtime):
     runtime.player.tavern_management.productnum = 101
     runtime.player.tavern_management.winenum = 500
+    runtime.progress.activated_achievements.add("melissa_full_storeroom")
     runtime.melissa.record_stock_growth()
-    runtime.melissa.record_stock_growth()
-    assert runtime.melissa.household_satisfaction == 4
+    assert runtime.melissa.household_satisfaction == 2
     assert runtime.progress.activated_achievements == {"melissa_full_storeroom"}
     runtime.progress.activated_achievements.clear()
     runtime.progress.achieved.add("melissa_full_storeroom")
     runtime.melissa.record_stock_growth()
-    assert runtime.melissa.household_satisfaction == 6
+    assert runtime.melissa.household_satisfaction == 4
     assert runtime.progress.activated_achievements == set()
     assert runtime.progress.achieved == {"melissa_full_storeroom"}
 
