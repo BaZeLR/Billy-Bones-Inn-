@@ -368,6 +368,20 @@ label story_clara_market_booklet_release_mongol:
     $ Mongol.guard_captain_known = True
     $ Robin.mongol_safe_pass = True
     $ Robin.blackwood_road_open = True
+    if Clara.mongol_case_detained() and threads["claraMongolAccusation"].num == 2:
+        vscene "images/clara/portrait.png"
+        $ scene_runtime.text = "Пока стража занята угощением, можно помочь и Клариссе. Она ждёт вашего решения: уйдёте ли вы с Монголом или откроете и её замок?"
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Освободить Клариссу вместе с Монголом":
+                $ threads["claraMongolAccusation"].advance()
+                $ scene_runtime.text = "Те же отмычки открывают второй замок. Кларисса выбирается следом за вами. Монгол скрывается на дороге к лесу, а ей вы велите идти к трактиру."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Покинуть караулку":
+                        pass
+            "Не освобождать Клариссу":
+                pass
     $ calendar_v2.advance_minutes(30)
     call stat
     $ event_runtime.active_thread.advance()

@@ -53,6 +53,25 @@ label external_clara_resolve_day:
     call NextDay_TavernDaily
     return
 
+label external_clara_actual_load_probe(saved_stage):
+    $ external_clara_prepare()
+    $ saveVersion = currentVersion
+    $ threads["claraMongolAccusation"].advanceTo(saved_stage, complete_at_end=True)
+    $ Clara.trust = 7
+    $ player.economy.money = 1234
+    $ renpy.save("external-clara-reload", include_screenshot=False)
+    if __import__("os").path.exists(config.basedir + "/clara-load.marker"):
+        return
+    python hide:
+        with open(config.basedir + "/clara-load.marker", "w") as marker:
+            marker.write("loaded")
+    $ initThreads()
+    $ threads["claraMongolAccusation"].reset()
+    $ Clara.trust = 0
+    $ player.economy.money = 1
+    $ renpy.load("external-clara-reload")
+    return
+
 testsuite global:
     teardown:
         exit
@@ -107,7 +126,7 @@ testcase external_clara_market_denial_arrest_sequence:
         calendar_v2.hour = 9
         calendar_v2.minute = 0
         rooms.enter("WineStore")
-        people.get_data("clara").set_schedule([NPCScheduleEntry(location="WineStore", start_minute=0, end_minute=1440, priority=999)])
+        Clara.set_day_location_override("WineStore")
         assert people.location("clara") == "WineStore"
         assert story_event_available("WineStore", "clara_mongol")
     run Call("IntClaraTalk", "clara")
@@ -232,6 +251,177 @@ testcase external_clara_moon_sabbath_returns_to_market:
         calendar_v2.daysInGame += 28
         calendar_v2.period += 1
         assert story_event_available("MarketPlace", "enter")
+
+testcase external_clara_zimmer_accusation_choices:
+    parameter decision = ["report", "protect", "postpone"]
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_clara_prepare()
+    python:
+        threads["claraBookletMarket"].advanceTo(3)
+        threads["claraMongolAccusation"].advanceTo(0, force_active=True)
+        Clara.trust = 3
+        player.horse.stolen_days = 0
+        Zimmer.horse_complaint_stage = 0
+        Zimmer.talked_today = 2
+        Mongol.stocks_arrest_day = -1
+        calendar_v2.week = 2
+        calendar_v2.hour = 16
+        rooms.enter("CityGuard")
+        assert people.location("zimmer") == "CityGuard"
+        assert story_event_available("talk_zimmer", "clara_mongol_accusation")
+    run Call("IntZimmerTalk")
+    advance until eval ("Решить, назвать ли сообщницу Монгола" in external_clara_choices()) timeout 20.0
+    click id (external_clara_button("Решить, назвать ли")) pos (0.5, 0.5)
+    advance until eval ("Назвать Клариссу сообщницей Монгола" in external_clara_choices()) timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and not main_ui_runtime.action_items) timeout 5.0
+    assert eval (scene_runtime.text == scene_runtime.location_text) timeout 5.0
+    if eval (decision == "report"):
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+    elif eval (decision == "protect"):
+        click id "choice_panel_button_1" pos (0.5, 0.5)
+    else:
+        click id "choice_panel_button_2" pos (0.5, 0.5)
+    if eval (decision != "postpone"):
+        advance until eval ("Вернуться к разговору" in external_clara_choices()) timeout 20.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("Закончить разговор" in external_clara_choices()) timeout 20.0
+    python:
+        case = threads["claraMongolAccusation"]
+        assert rooms.current_code == "CityGuard" and main_ui_runtime.mode == "talk"
+        assert case.num == (1 if decision == "report" else 0)
+        assert case.aborted == (decision == "protect")
+        assert Clara.trust == (4 if decision == "protect" else 3)
+        assert Clara.mongol_case_detained() == (decision == "report")
+        assert threads["claraBookletMarket"].num == (4 if decision == "report" else 3)
+        assert not threads["claraBookletMarket"].done[3]
+        assert Mongol.stocks_arrest_day == -1
+        assert threads["claraPaintingsPath"].num == 1
+        assert story_event_available("talk_zimmer", "clara_mongol_accusation") == (decision == "postpone")
+        if decision == "report":
+            assert people.location("clara") == ""
+            restored = __import__("pickle").loads(__import__("pickle").dumps(case))
+            threads["claraMongolAccusation"] = restored
+            initThreads()
+            assert Clara.mongol_case_detained()
+            assert people.location("clara") == ""
+            renpy.save("external-clara-custody", include_screenshot=False)
+            assert renpy.can_load("external-clara-custody")
+    click id (external_clara_button("Закончить разговор")) pos (0.5, 0.5)
+    advance until eval (not external_clara_choices()) timeout 20.0
+
+testcase external_clara_custody_food_escape_arrival:
+    parameter free_clara = [True, False]
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_clara_prepare()
+    python:
+        threads["claraMongolAccusation"].advanceTo(1, force_active=True)
+        threads["claraBookletMarket"].advanceTo(8, force_active=True)
+        Draupnir.mongol_lockpick_order_day = 98
+        Mongol.stocks_food_day = 99
+        Mongol.stocks_fate = ""
+        player.tavern_management.productnum = 10
+        player.tavern_management.winenum = 5
+        calendar_v2.hour = 21
+        rooms.enter("CityGuard")
+        assert story_event_available("menu_CityGuard", "clara_custody")
+        assert any(item.caption == "Навестить задержанную Клариссу" for item in city_guard_action_items())
+        origin = main_ui_context_snapshot()
+    run Call("checkTriggers", "menu_CityGuard", "clara_custody", 0)
+    advance until eval ("Передать Клариссе еду из трактира" in external_clara_choices()) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("Уйти от караулки" in external_clara_choices()) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (not external_clara_choices()) timeout 20.0
+    assert eval (main_ui_context_snapshot() == origin) timeout 5.0
+    assert eval (threads["claraMongolAccusation"].num == 2 and Clara.mongol_case_detained()) timeout 5.0
+    assert eval (player.tavern_management.productnum == 9) timeout 5.0
+    run Call("checkTriggers", "menu_CityGuard", "clara_custody", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (external_clara_choices() == ["Уйти и вернуться позже"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (not external_clara_choices()) timeout 20.0
+    assert eval (player.tavern_management.productnum == 9) timeout 5.0
+    run Call("checkTriggers", "menu_CityGuard", "mongol_stocks", 0)
+    advance until eval ("Послать стражникам вино и угощение, а затем освободить Монгола" in external_clara_choices()) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("Освободить Клариссу вместе с Монголом" in external_clara_choices()) timeout 20.0
+    if eval (free_clara):
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+        advance until eval ("Покинуть караулку" in external_clara_choices()) timeout 20.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+    else:
+        click id "choice_panel_button_1" pos (0.5, 0.5)
+    advance until eval (not external_clara_choices()) timeout 20.0
+    python:
+        assert Mongol.stocks_fate == "released" and Robin.mongol_safe_pass
+        assert threads["claraBookletMarket"].num == 9
+        assert player.tavern_management.productnum == 8
+        assert player.tavern_management.winenum == 4
+        assert Clara.mongol_case_detained() == (not free_clara)
+        assert threads["claraMongolAccusation"].num == (3 if free_clara else 2)
+        assert not threads["claraMongolAccusation"].completed
+        assert not Clara.tavern_resident()
+    if eval (free_clara):
+        $ rooms.enter("TavernMain")
+        assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
+        run Call("checkTriggers", "TavernMain", "enter", 0)
+        advance until eval ("Выслушать Клариссу" in external_clara_choices()) timeout 20.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+        advance until eval ("Поселить у Мелиссы и поручить уборку со следующего дня" in external_clara_choices()) timeout 20.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+        advance until eval (not external_clara_choices()) timeout 20.0
+        python:
+            assert threads["claraMongolAccusation"].completed
+            assert Clara.tavern_resident()
+            assert household.resident_ids().count("clara") == 1
+            assert Clara.is_tavern_worker()
+            assert Clara.job_value("jobcleaning", 0) == 0
+            assert Clara.job_value("jobcleaningtomorrow", 0) == 1
+            assert Clara.tavern_job_available("jobkitchentomorrow")
+            assert Clara.job_value("jobHallAvail", 0) == 0
+            calendar_v2.week = 2
+            calendar_v2.hour = 9
+            assert people.location("clara") == "TavernMelissaRoom", people.location("clara")
+            Clara.apply_tavern_job_plan()
+            assert Clara.job_value("jobcleaning", 0) == 1
+            while calendar_v2.day in HordusStaticData.monthly_visit_days():
+                calendar_v2.day += 1
+            calendar_v2.hour = 16
+            assert people.location("clara") == "TavernMain", people.location("clara")
+
+testcase external_clara_custody_actual_save_load:
+    parameter saved_stage = [1, 4]
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    python:
+        if __import__("os").path.exists(config.basedir + "/clara-load.marker"):
+            __import__("os").remove(config.basedir + "/clara-load.marker")
+    run Call("external_clara_actual_load_probe", saved_stage)
+    # Ren'Py's test executor owns the pending node; run the normal continuation.
+    run Call("_after_load")
+    assert eval (Clara.trust == 7 and player.economy.money == 1234) timeout 5.0
+    assert eval (threads["claraMongolAccusation"].num == max(0, saved_stage)) timeout 5.0
+    assert eval (Clara.mongol_case_detained() == (saved_stage == 1)) timeout 5.0
+    assert eval (Clara.tavern_resident() == (saved_stage == 4)) timeout 5.0
+
+testcase external_clara_missing_thread_load_initialization:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    python:
+        # Run the saved-state upgrade and after_load initializers together,
+        # before the test executor renders a screen with a partial old schema.
+        saveVersion = currentVersion
+        original_trust = Clara.trust
+        original_money = player.economy.money
+        threads.pop("claraMongolAccusation")
+        updateSave()
+        npc_schedule_after_load()
+        initStoryEventRuntime(True)
+        assert threads["claraMongolAccusation"].num == 0
+        assert not Clara.mongol_case_detained()
+        assert Clara.trust == original_trust and player.economy.money == original_money
 
 testcase external_clara_migration_preserves_later_story:
     parameter old_num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]

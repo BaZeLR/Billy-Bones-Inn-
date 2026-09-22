@@ -254,6 +254,8 @@ init 5 python:
                 info = people.get_info(npc_id)
                 if info is not None and info.can_work_tavern():
                     residents.append(npc_id)
+            if Clara.tavern_resident():
+                residents.append("clara")
             return residents
 
         def member_count(self):

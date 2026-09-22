@@ -78,6 +78,8 @@ init python:
 
     def city_guard_action_items():
         items = []
+        if story_event_available("menu_CityGuard", "clara_custody"):
+            items.append(MenuItem("Навестить задержанную Клариссу", Call("checkTriggers", "menu_CityGuard", "clara_custody", 0)))
         if len(rooms.get("CityGuard").visible_objects()) > 0:
             items.append(MenuItem("Расписные доски", Call("CityGuardShowPlacat")))
         if story_event_available("menu_CityGuard", "mongol_stocks"):

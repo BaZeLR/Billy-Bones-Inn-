@@ -19,6 +19,9 @@ label IntZimmerTalk:
     while True:
         $ _clara_booklet_thread = threads.get("claraBookletMarket")
         menu:
+            "Решить, назвать ли сообщницу Монгола" if story_event_available("talk_zimmer", "clara_mongol_accusation"):
+                call checkTriggers("talk_zimmer", "clara_mongol_accusation", 0) from _call_zimmer_clara_mongol_accusation
+
             "Поговорить о деле Клариссы и Серджио" if story_event_available("talk_zimmer", "clara_fiance_case"):
                 call checkTriggers("talk_zimmer", "clara_fiance_case", 0)
 

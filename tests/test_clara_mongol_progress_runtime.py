@@ -51,6 +51,7 @@ def runtime():
         calendar_v2=calendar,
         player=player,
         Clara=clara,
+        Mongol=SimpleNamespace(stocks_arrest_day=-1),
         daily_events=namespace["DailyEventRuntime"](),
         event_runtime=SimpleNamespace(fired_day=-1, fired_keys_today=[], active_thread=None),
         npc_relationship_level=lambda person: {"phase_index": 6},
@@ -80,6 +81,14 @@ def runtime():
     )
     threads = {data.name: namespace["createThread"](data) for data in namespace["claraThreadList"]}
     namespace["threads"] = threads
+    # Exercise the production NPC custody predicate against these real threads.
+    clara_class = next(node for node in _python_nodes("NPC/Girls/Clara/InitClara.rpy")
+                       if isinstance(node, ast.ClassDef) and node.name == "ClaraInfo")
+    custody = next(node for node in clara_class.body
+                   if isinstance(node, ast.FunctionDef) and node.name == "mongol_case_detained")
+    exec(compile(ast.Module(body=[custody], type_ignores=[]), "InitClara.rpy", "exec"), namespace)
+    clara.mongol_case_detained = namespace["mongol_case_detained"].__get__(clara)
+    clara.fiance_case_detained = lambda: False
     for thread in threads.values():
         thread.data.initConditions()
         for events in thread.data.triggers:
@@ -174,6 +183,50 @@ def test_wine_lie_requires_clara_in_wine_store(runtime):
     assert event.canTrigger()
     runtime.namespace["people"].location = lambda person: "TavernMain"
     assert not event.canTrigger()
+
+
+@pytest.mark.parametrize("arrest_day,expected", [(-1, False), (0, True), (18, True)])
+def test_fiance_introduction_requires_recorded_mongol_arrest(runtime, arrest_day, expected):
+    runtime.calendar.week = 7
+    runtime.calendar.hour = 8
+    runtime.namespace["Mongol"].stocks_arrest_day = arrest_day
+    event = runtime.threads["claraPaintingsPath"].getevent(6)
+    assert event.target == "story_clara_paintings_church_6"
+    assert event.canTrigger() is expected
+
+
+@pytest.mark.parametrize("stage,detained", [(0, False), (1, True), (2, True), (3, False), (4, False)])
+def test_custody_uses_report_and_release_milestones(runtime, stage, detained):
+    case = runtime.threads["claraMongolAccusation"]
+    case.advanceTo(stage, complete_at_end=True)
+    assert runtime.clara.mongol_case_detained() is detained
+
+
+def test_accusation_requires_witness_and_present_zimmer_not_existing_horse_claim(runtime):
+    event = runtime.threads["claraMongolAccusation"].getevent(0)
+    runtime.namespace["people"].location = lambda person: "CityGuard"
+    runtime.booklet.advanceTo(2)
+    assert not event.canTrigger()
+    runtime.booklet.advanceTo(3)
+    assert runtime.player.horse.stolen_days == 0
+    assert runtime.namespace["Mongol"].stocks_arrest_day == -1
+    assert event.canTrigger()
+    runtime.namespace["people"].location = lambda person: ""
+    assert not event.canTrigger()
+
+
+def test_custody_blocks_already_active_physical_events_but_not_mongol_case(runtime):
+    runtime.forest.advanceTo(0)
+    runtime.booklet.advanceTo(4)
+    runtime.calendar.hour = 15
+    assert runtime.forest.getAvailableEvents()
+    assert runtime.forest.metconds
+    runtime.threads["claraMongolAccusation"].advance()
+    assert not runtime.forest.getAvailableEvents()
+    runtime.booklet.setDay(-7)
+    assert runtime.booklet.getevent(4).canTrigger(runtime.booklet.day)
+    runtime.threads["claraMongolAccusation"].advanceTo(3)
+    assert runtime.forest.getAvailableEvents()
 
 
 @pytest.mark.parametrize("booklet_stage,expected", [(2, False), (3, True), (4, True), (8, True)])

@@ -186,13 +186,19 @@ init python:
                 self.day_location_override_code = ""
             return location_key
 
+        def mongol_case_detained(self):
+            case = threads["claraMongolAccusation"]
+            return bool(case.done[0]) and not bool(case.done[2])
+
         def fiance_case_detained(self):
             thread_info = threads.get("claraPaintingsPath")
             if thread_info is None or bool(thread_info.completed):
                 return False
             return 8 <= int(thread_info.num or 0) <= 11
 
-        def paintings_resident(self):
+        def tavern_resident(self):
+            if bool(threads["claraMongolAccusation"].completed):
+                return True
             thread_info = threads.get("claraPaintingsPath")
             if thread_info is None:
                 return False
@@ -253,7 +259,7 @@ init python:
             return ""
 
         def getLocation(self, wday=None, hour=None):
-            if self.fiance_case_detained():
+            if self.mongol_case_detained() or self.fiance_case_detained():
                 return ""
             scheduled_location = super(ClaraInfo, self).getLocation(wday, hour)
             if scheduled_location == "BarberShop":

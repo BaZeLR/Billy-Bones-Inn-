@@ -174,6 +174,7 @@ def _clara_runtime():
             breakfast=SimpleNamespace(event_active=False, present_ids=[]),
         )),
         "threads": {
+            "claraMongolAccusation": SimpleNamespace(done=[False] * 4, completed=False),
             "claraPaintingsPath": SimpleNamespace(num=15, completed=True),
             "claraTavernVisit": SimpleNamespace(num=7, completed=True),
         },
@@ -207,7 +208,7 @@ def _clara_runtime():
 @pytest.mark.parametrize("competing_label,tavern_stage", [
     ("melissa_tavern_visit", 6),
     ("melissa_room_visit", 3),
-    ("paintings_resident_day", 7),
+    ("tavern_resident_day", 7),
 ])
 def test_late_game_routine_visits_do_not_hide_clara_on_merchant_dates(competing_label, tavern_stage):
     clara, hordus_data, calendar, namespace = _clara_runtime()

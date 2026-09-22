@@ -160,7 +160,7 @@ def test_clara_paintings_events_use_event_checks_not_ready_helpers():
     assert '"location": "TavernMelissaRoom"' in clara_schedule
     assert '"ArtisansQuarter",\n            "enter",\n            7,' in paintings_thread
     assert 'if rule_name == "thread_step":' in room_rules
-    assert 'if rule_name == "clara_paintings_resident":' in room_rules
+    assert 'if rule_name == "clara_tavern_resident":' in room_rules
     assert "thread_info.num" in room_rules
 
 

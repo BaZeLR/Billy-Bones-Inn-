@@ -8595,6 +8595,8 @@ testcase external_clara_church_fiance_two_beat_event:
     $ rooms.enter("Church")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    assert eval (not story_event_available("Church", "clara_paintings")) timeout 5.0
+    $ Mongol.stocks_arrest_day = int(current_game_day())
     assert eval (story_event_available("Church", "clara_paintings")) timeout 5.0
     run Call("ChurchServiceMenu", True)
     run Call("ChurchServiceLegare")

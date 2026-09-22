@@ -169,27 +169,29 @@ def test_detention_and_residence_project_from_the_thread_without_flags():
 
     assert "def fiance_case_detained(self):" in clara
     assert "8 <= int(thread_info.num or 0) <= 11" in clara
-    assert "def paintings_resident(self):" in clara
+    assert "def tavern_resident(self):" in clara
     assert "bool(thread_info.completed) or int(thread_info.num or 0) >= 14" in clara
     assert "if Clara.fiance_case_detained():" in secondary
-    assert 'if rule_name == "clara_paintings_resident":' in room_rules
+    assert 'if rule_name == "clara_tavern_resident":' in room_rules
     assert "fiance_seen =" not in clara
     assert "clara_released =" not in clara
     assert "lives_at_tavern =" not in clara
 
     residence_rows = [
         row for row in clara_schedule["entries"]
-        if row.get("condition", {}).get("rule") == "clara_paintings_resident"
+        if row.get("condition", {}).get("rule") == "clara_tavern_resident"
+        and row.get("condition", {}).get("resident", True)
+        and row["label"].startswith("tavern_resident_")
     ]
     assert {row["label"] for row in residence_rows} == {
-        "paintings_resident_sleep",
-        "paintings_resident_day",
-        "paintings_resident_evening",
+        "tavern_resident_sleep",
+        "tavern_resident_day",
+        "tavern_resident_evening",
     }
     resident_priorities = {row["label"]: row["priority"] for row in residence_rows}
-    assert resident_priorities["paintings_resident_sleep"] > 700
-    assert resident_priorities["paintings_resident_day"] < 200
-    assert resident_priorities["paintings_resident_evening"] < 200
+    assert resident_priorities["tavern_resident_sleep"] > 700
+    assert resident_priorities["tavern_resident_day"] < 200
+    assert resident_priorities["tavern_resident_evening"] < 200
     for schedule, label in (
         (clara_schedule, "paintings_confession"),
         (melissa_schedule, "clara_paintings_confession"),

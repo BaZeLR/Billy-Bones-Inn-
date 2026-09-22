@@ -2,7 +2,7 @@
   "npc_id": "clara",
   "entries": [
     {
-      "label": "paintings_resident_sleep",
+      "label": "tavern_resident_sleep",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "23:00",
       "end": "05:59",
@@ -11,11 +11,11 @@
       "talkable": false,
       "priority": 910,
       "condition": {
-        "rule": "clara_paintings_resident"
+        "rule": "clara_tavern_resident"
       }
     },
     {
-      "label": "paintings_resident_day",
+      "label": "tavern_resident_day",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "06:00",
       "end": "17:59",
@@ -24,11 +24,11 @@
       "talkable": true,
       "priority": 100,
       "condition": {
-        "rule": "clara_paintings_resident"
+        "rule": "clara_tavern_resident"
       }
     },
     {
-      "label": "paintings_resident_evening",
+      "label": "tavern_resident_evening",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "18:00",
       "end": "22:59",
@@ -37,7 +37,7 @@
       "talkable": true,
       "priority": 100,
       "condition": {
-        "rule": "clara_paintings_resident"
+        "rule": "clara_tavern_resident"
       }
     },
     {
@@ -48,7 +48,11 @@
       "location": "WineStore",
       "awake": false,
       "talkable": false,
-      "priority": 700
+      "priority": 700,
+      "condition": {
+        "rule": "clara_tavern_resident",
+        "resident": false
+      }
     },
     {
       "label": "wine_store",
@@ -59,7 +63,11 @@
       "awake": true,
       "talkable": true,
       "working": true,
-      "priority": 600
+      "priority": 600,
+      "condition": {
+        "rule": "clara_tavern_resident",
+        "resident": false
+      }
     },
     {
       "label": "melissa_tavern_visit",
@@ -103,7 +111,25 @@
         "location_probabilities": [0.6, 0.4],
         "awake": true,
         "talkable": true,
-        "priority": 760
+        "priority": 760,
+        "condition": {
+          "rule": "clara_tavern_resident",
+          "resident": false
+        }
+      },
+      {
+        "label": "friday_dance_resident",
+        "weekdays": [5],
+        "start": "19:00",
+        "end": "21:59",
+        "location": ["FridayDance", "TavernMelissaRoom"],
+        "location_probabilities": [0.6, 0.4],
+        "awake": true,
+        "talkable": true,
+        "priority": 760,
+        "condition": {
+          "rule": "clara_tavern_resident"
+        }
       },
     {
       "label": "melissa_room_visit",
@@ -142,7 +168,11 @@
       "location_probabilities": [0.7],
       "awake": true,
       "talkable": true,
-      "priority": 200
+      "priority": 200,
+      "condition": {
+        "rule": "clara_tavern_resident",
+        "resident": false
+      }
     }
   ]
 }
