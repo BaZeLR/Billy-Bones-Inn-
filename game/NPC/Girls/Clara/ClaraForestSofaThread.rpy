@@ -183,7 +183,6 @@ label story_clara_forest_confession_5:
             if int(player.item_count("clara_pantaloons_001") or 0) > 0:
                 $ player.remove_item("clara_pantaloons_001", 1)
             $ Clara.drawings_secret_known = True
-            $ Clara.merchant_contact_unlocked = True
             $ Clara.change_social(friend_delta=4, open_delta=2)
             $ Clara.trust = min(20, int(Clara.trust or 0) + 4)
             if threads["claraTavernVisit"].completed:
@@ -196,7 +195,6 @@ label story_clara_forest_confession_5:
             $ player.add_money(_clara_stash_take)
             $ player.horse.stolen_purchase_price = 0
             $ Clara.drawings_secret_known = True
-            $ Clara.merchant_contact_unlocked = True
             $ Clara.change_social(friend_delta=2, open_delta=2)
             $ Clara.trust = min(20, int(Clara.trust or 0) + 2)
             if threads["claraTavernVisit"].completed:

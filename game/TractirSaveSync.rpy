@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 92
+define currentVersion = 93
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -787,6 +787,10 @@ init -100 python:
         if loaded_version < 92:
             updateSave_V91()
             loaded_version = 92
+
+        if loaded_version < 93:
+            updateSave_V92()
+            loaded_version = 93
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -1774,12 +1778,6 @@ init -100 python:
         Clara.market_follow_failed_hour = people_to_int(
             clara_var.pop("market_follow_failed_hour", getattr(Clara, "market_follow_failed_hour", -1)), -1
         )
-        Clara.market_day_roll_day = people_to_int(
-            clara_var.pop("market_day_roll_day", getattr(Clara, "market_day_roll_day", -1)), -1
-        )
-        Clara.market_day_roll = bool(people_to_int(
-            clara_var.pop("market_day_roll", getattr(Clara, "market_day_roll", False)), 0
-        ))
         Clara.market_evening_roll_day = people_to_int(
             clara_var.pop("market_evening_roll_day", getattr(Clara, "market_evening_roll_day", -1)), -1
         )
@@ -1799,12 +1797,6 @@ init -100 python:
             Clara.day_location_override_day = people_to_int(getattr(Clara, "day_location_override_day", -1), -1)
             Clara.day_location_override_code = str(getattr(Clara, "day_location_override_code", "") or "")
 
-        Clara.merchant_contact_unlocked = bool(people_to_int(
-            clara_var.pop("merchant_contact_unlocked", getattr(Clara, "merchant_contact_unlocked", False)), 0
-        ))
-        Clara.merchant_contact_month_key = people_to_int(
-            clara_var.pop("merchant_contact_month_key", getattr(Clara, "merchant_contact_month_key", -1)), -1
-        )
         Clara.old_water_pump_hint_seen = bool(people_to_int(
             clara_var.pop("old_water_pump_hint_seen", getattr(Clara, "old_water_pump_hint_seen", False)), 0
         ))
@@ -3067,6 +3059,32 @@ init -100 python:
         if hasattr(clara_var, "pop"):
             clara_var.pop("commission_followup_day", None)
             clara_var.pop("murder_day", None)
+
+    def updateSave_V92():
+        # Register the new instances without copying identity or thread state.
+        # An old merchant unlock is not an introduction to Hordus.
+        people.register(HordusStaticData, Hordus)
+        people.register(SofaStaticData, Sofa)
+        for legacy in (Clara.__dict__, getattr(Clara, "var", None)):
+            if not hasattr(legacy, "pop"):
+                continue
+            Hordus.last_trade_month = max(
+                int(Hordus.last_trade_month),
+                people_to_int(legacy.pop("merchant_contact_month_key", -1), -1),
+            )
+            for key in ("merchant_contact_unlocked", "market_day_roll_day", "market_day_roll"):
+                legacy.pop(key, None)
+
+        tavern = rooms.get("TavernMain")
+        if tavern is not None:
+            Sofa.installed = bool(Sofa.installed or _room_has_item_by_id(tavern, "cursed_sofa_001"))
+            tavern.game_items = [
+                item for item in tavern.game_items
+                if get_object_id(item) != "cursed_sofa_001"
+            ]
+        game_object_registry.pop("cursed_sofa_001", None)
+        globals().pop("CursedSofaObject", None)
+        initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

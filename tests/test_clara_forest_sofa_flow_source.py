@@ -78,7 +78,7 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
     wine_store = source("game/Town/WineStore.rpy")
     forest = source("game/Forest/Forest.rpy")
     forest_story = source("game/NPC/Girls/Clara/ClaraForestSofaThread.rpy")
-    merchant = source("game/NPC/Secondary/IntMongolTalk.rpy")
+    merchant = source("game/NPC/Secondary/IntHordusTalk.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
 
     assert items.count('object_id="clara_pantaloons_001"') == 1
@@ -87,9 +87,12 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
     assert 'player.add_item("clara_pantaloons_001", 1)' in wine_store
     assert 'int(threads["claraPaintingsPath"].num or 0) >= 2' in wine_store
     assert 'story_event_available(room_code, "clara_stash")' in forest
-    assert '_room_add_item_by_id(rooms.get("TavernMain"), "cursed_sofa_001")' in merchant
+    assert '$ Sofa.installed = True' in merchant
+    assert '_room_add_item_by_id' not in merchant
     assert 'player.add_item("cursed_sofa_001"' not in merchant
-    assert 'object_id="cursed_sofa_001"' in sofa
+    assert 'class SofaInfo(BaseNPC):' in sofa
+    assert 'class SofaData(PeopleData):' in sofa
+    assert 'CursedSofaObject = GameObject(' not in sofa
 
     combined = "\n".join((items, wine_store, forest, forest_story, merchant, sofa))
     for duplicate_flag in (
@@ -104,30 +107,22 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
 
 
 def test_sofa_purchase_waits_for_claras_completed_innovations():
-    merchant = source("game/NPC/Secondary/IntMongolTalk.rpy")
+    merchant = source("game/NPC/Secondary/IntHordusTalk.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
-    menu = merchant.split("label ClaraSecretMerchantMenu:", 1)[1].split(
-        "label ClaraSecretMerchantBuy(item_id=", 1
-    )[0]
-    guard = merchant.split("label ClaraSecretMerchantBuySofa:", 1)[1]
+    menu = merchant.split("label HordusMerchandise:", 1)[1]
 
     for condition in (
-        'bool(threads["claraPaintingsPath"].completed)',
+        'threads["claraPaintingsPath"].completed',
         "int(player.tavern_management.client_room_hole or 0) > 0",
         "int(player.tavern_management.glory_hole or 0) == 2",
         'int(threads["claraForestSofa"].num or 0) == 6',
-        "not cursed_sofa_installed()",
+        "not Sofa.installed",
     ):
         assert condition in menu
 
-    for rejection in (
-        'not bool(threads["claraPaintingsPath"].completed)',
-        "int(player.tavern_management.client_room_hole or 0) <= 0",
-        "int(player.tavern_management.glory_hole or 0) != 2",
-        'int(threads["claraForestSofa"].num or 0) != 6',
-        "cursed_sofa_installed()",
-    ):
-        assert rejection in guard
+    assert 'elif player.economy.money < _hordus_price:' in menu
+    assert 'elif Hordus.last_trade_month ==' in menu
+    assert '$ _hordus_price = HordusStaticData.catalog[_hordus_item]' in menu
 
     requirements = sofa.split("label CursedSofaRitualRequirements:", 1)[1].split(
         "label story_clara_sofa_ritual_7:", 1
@@ -195,7 +190,7 @@ def test_v77_save_migration_maps_existing_clara_threads_and_horse_claim_once():
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 92" in migration
+    assert "define currentVersion = 93" in migration
     assert "if loaded_version < 78:" in migration
     assert "updateSave_V77()" in migration
     assert "paintings_map = {" in block

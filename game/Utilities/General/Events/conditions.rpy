@@ -84,6 +84,8 @@ init -25 python:
             "rooms": rooms,
             "TownStreet": TownStreet,
             "Zimmer": Zimmer,
+            "Hordus": Hordus,
+            "Sofa": Sofa,
             "location": rooms.current_code,
             "calendar_v2": calendar_v2,
             "daily_events": daily_events,

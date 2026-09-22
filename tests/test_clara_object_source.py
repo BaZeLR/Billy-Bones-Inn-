@@ -214,13 +214,18 @@ def test_clara_story_state_uses_explicit_properties_and_one_time_migration():
 
     for property_name in (
         "flirt_count", "drawings_secret_known", "market_intro_seen",
-        "market_follow_failed_day", "market_follow_failed_hour", "market_day_roll_day",
-        "market_day_roll", "market_evening_roll_day", "market_evening_roll",
+        "market_follow_failed_day", "market_follow_failed_hour",
+        "market_evening_roll_day", "market_evening_roll",
         "day_location_override_day", "day_location_override_code",
-        "merchant_contact_unlocked", "merchant_contact_month_key",
         "old_water_pump_hint_seen",
     ):
         assert f"self.{property_name} =" in clara_class
+
+    for retired_property in (
+        "market_day_roll_day", "market_day_roll",
+        "merchant_contact_unlocked", "merchant_contact_month_key",
+    ):
+        assert f"self.{retired_property} =" not in clara_class
 
     assert "self.commission_followup_day =" not in clara_class
     assert "self.murder_day =" not in clara_class

@@ -1,59 +1,63 @@
-init 4 python:
-    CLARA_CURSED_SOFA_PRICE = 600
+init python:
+    class SofaData(PeopleData):
+        code_name = "sofa"
 
-    def cursed_sofa_installed():
-        room_obj = rooms.get("TavernMain")
-        return room_obj is not None and _room_has_item_by_id(room_obj, "cursed_sofa_001")
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Старинный диван",
+                fullname="Старинный диван",
+                genitive="старинного дивана",
+                dative="старинному дивану",
+                default_location="",
+                description="Неожиданно роскошный для вашего трактира диван. Резные ножки похожи на звериные лапы, а из глубины обивки временами доносится недовольное ворчание.",
+                schedule_entries=[NPCScheduleEntry(location="TavernMain")],
+            )
 
-    def cursed_sofa_story_active(_obj=None):
-        thread = threads.get("claraForestSofa")
-        return thread is not None and not thread.completed and int(thread.num or 0) in (6, 7)
+        def schedule_resolve(self, weekday_value=None, time_value=None):
+            if not Sofa.installed:
+                return None
+            return super(SofaData, self).schedule_resolve(weekday_value, time_value)
 
-    def cursed_sofa_story_available(_obj=None):
-        return cursed_sofa_story_active() and story_event_available("CursedSofa", "talk")
+    class SofaInfo(BaseNPC):
+        talk_label = "IntSofaTalk"
 
-    def cursed_sofa_waiting_for_ritual(_obj=None):
-        thread = threads.get("claraForestSofa")
-        return thread is not None and not thread.completed and int(thread.num or 0) == 7 and not story_event_available("CursedSofa", "talk")
+        def __init__(self, name="sofa", **kwargs):
+            super().__init__(name, **kwargs)
+            self.data = SofaStaticData
+            self.known = True
+            self.installed = False
 
-    def cursed_sofa_freed(_obj=None):
-        thread = threads.get("claraForestSofa")
-        return thread is not None and bool(thread.completed)
+        def update(self):
+            super(SofaInfo, self).update()
+            self.data = SofaStaticData
+            return self
 
-    CursedSofaObject = GameObject(
-        object_id="cursed_sofa_001",
-        name="старинный диван",
-        description="Неожиданно роскошный для вашего трактира диван. Резные ножки похожи на звериные лапы, а из глубины обивки временами доносится недовольное ворчание.",
-        actions=[
-            ObjectAction(
-                action_id="cursed_sofa_story",
-                label="Поговорить с диваном",
-                hook="call",
-                target="checkTriggers",
-                args=("CursedSofa", "talk", 0),
-                condition=cursed_sofa_story_available,
-            ),
-            ObjectAction(
-                action_id="cursed_sofa_wait",
-                label="Спросить диван о проклятии",
-                hook="call",
-                target="CursedSofaRitualRequirements",
-                condition=cursed_sofa_waiting_for_ritual,
-            ),
-            ObjectAction(
-                action_id="cursed_sofa_repeat",
-                label="Послушать новую историю",
-                hook="call",
-                target="CursedSofaRepeatStory",
-                condition=cursed_sofa_freed,
-            ),
-        ],
-        custom_properties={
-            "object_kind": "talking_furniture",
-            "source_thread": "claraForestSofa",
-        },
-    )
 
+define SofaStaticData = SofaData()
+default Sofa = SofaInfo()
+
+
+label register_sofa_secondary:
+    $ people.register(SofaStaticData, Sofa)
+    return
+
+
+label IntSofaTalk:
+    $ main_ui_begin_talk_state("Говорящий диван", "sofa")
+    vscene resolve_room_background_media(rooms.get("TavernMain"))
+    $ scene_runtime.text = SofaStaticData.description
+    while True:
+        menu:
+            "Поговорить с диваном" if story_event_available("CursedSofa", "talk"):
+                call checkTriggers("CursedSofa", "talk", 0)
+            "Спросить диван о проклятии" if not threads["claraForestSofa"].completed and int(threads["claraForestSofa"].num or 0) == 7 and not story_event_available("CursedSofa", "talk"):
+                call CursedSofaRitualRequirements
+            "Послушать новую историю" if threads["claraForestSofa"].completed:
+                call CursedSofaRepeatStory
+            "Закончить разговор":
+                $ main_ui_end_talk_state()
+                return
 
 label story_clara_sofa_first_talk_6:
     $ main_ui_begin_native_scene_state("Говорящий диван")

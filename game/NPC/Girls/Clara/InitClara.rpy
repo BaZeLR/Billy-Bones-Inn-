@@ -26,6 +26,12 @@ init python:
                 "portrait": {"default": [self.portrait]},
             }
 
+        def schedule_resolve(self, weekday_value=None, time_value=None):
+            merchant_visit = HordusStaticData.schedule_resolve(weekday_value, time_value)
+            if merchant_visit is not None:
+                return merchant_visit
+            return super(ClaraData, self).schedule_resolve(weekday_value, time_value)
+
     class ClaraInfo(Girl):
         """Clara runtime: wine store, market booklet, paintings thread, social state."""
         talk_label = "IntClaraTalk"
@@ -44,14 +50,10 @@ init python:
             self.market_intro_seen = False
             self.market_follow_failed_day = -1
             self.market_follow_failed_hour = -1
-            self.market_day_roll_day = -1
-            self.market_day_roll = False
             self.market_evening_roll_day = -1
             self.market_evening_roll = False
             self.day_location_override_day = -1
             self.day_location_override_code = ""
-            self.merchant_contact_unlocked = False
-            self.merchant_contact_month_key = -1
             self.old_water_pump_hint_seen = False
             self.energy = 100
             self.energy_max = 100
@@ -376,12 +378,6 @@ init python:
         def prepare_daily_event_rolls(self):
             day_value = current_game_day()
             week_value = int(calendar_v2.week or 0)
-            if people_to_int(self.market_day_roll_day, -1) != day_value:
-                self.market_day_roll_day = day_value
-                if week_value == 7:
-                    self.market_day_roll = False
-                else:
-                    self.market_day_roll = procedural_randint(1, 2, "clara_market_day_%s_%s" % (day_value, week_value)) == 1
             if people_to_int(self.market_evening_roll_day, -1) != day_value:
                 self.market_evening_roll_day = day_value
                 if week_value in (5, 7):

@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -50,14 +51,57 @@ def test_clara_market_event_checks_are_explicit_tuple_conditions():
         assert helper_name not in clara_thread
 
     assert 'def prepare_daily_event_rolls(self):' in clara_init
-    assert 'procedural_randint(1, 2, "clara_market_day_%s_%s"' in clara_init
+    assert "market_day_roll" not in clara_init
+    assert "merchant_contact_" not in clara_init
     assert 'procedural_randint(1, 3, "clara_market_evening_%s_%s"' in clara_init
     assert "$ Clara.prepare_daily_event_rolls()" in next_day
-    assert "#people_to_int(Clara.market_day_roll_day, -1) == int(calendar_v2.daysInGame or 0)" in clara_thread
-    assert "#bool(Clara.market_day_roll)" in clara_thread
+    assert "#str(people.location('hordus') or '') == 'MarketPlace'" in clara_thread
+    assert "#str(people.location('clara') or '') == 'MarketPlace'" in clara_thread
+    assert "market_day_roll" not in clara_thread
     assert "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)" in clara_thread
     assert "#bool(Clara.market_evening_roll)" in clara_thread
     assert clara_thread.count("(18, 22)") == 2
+
+
+def test_clara_daytime_market_schedule_reuses_hordus_authority():
+    schedule = json.loads(_source("game/NPC/Schedules/clara.json"))
+    rules = _source("game/Utilities/General/Classes/GameObjectTemplate.rpy")
+    clara_init = _source("game/NPC/Girls/Clara/InitClara.rpy")
+    data = clara_init.split("class ClaraData(PeopleData):", 1)[1].split("class ClaraInfo(Girl):", 1)[0]
+
+    assert all(row["label"] != "market_visit_day" for row in schedule["entries"])
+    assert "hordus_market_visit" not in rules
+    assert "merchant_visit = HordusStaticData.schedule_resolve(weekday_value, time_value)" in data
+    assert "if merchant_visit is not None:\n                return merchant_visit" in data
+    assert "return super(ClaraData, self).schedule_resolve(weekday_value, time_value)" in data
+    assert "NPCScheduleEntry(" not in data
+
+    evening = next(row for row in schedule["entries"] if row["label"] == "market_visit_evening")
+    assert evening["weekdays"] == [1, 2]
+    assert evening["start"] == "18:00"
+    assert evening["end"] == "18:59"
+    assert evening["location_probabilities"] == [0.25]
+
+
+def test_hordus_meetings_repeat_independently_of_mongol_progress():
+    events = _source("game/Utilities/General/Classes/StoryEventRuntime.rpy")
+    booklet = events.split('LThreadData(0, "clara", "BookletMarket"', 1)[1].split(
+        'RThreadData(0, "clara", "HordusMarket"', 1
+    )[0]
+    repeat = events.split('RThreadData(0, "clara", "HordusMarket"', 1)[1].split(
+        'LThreadData(1, "clara", "PaintingsPath"', 1
+    )[0]
+
+    assert '"story_clara_hordus_market"' not in booklet
+    assert '"story_clara_hordus_market"' in repeat
+    assert "#int(threads['claraBookletMarket'].num or 0) > 0" in repeat
+    assert "#Hordus.last_meeting_day != int(calendar_v2.daysInGame or 0)" in repeat
+    assert "#str(people.location('hordus') or '') == 'MarketPlace'" in repeat
+    assert "#str(people.location('clara') or '') == 'MarketPlace'" in repeat
+    assert '"MarketPlace",\n            "enter",\n            0,' in repeat
+    assert "threaded=False" in repeat
+    assert "claraBookletMarket'].completed" not in repeat
+    assert "market_day_roll" not in repeat
 
 
 def test_clara_paintings_events_use_event_checks_not_ready_helpers():
@@ -341,7 +385,7 @@ def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 92" in migration
+    assert "define currentVersion = 93" in migration
     assert "if loaded_version < 74:" in migration
     assert "updateSave_V73()" in migration
     assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block

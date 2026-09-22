@@ -538,12 +538,12 @@ define claraThreadList = [
     LThreadData(0, "clara", "BookletMarket", None, [
         (
             "story_clara_market_booklet_0",
-            [1, 2, 3, 4, 5, 6], (11, 12), None,
+            None, None, None,
             1,
             None,
             [
-                "#people_to_int(Clara.market_day_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
-                "#bool(Clara.market_day_roll)",
+                "#str(people.location('hordus') or '') == 'MarketPlace'",
+                "#str(people.location('clara') or '') == 'MarketPlace'",
                 "#not (people_to_int(Clara.market_follow_failed_day, -1) == int(calendar_v2.daysInGame or 0) and people_to_int(Clara.market_follow_failed_hour, -1) == int(calendar_v2.hour or 0))",
             ],
             None,
@@ -653,6 +653,24 @@ define claraThreadList = [
             8,
         ),
     ], highlight=False, threaded=True),
+    RThreadData(0, "clara", "HordusMarket", None, [1, [
+        (
+            "story_clara_hordus_market",
+            None, None, None,
+            1,
+            None,
+            [
+                "#int(threads['claraBookletMarket'].num or 0) > 0",
+                "#Hordus.last_meeting_day != int(calendar_v2.daysInGame or 0)",
+                "#str(people.location('hordus') or '') == 'MarketPlace'",
+                "#str(people.location('clara') or '') == 'MarketPlace'",
+            ],
+            None,
+            "MarketPlace",
+            "enter",
+            0,
+        ),
+    ]], highlight=False, threaded=False),
     #
     # clara_paintings_path
     #
@@ -1017,7 +1035,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#'cursed_sofa_001' in rooms.get('TavernMain').game_items",
+                "#Sofa.installed",
             ],
             None,
             "CursedSofa",
@@ -1030,7 +1048,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#'cursed_sofa_001' in rooms.get('TavernMain').game_items",
+                "#Sofa.installed",
                 "#threads['claraPaintingsPath'].completed",
                 "#bool(Clara.sex_stat('virginity', True))",
                 "#bool(Melissa.sex_stat('virginity', True))",
