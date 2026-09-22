@@ -2,12 +2,19 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def tavern_morning_sickness_girl():
+    def tavern_morning_sickness_girl(room_code=""):
+        current_room = str(room_code or rooms.current_code or "").strip()
+        if not room_in_group(current_room, ROOM_GROUP_TAVERN):
+            return ""
+        if not 6 <= int(calendar_v2.hour or 0) < 11:
+            return ""
+        if player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active:
+            return ""
         current_slot = calendar_v2.time_slot()
         for girl_key, girl_info in people.girl_items():
             if girl_info is None or not girl_info.is_tavern_worker():
                 continue
-            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen", current_slot):
+            if daily_events.exists(girl_key, "MorningSickness", current_room, current_slot):
                 return girl_key
         return ""
 

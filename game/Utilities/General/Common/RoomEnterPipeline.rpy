@@ -2,8 +2,16 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label RoomEnterEventGate(room_code="", include_daily=True):
-    $ renpy.dynamic("_room_enter_code", "_room_enter_daily_ids", "_room_enter_daily_npc", "_household_seen_before")
+    $ renpy.dynamic("_room_enter_code", "_room_enter_daily_ids", "_room_enter_daily_npc", "_household_seen_before", "_room_enter_sick_girl")
     $ _room_enter_code = str(room_code or rooms.current_code or "").strip()
+
+    $ _room_enter_sick_girl = tavern_morning_sickness_girl(_room_enter_code)
+    while _room_enter_sick_girl:
+        call check_daily_event(_room_enter_sick_girl, "MorningSickness", _room_enter_code, calendar_v2.time_slot())
+        if not _return:
+            $ _room_enter_sick_girl = ""
+        else:
+            $ _room_enter_sick_girl = tavern_morning_sickness_girl(_room_enter_code)
 
     if _room_enter_code != "" and story_event_available(_room_enter_code, "enter"):
         call checkTriggers(_room_enter_code, "enter", 0)

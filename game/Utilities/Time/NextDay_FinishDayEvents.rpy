@@ -16,7 +16,6 @@ init python:
         Amanda.ensure_story_defaults()
         week_val = _ndf_int(calendar_v2.week, 1)
         dayspassed_val = int(current_game_day())
-        glory_hole_look = _ndf_int(player.tavern_management.glory_hole_look, 0)
 
         if Georgett.story_value("TalkChurchAfterCermonLiza", 0) and not Liza.prostitution_started:
             Liza.prostitution_started = True
@@ -56,7 +55,7 @@ init python:
                     pregnancy_check(girl, glory_hole_inside, 1, "Мастер Драупнир")
                 elif event_type == 2:
                     pregnancy_check(girl, glory_hole_inside, 1, "Эдди")
-                elif glory_hole_look == 3:
+                elif event_type == 3:
                     pregnancy_check(girl, glory_hole_inside, 1, "Мессир Легаре")
                 elif event_type == 4:
                     pregnancy_check(girl, glory_hole_inside, 1, "Отец Герхард")

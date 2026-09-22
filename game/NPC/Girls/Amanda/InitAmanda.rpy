@@ -312,11 +312,9 @@ init python:
             return count
 
         def birth_ready(self):
-            state = self.pregnancy_state()
             return (
-                people_to_int(current_game_day(), 0) > 0
-                and people_to_int(state.get("pregnancy", 0), 0) >= 240
-                and str(state.get("pregfather", "") or "") != ""
+                self.pregnancy_days() > 0
+                and daily_events.exists(self.code_name, "GiveBirth") > 0
             )
 
         def apply_body_state(self):

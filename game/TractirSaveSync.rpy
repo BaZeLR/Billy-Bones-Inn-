@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 97
+define currentVersion = 98
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -806,6 +806,9 @@ init -100 python:
         if loaded_version < 97:
             updateSave_V96()
             loaded_version = 97
+        if loaded_version < 98:
+            updateSave_V97()
+            loaded_version = 98
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3152,6 +3155,18 @@ init -100 python:
             # question. Already-played arrests and later outcomes stay played.
             new_num = booklet.data.length if was_completed else old_num + int(old_num >= 4)
             booklet.advanceTo(new_num, complete_at_end=was_completed)
+
+    def updateSave_V97():
+        # Keep pending symptoms; broaden only their obsolete kitchen binding.
+        # The room-entry rule owns the tavern/clock/breakfast eligibility.
+        for row in list(daily_events.rows):
+            if row.get("EventType") == "MorningSickness" and str(row.get("Location", "")).lower() == "tavernkitchen":
+                row["Location"] = "alllocs"
+            if row.get("EventType") == "GiveBirth":
+                birth_info = people.get_info(str(row.get("GirlName", "") or ""))
+                # The daily producer never schedules birth at 240 days or less.
+                if birth_info is not None and birth_info.pregnancy_days() <= 240:
+                    daily_events.rows.remove(row)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

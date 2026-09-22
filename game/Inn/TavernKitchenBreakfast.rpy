@@ -1099,19 +1099,12 @@ init python:
 
 
 label TavernKitchenBreakfast:
-    $ renpy.dynamic("_morning_sick_girl", "_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
+    $ renpy.dynamic("_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
     if not tavern_breakfast_available():
         $ scene_runtime.text = "Сегодня вы уже завтракали."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
-    $ _morning_sick_girl = str(tavern_morning_sickness_girl() or "")
-    while _morning_sick_girl != "":
-        call check_daily_event(_morning_sick_girl, "MorningSickness", "TavernKitchen", calendar_v2.time_slot())
-        if not _return:
-            $ _morning_sick_girl = ""
-        else:
-            $ _morning_sick_girl = str(tavern_morning_sickness_girl() or "")
     $ player.tavern_management.breakfast.present_ids = list(household_breakfast_attendee_ids() or [])
     python hide:
         for _breakfast_girl_id in list(player.tavern_management.breakfast.present_ids or []):

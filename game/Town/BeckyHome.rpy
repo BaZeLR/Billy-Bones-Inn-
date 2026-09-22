@@ -77,7 +77,7 @@ init python:
     )
 
 label BeckyHome(arrive_mode=""):
-    $ renpy.dynamic("_becky_home_room", "_becky_home_text", "GirlName", "_start_becky_sex", "_becky_admitted")
+    $ renpy.dynamic("_becky_home_room", "_becky_home_text", "GirlName", "_start_becky_sex", "_becky_admitted", "_becky_home_enter_event")
     if arrive_mode not in ("FromDances", "FromDinner", "SvalnyiGreh") and not Becky.is_home_for_evening_visit():
         vscene "images/becky/Home/house2.jpg"
         $ scene_runtime.text = "Вы постучали, но Бекки не ответила. Стоит вернуться вечером, когда она будет дома и еще не ляжет спать."
@@ -110,6 +110,12 @@ label BeckyHome(arrive_mode=""):
     $ _becky_home_room.mark_visited()
     $ main_ui_begin_native_scene_state("Дом Бекки")
 
+    if arrive_mode == 'FromDinner':
+        "Вы зашли вслед за Бекки в ее спальню. Вдоль стен стояло несколько массивных сундуков, скамья, пара стульев. А весь центр комнаты занимала большая кровать."
+    $ _becky_home_enter_event = story_event_available("BeckyHome", "enter")
+    if _becky_home_enter_event:
+        call checkTriggers("BeckyHome", "enter", 0)
+
     $ _start_becky_sex = False
     if arrive_mode == 'FromDances' and int(threads["beckyDinner"].num or 0) < 2:
         "[_becky_home_room.descriptions[1].text]\nВы и миссис Блэнкеншип находитесь в ее спальне."
@@ -120,10 +126,7 @@ label BeckyHome(arrive_mode=""):
         "[_becky_home_room.descriptions[2].text]\nВы и миссис Блэнкеншип находитесь в ее спальне.\nВместе с вами находится Эдди, ее управляющий лавкой. Им движут к хозяйке отнюдь не деловые чувства."
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
-        "Вы зашли вслед за Бекки в ее спальню. Вдоль стен стояло несколько массивных сундуков, скамья, пара стульев. А весь центр комнаты занимала большая кровать."
-        if story_event_available("BeckyHome", "enter"):
-            call checkTriggers("BeckyHome", "enter", 0)
-        else:
+        if not _becky_home_enter_event:
             if not threads["beckyEddieSex"].completed:
                 "Дав вам зайти, вдова закрыла дверь на ключ и обернулась к вам, сказав: 'Если детишки мои развлекаются, то почему в конце концов я не могу себе такого позволить? Иди же ко мне!' "
             else:

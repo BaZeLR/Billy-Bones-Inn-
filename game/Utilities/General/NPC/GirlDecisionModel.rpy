@@ -205,6 +205,8 @@ init -34 python:
         girl_info = people.get_info(girl)
         if girl_info is None or str(getattr(girl_info, "registry_group", "") or "") != "girl":
             return {"phase": "none", "horny": 0.0, "critical": 0.0, "fertility": 0.0}
+        if girl_info.pregnancy_days() > 0:
+            return {"phase": "pregnant", "horny": 0.0, "critical": 0.0, "fertility": 0.0}
         offset = (sum([ord(ch) for ch in girl]) + girl_decision_int(people_birth_date(girl).get("day", 0), 0)) % 28
         day_index = (current_game_day() + offset) % 28
         if day_index in (0, 1, 2):

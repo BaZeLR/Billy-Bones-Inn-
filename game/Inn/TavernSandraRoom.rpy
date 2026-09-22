@@ -198,6 +198,7 @@ label TavernSandraRoom:
         while True:
             call screen main_ui
     $ rooms.enter("TavernSandraRoom")
+    call RoomEnterEventGate(rooms.current_code, False)
     if tavern_sandra_room_nightwear_now():
         $ Sandra.wear_night_clothes(0)
     $ scene_runtime.picture = tavern_sandra_room_picture()

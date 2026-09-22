@@ -130,10 +130,13 @@ init -44 python:
         for index, row in enumerate(rows, start=1):
             normalized.append({
                 "RowId": _sexevents_int(row.get("RowId", row.get("row_id", index)), index),
+                "GirlName": str(row.get("GirlName", girl_name) or girl_name),
                 "DudeName": str(row.get("DudeName", row.get("partner", "")) or ""),
                 "DudeNameType": str(row.get("DudeNameType", row.get("partner_type", "")) or ""),
+                "IsDudeRandom": _sexevents_int(row.get("IsDudeRandom", 0), 0),
                 "CumTarget": str(row.get("CumTarget", row.get("cum_target", "")) or ""),
                 "Day": _sexevents_int(row.get("Day", row.get("day", 0)), 0),
+                "Zalet": _sexevents_int(row.get("Zalet", 0), 0),
             })
         return normalized
 

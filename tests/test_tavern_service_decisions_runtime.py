@@ -30,6 +30,9 @@ class Worker:
     def sex_stat(self, key, default=0):
         return self.stats.get(key, default)
 
+    def pregnancy_days(self):
+        return self.sex_stat("pregnancy", 0)
+
 
 def decision_model():
     # Exercise the real reward owner, not a second test implementation of mana.

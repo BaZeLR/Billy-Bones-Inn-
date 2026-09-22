@@ -141,7 +141,7 @@ default daily_events = DailyEventRuntime()
 
 
 label check_daily_event(girlname=None, eventtype=None, curloc=None, checktime=None):
-    $ renpy.dynamic("_daily_found", "_daily_event_label", "_daily_event_girl", "_daily_event_loc", "_daily_call_mode", "_daily_row")
+    $ renpy.dynamic("_daily_found", "_daily_event_label", "_daily_event_girl", "_daily_event_loc", "_daily_call_mode", "_daily_row", "_daily_birth_info")
     python:
         _daily_found = 0
         _daily_event_label = ""
@@ -156,7 +156,15 @@ label check_daily_event(girlname=None, eventtype=None, curloc=None, checktime=No
             _daily_event_girl = str(_daily_row.get("GirlName", "") or "")
             _daily_event_loc = str((curloc if curloc is not None else rooms.current_code) or "").lower()
             _daily_call_mode = str(_daily_row.get("CallMode", "none") or "none")
-            if not renpy.has_label(_daily_event_label):
+            if _daily_event_label in ("GiveBirth", "CreateKid"):
+                _daily_birth_info = people.get_info(_daily_event_girl)
+                if _daily_birth_info is None or _daily_birth_info.pregnancy_days() <= 0:
+                    _daily_found = 0
+                    _daily_event_label = ""
+                elif _daily_event_label == "CreateKid":
+                    CreateKid(_daily_event_girl)
+                    _daily_event_label = ""
+            if _daily_event_label and not renpy.has_label(_daily_event_label):
                 _daily_event_label = ""
     if _daily_found and _daily_event_label != "":
         if _daily_call_mode == "girl_location":

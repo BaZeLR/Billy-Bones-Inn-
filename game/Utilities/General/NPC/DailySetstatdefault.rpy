@@ -23,7 +23,7 @@ label DailySetstatdefault(girl_name):
     if daily_events.exists(girl_name, "MorningSickness") == 0:
         if ((_dssd_pregnancy_days > 0 and _dssd_pregnancy_days < 80 and procedural_randint(1, 7, "morning_sickness_%s_%s" % (girl_name, int(current_game_day()))) == 1)
                 or (_dssd_pregnancy_days == 0 and procedural_randint(1, 60, "false_morning_sickness_%s_%s" % (girl_name, int(current_game_day()))) == 32)):
-            $ daily_events.add(girl_name, "TavernKitchen", 2, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
+            $ daily_events.add(girl_name, "alllocs", 2, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
 
     if daily_events.exists(girl_name, "GiveBirth") == 0:
         if ((_dssd_pregnancy_days > 240 and procedural_randint(1, 45, "birth_window_%s_%s" % (girl_name, int(current_game_day()))) > max(270 - _dssd_pregnancy_days, 0) + 10 and procedural_randint(1, 3, "birth_confirm_%s_%s" % (girl_name, int(current_game_day()))) == 1)

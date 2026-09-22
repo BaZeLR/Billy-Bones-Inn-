@@ -62,6 +62,7 @@ label TavernGloryHole:
     $ renpy.dynamic("_tgh_room", "_tgh_desc_parts", "_tgh_desc", "_tgh_worker", "_tgh_workers")
     scene black
     $ rooms.enter("TavernGloryHole")
+    call RoomEnterEventGate(rooms.current_code, False)
     $ _tgh_room = rooms.current
     $ scene_runtime.picture = _tgh_room.bg_picture or None
     $ _tgh_desc_parts = [str(_tgh_desc.text or "") for _tgh_desc in _tgh_room.visible_descriptions()]

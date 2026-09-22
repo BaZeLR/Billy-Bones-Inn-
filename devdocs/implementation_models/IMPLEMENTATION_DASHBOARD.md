@@ -17,6 +17,23 @@ This dashboard tracks conversion toward the intended model:
 
 ## Core Systems
 
+### Pregnancy lifecycle corrections — 2026-09-22
+
+This is a verified slice, not a claim that every NPC branch is complete.
+
+- Conception truth remains in the NPC's `pregnancy`/`pregfather` stats and detailed encounter history. `sex_history_rows` must preserve `Zalet`, `IsDudeRandom`, and `GirlName`; otherwise later paternity-suspect queries lose the conception record.
+- Paternity beliefs are derived by `ZaletOpinionCalc` from that history, separately from the true father. Uncertainty/ranking exists; a new deliberate-lie interaction has not been added.
+- Overnight encounters identify the father from their scheduled event type, not viewing progress. Unnamed partners use the existing name generator with encounter-specific draw keys; subsequent encounters never replace an existing pregnancy's true father.
+- `DailySetstatdefault` remains the sole birth-date/privacy authority. Room entries consume its queued `GiveBirth` event, including its offscreen `CreateKid` outcome. Stale rows cannot create a second child.
+- Amanda keeps her existing `AmandaBirthEvent` and NPC readiness method; there is no second generic Amanda birth registration.
+- Morning sickness is a standalone entry event in physical tavern rooms, 06:00–10:59, before breakfast. Eligible pending events finish before ordinary entry events continue. Breakfast does not replay them. Save version 98 preserves pending rows while removing their obsolete kitchen-only binding.
+- The shared cycle returns a pregnant phase instead of menstrual/fertile phases while the NPC is pregnant.
+- Checks: `test_pregnancy_*`, `test_morning_sickness_room_entry_runtime.py`, and isolated native `external_becky_birth_entry_test.py` / `external_morning_sickness_entry_test.py`. Birth tests include actual delivery, daily report, bedroom return, and exactly one child.
+- Church duplicate actions: not reproduced in fresh native checks or copied available saves; still awaiting the affected church screenshot/save. No speculative church production fix.
+- Pending new features: actual last-period history, moss-cloth requests, and autonomous child-wish/clothing decisions. The requested chance modifier is **±5 percentage points (±50 in the existing per-thousand calculation)**, not a second pregnancy state. These are not implemented by the lifecycle corrections above.
+
+### System overview
+
 | System | Model Doc | Template | Runtime Owner | Status | Notes |
 |---|---|---|---|---|---|
 | NPCs | `NPC_MODEL_AND_TEMPLATE.md` | included | NPC class instance | [~] | Classes are authoritative; legacy dict authority must be removed. |

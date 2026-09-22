@@ -1,33 +1,28 @@
 label story_give_birth_sandra:
-    call GiveBirth("sandra")
-    return True
+    call check_daily_event("sandra", "GiveBirth")
+    return _return
 
 
 label story_give_birth_melissa:
-    call GiveBirth("melissa")
-    return True
-
-
-label story_give_birth_amanda:
-    call GiveBirth("amanda")
-    return True
+    call check_daily_event("melissa", "GiveBirth")
+    return _return
 
 
 label story_give_birth_becky:
-    call GiveBirth("becky")
-    return True
+    call check_daily_event("becky", "GiveBirth")
+    return _return
 
 
 label story_give_birth_inga:
-    call GiveBirth("inga")
-    return True
+    call check_daily_event("inga", "GiveBirth")
+    return _return
 
 
 label story_give_birth_georgett:
-    call GiveBirth("georgett")
-    return True
+    call check_daily_event("georgett", "GiveBirth")
+    return _return
 
 
 label story_give_birth_liza:
-    call GiveBirth("liza")
-    return True
+    call check_daily_event("liza", "GiveBirth")
+    return _return

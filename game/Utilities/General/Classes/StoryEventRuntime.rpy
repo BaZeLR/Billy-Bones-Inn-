@@ -2374,13 +2374,15 @@ define franThreadList = [
 ]
 
 define birthThreadList = [
+    # DailySetstatdefault is the sole due-date/privacy authority. These room
+    # entries only expose its pending event; they do not calculate a second date.
     UThreadData(0, "system", "GiveBirth", None, [
-        ("story_give_birth_sandra", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Sandra.pregnancy_days() >= 240", "#str(Sandra.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 5),
-        ("story_give_birth_melissa", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Melissa.pregnancy_days() >= 240", "#str(Melissa.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 6),
-        ("story_give_birth_becky", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Becky.pregnancy_days() >= 240", "#str(Becky.stats.get('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 5),
-        ("story_give_birth_inga", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Inga.pregnancy_days() >= 240", "#str(Inga.sex_stat('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 6),
-        ("story_give_birth_georgett", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Georgett.pregnancy_days() >= 240", "#str(Georgett.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 5),
-        ("story_give_birth_liza", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Liza.pregnancy_days() >= 240", "#str(Liza.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 6),
+        ("story_give_birth_sandra", None, None, None, 1, None, ["#daily_events.exists('sandra', 'GiveBirth') > 0", "#Sandra.pregnancy_days() > 0"], None, "TavernMain", "enter", 5),
+        ("story_give_birth_melissa", None, None, None, 1, None, ["#daily_events.exists('melissa', 'GiveBirth') > 0", "#Melissa.pregnancy_days() > 0"], None, "TavernMain", "enter", 6),
+        ("story_give_birth_becky", None, None, None, 1, None, ["#daily_events.exists('becky', 'GiveBirth') > 0", "#Becky.pregnancy_days() > 0"], None, "BeckyHome", "enter", 5),
+        ("story_give_birth_inga", None, None, None, 1, None, ["#daily_events.exists('inga', 'GiveBirth') > 0", "#Inga.pregnancy_days() > 0"], None, "BeckyHome", "enter", 6),
+        ("story_give_birth_georgett", None, None, None, 1, None, ["#daily_events.exists('georgett', 'GiveBirth') > 0", "#Georgett.pregnancy_days() > 0"], None, "PortStreets", "enter", 5),
+        ("story_give_birth_liza", None, None, None, 1, None, ["#daily_events.exists('liza', 'GiveBirth') > 0", "#Liza.pregnancy_days() > 0"], None, "PortStreets", "enter", 6),
     ], highlight=False, threaded=True),
 ]
 

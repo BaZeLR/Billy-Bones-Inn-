@@ -7567,6 +7567,11 @@ testcase external_francheska_secondary_and_birth_thread:
     $ Amanda.set_sex_stat("pregnancy", 240)
     $ Amanda.set_sex_stat("pregfather", "Вы")
     $ rooms.enter("TavernMain")
+    assert eval (not Amanda.birth_ready()) timeout 5.0
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("TavernMain", "enter")) timeout 5.0
+    $ Amanda.set_sex_stat("pregnancy", 285)
+    $ daily_events.add("amanda", "alllocs", -1, ">", 1, 9999, "GiveBirth", "GiveBirth", "girl")
     assert eval (Amanda.birth_ready()) timeout 5.0
     $ initStoryEventRuntime(True)
     $ event_runtime.evaluation_time = None
@@ -7575,9 +7580,14 @@ testcase external_francheska_secondary_and_birth_thread:
     assert eval (str(event_runtime.available["TavernMain"]["enter"].target or "") == "story_amanda_give_birth_0") timeout 5.0
     $ Amanda.set_sex_stat("pregnancy", 0)
     $ Amanda.set_sex_stat("pregfather", "")
+    $ daily_events.delete("amanda", "GiveBirth")
     $ Inga.set_sex_stat("pregnancy", 240)
     $ Inga.set_sex_stat("pregfather", "Лукас")
     $ rooms.enter("BeckyHome")
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("BeckyHome", "enter")) timeout 5.0
+    $ Inga.set_sex_stat("pregnancy", 285)
+    $ daily_events.add("inga", "alllocs", -1, ">", 1, 9999, "GiveBirth", "GiveBirth", "girl")
     $ initStoryEventRuntime(True)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
@@ -7585,6 +7595,7 @@ testcase external_francheska_secondary_and_birth_thread:
     assert eval (str(event_runtime.available["BeckyHome"]["enter"].target or "") == "story_give_birth_inga") timeout 5.0
     $ Inga.set_sex_stat("pregnancy", 0)
     $ Inga.set_sex_stat("pregfather", "")
+    $ daily_events.delete("inga", "GiveBirth")
     $ external_calendar_set_fields(day_value=1, month_value=1, year_value=CALENDAR_START_CYCLE, hour_value=10, minute_value=0)
     $ external_calendar_set_weekday(1)
     $ people.get_data("fran").set_schedule([NPCScheduleEntry(location="EllonaTemple", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999, label="test_temple_talk")])

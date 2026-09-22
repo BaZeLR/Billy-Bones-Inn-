@@ -103,9 +103,9 @@ init python:
     def RandomOccupCode(*_args):
         return procedural_choice(OccupationsList, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:165:1")
 
-    def RandomNameCode(gender="", nationality=""):
+    def RandomNameCode(gender="", nationality="", key=""):
         if nationality == "":
-            nationality = procedural_choice(["German", "Italian", "French"], key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:169:2")
+            nationality = procedural_choice(["German", "Italian", "French"], key=(str(key) + ":nationality") if key else "procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:169:2")
 
         suffix = "MaleName" if str(gender).lower() == "male" else "FemaleName"
         name_map = {
@@ -115,15 +115,16 @@ init python:
             "FrenchFemaleName": FrenchFemaleName,
             "ItalianMaleName": ItalianMaleName,
             "ItalianFemaleName": ItalianFemaleName,
+            "NegrMaleName": NegrMaleName,
         }
         list_name = nationality + suffix
         name_list = name_map.get(list_name, [])
 
         if not name_list:
             fallback = GermanMaleName if suffix == "MaleName" else GermanFemaleName
-            return procedural_choice(fallback, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:185:3")
+            return procedural_choice(fallback, key=(str(key) + ":fallback") if key else "procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:185:3")
 
-        return procedural_choice(name_list, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:187:4")
+        return procedural_choice(name_list, key=(str(key) + ":name:" + nationality) if key else "procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:187:4")
 
     def RandomStreetNameCode(*_args):
         return procedural_choice(StreetNameList, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:190:5")

@@ -102,10 +102,10 @@ init python:
                 ][randnum-1]
             # Randomize dad name if needed
             if dad_name_reset:
-                # Placeholder: replace with actual random name code
-                dad = 'Случайный мужчина'
-                if dad_type == 'Неизвестный негр':
-                    dad = 'Случайный негр'
+                dad = RandomNameCode(
+                    "Male", "Negr" if dad_type == 'Неизвестный негр' else "",
+                    key="pregnancy_father_%s_%s" % (girl, int(girl_info.sex_stat("sexacts", 0) or 0) + 1),
+                )
             # Randomize cum place if needed
             if cum_place_reset:
                 randvar = procedural_randint(1, 6, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:93:2")

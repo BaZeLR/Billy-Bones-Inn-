@@ -1029,7 +1029,8 @@ def test_amanda_birth_is_thread_owned_and_conception_uses_the_shared_girl_owner(
     assert "GIRL_DECISION_CYCLE_IDS" not in decision_model
     assert "self.sync_from_amanda_maps()" not in amanda_init
     assert "label story_amanda_give_birth_0:" in pregnancy_events
-    assert 'call GiveBirth("amanda")' in pregnancy_events
+    assert 'call check_daily_event("amanda", "GiveBirth")' in pregnancy_events
+    assert 'return _return' in pregnancy_events
     assert "def amanda_birth_ready():" not in pregnancy_events
     assert "def amanda_pregnancy_check(cum_place" not in pregnancy_events
     assert 'pregnancy_check("amanda", "inside", 1, "Вы")' in at_home
