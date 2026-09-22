@@ -478,6 +478,8 @@ label story_becky_sandra_kitchen_visit:
 
             "Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:
                 $ scene_runtime.text = tavern_kitchen_spicy_tincture_apply(("sandra", "becky"))
+                $ Sandra.add_arousal(5)
+                $ Becky.add_arousal(5)
                 $ scene_runtime.location_text = scene_runtime.text
                 vscene "images/tavern/kitchen/becky_visit_1.png"
                 call stat
