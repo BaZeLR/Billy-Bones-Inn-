@@ -19,11 +19,14 @@ init 6 python:
             ),
         ],
         exits=[
+            RoomExit(label="Войти в прачечную и купальню", target="ShedWashroom", minutes_to_pass=1, condition={"rule": "tavern_renovation", "code": "shed"}),
             RoomExit(label="Вернуться на задний двор", target="Backyard"),
         ],
         game_items=[
             "old_axe_001",
             "lumber_001",
+            "shed_ruined_stove",
+            "shed_hot_water_stove",
         ],
         custom_properties={},
         state={
@@ -41,6 +44,8 @@ init 6 python:
 
     def shed_picture():
         current_minutes = (int(calendar_v2.hour or 0) % 24) * 60 + int(calendar_v2.minute or 0)
+        if tavern.renovation_complete("shed"):
+            return "images/tavern/backyard/shed/renovated.png" if 360 <= current_minutes <= 1170 else "images/tavern/backyard/shed/renovated_night.png"
         if 360 <= current_minutes <= 1170:
             return "images/tavern/backyard/shed/shed.png"
         return "images/tavern/backyard/shed/shed_night.png"
@@ -52,7 +57,13 @@ init 6 python:
 
         intro_value = str(intro_text or "").strip()
         if intro_value:
-            text_parts.append(intro_value)
+            if tavern.renovation_complete("shed"):
+                text_parts.append("Сарай отремонтирован. Здесь стоят печь с баком горячей воды, бревна и отдельная поленница колотых дров. За плотно закрывающейся дверью находится другая комната — прачечная с купальней.")
+            else:
+                text_parts.append(intro_value)
+                text_parts.append("За старой перегородкой есть каморка с наполовину развалившейся печью. Ее просторное нутро давно остыло.")
+        if tavern.renovation_days_left("shed"):
+            text_parts.append("Драупнир ремонтирует сарай. До окончания: %s дн." % tavern.renovation_days_left("shed"))
 
         if include_notice and bool(rooms.get("Shed").state.get("notice_pending", False)) and str(rooms.get("Shed").state.get("notice_text", "") or "").strip():
             text_parts.append(str(rooms.get("Shed").state.get("notice_text", "") or "").strip())
@@ -110,6 +121,8 @@ init 6 python:
             game_item = get_game_item(object_id, room_obj)
             if game_item is None:
                 continue
+            if not game_item.is_visible():
+                continue
             for item_action in game_item.visible_actions():
                 if str(getattr(item_action, "action_id", "") or "") in hidden_action_ids:
                     continue
@@ -137,7 +150,7 @@ init 6 python:
         if not shed_has_lumber(room_obj):
             items.append(MenuItem("Сходить в лес за бревнами", [SetDict(rooms.get("Forest").state, "return_target", "Shed"), Call("TravelToForest")]))
 
-        items.append(MenuItem("Вернуться на задний двор", movement_actions("Backyard")))
+        items.extend(room_obj.build_exit_items())
         return items
 
 

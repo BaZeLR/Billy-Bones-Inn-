@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 93
+define currentVersion = 94
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -791,6 +791,10 @@ init -100 python:
         if loaded_version < 93:
             updateSave_V92()
             loaded_version = 93
+
+        if loaded_version < 94:
+            updateSave_V93()
+            loaded_version = 94
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3085,6 +3089,22 @@ init -100 python:
         game_object_registry.pop("cursed_sofa_001", None)
         globals().pop("CursedSofaObject", None)
         initThreads()
+
+    def updateSave_V93():
+        # New construction is tavern-owned. Ren'Py's default creates TavernInfo
+        # for older saves; never replace existing rooms or their inventories.
+        rooms.repair()
+        for room_code, object_ids in (
+            ("Shed", ("shed_ruined_stove", "shed_hot_water_stove")),
+            ("TavernMyRoom", ("myroom_guest_peephole",)),
+        ):
+            room = rooms.get(room_code)
+            for object_id in object_ids:
+                if not _room_has_item_by_id(room, object_id):
+                    _room_add_item_by_id(room, object_id)
+        shed = rooms.get("Shed")
+        if not any(exit.target == "ShedWashroom" for exit in shed.exits):
+            shed.exits.insert(0, next(exit for exit in ShedRoomDefinition.exits if exit.target == "ShedWashroom"))
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

@@ -2,6 +2,19 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
+    def tavern_empty_room_picture():
+        if tavern.renovation_complete("guest_room"):
+            return "images/amanda/Room/emptyroom.jpg"
+        return rooms.get("TavernEmptyRoom").bg_picture
+
+    def tavern_empty_room_description():
+        if tavern.renovation_complete("guest_room"):
+            return "Гостевая комната отремонтирована: добротная кровать с занавесями, шкаф и стол превращают ее в уютную небольшую гостиную. Здесь удобно принять гостей и спокойно побеседовать."
+        text = rooms.get("TavernEmptyRoom").descriptions[0].text
+        if tavern.renovation_days_left("guest_room"):
+            text += "\n\nДо окончания ремонта осталось дней: %s." % tavern.renovation_days_left("guest_room")
+        return text
+
     def tavern_empty_room_peephole_visible():
         return int(player.tavern_management.client_room_hole or 0) > 0
 
@@ -78,8 +91,8 @@ init 6 python:
 label TavernEmptyRoom:
     $ rooms.enter("TavernEmptyRoom")
     call RoomEnterEventGate(rooms.current_code, False)
-    $ scene_runtime.picture = rooms.current.bg_picture or None
-    $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
+    $ scene_runtime.picture = tavern_empty_room_picture()
+    $ scene_runtime.text = tavern_empty_room_description()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = rooms.get("TavernEmptyRoom").display_name
     $ main_ui_runtime.action_content = None
@@ -105,9 +118,9 @@ label TavernEmptyRoomObjectMenu(object_id=""):
             if _peephole_action.hook == "call" and str(_peephole_action.target or ""):
                 main_ui_runtime.action_items.append(MenuItem(_peephole_action.label, Call(_peephole_action.target, *tuple(getattr(_peephole_action, "args", ()) or ()))))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
-            SetField(scene_runtime, "picture", rooms.get("TavernEmptyRoom").bg_picture or None),
-            SetField(scene_runtime, "text", rooms.get("TavernEmptyRoom").descriptions[0].text),
-            SetField(scene_runtime, "location_text", rooms.get("TavernEmptyRoom").descriptions[0].text),
+            SetField(scene_runtime, "picture", tavern_empty_room_picture()),
+            SetField(scene_runtime, "text", tavern_empty_room_description()),
+            SetField(scene_runtime, "location_text", tavern_empty_room_description()),
             SetField(main_ui_runtime, "action_title", rooms.get("TavernEmptyRoom").display_name),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", tavern_empty_room_action_items()),
@@ -134,8 +147,8 @@ label TavernEmptyRoomPeekEmpty:
     show screen main_ui
     menu:
         "Вернуться в комнату":
-            $ scene_runtime.picture = rooms.get("TavernEmptyRoom").bg_picture or None
-            $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
+            $ scene_runtime.picture = tavern_empty_room_picture()
+            $ scene_runtime.text = tavern_empty_room_description()
             $ scene_runtime.location_text = scene_runtime.text
             $ main_ui_runtime.action_title = rooms.get("TavernEmptyRoom").display_name
             $ main_ui_runtime.action_items = tavern_empty_room_action_items()

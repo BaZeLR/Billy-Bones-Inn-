@@ -74,7 +74,7 @@ def test_object_menus_that_replace_room_pictures_restore_their_room_projection()
         ("game/Forest/Forest.rpy", "ForestSubroomSpawnedItemMenu", "rooms.current.bg_picture"),
         ("game/Inn/TavernAmandaRoom.rpy", "tavern_amanda_room_object_menu", "tavern_amanda_room_picture("),
         ("game/Inn/TavernAtic.rpy", "TavernAticObjectMenu", "attic_room_picture_path()"),
-        ("game/Inn/TavernEmptyRoom.rpy", "TavernEmptyRoomObjectMenu", 'rooms.get("TavernEmptyRoom").bg_picture'),
+        ("game/Inn/TavernEmptyRoom.rpy", "TavernEmptyRoomObjectMenu", "tavern_empty_room_picture()"),
         ("game/Inn/TavernKitchen.rpy", "TavernKitchenDepositMenu", "tavern_kitchen_picture()"),
         ("game/Inn/TavernKitchenCauldron001.rpy", "TavernKitchenCauldronMenu", "tavern_kitchen_picture()"),
         ("game/Inn/TavernKitchenHearth001.rpy", "TavernKitchenHearthMenu", "tavern_kitchen_picture()"),

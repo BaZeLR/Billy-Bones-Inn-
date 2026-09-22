@@ -24,6 +24,7 @@ init python:
         return 0 <= current_hour < 6
 
 label NextDay(retlocname, timepassed):
+    $ renpy.dynamic("_renovation_code", "_renovation_due")
     $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_service_key", "_service_clients", "_service_name", "_tractir_game_over_ending", "_day_start_save_name", "_day_start_existing_name", "_day_start_stale_slot", "_day_start_slot_number", "_girl")
     $ next_day_runtime.update()
     $ visitorshappy = 0
@@ -90,6 +91,10 @@ label NextDay(retlocname, timepassed):
         $ player.daily_maintenance(1)
         
         call NextDay_NewDayEvents(retlocname)
+        python:
+            for _renovation_code, _renovation_due in tavern.renovation_due_days.items():
+                if int(_renovation_due) == int(calendar_v2.daysInGame):
+                    ExtraEvents += "\n\nДраупнир закончил работу: %s." % TAVERN_RENOVATIONS[_renovation_code].title
         call CreateTavernEvents
         
         $ iDaysCount += 1

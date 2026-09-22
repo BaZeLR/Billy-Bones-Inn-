@@ -40,6 +40,8 @@ init 6 python:
                     return procedural_choice(melissa_backyard, "backyard_melissa_morning_routine")
             if str(people.location("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
+        if tavern.renovation_complete("backyard"):
+            return "images/tavern/backyard/backyard_renewal.png"
         return str(rooms.get("Backyard").bg_picture or "")
 
     def player_has_plain_soap():
@@ -53,6 +55,10 @@ init 6 python:
 
     def backyard_dynamic_text():
         base_text = backyard_base_text()
+        if tavern.renovation_complete("backyard"):
+            base_text = "Задний двор теперь ухожен: под ногами сухие каменные дорожки, забор выправлен, а нужник стоит крепко и больше не грозит развалиться. У воды удобно умыться и набрать ведро; на веревке сушится белье. Сарай и конюшня остались на своих местах."
+        elif tavern.renovation_days_left("backyard"):
+            base_text += "\n\nВо дворе идет ремонт. Драупнир обещал закончить через %s дн." % tavern.renovation_days_left("backyard")
         if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
             laundry_workers = []
             for person in girls_by_job("jobcleaning", "Backyard"):
@@ -208,6 +214,9 @@ label BackyardObjectMenu(object_id="", display_text=""):
 
     if str(display_text or "") != "":
         $ scene_runtime.text = str(display_text or "")
+        $ scene_runtime.location_text = scene_runtime.text
+    elif object_id == "backyard_toilet" and tavern.renovation_complete("backyard"):
+        $ scene_runtime.text = "Драупнир выправил стены нужника, заменил петли и подогнал дверцу. Теперь она закрывается плотно, а внутри сухо."
         $ scene_runtime.location_text = scene_runtime.text
     else:
         $ scene_runtime.text = _yard_object.description

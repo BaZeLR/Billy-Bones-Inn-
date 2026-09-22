@@ -44,6 +44,8 @@ init -50 python:
         rule_name = str(row.get("rule", "") or "").strip()
         if not rule_name:
             return False
+        if rule_name == "tavern_renovation":
+            return tavern.renovation_complete(row["code"]) == bool(row.get("completed", True))
         if rule_name == "eddie_absent_week":
             return 22 <= int(calendar_v2.day or 0) <= 28
         if rule_name == "eddie_in_town":
