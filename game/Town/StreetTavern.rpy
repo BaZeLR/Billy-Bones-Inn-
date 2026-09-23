@@ -3,16 +3,16 @@
 # ================================================================================
 init python:
     def street_tavern_sign_broken():
-        return player.tavern_management.slogan_state == 0
+        return tavern.renovations['sign'].status not in ('building', 'completed')
 
     def street_tavern_sign_repairing():
-        return player.tavern_management.slogan_state == 1
+        return tavern.renovations['sign'].status == 'building'
 
     def street_tavern_sign_fixed():
-        return player.tavern_management.slogan_state > 1
+        return tavern.renovation_complete('sign')
 
     def street_tavern_draupnir_donkey_visible():
-        return player.tavern_management.glory_hole == 1
+        return tavern.renovations['glory_hole'].status == 'building'
 
     def street_tavern_exit_minutes(target_room=""):
         target_key = str(target_room or "").strip()
@@ -181,9 +181,9 @@ label StreetTavernObjectMenu(object_id=""):
 
 
 label StreetTavernExamineSignboard:
-    if player.tavern_management.slogan_state == 0:
+    if tavern.renovations['sign'].status not in ('building', 'completed'):
         "Вывеска выглядит старой и выцветшей. Она уже давно просится в руки хорошего мастера."
-    elif player.tavern_management.slogan_state == 1:
+    elif tavern.renovations['sign'].status == 'building':
         "Мастер Драупнир как раз приводит вывеску в порядок. Лучше не мешать ему за работой."
     else:
         "Теперь вывеска действительно выглядит так, словно достойна хорошего трактира."

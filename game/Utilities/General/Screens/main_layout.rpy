@@ -632,7 +632,7 @@ screen main_ui():
                                                             Function(main_ui_close_inventory_dropdown),
                                                             Call("IntDogTalk", _where_id),
                                                         ]
-                                                elif _npc_id.lower() == "draupnir" and int(player.tavern_management.slogan_state or 0) == 1:
+                                                elif _npc_id.lower() == "draupnir" and tavern.active_renovation is not None:
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_npc_draupnir_repairing"
                                                         alt "main_ui_entity_button_npc_draupnir_repairing"

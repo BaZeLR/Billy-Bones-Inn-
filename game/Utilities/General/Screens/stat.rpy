@@ -184,7 +184,7 @@ init python:
             score += 10
         if Liza.prostitution_started:
             score += 10
-        if Draupnir.glory_hole_quote_received or _player_int(player.tavern_management.glory_hole, 0) > 0:
+        if tavern.renovations["glory_hole"].status in ("accepted", "building", "completed"):
             score += 15
         if threads["beckyHome"].completed:
             score += 15
@@ -200,17 +200,15 @@ init python:
     def tavern_improvements_score():
         score = 0
 
-        slogan_state = _player_int(player.tavern_management.slogan_state, 0)
-        if slogan_state > 1:
+        if tavern.renovation_complete("sign"):
             score += 20
-        elif slogan_state == 1:
+        elif tavern.renovations["sign"].status == "building":
             score += 10
-        if _player_int(player.tavern_management.client_room_hole, 0) > 0:
+        if tavern.renovation_complete("peephole"):
             score += 10
-        glory_state = _player_int(player.tavern_management.glory_hole, 0)
-        if glory_state >= 2:
+        if tavern.renovation_complete("glory_hole"):
             score += 20
-        elif glory_state == 1:
+        elif tavern.renovations["glory_hole"].status == "building":
             score += 10
         score += min(20, max(0, int(round(float(_player_int(player.tavern_management.cleanliness, 0)) / 5.0)) - 10))
 

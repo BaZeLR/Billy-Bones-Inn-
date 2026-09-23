@@ -32,7 +32,7 @@ def runtime():
     for path, names in (
         ("Utilities/General/NPC/PeopleRuntime.rpy", {"people_to_int"}),
         ("NPC/Secondary/WerecatNPC.rpy", {"werecat_story_defaults", "werecat_state"}),
-        ("Inn/TavernRenovations.rpy", {"TavernInfo"}),
+        ("Inn/TavernRenovations.rpy", {"TavernInfo", "TavernRenovation", "TavernRenovationDefinition", "TAVERN_RENOVATIONS"}),
         ("NPC/Girls/Melissa/InitMelissa.rpy", {"MelissaInfo"}),
         ("Utilities/General/Common/AchievementsEndings.rpy", {
             "tractir_achievements", "TractirProgressRuntimeState", "tractir_activate_achievement",
@@ -48,15 +48,18 @@ def runtime():
     namespace["werecat"] = SimpleNamespace(var=namespace["werecat_story_defaults"]())
     namespace["tavern"] = namespace["TavernInfo"]()
     namespace["Melissa"] = namespace["MelissaInfo"]()
+    namespace["Melissa"].reward_need_fulfilled = lambda *args: None
     namespace["tractir_progress"] = namespace["TractirProgressRuntimeState"]()
     namespace["Sandra"] = SimpleNamespace(
         rel=10, trust=0, anger_with_player=0, rebellion=0,
         change_mana=lambda *args: None, change_fear=lambda *args: None,
     )
-    amanda = SimpleNamespace(openness=0, rebel_baseline=0)
+    amanda = SimpleNamespace(openness=0, rebel_baseline=0, reward_need_fulfilled=lambda *args: None)
     namespace["people"] = SimpleNamespace(
         get_info=lambda key: namespace["Melissa"] if key == "melissa" else amanda,
+        girl_items=lambda: [],
     )
+    namespace["rooms"] = {"ShedWashroom": SimpleNamespace(is_hidden=True)}
     # Existing household relationship rewards are outside this feature's scope.
     namespace["relationship_apply_weekly_chore_evaluation"] = lambda preview: None
     return SimpleNamespace(
@@ -83,8 +86,10 @@ def test_new_game_starts_without_comfort_or_stock_rewards(runtime):
 ])
 def test_room_comfort_uses_actual_roof_completion(runtime, stage, due, day, expected):
     runtime.bat_thread.num = stage
-    runtime.melissa.roof_repair_complete_day = due
+    runtime.tavern.renovations["roof"].due_day = due
+    runtime.tavern.renovations["roof"].status = "building" if due >= 0 else "unrequested"
     runtime.calendar.daysInGame = day
+    runtime.tavern.finish_due_renovations()
     assert runtime.melissa.comfort_components["room"] == expected
     assert runtime.melissa.comfort == expected
 
@@ -92,14 +97,18 @@ def test_room_comfort_uses_actual_roof_completion(runtime, stage, due, day, expe
 def test_fixed_comfort_is_derived_live_and_never_accumulates(runtime):
     runtime.rats["rats_problem_active"] = 0
     runtime.bat_thread.num = 7
-    runtime.melissa.roof_repair_complete_day = 7
-    runtime.tavern.renovation_due_days.update(backyard=8, shed=9)
+    for code, due in (("roof", 7), ("backyard", 8), ("shed", 9)):
+        runtime.tavern.renovations[code].due_day = due
+        runtime.tavern.renovations[code].status = "building"
+    runtime.tavern.finish_due_renovations()
     assert runtime.melissa.comfort == 2
     runtime.calendar.daysInGame = 8
+    runtime.tavern.finish_due_renovations()
     assert runtime.melissa.comfort_components["yard"] == 1
     assert runtime.melissa.comfort_components["toilet"] == 1
     assert runtime.melissa.comfort == 4
     runtime.calendar.daysInGame = 9
+    runtime.tavern.finish_due_renovations()
     for _ in range(3):
         assert runtime.melissa.comfort == 6
     runtime.calendar.daysInGame = 100

@@ -24,10 +24,7 @@ label NextDay_NewDayEvents(retlocname=""):
         crafting_release_ready_soap_batches()
 
         # --- Заканчиваем делать то, что начали в течении дня.
-        if player.tavern_management.slogan_state == 1:
-            player.tavern_management.slogan_state = 2
-        if player.tavern_management.glory_hole == 1:
-            player.tavern_management.glory_hole = 2
+        tavern.finish_due_renovations()
 
         # Выберем, снимет ли Эдди Жоржи себе домой сегодня.
         _georgett_work_location = str(people.location("georgett", week_value, 19 * 60) or "")
@@ -83,7 +80,7 @@ label NextDay_NewDayEvents(retlocname=""):
             TodaySexEvents_Add('inga', 99, 99, 'Lucas')
 
         # Аманда
-        if Amanda.corruption >= 22 and player.tavern_management.glory_hole == 2 and _girl_job_value('liza', 'jobgloryhole') == 1:
+        if Amanda.corruption >= 22 and tavern.renovation_complete('glory_hole') and _girl_job_value('liza', 'jobgloryhole') == 1:
             if Amanda.var_int("glorytried", 0) == 0:
                 if procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:140:8") == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')

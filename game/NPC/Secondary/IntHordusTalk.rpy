@@ -52,7 +52,7 @@ label HordusMerchandise:
     $ scene_runtime.text = "Хордус откидывает край покрывала. — Выбирай внимательно. Один редкий товар за месяц; остальное пусть пока подождет своего часа."
     while True:
         menu:
-            "Старинный диван — [HordusStaticData.catalog['cursed_sofa_001']] мараведи" if threads["claraPaintingsPath"].completed and int(player.tavern_management.client_room_hole or 0) > 0 and int(player.tavern_management.glory_hole or 0) == 2 and int(threads["claraForestSofa"].num or 0) == 6 and not Sofa.installed:
+            "Старинный диван — [HordusStaticData.catalog['cursed_sofa_001']] мараведи" if threads["claraPaintingsPath"].completed and tavern.renovation_complete('peephole') and tavern.renovation_complete('glory_hole') and int(threads["claraForestSofa"].num or 0) == 6 and not Sofa.installed:
                 $ _hordus_item = "cursed_sofa_001"
             "Роскошное мыло — [HordusStaticData.catalog['luxury_soap_001']] мараведи":
                 $ _hordus_item = "luxury_soap_001"

@@ -591,21 +591,15 @@ label story_melissa_bat_problem_roof:
     $ main_ui_begin_native_scene_state("Починка крыши")
     show screen main_ui
     vscene "images/player_room/player_room_attic_1.png"
-    if int(player.economy.money or 0) >= 2000:
-        $ scene_runtime.text = "Вы договариваетесь о починке старой крыши и отдаете за работу две тысячи монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
-    else:
-        $ scene_runtime.text = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
-    $ scene_runtime.location_text = scene_runtime.text
+    "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Нужно заказать Драупниру замену гнилых досок и заделку щелей. Пока кровля не починена, Мелисса не сможет спокойно вернуться в свою комнату."
+    $ tavern.renovations["roof"].request("melissa")
     menu:
-        "Продолжить":
+        "Закажу починку у Драупнира":
+            $ tavern.renovations["roof"].accept()
+            $ threads["tavernRenovations"].enable()
+        "Позже":
             pass
-    $ calendar_v2.advance_minutes(45)
-    if int(player.economy.money or 0) >= 2000:
-        $ player.spend_money(2000)
-        $ Melissa.roof_repair_complete_day = int(current_game_day() or 0) + 2
-        $ event_runtime.evaluation_time = None
-        $ findAvailableEvents(True)
-        call stat
+    $ event_runtime.evaluation_time = None
     $ main_ui_end_native_scene_state()
     return True
 

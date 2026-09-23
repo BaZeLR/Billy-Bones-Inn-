@@ -220,7 +220,7 @@ label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
 
 label IntGeorgettAskWork(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "Вы спрашиваете Жоржетту как ей работается у вас в трактире.\n"
-    if player.tavern_management.glory_hole == 2:
+    if tavern.renovation_complete('glory_hole'):
         $ scene_runtime.text += "«Очень хорошо, и клиентов много, и кормят неплохо, и комната всем устраивает. А теперь, когда есть глорихол, наши заработки еще повысились!»"
     elif int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1:
         $ scene_runtime.text += "«Очень хорошо, и клиентов много, и кормят неплохо, и комната всем устраивает. Разве что если бы еще глорихол был, то можно бы было еще больше денег заработать, наверное.»"

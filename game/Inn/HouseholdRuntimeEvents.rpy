@@ -137,8 +137,7 @@ init python:
 
     def melissa_temp_room_text():
         temp_room = str(Melissa.temp_room_code or "")
-        repair_day = people_to_int(Melissa.roof_repair_complete_day, -1)
-        waiting_for_repair = repair_day >= 0
+        waiting_for_repair = tavern.renovations["roof"].status == "building"
         if temp_room == "" or threads["melissaBatProblem"].num >= 10:
             return ""
         if temp_room == "TavernMyRoom":

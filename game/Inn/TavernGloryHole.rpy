@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_glory_hole_available():
-        return int(player.tavern_management.glory_hole or 0) == 2
+        return tavern.renovation_complete('glory_hole')
 
     def tavern_glory_hole_workers():
         return girls_by_job("jobgloryhole", "TavernGloryHole")

@@ -40,7 +40,7 @@ init python:
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None
         player.tavern_management.cleanliness = 100
-        tavern.renovation_due_days = {}
+        tavern.renovations = {key: TavernRenovation(key) for key in TAVERN_RENOVATIONS}
         tavern_storage_supplies_stock().clear()
         tavern_storage_supplies_effects().clear()
         household.seen.clear()
@@ -137,9 +137,9 @@ testcase external_melissa_needs_only_unfinished:
         player.tavern_management.productnum = 101
         werecat_state()["rats_problem_active"] = 0 if completed else 1
         threads["melissaBatProblem"].num = 7 if completed else 0
-        Melissa.roof_repair_complete_day = 30 if completed else -1
         if completed:
-            tavern.renovation_due_days.update(backyard=30, shed=30)
+            for code in ("roof", "backyard", "shed"):
+                tavern.renovations[code].status = "completed"
             player.chores.weekly["clean_upstairs_rooms"] = 1
         _melissa_read = []
     run Call("HouseholdEvent_Try", "TavernKitchen", "room")
@@ -154,10 +154,10 @@ testcase external_melissa_needs_only_unfinished:
         for marker in ("Избавь нас от крыс", "ремонт моей комнаты", "порядок двор", "нужник нужно", "На этой неделе", "Прачечная"):
             assert (marker in read_text) != completed, (marker, read_text)
         assert ("все сделано" in read_text) == completed
-        assert all(not project.order_visible for project in TAVERN_RENOVATIONS.values())
+        assert all(job.status != "accepted" for job in tavern.renovations.values())
 
 testcase external_melissa_needs_leads_to_renovation_event:
-    $ threads["melissaTavernRenovation"].reset()
+    $ threads["tavernRenovations"] = UThreadInfo(threadData["tavernRenovations"])
     $ _melissa_read = []
     $ _kitchen_origin = main_ui_context_snapshot()
     run Call("HouseholdEvent_Try", "TavernKitchen", "room")
@@ -173,7 +173,7 @@ testcase external_melissa_needs_leads_to_renovation_event:
     advance until eval ("Вернуться к разговору" in external_melissa_choices()) timeout 20.0
     click id (external_melissa_button("Вернуться к разговору")) pos (0.5, 0.5)
     advance until eval (not external_melissa_choices()) timeout 20.0
-    assert eval (threads["melissaTavernRenovation"].num == 1)
+    assert eval (tavern.renovations["backyard"].status == "accepted")
     assert eval (main_ui_context_snapshot() == _kitchen_origin)
 
 testcase external_melissa_reward_by_current_state:

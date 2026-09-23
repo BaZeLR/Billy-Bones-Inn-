@@ -16,10 +16,10 @@ init 6 python:
         return text
 
     def tavern_empty_room_peephole_visible():
-        return int(player.tavern_management.client_room_hole or 0) > 0
+        return tavern.renovation_complete('peephole')
 
     def tavern_empty_room_peephole_has_client():
-        if not player.tavern_management.isTavernOpen or int(player.tavern_management.client_room_hole or 0) <= 0:
+        if not player.tavern_management.isTavernOpen or not tavern.renovation_complete('peephole'):
             return False
         girl_name = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
         if girl_name == "georgett":
@@ -27,7 +27,7 @@ init 6 python:
         return story_event_available("TavernEmptyRoom", "tavern_client_room")
 
     def tavern_empty_room_peephole_no_client():
-        return int(player.tavern_management.client_room_hole or 0) > 0 and not tavern_empty_room_peephole_has_client()
+        return tavern.renovation_complete('peephole') and not tavern_empty_room_peephole_has_client()
 
     TavernEmptyRoomPeepholeObject = GameObject(
         object_id="tavern_empty_room_peephole",

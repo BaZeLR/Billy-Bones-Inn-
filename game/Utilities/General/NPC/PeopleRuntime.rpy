@@ -1562,7 +1562,7 @@ init -999 python:
                 return False
             if key == "jobgloryholeTommorow":
                 return (
-                    int(player.tavern_management.glory_hole or 0) == 2
+                    tavern.renovation_complete('glory_hole')
                     and self.tavern_service_available("gloryhole")
                 )
             if key == "jobwhoreTommorow":
@@ -1588,7 +1588,7 @@ init -999 python:
         def assign_tavern_service(self, target="", tomorrow=True):
             target_key = str(target or "").strip().lower()
             suffix = "Tommorow" if tomorrow else ""
-            if target_key == "gloryhole" and self.is_tavern_worker() and int(player.tavern_management.glory_hole or 0) == 2 and self.tavern_service_available("gloryhole"):
+            if target_key == "gloryhole" and self.is_tavern_worker() and tavern.renovation_complete('glory_hole') and self.tavern_service_available("gloryhole"):
                 self.set_job_value("jobgloryhole" + suffix, 1)
                 self.set_job_value("jobwhore" + suffix, 0)
                 return

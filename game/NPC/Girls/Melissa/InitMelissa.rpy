@@ -206,7 +206,6 @@ init python:
             self.drawings_booklet_left = False
             self.drawings_booklet_read = False
             self.drawings_returned = False
-            self.roof_repair_complete_day = -1
             self.breakfast_tease_day = -1
             self.energy = 100
             self.energy_max = 100
@@ -314,7 +313,7 @@ init python:
             return (
                 people_to_int(self.storage_rat_help_day, -1) >= 0
                 and threads["melissaBatProblem"].completed
-                and people_to_int(self.roof_repair_complete_day, -1) >= 0
+                and tavern.renovation_complete("roof")
                 and bool(self.drawings_returned)
                 and booklet_resolved
             )
@@ -437,11 +436,9 @@ init python:
             return scheduled_location
 
         def bats_repair_complete(self):
-            repair_day = people_to_int(self.roof_repair_complete_day, -1)
             return (
                 threads["melissaBatProblem"].num >= 7
-                and repair_day >= 0
-                and current_game_day() >= repair_day
+                and tavern.renovation_complete("roof")
             )
 
         @property
@@ -520,10 +517,8 @@ init python:
                 if int(player.item_count("bat_repellent_001") or 0) > 0:
                     return "Выжечь гнездо дымной смесью"
                 return "Осмотреть, как выкурить гнездо"
-            if people_to_int(self.roof_repair_complete_day, -1) < 0:
-                if people_to_int(player.economy.money, 0) >= 2000:
-                    return "Заказать починку крыши за 2000"
-                return "Прикинуть, сколько обойдется починка крыши"
+            if tavern.renovations["roof"].status in ("unrequested", "requested"):
+                return "Обсудить починку крыши"
             return "Осмотреть починку крыши"
 
         def bats_completion_ready(self):

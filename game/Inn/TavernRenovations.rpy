@@ -1,7 +1,7 @@
-# Threads own requests and outcomes; the tavern owns construction dates.
+# Tavern owns construction; the thread records which follow-up scenes were played.
 init -30 python:
     class TavernRenovationDefinition(object):
-        def __init__(self, code, title, price, logs, days, description, quest_giver, room):
+        def __init__(self, code, title, price, logs, days, description, quest_giver, room, payment_text="Драупнир принимает оплату и отмечает, сколько брёвен заберёт из сарая. Заказ принят."):
             self.code = code
             self.title = title
             self.price = price
@@ -10,41 +10,69 @@ init -30 python:
             self.description = description
             self.quest_giver = quest_giver
             self.room = room
-
-        @property
-        def thread_name(self):
-            return self.quest_giver + "TavernRenovation"
+            self.payment_text = payment_text
 
         @property
         def order_visible(self):
-            thread = threads[self.thread_name]
-            return thread.num > 0 and not thread.aborted
+            return tavern.renovations[self.code].status in ("accepted", "building", "completed")
 
         @property
         def quote(self):
             return "%s мараведи, %s бревен, срок — %s дн." % (self.price, self.logs, self.days)
 
+    class TavernRenovation(object):
+        def __init__(self, code):
+            self.code = code
+            self.status = "unrequested"
+            self.requester = ""
+            self.requested_day = -1
+            self.started_day = -1
+            self.due_day = -1
+            self.completed_day = -1
+            self.paid_maravedies = 0
+            self.used_logs = 0
+
+        def request(self, requester):
+            if self.status == "unrequested":
+                self.status = "requested"
+                self.requester = requester
+                self.requested_day = int(calendar_v2.daysInGame)
+
+        def accept(self):
+            if self.status == "requested":
+                self.status = "accepted"
+
     class TavernInfo(object):
         def __init__(self):
-            # Physical construction dates, not a second quest-progress store.
-            self.renovation_due_days = {}
+            self.renovations = {code: TavernRenovation(code) for code in TAVERN_RENOVATIONS}
 
-        def renovation_complete(self, code, day=None):
-            due = int(self.renovation_due_days.get(code, -1))
-            today = int(calendar_v2.daysInGame if day is None else day)
-            return due >= 0 and today >= due
+        def renovation_complete(self, code):
+            return self.renovations[code].status == "completed"
+
+        @property
+        def active_renovation(self):
+            return next((job for job in self.renovations.values() if job.status == "building"), None)
+
+        @property
+        def renovation_work_description(self):
+            job = self.active_renovation
+            if job is None:
+                return ""
+            return "Драупнир работает над заказом: %s. До окончания осталось дней: %s." % (TAVERN_RENOVATIONS[job.code].title, self.renovation_days_left(job.code))
 
         def renovation_days_left(self, code):
-            due = int(self.renovation_due_days.get(code, -1))
-            return max(0, due - int(calendar_v2.daysInGame)) if due >= 0 else 0
+            job = self.renovations[code]
+            return max(0, job.due_day - int(calendar_v2.daysInGame)) if job.status == "building" else 0
 
         def renovation_order_error(self, code):
             project = TAVERN_RENOVATIONS[code]
-            if code in self.renovation_due_days:
+            job = self.renovations[code]
+            if job.status in ("building", "completed"):
                 return "Эта работа уже выполнена." if self.renovation_complete(code) else "Этот заказ уже выполняется."
-            thread = threads[project.thread_name]
-            if not thread.checkActive() or thread.num != 1:
+            if job.status != "accepted":
                 return "Сначала нужно принять просьбу об этом улучшении."
+            if self.active_renovation is not None:
+                return "Драупнир сначала должен закончить текущий заказ."
             if not rooms.get("StolyarWorkshop").is_open():
                 return "Мастерская сейчас закрыта."
             if player.economy.money < project.price:
@@ -57,34 +85,59 @@ init -30 python:
             if self.renovation_order_error(code):
                 return False
             project = TAVERN_RENOVATIONS[code]
-            player.spend_money(project.price)
+            if not player.spend_money(project.price):
+                return False
             for _ in range(project.logs):
                 _room_remove_item_by_id(rooms.get("Shed"), "lumber_001")
-            self.renovation_due_days[code] = int(calendar_v2.daysInGame) + project.days
+            job = self.renovations[code]
+            job.status = "building"
+            job.started_day = int(calendar_v2.daysInGame)
+            job.due_day = job.started_day + project.days
+            job.paid_maravedies = project.price
+            job.used_logs = project.logs
             return True
+
+        def finish_due_renovations(self):
+            today = int(calendar_v2.daysInGame)
+            for job in self.renovations.values():
+                if job.status != "building" or today < job.due_day:
+                    continue
+                job.status = "completed"
+                job.completed_day = today
+                for girl_id, info in people.girl_items():
+                    if info.is_tavern_worker():
+                        info.reward_need_fulfilled(1, "renovation_" + job.code)
+                if job.requester != "player":
+                    people.get_info(job.requester).reward_need_fulfilled(2, "renovation_" + job.code)
 
 default tavern = TavernInfo()
 
 define TAVERN_RENOVATIONS = {
+    "sign": TavernRenovationDefinition("sign", "Ремонт вывески", 200, 0, 1, "Починить обветшавшую вывеску трактира.", "player", "StreetTavern", "Скрепя сердце вы отсчитали 200 мараведи мастеру Драупниру. Собрав свои инструменты работящий гном направил свои стопы к вашему трактиру."),
+    "peephole": TavernRenovationDefinition("peephole", "Потайное окошко", 100, 0, 1, "Устроить в комнате хозяина потайное окошко для наблюдения за гостевой. Работа будет готова на следующий день.", "player", "TavernMyRoom", "Скрепя сердце вы отсчитали 100 мараведи мастеру Драупниру. Взяв с собой дрель, стамески, пилу и еще пару инструментов, работящий гном отправился к вашему трактиру. Потайное окошко будет готово на следующий день."),
+    "glory_hole": TavernRenovationDefinition("glory_hole", "Глорихол", 700, 0, 1, "Устроить отдельную комнату с ширмой и занавесями.", "georgett", "TavernMain", "Жестоко задавив в себе жабу пока она еще была в состоянии головастика, вы отсчитали 700 мараведи мастеру Драупниру. Загрузив ослика досками, собрав в ящичек разнообразные инструменты, а в специальный мешок ткани для занавески, трудолюбивый гном потопал к вашему трактиру."),
+    "roof": TavernRenovationDefinition("roof", "Починка крыши", 2000, 0, 2, "Заменить гнилые доски и заделать щели после изгнания летучих мышей.", "melissa", "TavernAtic", "Вы договариваетесь о починке старой крыши и отдаете за работу две тысячи монет. Теперь остается только дождаться, пока Драупнир перетянет гнилые доски, забьет щели и приведет верх трактира в порядок. Он обещает управиться за пару дней."),
     "backyard": TavernRenovationDefinition("backyard", "Благоустройство двора", 600, 8, 3, "Поправить забор и нужник, осушить дорожки, привести в порядок место для воды и хозяйственных работ.", "melissa", "Backyard"),
     "shed": TavernRenovationDefinition("shed", "Прачечная и купальня в сарае", 900, 12, 4, "Починить сарай и разделить его перегородкой. В одной части устроить прачечную и купальню, в другой — печь с баком горячей воды и раздельное хранение бревен и колотых дров.", "sandra", "Shed"),
     "guest_room": TavernRenovationDefinition("guest_room", "Ремонт гостевой комнаты", 700, 8, 3, "Привести в порядок стены и пол, поставить добротную кровать, шкаф и стол, повесить занавеси. Гостевая послужит и небольшой гостиной для спокойных бесед. Существующее оборудование комнаты останется на месте.", "clara", "TavernEmptyRoom"),
 }
 
 define tavernRenovationThreadList = [
-    LThreadData(0, project.quest_giver, "TavernRenovation", None, [
-        ("story_tavern_renovation_request", None, None, None, 1, None,
+    UThreadData(0, "tavern", "Renovations", None, [
+        ([("story_tavern_renovation_request", None, None, None, 1, None,
          ["#people.location('%s') == rooms.current_code" % project.quest_giver,
-          "#rooms.current.group_name == ROOM_GROUP_TAVERN"]
+          "#rooms.current.group_name == ROOM_GROUP_TAVERN",
+          "#tavern.renovations['%s'].status in ('unrequested', 'requested')" % project.code]
          + (["#Clara.tavern_resident()"] if project.quest_giver == "clara" else []),
-         None, "talk_" + project.quest_giver, "renovation", 60),
-        ("DraupnirRenovationOrder", None, None, None, 1, None, None,
+         None, "talk_" + project.quest_giver, "renovation", 60, True)] if project.code in ("backyard", "shed", "guest_room") else []) + [
+        ("DraupnirRenovationOrder", None, None, None, 1, None,
+         ["#tavern.renovations['%s'].status == 'accepted'" % project.code],
          None, "talk_draupnir", "renovation_" + project.code, 60, True),
         ("story_tavern_renovation_complete", None, None, None, 1, None,
          ["#tavern.renovation_complete('%s')" % project.code],
          None, project.room, "enter", 5),
+        ] for project in TAVERN_RENOVATIONS.values()
     ], highlight=True, threaded=True)
-    for project in TAVERN_RENOVATIONS.values()
 ]
 
 init 5 python:
@@ -110,10 +163,11 @@ init 5 python:
         actions=[ObjectAction(action_id="inspect_shed_stove", label="Печь и запас дров", hook="call", target="ShedHotWaterStove")],
     )
 
-# Accept advances to the order; postpone repeats later; refusal aborts the quest.
+# Each request resolves its own item, never aborting unrelated improvements.
 label story_tavern_renovation_request:
     $ renpy.dynamic("_renovation")
-    $ _renovation = next(project for project in TAVERN_RENOVATIONS.values() if project.thread_name == event_runtime.active_thread.data.name)
+    $ _renovation = next(project for project in TAVERN_RENOVATIONS.values() if project.code in ("backyard", "shed", "guest_room") and "talk_" + project.quest_giver == evt.location)
+    $ tavern.renovations[_renovation.code].request(_renovation.quest_giver)
     $ main_ui_begin_native_scene_state(_renovation.title)
     show screen main_ui
     if _renovation.code == "shed":
@@ -128,12 +182,13 @@ label story_tavern_renovation_request:
     menu:
         "Хорошо, закажу работу у Драупнира":
             $ event_runtime.active_thread.enable()
-            $ event_runtime.active_thread.advance()
+            $ tavern.renovations[_renovation.code].accept()
             "Вы соглашаетесь обсудить заказ с Драупниром. Деньги и строительные брёвна понадобятся при оплате работы."
         "Обсудим это позже":
             "Вы пока не даёте обещаний. К разговору можно будет вернуться позже."
         "Отказаться от этого улучшения":
-            $ event_runtime.active_thread.abort()
+            $ tavern.renovations[_renovation.code].status = "declined"
+            $ event_runtime.active_thread.seen(list(TAVERN_RENOVATIONS).index(_renovation.code))
             "Вы решаете отказаться от этой затеи. Заказ мастеру передан не будет."
     menu:
         "Вернуться к разговору":
@@ -146,33 +201,34 @@ label DraupnirRenovations:
     vscene "images/draupnir/dwarf1.jpg"
     while True:
         menu:
+            "Ремонт вывески" if TAVERN_RENOVATIONS["sign"].order_visible:
+                call DraupnirRenovationOrder("sign")
+            "Потайное окошко" if TAVERN_RENOVATIONS["peephole"].order_visible:
+                call DraupnirRenovationOrder("peephole")
+            "Глорихол" if TAVERN_RENOVATIONS["glory_hole"].order_visible:
+                call DraupnirRenovationOrder("glory_hole")
+            "Починка крыши" if TAVERN_RENOVATIONS["roof"].order_visible:
+                call DraupnirRenovationOrder("roof")
             "Благоустройство двора" if TAVERN_RENOVATIONS["backyard"].order_visible:
-                if story_event_available("talk_draupnir", "renovation_backyard"):
-                    call checkTriggers("talk_draupnir", "renovation_backyard", 0)
-                else:
-                    call DraupnirRenovationOrder("backyard")
+                call DraupnirRenovationOrder("backyard")
             "Прачечная и купальня в сарае" if TAVERN_RENOVATIONS["shed"].order_visible:
-                if story_event_available("talk_draupnir", "renovation_shed"):
-                    call checkTriggers("talk_draupnir", "renovation_shed", 0)
-                else:
-                    call DraupnirRenovationOrder("shed")
+                call DraupnirRenovationOrder("shed")
             "Ремонт гостевой комнаты" if TAVERN_RENOVATIONS["guest_room"].order_visible:
-                if story_event_available("talk_draupnir", "renovation_guest_room"):
-                    call checkTriggers("talk_draupnir", "renovation_guest_room", 0)
-                else:
-                    call DraupnirRenovationOrder("guest_room")
+                call DraupnirRenovationOrder("guest_room")
             "Назад":
                 $ main_ui_end_native_scene_state()
                 return
 
 label DraupnirRenovationOrder(code=None):
     $ renpy.dynamic("_renovation", "_renovation_error", "_renovation_quote", "_renovation_days")
-    $ _renovation = TAVERN_RENOVATIONS[code] if code is not None else next(project for project in TAVERN_RENOVATIONS.values() if project.thread_name == event_runtime.active_thread.data.name)
+    $ _renovation = TAVERN_RENOVATIONS[code if code is not None else evt.action[len("renovation_"):]]
     $ code = _renovation.code
-    $ main_ui_runtime.action_title = _renovation.title
+    $ main_ui_begin_native_scene_state(_renovation.title)
+    show screen main_ui
+    vscene "images/draupnir/dwarf1.jpg"
     $ _renovation_quote = _renovation.description + "\n\n" + _renovation.quote
     "[_renovation_quote]"
-    if code in tavern.renovation_due_days:
+    if tavern.renovations[code].status in ("building", "completed"):
         if tavern.renovation_complete(code):
             "Эта работа уже закончена."
         else:
@@ -188,21 +244,21 @@ label DraupnirRenovationOrder(code=None):
         menu:
             "Заказать работу" if not _renovation_error:
                 if tavern.order_renovation(code):
-                    $ threads[_renovation.thread_name].advance()
-                    "Драупнир принимает оплату и отмечает, сколько брёвен заберёт из сарая. Заказ принят."
+                    $ threads["tavernRenovations"].enable()
+                    "[_renovation.payment_text]"
                     menu:
                         "Продолжить":
                             pass
             "Назад":
                 pass
-    $ main_ui_runtime.action_title = "Обустройство трактира"
+    $ main_ui_end_native_scene_state()
     return
 
 
 # A completed building is inspected once; room entry only triggers this event.
 label story_tavern_renovation_complete:
     $ renpy.dynamic("_renovation", "_renovation_picture")
-    $ _renovation = next(project for project in TAVERN_RENOVATIONS.values() if project.thread_name == event_runtime.active_thread.data.name)
+    $ _renovation = next(project for project in TAVERN_RENOVATIONS.values() if project.room == evt.location)
     $ main_ui_begin_native_scene_state(_renovation.title)
     show screen main_ui
     if _renovation.code == "shed":
@@ -212,14 +268,25 @@ label story_tavern_renovation_complete:
     elif _renovation.code == "backyard":
         vscene "images/tavern/backyard/backyard_renewal.png"
         "Двор приведён в порядок: дорожки осушены, забор и нужник починены. Воду и хозяйственные припасы теперь можно носить без прежних неудобств."
-    else:
+    elif _renovation.code == "guest_room":
         vscene "images/amanda/Room/emptyroom.jpg"
         "Вместо пустой комнаты вас встречает уютная гостиная: добротная кровать, шкаф, стол и занавеси. Теперь здесь можно спокойно принять гостей."
+    else:
+        $ _renovation_picture = rooms.current.bg_picture
+        vscene _renovation_picture
+        if _renovation.code == "peephole":
+            "Потайное окошко готово. Теперь из своей комнаты вы можете незаметно наблюдать за происходящим в гостевой."
+        elif _renovation.code == "roof":
+            "Драупнир заменил гнилые доски и заделал щели. Крыша над комнатой Мелиссы починена; теперь можно сообщить ей об этом."
+        elif _renovation.code == "sign":
+            "Вывеска починена. Теперь посетители снова смогут как следует разглядеть название вашего трактира."
+        else:
+            "Драупнир закончил работу: отдельная комната с ширмой и занавесями готова принимать посетителей."
+    if _renovation.quest_giver != "player":
+        "В трактире рады законченной работе. Особенно довольна та, кто просила об этом улучшении."
     menu:
         "Осмотреть готовую работу":
-            if _renovation.code == "shed":
-                $ rooms.get("ShedWashroom").is_hidden = False
-            $ event_runtime.active_thread.complete()
+            $ event_runtime.active_thread.seen(list(TAVERN_RENOVATIONS).index(_renovation.code))
     $ main_ui_end_native_scene_state()
     return True
 

@@ -351,7 +351,7 @@ define melissaThreadList = [
                 1,
                 None,
                 [
-                    "#people_to_int(Melissa.roof_repair_complete_day, -1) < 0",
+                    "#tavern.renovations['roof'].status in ('unrequested', 'requested')",
                 ],
                 None,
                 "TavernAtic",
@@ -364,8 +364,7 @@ define melissaThreadList = [
                 1,
                 None,
                 [
-                    "#people_to_int(Melissa.roof_repair_complete_day, -1) >= 0",
-                    "#int(current_game_day() or 0) >= people_to_int(Melissa.roof_repair_complete_day, -1)",
+                    "#tavern.renovation_complete('roof')",
                 ],
                 None,
                 "talk_melissa",
@@ -392,8 +391,7 @@ define melissaThreadList = [
             1,
             None,
             [
-                "#people_to_int(Melissa.roof_repair_complete_day, -1) >= 0",
-                "#int(current_game_day() or 0) >= people_to_int(Melissa.roof_repair_complete_day, -1)",
+                "#tavern.renovation_complete('roof')",
             ],
             None,
             "TavernAmandaRoom",
@@ -1151,8 +1149,8 @@ define claraThreadList = [
                 "#threads['claraPaintingsPath'].completed",
                 "#bool(Clara.sex_stat('virginity', True))",
                 "#bool(Melissa.sex_stat('virginity', True))",
-                "#int(player.tavern_management.client_room_hole or 0) > 0",
-                "#int(player.tavern_management.glory_hole or 0) == 2",
+                "#tavern.renovation_complete('peephole')",
+                "#tavern.renovation_complete('glory_hole')",
                 "#str(people.location('clara') or '') == 'TavernMain'",
                 "#str(people.location('melissa') or '') == 'TavernMain'",
             ],
@@ -1356,8 +1354,8 @@ define claraThreadList = [
     LThreadData(0, "clara", "TavernEducation", [
         "#bool(threads['claraPaintingsPath'].completed)",
         "#bool(threads['claraTavernVisit'].completed)",
-        "#int(player.tavern_management.client_room_hole or 0) > 0",
-        "#int(player.tavern_management.glory_hole or 0) == 2",
+        "#tavern.renovation_complete('peephole')",
+        "#tavern.renovation_complete('glory_hole')",
     ], [
         (
             "story_clara_tavern_education_cards_0",
@@ -2092,7 +2090,7 @@ define lizaThreadList = [
             [
                 "#Liza.can_work_tavern()",
                 "#str(rooms.get('TavernMain').state.get('client_room_girl', '') or '') == 'liza'",
-                "#int(player.tavern_management.client_room_hole or 0) > 0",
+                "#tavern.renovation_complete('peephole')",
                 "#CheckIfSexEventExist('liza', 3, 'Prostitution') > 0",
             ],
             None,
@@ -2276,7 +2274,7 @@ define georgettThreadList = [
             None,
             [
                 "#Georgett.can_talk_today()",
-                "#int(player.tavern_management.glory_hole or 0) == 2",
+                "#tavern.renovation_complete('glory_hole')",
                 "#int(Georgett.story_value('GloryHoleAgreed', 0) or 0) == 0",
             ],
             None,
@@ -2421,9 +2419,9 @@ define birthThreadList = [
 
 define threadListsByGirl = {
     "amanda": amandaThreadList,
-    "melissa": melissaThreadList + [row for row in tavernRenovationThreadList if row.person == "melissa"],
-    "sandra": sandraThreadList + [row for row in tavernRenovationThreadList if row.person == "sandra"],
-    "clara": claraThreadList + [row for row in tavernRenovationThreadList if row.person == "clara"],
+    "melissa": melissaThreadList,
+    "sandra": sandraThreadList,
+    "clara": claraThreadList,
     "mongol": mongolThreadList,
     "cityguard": cityGuardThreadList,
     "robin": robinThreadList,
@@ -2436,7 +2434,7 @@ define threadListsByGirl = {
     "liza": lizaThreadList,
     "georgett": georgettThreadList,
     "fran": franThreadList,
-    "tavern": tavernThreadList,
+    "tavern": tavernThreadList + tavernRenovationThreadList,
     "city": cityThreadList,
     "birth": birthThreadList,
 }

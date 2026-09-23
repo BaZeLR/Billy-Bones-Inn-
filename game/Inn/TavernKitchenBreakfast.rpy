@@ -930,7 +930,7 @@ init python:
             return False
         if not info.tavern_service_available("intimate"):
             return True
-        return int(player.tavern_management.glory_hole or 0) == 2 and not info.tavern_service_available("gloryhole")
+        return tavern.renovation_complete('glory_hole') and not info.tavern_service_available("gloryhole")
 
     def tavern_sunday_dinner_service_offer_ids(present_ids=None):
         rows = list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids())
@@ -2055,7 +2055,7 @@ label TavernKitchenSundayDinnerServiceOffer(girl_name=""):
             "Вернуться к обеду":
                 return
     $ _service_offer_intimate = not _service_offer_info.tavern_service_available("intimate")
-    $ _service_offer_glory = int(player.tavern_management.glory_hole or 0) == 2 and not _service_offer_info.tavern_service_available("gloryhole")
+    $ _service_offer_glory = tavern.renovation_complete('glory_hole') and not _service_offer_info.tavern_service_available("gloryhole")
     if _service_offer_intimate:
         $ _service_offer_info.enable_tavern_service("intimate")
     if _service_offer_glory:

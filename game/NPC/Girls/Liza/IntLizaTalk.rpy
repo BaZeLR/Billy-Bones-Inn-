@@ -153,7 +153,7 @@ label IntLizaTalkTellGeorgettGerhard(girl_name_ilt="liza", girl_loc_ilt=""):
 
 label IntLizaTalkAskWork(girl_name_ilt="liza", girl_loc_ilt=""):
     $ scene_runtime.text = "Вы спрашиваете Лизетту как ей работается у вас в трактире."
-    if player.tavern_management.glory_hole == 2:
+    if tavern.renovation_complete('glory_hole'):
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n«Ой, - отвечает она, - здесь так здорово! Мне все нравится. А теперь еще и этот, холгло.., тьфу, в смысле глорихол есть! Все круто, куда круче чем на улице!»"
     elif Liza.glory_hole_asked:
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n«Ой, - отвечает она, - здесь так здорово! Мне все нравится!»"

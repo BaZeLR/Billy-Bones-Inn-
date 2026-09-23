@@ -1,66 +1,76 @@
-# Tavern renovations (new content, 2026-09-22)
+# Tavern renovations (2026-09-23)
 
-These are new game features, not recovered QSP renovations. Existing sign,
-glory-hole, soap-barrel and dog-booth jobs are unchanged. The existing paid
-guest-room observation window is relocated to MC's room, without a second fee.
+## Scope and ownership
 
-## Current scope: quest-driven construction (2026-09-23)
+Seven improvements share one construction lifecycle. Tavern owns
+`renovations: {code: TavernRenovation}`; Player, Draupnir and Melissa no longer
+store parallel construction flags, quotes or deadlines. The immutable
+`TAVERN_RENOVATIONS` catalog owns prices, materials, durations, requesters and
+construction locations. Soap barrels and dog booths are outside this change.
 
-The earlier hidden preparation is now connected to native NPC request events.
-Sandra offers the bathroom/laundry, Melissa the yard/toilet, and resident
-Clarissa the guest room/lounge. Their existing talk menus expose the request;
-Melissa's kitchen needs conversation can also lead into the same request after
-the kitchen event ends. No parallel kitchen quest or extra progression flag.
-
-Each uses the existing three-step `LThreadData`/`LThreadInfo` lifecycle:
-
-| Stage | State / action |
-| --- | --- |
-| 0 | Request available with the giver present in the tavern; Clarissa must reside there. |
-| 1 | Accept calls `enable()` and `advance()`; only that order appears at Draupnir. |
-| 2 | Successful payment advances once; construction is ongoing until its saved due day. |
-| 3 | On entry to the renovated location, inspection calls `complete()`. |
-
-Postponement does not advance and permits a later request. Explicit refusal
-calls `abort()` and prevents the order. Insufficient resources and closing a
-quote leave stage 1 intact, including retrying the quote on the same day.
-`ShedWashroom` stays hidden until the completion event opens its door.
-
-## Ownership and flow
-
-- `tavern: TavernInfo` owns `renovation_due_days`, one absolute completion date
-  per paid project. Do not mirror these dates or completion booleans on Player,
-  rooms, Draupnir or quest givers.
-- `TAVERN_RENOVATIONS` is the only price/material/duration catalog.
-- Quest state lives only in `sandraTavernRenovation`,
-  `melissaTavernRenovation`, and `claraTavernRenovation`. These appear under
-  their NPCs in the existing story board. Catalog visibility reads their state;
-  no mutable `is_hidden` flag remains on the constant catalog.
-- Draupnir's order event quotes and charges. The player
-  pays maravedies; the existing
-  shed inventory supplies building logs (`lumber_001`). Split firewood is not
-  construction timber. No second inventory is created.
-- Completion is derived from the saved date and actual calendar day. The
-  morning report announces completed work, including during multi-day sleep.
-  The completion event, not the report or room-entry procedure, completes the quest.
-- There is no automatic new relationship reward or schedule change.
-
-## Initial balancing values
-
-These values were proposed for the new content; they are not QSP prices.
-
-| Project | Quest giver | Maravedies | Logs | Calendar days |
+| Project | Request source | Maravedies | Shed logs | Calendar days |
 | --- | --- | ---: | ---: | ---: |
-| Yard and toilet | Melissa | 600 | 8 | 3 |
-| Shed laundry/bathroom + utility room | Sandra | 900 | 12 | 4 |
-| Guest room/lounge | Clarissa | 700 | 8 | 3 |
+| Sign | MC asks Draupnir | 200 | 0 | 1 |
+| Existing peephole, now in MC room | MC asks Draupnir after services unlock | 100 | 0 | **1** |
+| Glory hole | Georgette explains it; MC asks Draupnir | 700 | 0 | 1 |
+| Roof | Melissa bat story, after fumigation | 2000 | 0 | 2 |
+| Yard/toilet | Melissa in tavern | 600 | 8 | 3 |
+| Laundry/bathroom and utility room | Sandra in tavern | 900 | 12 | 4 |
+| Guest room/lounge | Resident Clarissa | 700 | 8 | 3 |
 
-The single `tavern_empty_room_peephole` object now belongs to `TavernMyRoom`,
-not `TavernEmptyRoom`. It retains the existing `client_room_hole` paid-unlock
-state and guest observation routines. The hall's existing "go and check" shortcut
-still opens the observation event directly and returns to the hall afterward;
-its narration uses the window in MC's room. No extra object-menu click is needed.
-The redundant `player_peephole` order, object and procedure were removed.
+The newer three projects keep their accepted balancing values. Earlier prices
+and story prerequisites remain intact. Peephole construction is now explicitly
+one day, ready next morning, without resetting the hour or charging again.
+
+## Standard lifecycle
+
+`unrequested -> requested -> accepted -> building -> completed`.
+Postponement leaves the request available. Explicit refusal marks that item
+`declined`, never aborting unrelated improvements.
+
+Each saved renovation contains requester, request/start/due/completion days,
+paid maravedies and consumed log quantity. Paid/used quantities are transaction
+history, not a second wallet or inventory. Whole logs come from the existing
+Shed inventory; split or carried firewood cannot replace them.
+
+One existing unordered thread, `tavernRenovations`, contains seven independent
+items. Events check the Tavern object's status. Thread `done[index]` records
+the inspection/follow-up having been played (or explicit refusal), **not**
+physical completion. `num` counts resolved items. Each native event label owns
+its text, picture, menu and return; no new dispatch/refresh labels.
+
+- Request events record the NPC on the same object; no NPC-side request flag.
+- The shared `DraupnirRenovationOrder` checks acceptance, workshop hours,
+  builder availability, money and timber before charging exactly once.
+- Draupnir accepts one new construction order at a time. His runtime
+  `getLocation` reads the active job and places him at its construction site,
+  not the workshop. Conversation is disabled while he is building.
+- The existing next-day lifecycle calls `finish_due_renovations`. It changes
+  each due job once, grants **+1 motivation (mana)** to every current tavern
+  worker and **+2 additional motivation** to its NPC requester. Existing
+  motivation limits apply. No corruption change.
+- The morning report names completed work; a location-entry inspection event
+  follows once and marks the thread item seen. New facilities/actions become
+  usable at physical completion, without waiting for inspection.
+- The washroom exit and entry guard read that same completion state; no saved
+  room-hidden flag mirrors construction progress.
+- Roof completion enables Melissa's breakfast invitation; it does **not**
+  finish her bats thread or skip the argument, booklet search and thanks.
+- Already-completed historical renovations never replay motivation rewards.
+
+The single `tavern_empty_room_peephole` object belongs to `TavernMyRoom`.
+The Hall's existing "go and check" shortcut remains direct and returns to Hall;
+the bedroom object returns to the bedroom. Both use the same paid unlock and
+existing guest observation procedures. There is no second peephole project.
+
+## Flow classification
+
+KEEP: actual room entries, NPC request/quote scenes, carpenter object menu,
+shared order event, inspection event, bath/stove object actions.
+REMOVE: three separate payment labels, duplicated workshop quote calculations,
+Player construction flags, NPC quote/deadline fields and the three parallel
+renovation request threads. The Hall's monthly Monday/day-1 reset of paid
+peephole/glory-hole state is removed, not translated into a new reset.
 
 ## Physical rooms and art
 
@@ -110,31 +120,37 @@ geometry with moonlight and soft off-frame candlelight. All images landscape
 
 ## Save handling
 
-Version 94 adds only missing permanent object IDs and the new room exit to old
-saves. The new `default tavern` supplies the new owner's initial state.
-Never replace an existing room or repopulate consumable inventory. Existing
-logs, fuel, items, relationships, quests and construction purchases remain.
-Version 100 moves the old window ID and removes its duplicate without replacing
-either room. Already paid renovations resume at their inspection stage, not at
-a new request/payment. Existing advanced or aborted threads are not reset.
-This follows Ren'Py's saved/default-state and native-menu contracts:
-[save/rollback](https://www.renpy.org/doc/html/save_load_rollback.html),
-[menus](https://www.renpy.org/doc/html/menus.html).
+Version 100 moved the existing observation object. Version 101 transfers old
+Player flags, Draupnir quotes, Melissa's roof deadline and Tavern's old date map
+into renovation objects, then removes those retired fields and threads.
+Existing inventories, resources, room identities, story progress and paid dates
+are not rebuilt. Previously paid overlapping jobs keep their deadlines; only
+new orders obey the single-builder limit. An old sign/glory-hole job lacking a
+timestamp retains the original next-day completion promise.
+
+Saved RoomAction callbacks retain their callable names; their payment targets
+are migrated to the shared order event. The saved runtime uses `default tavern`,
+not mutable state in a `define`. This follows Ren'Py's
+[save/rollback contract](https://www.renpy.org/doc/html/save_load_rollback.html).
+Use the established morning-after-report checkpoint when changing script flow;
+this is not a guarantee that arbitrary old mid-scene return addresses survive.
 
 ## Verification
 
-- Focused runtime tests cover exact costs, construction dates, rejected and
-  duplicate payments, accepted/aborted states, and preserved inventory.
-- Native Ren'Py 8.5.2 tests click all three NPC request menus and Draupnir's
-  orders through completion, refusal/postponement and same-day payment retry.
-  They check the moved window, both existing client scenes, migration
-  idempotence, room opening, bathing and return contexts: 14 cases / 79 assertions.
-  Both the unchanged Hall shortcut and the bedroom object are exercised.
-- Melissa's kitchen suite passes 22 cases / 124 assertions, including the
-  handoff from her finished needs conversation into the renovation request.
-  Its click helper waits for the next menu's items, not the outgoing screen.
-- The focused Python suite passes 110 tests. A broader source check has three
-  pre-existing failures expecting save version 92 (HEAD before this work was
-  already 98); this is not a claim that the whole project's suite is green.
-- Ren'Py compile and lint pass in a copied project using isolated test saves.
-  Tests do not modify the user's saves.
+- Focused runtime checks: all seven exact costs/durations, no double charges,
+  one builder, exact-once team/requester rewards, preservation of paid state
+  and resources, rejection/refusal, and residual-authority scan.
+- Native Ren'Py 8.5.2 tests click request/order/inspection menus, test next-day
+  completion and Draupnir's actual location, preserve roof-story continuation,
+  bath navigation and both existing Hall/bedroom observation routes.
+- Melissa's kitchen event suite remains a separate regression check.
+- Final checks: 103 focused Python tests; 22 native renovation cases with
+  165 assertions; 22 native Melissa kitchen cases with 125 assertions.
+  A separate native save/load run uses an actual Ren'Py statement checkpoint
+  and verifies version-100 state conversion, resources and motivation via
+  seven post-load assertions. It exits after the verification marker, rather
+  than depending on the test runner resuming across a loaded call stack.
+  Ren'Py 8.5.2 compile/lint pass (only generated test-code reachability notes).
+- Source-based tests that demand saveVersion 92 or an obsolete unrelated
+  girl-decision expression already fail on the pre-change baseline; they
+  are not treated as gameplay failures or repaired in this change.

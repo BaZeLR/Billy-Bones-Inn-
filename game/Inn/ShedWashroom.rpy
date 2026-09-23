@@ -3,7 +3,6 @@ init 6 python:
         code_name="ShedWashroom",
         display_name="Прачечная и купальня",
         group_name=ROOM_GROUP_TAVERN,
-        is_hidden=True,
         bg_picture="images/tavern/backyard/shed/washroom.png",
         descriptions=[RoomDescription(
             text="Это отдельная комната в отремонтированном сарае. Здесь стоят купель, корыто для стирки и скамья; на полках сложены полотенца и белье. Плотная дверь отделяет прачечную от соседнего помещения с печью и запасом дров.",
@@ -20,7 +19,7 @@ init 6 python:
         return "images/tavern/backyard/shed/washroom_night.png"
 
 label ShedWashroom:
-    if rooms.get("ShedWashroom").is_hidden or not tavern.renovation_complete("shed"):
+    if not tavern.renovation_complete("shed"):
         jump Shed
     $ rooms.enter("ShedWashroom")
     call RoomEnterEventGate(rooms.current_code, False)

@@ -661,9 +661,6 @@ init -998 python:
             self.productnum = 200
             self.winenum = 100
             self.visitors = 40
-            self.slogan_state = 0
-            self.client_room_hole = 0
-            self.glory_hole = 0
             self.glory_hole_look = 0
             self.glory_hole_session = PlayerGloryHoleSessionState()
             self.dance_sponsor = 0

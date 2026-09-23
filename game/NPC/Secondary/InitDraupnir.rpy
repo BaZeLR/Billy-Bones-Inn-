@@ -24,11 +24,6 @@ init python:
                 ],
             )
 
-        def getLocation(self, wday=None, hour=None):
-            if int(player.tavern_management.slogan_state or 0) == 1:
-                return "StreetTavern"
-            return super(DraupnirData, self).getLocation(wday, hour)
-
     class DraupnirInfo(BaseNPC):
         """Draupnir: carpenter/artisan in StolyarWorkshop, gloryhole/soap/dog-booth quests."""
         talk_label = "IntDraupnirTalk"
@@ -36,15 +31,18 @@ init python:
 
         def __init__(self, name="draupnir", **kwargs):
             super().__init__(name, **kwargs)
-            self.slogan_quote_received = False
-            self.peep_hole_quote_received = False
-            self.glory_hole_quote_received = False
             self.soap_barrel_quote_received = False
             self.dog_booth_quote_received = False
             self.mongol_lockpick_order_day = -1
 
+        def getLocation(self, wday=None, hour=None):
+            job = tavern.active_renovation
+            if job is not None:
+                return TAVERN_RENOVATIONS[job.code].room
+            return super(DraupnirInfo, self).getLocation(wday, hour)
+
         def social_action_allowed(self, action="", item_id=""):
-            if int(player.tavern_management.slogan_state or 0) == 1:
+            if tavern.active_renovation is not None:
                 return False
             return super(DraupnirInfo, self).social_action_allowed(action, item_id)
 

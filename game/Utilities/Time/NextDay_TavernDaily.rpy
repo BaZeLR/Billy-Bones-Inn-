@@ -65,7 +65,7 @@ label NextDay_TavernDaily():
                 if tavernlevel > CurDay['visitors'] * 4:
                     CurDay['happy'] += 1
         # Sign and girls effects
-        if player.tavern_management.slogan_state < 2 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:76:3") == 1:
+        if not tavern.renovation_complete('sign') and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:76:3") == 1:
             CurDay['happy'] -= 1
         if get_random_girl_by_job('jobwhore') and procedural_randint(1, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:78:4") == 1:
             CurDay['happy'] += 1

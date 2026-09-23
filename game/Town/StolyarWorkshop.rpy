@@ -8,52 +8,31 @@ init python:
 
 
     def stolyar_workshop_can_ask_slogan():
-        return int(player.tavern_management.slogan_state or 0) == 0 and not Draupnir.slogan_quote_received
+        return tavern.renovations["sign"].status == "unrequested"
 
 
     def stolyar_workshop_can_pay_slogan():
-        return (
-            int(player.tavern_management.slogan_state or 0) == 0
-            and Draupnir.slogan_quote_received
-            and int(player.economy.money or 0) >= 200
-        )
+        return tavern.renovations["sign"].status == "accepted"
 
 
     def stolyar_workshop_can_ask_hole():
-        return (
-            stolyar_workshop_georgett_services_available()
-            and not Draupnir.peep_hole_quote_received
-            and int(player.tavern_management.client_room_hole or 0) == 0
-        )
+        return stolyar_workshop_georgett_services_available() and tavern.renovations["peephole"].status == "unrequested"
 
 
     def stolyar_workshop_can_pay_hole():
-        return (
-            stolyar_workshop_georgett_services_available()
-            and Draupnir.peep_hole_quote_received
-            and int(player.tavern_management.client_room_hole or 0) == 0
-            and int(player.economy.money or 0) >= 100
-            and rooms.get("StolyarWorkshop").is_open()
-        )
+        return tavern.renovations["peephole"].status == "accepted"
 
 
     def stolyar_workshop_can_ask_glory():
         return (
             stolyar_workshop_georgett_services_available()
-            and not Draupnir.glory_hole_quote_received
-            and int(player.tavern_management.glory_hole or 0) == 0
+            and tavern.renovations["glory_hole"].status == "unrequested"
             and int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1
         )
 
 
     def stolyar_workshop_can_pay_glory():
-        return (
-            stolyar_workshop_georgett_services_available()
-            and Draupnir.glory_hole_quote_received
-            and int(player.tavern_management.glory_hole or 0) == 0
-            and int(player.economy.money or 0) >= 700
-            and rooms.get("StolyarWorkshop").is_open()
-        )
+        return tavern.renovations["glory_hole"].status == "accepted"
 
 
     def stolyar_workshop_can_ask_soap_barrel():
@@ -102,11 +81,11 @@ init python:
         action_menus=[
             RoomAction(action_id="inspect_draupnir", label="Осмотреть", hook="call", target="StolyarWorkshopLook"),
             RoomAction(action_id="ask_slogan", label="Спросить о ремонте вывески", hook="call", target="StolyarWorkshopAskSlogan", condition=stolyar_workshop_can_ask_slogan),
-            RoomAction(action_id="pay_slogan", label="Заплатить 200 мараведи за ремонт вывески", hook="call", target="StolyarWorkshopPaySlogan", condition=stolyar_workshop_can_pay_slogan),
+            RoomAction(action_id="pay_slogan", label="Заплатить 200 мараведи за ремонт вывески", hook="call", target="DraupnirRenovationOrder", args=("sign",), condition=stolyar_workshop_can_pay_slogan),
             RoomAction(action_id="ask_hole", label="Спросить о дырке в стене", hook="call", target="StolyarWorkshopAskHole", condition=stolyar_workshop_can_ask_hole),
-            RoomAction(action_id="pay_hole", label="Заплатить 100 мараведи за обзорное отверстие", hook="call", target="StolyarWorkshopPayHole", condition=stolyar_workshop_can_pay_hole),
+            RoomAction(action_id="pay_hole", label="Заплатить 100 мараведи за обзорное отверстие", hook="call", target="DraupnirRenovationOrder", args=("peephole",), condition=stolyar_workshop_can_pay_hole),
             RoomAction(action_id="ask_glory", label="Спросить о глорихоле", hook="call", target="StolyarWorkshopAskGlory", condition=stolyar_workshop_can_ask_glory),
-            RoomAction(action_id="pay_glory", label="Заплатить 700 мараведи за устройство глорихола", hook="call", target="StolyarWorkshopPayGlory", condition=stolyar_workshop_can_pay_glory),
+            RoomAction(action_id="pay_glory", label="Заплатить 700 мараведи за устройство глорихола", hook="call", target="DraupnirRenovationOrder", args=("glory_hole",), condition=stolyar_workshop_can_pay_glory),
             RoomAction(action_id="ask_soap_barrel", label="Спросить о бочке для щелока", hook="call", target="StolyarWorkshopAskSoapBarrel", condition=stolyar_workshop_can_ask_soap_barrel),
             RoomAction(action_id="pay_soap_barrel", label="Заплатить 75 мараведи за зольную бочку", hook="call", target="StolyarWorkshopPaySoapBarrel", condition=stolyar_workshop_can_pay_soap_barrel),
             RoomAction(action_id="ask_dog_booth", label="Спросить о собачьей будке", hook="call", target="StolyarWorkshopAskDogBooth", condition=stolyar_workshop_can_ask_dog_booth),
@@ -125,7 +104,7 @@ init python:
     )
 
 label StolyarWorkshop:
-    $ renpy.dynamic("slogan_asked", "hole_asked", "glory_asked", "soap_barrel_asked", "dog_booth_asked", "glory_explained", "can_ask_slogan", "can_pay_slogan", "can_ask_hole", "can_pay_hole", "can_ask_glory", "can_pay_glory", "can_ask_soap_barrel", "can_pay_soap_barrel", "can_ask_dog_booth", "can_pay_dog_booth", "has_pending_orders", "_stolyar_desc_rows", "georgett_whore")
+    $ renpy.dynamic("can_pay_soap_barrel", "can_pay_dog_booth", "_stolyar_desc_rows", "_renovation_quotes")
     $ rooms.enter("StolyarWorkshop")
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ main_ui_runtime.action_title = "Действия"
@@ -133,28 +112,8 @@ label StolyarWorkshop:
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.object_id = ""
     $ dress_shop.girl_dress_block = 0
-    $ slogan_asked = Draupnir.slogan_quote_received
-    $ hole_asked = Draupnir.peep_hole_quote_received
-    $ glory_asked = Draupnir.glory_hole_quote_received
-    $ soap_barrel_asked = Draupnir.soap_barrel_quote_received
-    $ dog_booth_asked = Draupnir.dog_booth_quote_received
-    python:
-        try:
-            georgett_whore = int(Georgett.job_value("jobWhoreAvail", 0) or 0) > 0
-        except Exception:
-            georgett_whore = False
-    $ glory_explained = int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1
-    $ can_ask_slogan = (player.tavern_management.slogan_state == 0 and slogan_asked == 0)
-    $ can_pay_slogan = (player.tavern_management.slogan_state == 0 and slogan_asked > 0 and player.economy.money >= 200)
-    $ can_ask_hole = (georgett_whore and hole_asked == 0 and player.tavern_management.client_room_hole == 0)
-    $ can_pay_hole = (georgett_whore and hole_asked > 0 and player.tavern_management.client_room_hole == 0 and player.economy.money >= 100 and rooms.get("StolyarWorkshop").is_open())
-    $ can_ask_glory = (georgett_whore and glory_asked == 0 and player.tavern_management.glory_hole == 0 and glory_explained)
-    $ can_pay_glory = (georgett_whore and glory_asked > 0 and player.tavern_management.glory_hole == 0 and player.economy.money >= 700 and rooms.get("StolyarWorkshop").is_open())
-    $ can_ask_soap_barrel = (soap_recipe_chain_discovered() and not crafting.ash_barrel_installed and soap_barrel_asked == 0)
-    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and not crafting.ash_barrel_installed and soap_barrel_asked > 0 and player.economy.money >= 75 and rooms.get("StolyarWorkshop").is_open())
-    $ can_ask_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked == 0)
-    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog.booth_built == 0 and dog_booth_asked > 0 and player.economy.money >= 100 and rooms.get("StolyarWorkshop").is_open())
-    $ has_pending_orders = (can_pay_slogan or (hole_asked > 0 and player.tavern_management.client_room_hole == 0) or (glory_asked > 0 and player.tavern_management.glory_hole == 0) or can_pay_soap_barrel or can_pay_dog_booth)
+    $ can_pay_soap_barrel = stolyar_workshop_can_pay_soap_barrel()
+    $ can_pay_dog_booth = stolyar_workshop_can_pay_dog_booth()
 
     if not rooms.current.is_open():
         $ scene_runtime.text = rooms.current.schedule.closed_text
@@ -164,8 +123,8 @@ label StolyarWorkshop:
         while True:
             call screen main_ui
 
-    if player.tavern_management.slogan_state == 1 or player.tavern_management.glory_hole == 1:
-        $ scene_runtime.text = "Мастерская закрыта, мастер Драупнир работает над вашим заказом."
+    if tavern.active_renovation is not None:
+        $ scene_runtime.text = "Мастерская закрыта. " + tavern.renovation_work_description
         $ scene_runtime.location_text = scene_runtime.text
         call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
         $ main_ui_runtime.action_items = rooms.get("StolyarWorkshop").build_exit_items()
@@ -179,18 +138,13 @@ label StolyarWorkshop:
         $ scene_runtime.text = _stolyar_desc_rows[0].text
     else:
         $ scene_runtime.text = "Вы находитесь в мастерской Драупнира."
-    if has_pending_orders:
-        $ scene_runtime.text += "\n\nВы помните, что у него можно заказать следующее:"
-        if can_pay_slogan:
-            $ scene_runtime.text += "\n\nРемонт вывески за 200 мараведи."
-        if hole_asked > 0 and player.tavern_management.client_room_hole == 0:
-            $ scene_runtime.text += "\n\nДырку для подглядывания за 100 мараведи."
-        if glory_asked > 0 and player.tavern_management.glory_hole == 0:
-            $ scene_runtime.text += "\n\nГлорихол за 700 мараведи."
-        if can_pay_soap_barrel:
-            $ scene_runtime.text += "\n\nЗольную бочку для щелока за 75 мараведи."
-        if can_pay_dog_booth:
-            $ scene_runtime.text += "\n\nСобачью будку за 100 мараведи."
+    $ _renovation_quotes = ["%s: %s" % (project.title, project.quote) for project in TAVERN_RENOVATIONS.values() if tavern.renovations[project.code].status == "accepted"]
+    if _renovation_quotes:
+        $ scene_runtime.text += "\n\nВы помните, что у него можно заказать следующее:\n\n" + "\n\n".join(_renovation_quotes)
+    if can_pay_soap_barrel:
+        $ scene_runtime.text += "\n\nЗольную бочку для щелока за 75 мараведи."
+    if can_pay_dog_booth:
+        $ scene_runtime.text += "\n\nСобачью будку за 100 мараведи."
     $ scene_runtime.location_text = scene_runtime.text
     $ rooms.current.mark_visited()
     call ShowImageSeq("draupnir", "", "dwarf", 3)
@@ -215,21 +169,9 @@ label StolyarWorkshopLook:
 label StolyarWorkshopAskSlogan:
     $ main_ui_begin_native_scene_state("Ремонт вывески")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру что вывеска на вашем трактире совсем обветшала. Что, в свою очередь, приводит к неисчислимым бедствиям для вас, а конкретно к тому, что далеко не все, кто зашел бы именно в ваш трактир действительно туда заходят. Из чего проистекает ваше текущее стесненное в средствах положение. После этого жалобного рассказа вы осторожно поинтересовались у мастера Драупнира, сколько будет стоить починить вывеску и нельзя ли это сделать в рассрочку. Мастер Драупнир внимательно выслушал вашу историю, но только и соизволил ответить: 'Двести мараведи. Вперед.' Дальнейшие уточнения на предмет не оговорился ли он и обязательно ли платить вперед ни к чему не привели."
-    $ Draupnir.slogan_quote_received = True
-    $ scene_runtime.location_text = scene_runtime.text
-    show screen main_ui
-    menu:
-        "Назад":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label StolyarWorkshopPaySlogan:
-    $ main_ui_begin_native_scene_state("Ремонт вывески")
-    $ scene_runtime.text = "Скрепя сердце вы отсчитали 200 мараведи мастеру Драупниру. Собрав свои инструменты работящий гном направил свои стопы к вашему трактиру."
-    $ player.tavern_management.slogan_state = 1
-    $ player.spend_money(200)
+    $ tavern.renovations["sign"].request(TAVERN_RENOVATIONS["sign"].quest_giver)
+    $ tavern.renovations["sign"].accept()
+    $ threads["tavernRenovations"].enable()
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
@@ -242,23 +184,9 @@ label StolyarWorkshopPaySlogan:
 label StolyarWorkshopAskHole:
     $ main_ui_begin_native_scene_state("Потайное окошко")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру что, после появления в вашем заведении веселых девушек, в задней комнате стали происходить интересные вещи. Однако полностью оценить их интересность вы не можете, по причине досадного наличия отстутствия хорошего обзора. После этого вы поинтересовались, не имеется ли у мастера Драупнира длинного сверла, а также не хочет ли он, в компании с оным сверлом, навестить ваше заведение. Мастер Драупнир внимательно выслушал вашу историю, но только и соизволил ответить: 'Сто мараведи. И делать это, как ты сам понимаешь, надо с утра.'"
-    $ Draupnir.peep_hole_quote_received = True
-    $ scene_runtime.location_text = scene_runtime.text
-    show screen main_ui
-    menu:
-        "Назад":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label StolyarWorkshopPayHole:
-    $ main_ui_begin_native_scene_state("Потайное окошко")
-    $ scene_runtime.text = "Скрепя сердце вы отсчитали 100 мараведи мастеру Драупниру. Взяв с собой дрель, стамески, пилу и еще пару инструментов, работящий гном отправился к вашему трактиру. Впрочем, долго он там не задержался, вернувшись и отрапортовав что все сделанно, потайное окошко готово."
-    $ player.tavern_management.client_room_hole = 1
-    $ player.spend_money(100)
-    $ calendar_v2.hour = 8
-    $ calendar_v2.minute = 0
+    $ tavern.renovations["peephole"].request(TAVERN_RENOVATIONS["peephole"].quest_giver)
+    $ tavern.renovations["peephole"].accept()
+    $ threads["tavernRenovations"].enable()
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
@@ -271,21 +199,9 @@ label StolyarWorkshopPayHole:
 label StolyarWorkshopAskGlory:
     $ main_ui_begin_native_scene_state("Глорихол")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру об новинке про которую вы слышали - глорихоле. Ну и о том, что вы хотели бы устроить таковую в своем трактире. Ну и что работы там всего чуть-чуть - сделать ширмочку, занавески, просверлить дырки, отполировать, покрасить и еще кое-чего по мелочи, может можно мараведи в 20 уложиться? А, да, еще и сделать так чтобы вы могли незаметно проверить, что там делается, ведь это совсем просто. Может еще 5 или даже 7 мараведи сверх. Вместе с материалами? Мастер Драупнир внимательно выслушал вашу историю, судя по всему на этот раз идея гному понравилась. Но все таки цену он заломил немножко выше предложенной: 'Семьсот мараведи. Ну и да, работа на весь день, начинать надо с утра.'"
-    $ Draupnir.glory_hole_quote_received = True
-    $ scene_runtime.location_text = scene_runtime.text
-    show screen main_ui
-    menu:
-        "Назад":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
-
-
-label StolyarWorkshopPayGlory:
-    $ main_ui_begin_native_scene_state("Глорихол")
-    $ scene_runtime.text = "Жестоко задавив в себе жабу пока она еще была в состоянии головастика, вы отсчитали 700 мараведи мастеру Драупниру. Загрузив ослика досками, собрав в ящичек разнообразные инструменты, а в специальный мешок ткани для занавески, трудолюбивый гном потопал к вашему трактиру."
-    $ player.tavern_management.glory_hole = 1
-    $ player.spend_money(700)
+    $ tavern.renovations["glory_hole"].request(TAVERN_RENOVATIONS["glory_hole"].quest_giver)
+    $ tavern.renovations["glory_hole"].accept()
+    $ threads["tavernRenovations"].enable()
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:

@@ -21,7 +21,7 @@ init python:
         return Amanda.corruption > 8 and Amanda.sex_stat("sexacts", 0) == 0 and Liza.pregnancy_days() >= 120
 
     def amanda_liza_glory_offer_condition():
-        return Amanda.corruption >= 22 and player.tavern_management.glory_hole == 2 and Amanda.sex_stat("sexacts", 0) == 0
+        return Amanda.corruption >= 22 and tavern.renovation_complete('glory_hole') and Amanda.sex_stat("sexacts", 0) == 0
 
     def amanda_liza_glory_tried_condition():
         return Amanda.corruption >= 20 and Amanda.var_int("glorytried", 0) and Amanda.var_int("glorysuck", 0) == 0 and Amanda.var_int("gloryscold", 0) == 0 and Amanda.var_int("glorywalkout", 0) == 0

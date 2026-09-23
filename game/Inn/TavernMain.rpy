@@ -97,7 +97,7 @@ init python:
         return ""
 
     def tavern_main_glory_hole_visible():
-        return player.tavern_management.glory_hole == 2
+        return tavern.renovation_complete('glory_hole')
 
     def tavern_main_intimate_workers():
         workers = []
@@ -178,10 +178,9 @@ init python:
                 desc_parts.append("В стороне от общего зала ждут клиентов: " + _tavern_join_names(other_workers) + ".")
             if client_girl not in ("", "georgett", "liza"):
                 desc_parts.append(people_display_name(client_girl) + " сейчас принимает клиента в отдельной комнате.")
-            glory_quest_started = bool(Draupnir.glory_hole_quote_received)
-            if player.tavern_management.glory_hole == 1 and glory_quest_started:
+            if tavern.renovations['glory_hole'].status == 'building':
                 desc_parts.append("В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом.")
-            elif player.tavern_management.glory_hole == 2 and glory_quest_started:
+            elif tavern.renovation_complete('glory_hole'):
                 desc_parts.append("В дальнем углу трактира располагается ширмочка, а за ней, как вы знаете, глорихол - место где, за умеренную плату, а для вас, как вы надеетесь, и вовсе бесплатно, любой страждущий может получить полностью анонимный минет. Ну, если с другой стороны ширмы есть кто-то, желающий его сделать.")
 
         desc_parts.append(werecat_visible_text("TavernMain"))
@@ -227,7 +226,7 @@ init python:
         tavern_main_fireplace_wood_stock()
         sections = rooms.get("TavernMain").build_menu_sections()
         items = list(sections.get("movement", [])) + list(sections.get("actions", []))
-        if player.tavern_management.isTavernOpen and int(player.tavern_management.client_room_hole or 0) > 0 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "":
+        if player.tavern_management.isTavernOpen and tavern.renovation_complete('peephole') and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "":
             items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", rooms.get("TavernMain").state["client_room_girl"])))
         if tavern_main_closed_text() == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
             items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
@@ -251,21 +250,6 @@ label TavernMain:
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
-    python:
-        # Force TavernMain base intro text in the left panel; prevents stale/conditional text bleed.
-        _glory_quest_started = int(Draupnir.glory_hole_quote_received)
-        _cur_desc_low = str(scene_runtime.location_text or "").lower()
-        if ("глорихол" in _cur_desc_low) and _glory_quest_started <= 0:
-            scene_runtime.text = _tavern_main_base_desc
-            scene_runtime.location_text = _tavern_main_base_desc
-    
-
-    # Startup safety: no Glory Hole stage before the quest/dialog branch starts.
-    if int(calendar_v2.week or 1) == 1 and int(calendar_v2.day or 1) == 1:
-        $ _draupnir_gh_asked = int(Draupnir.glory_hole_quote_received)
-        if _draupnir_gh_asked == 0:
-            $ player.tavern_management.glory_hole = 0
-            $ player.tavern_management.client_room_hole = 0
     # Determine if tavern is closed
     if player.tavern_management.isTavernOpen:
         python:

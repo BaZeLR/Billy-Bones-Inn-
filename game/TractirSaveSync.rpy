@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 100
+define currentVersion = 101
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -36,6 +36,8 @@ init -100 python:
             werecat_thread.advanceTo(0)
 
     def tractir_save_patch_loaded_state():
+        if not hasattr(tavern, "renovations"):
+            updateSave_V100()
         ensure_game_item_registry()
         people.repair()
         rooms.repair()
@@ -815,6 +817,9 @@ init -100 python:
         if loaded_version < 100:
             updateSave_V99()
             loaded_version = 100
+        if loaded_version < 101:
+            updateSave_V100()
+            loaded_version = 101
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3190,13 +3195,77 @@ init -100 python:
         bedroom = rooms.get("TavernMyRoom")
         bedroom.game_items = [item for item in bedroom.game_items if get_object_id(item) not in ("myroom_guest_peephole", "tavern_empty_room_peephole")]
         _room_add_item_by_id(bedroom, "tavern_empty_room_peephole")
-        if tavern.renovation_due_days.pop("player_peephole", None) is not None:
-            player.tavern_management.client_room_hole = max(1, int(player.tavern_management.client_room_hole or 0))
-        for code, project in TAVERN_RENOVATIONS.items():
-            thread = threads[project.thread_name]
-            if code in tavern.renovation_due_days and thread.num < 2 and not thread.aborted:
+
+    def updateSave_V100():
+        # Transfer once, then remove the retired fields. No charges, inventory
+        # rebuilds or retrospective motivation rewards during save conversion.
+        if not hasattr(tavern, "renovations"):
+            tavern.renovations = {code: TavernRenovation(code) for code in TAVERN_RENOVATIONS}
+        initThreads()
+        thread = threads["tavernRenovations"]
+        today = int(calendar_v2.daysInGame)
+        old_dates = tavern.__dict__.pop("renovation_due_days", {})
+        for index, (code, project) in enumerate(TAVERN_RENOVATIONS.items()):
+            job = tavern.renovations[code]
+            old_thread = threads.pop(project.quest_giver + "TavernRenovation", None) if code in ("backyard", "shed", "guest_room") else None
+            built = False
+            pending = False
+            quoted = False
+            due = old_dates.get(code, -1)
+            if code in ("sign", "peephole", "glory_hole"):
+                field, quote_field = {
+                    "sign": ("slogan_state", "slogan_quote_received"),
+                    "peephole": ("client_room_hole", "peep_hole_quote_received"),
+                    "glory_hole": ("glory_hole", "glory_hole_quote_received"),
+                }[code]
+                value = int(player.tavern_management.__dict__.pop(field, 0) or 0)
+                quoted = bool(Draupnir.__dict__.pop(quote_field, False))
+                built = value >= (1 if code == "peephole" else 2)
+                pending = value == 1 and code != "peephole"
+                if code == "peephole" and "player_peephole" in old_dates:
+                    built = True
+            elif code == "roof":
+                due = int(Melissa.__dict__.pop("roof_repair_complete_day", -1))
+                # Completed story is authoritative even if a very old save
+                # never retained its physical repair timestamp.
+                built = threads["melissaBatProblem"].num >= 8
+            if job.status != "unrequested":
+                continue
+            if due >= 0:
+                built = built or today >= due
+                pending = not built
+            if built or pending:
+                job.status = "completed" if built else "building"
+                job.requester = project.quest_giver
+                job.due_day = int(due) if due >= 0 else today if built else today + project.days
+                job.started_day = job.due_day - project.days if due >= 0 else -1
+                job.completed_day = job.due_day if built else -1
+                job.paid_maravedies = project.price
+                job.used_logs = project.logs
+                if built and (old_thread is None or old_thread.completed):
+                    if not thread.done[index]:
+                        thread.seen(index)
+            elif old_thread is not None and old_thread.aborted:
+                job.status = "declined"
+                job.requester = project.quest_giver
+                if not thread.done[index]:
+                    thread.seen(index)
+            elif quoted or (old_thread is not None and old_thread.num > 0):
+                job.status = "accepted"
+                job.requester = project.quest_giver
+            if job.status != "unrequested":
                 thread.enable()
-                thread.advanceTo(2)
+        # The existing exit condition and entry guard read Tavern directly.
+        # Clear the obsolete saved UI gate instead of mirroring completion.
+        rooms.get("ShedWashroom").is_hidden = False
+        # Saved room actions retain their identity, but payment now uses the
+        # same authored order event as the carpenter's conversation.
+        workshop = rooms.get("StolyarWorkshop")
+        for action in workshop.action_menus:
+            code = {"pay_slogan": "sign", "pay_hole": "peephole", "pay_glory": "glory_hole"}.get(action.action_id)
+            if code is not None:
+                action.target = "DraupnirRenovationOrder"
+                action.args = (code,)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

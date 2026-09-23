@@ -86,7 +86,6 @@ def test_melissa_story_state_has_explicit_npc_properties_without_var_authority()
         "drawings_booklet_left",
         "drawings_booklet_read",
         "drawings_returned",
-        "roof_repair_complete_day",
         "breakfast_tease_day",
     ]
 

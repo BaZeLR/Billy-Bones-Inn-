@@ -234,9 +234,8 @@ init python:
         lines = []
         if key == "melissa":
             if threads["melissaBatProblem"].num >= 7 and threads["melissaBatProblem"].num < 8:
-                repair_day = people_to_int(Melissa.roof_repair_complete_day, -1)
-                if repair_day > current_game_day():
-                    days_left = repair_day - current_game_day()
+                if tavern.renovations["roof"].status == "building":
+                    days_left = tavern.renovation_days_left("roof")
                     lines.append("Над комнатой Мелиссы уже заказана починка крыши. Мастерам осталось еще примерно %s дн., прежде чем можно будет окончательно считать дело закрытым." % days_left)
                 elif Melissa.bats_repair_complete():
                     lines.append("Похоже, мастера уже закончили с крышей: над комнатой стало тихо, щели подлатаны. Теперь можно попросить Мелиссу прийти завтра на общий завтрак и спокойно обсудить ее возвращение.")
@@ -421,7 +420,7 @@ init python:
         service_quality_value = player.tavern_management.service.waitress_quality
         products_value = player.tavern_management.productnum
         wine_value = player.tavern_management.winenum
-        gloryhole_level = player.tavern_management.glory_hole
+        gloryhole_level = 2 if tavern.renovation_complete("glory_hole") else 0
 
         return {
             "visitors": _tavern_int(visitors_value, 40),

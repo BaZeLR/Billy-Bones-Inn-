@@ -92,8 +92,8 @@ label NextDay(retlocname, timepassed):
         
         call NextDay_NewDayEvents(retlocname)
         python:
-            for _renovation_code, _renovation_due in tavern.renovation_due_days.items():
-                if int(_renovation_due) == int(calendar_v2.daysInGame):
+            for _renovation_code, _renovation_job in tavern.renovations.items():
+                if _renovation_job.completed_day == int(calendar_v2.daysInGame):
                     ExtraEvents += "\n\nДраупнир закончил работу: %s." % TAVERN_RENOVATIONS[_renovation_code].title
         call CreateTavernEvents
         
