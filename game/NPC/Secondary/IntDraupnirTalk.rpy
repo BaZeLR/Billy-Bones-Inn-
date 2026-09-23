@@ -8,7 +8,7 @@ label IntDraupnirTalk:
         $ scene_runtime.location_text = scene_runtime.text
     while True:
         menu:
-            "Обустройство трактира" if any(not project.is_hidden for project in TAVERN_RENOVATIONS.values()):
+            "Обустройство трактира" if any(project.order_visible for project in TAVERN_RENOVATIONS.values()):
                 call DraupnirRenovations
 
             "Поболтать с гномом":

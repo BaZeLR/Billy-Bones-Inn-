@@ -92,6 +92,7 @@ init -25 python:
             "dog": dog,
             "event_runtime": event_runtime,
             "player": player,
+            "tavern": tavern,
             "threads": threads,
             "ROOM_GROUP_TAVERN": ROOM_GROUP_TAVERN,
             "CheckIfSexEventExist": CheckIfSexEventExist,

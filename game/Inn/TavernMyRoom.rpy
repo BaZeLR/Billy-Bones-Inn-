@@ -61,7 +61,7 @@ init python:
             "chest_001",
             "myroom_window_001",
             "myroom_attic_hatch_001",
-            "myroom_guest_peephole",
+            "tavern_empty_room_peephole",
         ],
         custom_properties={
             "object_menu_label": "TavernMyRoomObjectMenu",
@@ -118,7 +118,7 @@ init python:
             base_text += "\n\nУ стены стоит " + table_markup + ", за которым можно читать записи и мастерить полезные вещи."
 
         extra_rows = []
-        if tavern.renovation_complete("player_peephole"):
+        if int(player.tavern_management.client_room_hole or 0) > 0:
             extra_rows.append("В стене скрыто сделанное Драупниром потайное окошко в гостевую комнату.")
         if tavern_my_room_has_floor_item("recipe_book_001"):
             extra_rows.append("На небольшом столике у стены лежит старая пыльная книга с рецептами, которую вы сняли с чердака.")

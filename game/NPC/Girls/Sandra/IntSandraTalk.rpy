@@ -11,6 +11,9 @@ label IntSandraTalk(girl_name="sandra"):
         $ scene_runtime.location_text = scene_runtime.text
     $ _sandra_special_entry = household_special_talk_entry(girl_name) if int(Sandra.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
     menu:
+        "Обсудить купальню и прачечную" if story_event_available("talk_sandra", "renovation"):
+            call checkTriggers("talk_sandra", "renovation", 0)
+            jump IntSandraTalk
         "Осмотреть":
             call ShowGirlCard(girl_name)
             jump IntSandraTalk

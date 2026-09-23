@@ -176,6 +176,8 @@ label HouseholdEvent_KitchenMelissaPracticalComplaint:
         "Закончить разговор":
             pass
     $ main_ui_end_native_scene_state()
+    if _melissa_reply == "needs" and story_event_available("talk_melissa", "renovation"):
+        call checkTriggers("talk_melissa", "renovation", 0)
     return
 
 

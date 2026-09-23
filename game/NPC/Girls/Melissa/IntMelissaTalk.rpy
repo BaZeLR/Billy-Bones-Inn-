@@ -14,6 +14,9 @@ label IntMelissaTalk(girl_name="melissa"):
         call checkTriggers(rooms.current_code, "melissa_talk", 0)
     $ _melissa_special_entry = household_special_talk_entry(girl_name) if int(Melissa.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
     menu:
+        "Обсудить ремонт двора и нужника" if story_event_available("talk_melissa", "renovation"):
+            call checkTriggers("talk_melissa", "renovation", 0)
+            jump IntMelissaTalk
         "Осмотреть":
             call ShowGirlCard(girl_name)
             jump IntMelissaTalk

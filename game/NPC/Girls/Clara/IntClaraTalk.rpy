@@ -20,6 +20,9 @@ label IntClaraTalk(girl_name="clara"):
     while _clara_repeat_menu:
         $ _clara_repeat_menu = False
         menu:
+            "Обсудить ремонт гостевой комнаты" if story_event_available("talk_clara", "renovation"):
+                call checkTriggers("talk_clara", "renovation", 0)
+                $ _clara_repeat_menu = True
             "Осмотреть":
                 call ShowGirlCard(girl_name)
                 $ _clara_repeat_menu = True

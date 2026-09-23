@@ -32,7 +32,7 @@ init 6 python:
     TavernEmptyRoomPeepholeObject = GameObject(
         object_id="tavern_empty_room_peephole",
         name="Потайное окошко",
-        description="В стене аккуратно спрятано потайное окошко, за которое вы заплатили Драупниру. Через него можно проверить, что происходит в комнате.",
+        description="В стене вашей комнаты спрятано потайное окошко, за которое вы заплатили Драупниру. Отсюда можно наблюдать за происходящим в гостевой.",
         picture="images/amanda/Room/emptyroom.jpg",
         condition=tavern_empty_room_peephole_visible,
         actions=[
@@ -56,8 +56,6 @@ init 6 python:
 
     def tavern_empty_room_action_items():
         items = []
-        for room_object in rooms.get("TavernEmptyRoom").visible_objects():
-            items.append(MenuItem(room_object.name, Call("TavernEmptyRoomObjectMenu", room_object.object_id)))
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernEmptyRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernEmptyRoom")))
@@ -79,12 +77,8 @@ init 6 python:
         exits=[
             RoomExit(label="Вернуться в коридор", target="TavernUpstairs"),
         ],
-        game_items=[
-            TavernEmptyRoomPeepholeObject,
-        ],
-        custom_properties={
-            "object_menu_label": "TavernEmptyRoomObjectMenu",
-        },
+        game_items=[],
+        custom_properties={},
     )
 
 
@@ -101,32 +95,6 @@ label TavernEmptyRoom:
         call screen main_ui
 
 
-label TavernEmptyRoomObjectMenu(object_id=""):
-    $ renpy.dynamic("_peephole_action")
-    if str(object_id or "") != "tavern_empty_room_peephole":
-        return
-    $ main_ui_runtime.object_id = object_id
-    $ main_ui_runtime.action_title = TavernEmptyRoomPeepholeObject.name
-    $ main_ui_runtime.action_content = None
-    $ scene_runtime.text = TavernEmptyRoomPeepholeObject.description
-    $ scene_runtime.location_text = scene_runtime.text
-    if str(TavernEmptyRoomPeepholeObject.picture or ""):
-        $ scene_runtime.picture = TavernEmptyRoomPeepholeObject.picture
-    $ main_ui_runtime.action_items = []
-    python:
-        for _peephole_action in TavernEmptyRoomPeepholeObject.visible_actions():
-            if _peephole_action.hook == "call" and str(_peephole_action.target or ""):
-                main_ui_runtime.action_items.append(MenuItem(_peephole_action.label, Call(_peephole_action.target, *tuple(getattr(_peephole_action, "args", ()) or ()))))
-        main_ui_runtime.action_items.append(MenuItem("Назад", [
-            SetField(scene_runtime, "picture", tavern_empty_room_picture()),
-            SetField(scene_runtime, "text", tavern_empty_room_description()),
-            SetField(scene_runtime, "location_text", tavern_empty_room_description()),
-            SetField(main_ui_runtime, "action_title", rooms.get("TavernEmptyRoom").display_name),
-            SetField(main_ui_runtime, "action_content", None),
-            SetField(main_ui_runtime, "action_items", tavern_empty_room_action_items()),
-            Function(main_ui_restart_interaction),
-        ]))
-    return
 
 
 label TavernEmptyRoomPeekClient:
@@ -141,16 +109,12 @@ label TavernEmptyRoomPeekClient:
 
 
 label TavernEmptyRoomPeekEmpty:
-    $ scene_runtime.picture = "images/amanda/Room/emptyroom.jpg"
-    $ scene_runtime.text = "Вы осторожно проверяете потайное окошко, но в комнате сейчас никого нет. Остается только вернуться позже, когда кто-нибудь из посетителей уединится наверху."
-    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_begin_native_scene_state("Потайное окошко")
     show screen main_ui
+    vscene "images/amanda/Room/emptyroom.jpg"
+    "Вы осторожно проверяете потайное окошко из своей комнаты, но в гостевой сейчас никого нет. Остается только вернуться позже."
     menu:
-        "Вернуться в комнату":
-            $ scene_runtime.picture = tavern_empty_room_picture()
-            $ scene_runtime.text = tavern_empty_room_description()
-            $ scene_runtime.location_text = scene_runtime.text
-            $ main_ui_runtime.action_title = rooms.get("TavernEmptyRoom").display_name
-            $ main_ui_runtime.action_items = tavern_empty_room_action_items()
-            $ main_ui_restart_interaction()
-            return
+        "Закрыть окошко":
+            pass
+    $ main_ui_end_native_scene_state()
+    return

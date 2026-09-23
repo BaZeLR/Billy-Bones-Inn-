@@ -16,7 +16,6 @@ EXPECTED = {
     "backyard": (600, 8, 3),
     "shed": (900, 12, 4),
     "guest_room": (700, 8, 3),
-    "player_peephole": (100, 1, 1),
 }
 
 
@@ -85,14 +84,19 @@ def _runtime(day=30, money=10000, logs=40, chopped=7, carried_logs=0, ready_for=
         "get_object_id": lambda item: item if isinstance(item, str) else item.object_id,
         "player_to_int": lambda value, default=0: int(value) if value is not None else default,
         "threads": {},
+        "_story_num_day": lambda: calendar.daysInGame,
+        "_story_level_enabled": lambda *args: True,
     }
     _exec_definitions("Inn/TavernRenovations.rpy", {"TavernRenovationDefinition", "TAVERN_RENOVATIONS", "TavernInfo"}, namespace)
     _exec_definitions("Utilities/General/Common/Actions.rpy", {"_room_item_count_by_id", "_room_remove_item_by_id"}, namespace)
     namespace["tavern"] = namespace["TavernInfo"]()
+    _exec_definitions("Utilities/General/Events/threads.rpy", {"ThreadInfo", "LThreadInfo"}, namespace)
     for project in namespace["TAVERN_RENOVATIONS"].values():
-        project.is_hidden = False  # Isolated preview of the prepared transaction.
-    if ready_for == "player_peephole":
-        namespace["tavern"].renovation_due_days["guest_room"] = day
+        data = SimpleNamespace(length=3, highlight=True, level=0, person=project.quest_giver, checkConditions=lambda: True)
+        thread = namespace["LThreadInfo"](data)
+        thread.enable()
+        thread.advance()
+        namespace["threads"][project.thread_name] = thread
     return SimpleNamespace(
         owner=namespace["tavern"], calendar=calendar, player=player,
         shed=shed, spent=spent, namespace=namespace,
@@ -110,7 +114,7 @@ def _transaction_state(runtime):
     )
 
 
-def test_catalog_has_exactly_the_four_authored_projects_and_costs():
+def test_catalog_has_three_requested_renovations_without_second_window_purchase():
     runtime = _runtime()
     assert set(runtime.catalog) == set(EXPECTED)
     for code, expected in EXPECTED.items():
@@ -208,44 +212,48 @@ def test_new_projects_do_not_modify_legacy_upgrade_ownership():
     runtime.player.tavern_management.glory_hole = 2
     before = deepcopy(runtime.player.tavern_management.__dict__)
     for code in EXPECTED:
-        if code == "player_peephole":
-            runtime.calendar.daysInGame = runtime.owner.renovation_due_days["guest_room"]
         assert runtime.owner.order_renovation(code)
     assert set(runtime.owner.renovation_due_days) == set(EXPECTED)
     assert before == runtime.player.tavern_management.__dict__
     assert not hasattr(runtime.player.tavern_management, "renovation_due_days")
 
 
-def test_future_quest_givers_are_metadata_not_active_threads():
+def test_quest_givers_link_to_existing_thread_objects():
     runtime = _runtime()
     assert runtime.catalog["backyard"].quest_giver == "melissa"
     assert runtime.catalog["shed"].quest_giver == "sandra"
     assert runtime.catalog["guest_room"].quest_giver == "clara"
-    assert runtime.namespace["threads"] == {}
-    assert not hasattr(runtime.catalog["shed"], "request_thread")
+    for project in runtime.catalog.values():
+        assert project.thread_name in runtime.namespace["threads"]
+        assert project.order_visible
+        assert not hasattr(project, "is_hidden")
 
 
 @pytest.mark.parametrize("code", EXPECTED)
-def test_hidden_orders_are_unavailable_without_charging(code):
+@pytest.mark.parametrize("state", ["not_requested", "aborted", "completed"])
+def test_unaccepted_aborted_and_completed_quests_cannot_charge(code, state):
     runtime = _runtime()
-    runtime.catalog[code].is_hidden = True
+    thread = runtime.namespace["threads"][runtime.catalog[code].thread_name]
+    if state == "not_requested":
+        thread.reset()
+    elif state == "aborted":
+        thread.abort()
+    else:
+        thread.advance()
+        thread.complete()
     before = _transaction_state(runtime)
     assert runtime.owner.renovation_order_error(code)
     assert runtime.owner.order_renovation(code) is False
     assert _transaction_state(runtime) == before
 
 
-def test_private_peephole_requires_completed_guest_room_not_legacy_client_window():
+def test_observation_window_is_not_a_second_construction_project():
     runtime = _runtime()
     runtime.player.tavern_management.client_room_hole = 1
     before = _transaction_state(runtime)
-    assert runtime.owner.renovation_order_error("player_peephole")
-    assert runtime.owner.order_renovation("player_peephole") is False
-    assert _transaction_state(runtime) == before
+    assert "player_peephole" not in runtime.catalog
     assert runtime.owner.order_renovation("guest_room")
-    assert runtime.owner.order_renovation("player_peephole") is False
     runtime.calendar.daysInGame = runtime.owner.renovation_due_days["guest_room"]
-    assert runtime.owner.order_renovation("player_peephole")
     assert runtime.player.tavern_management.client_room_hole == 1
 
 

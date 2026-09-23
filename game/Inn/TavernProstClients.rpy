@@ -21,7 +21,7 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
         $ main_ui_end_native_scene_state()
         return
 
-    $ scene_runtime.text = "Вы зашли в соседнюю комнату, где у вас было оборудовано специальное потайное окошко. Через него вам открылся прекрасный вид."
+    $ scene_runtime.text = "Из своей комнаты вы смотрите через потайное окошко в гостевую. Отсюда хорошо видно происходящее внутри."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:

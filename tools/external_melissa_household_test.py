@@ -7,14 +7,16 @@ import external_tavern_renovations_test as isolated
 def read_until_choice(prefix):
     # Ren'Py 8.5.2 testcases support if/until, not while blocks. Expand a bounded
     # series of real clicks; once the target choice is reached, later steps skip.
+    # Wait for a new menu's items, not the outgoing choice screen still on screen.
     step = '''    if eval (not any(caption.startswith(%r) for caption in external_melissa_choices())):
         $ _melissa_read.append(scene_runtime.text)
+        $ _melissa_previous_items = renpy.get_screen("choice").scope["items"]
         assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == []) timeout 5.0
         click id "choice_panel_button_0" pos (0.5, 0.5)
-        pause 0.05
-        advance until screen "choice" timeout 20.0
+        pause 0.1
+        advance until eval (renpy.get_screen("choice") is not None and renpy.get_screen("choice").scope["items"] is not _melissa_previous_items) timeout 20.0
 ''' % prefix
-    return step * 10
+    return step * 10 + '    assert eval (any(caption.startswith(%r) for caption in external_melissa_choices())) timeout 5.0\n' % prefix
 
 
 TEST_RPY = r'''
@@ -152,7 +154,27 @@ testcase external_melissa_needs_only_unfinished:
         for marker in ("Избавь нас от крыс", "ремонт моей комнаты", "порядок двор", "нужник нужно", "На этой неделе", "Прачечная"):
             assert (marker in read_text) != completed, (marker, read_text)
         assert ("все сделано" in read_text) == completed
-        assert all(project.is_hidden for project in TAVERN_RENOVATIONS.values())
+        assert all(not project.order_visible for project in TAVERN_RENOVATIONS.values())
+
+testcase external_melissa_needs_leads_to_renovation_event:
+    $ threads["melissaTavernRenovation"].reset()
+    $ _melissa_read = []
+    $ _kitchen_origin = main_ui_context_snapshot()
+    run Call("HouseholdEvent_Try", "TavernKitchen", "room")
+    advance until screen "choice" timeout 20.0
+{READ_TO_ACTIONS}
+    click id (external_melissa_button("Спросить, что")) pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+{READ_TO_FINISH}
+    click id (external_melissa_button("Закончить")) pos (0.5, 0.5)
+    advance until eval ("Хорошо, закажу работу у Драупнира" in external_melissa_choices()) timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
+    click id (external_melissa_button("Хорошо, закажу")) pos (0.5, 0.5)
+    advance until eval ("Вернуться к разговору" in external_melissa_choices()) timeout 20.0
+    click id (external_melissa_button("Вернуться к разговору")) pos (0.5, 0.5)
+    advance until eval (not external_melissa_choices()) timeout 20.0
+    assert eval (threads["melissaTavernRenovation"].num == 1)
+    assert eval (main_ui_context_snapshot() == _kitchen_origin)
 
 testcase external_melissa_reward_by_current_state:
     parameter state = [(4, 30, 80, 100, "сдержанно благодарит"), (15, 3, 80, 100, "быстро целует"), (15, 20, 0, 100, "запишем в долг"), (15, 20, 80, 100, "особая благодарность"), (15, 20, 80, 20, "Сегодня сил совсем мало")]

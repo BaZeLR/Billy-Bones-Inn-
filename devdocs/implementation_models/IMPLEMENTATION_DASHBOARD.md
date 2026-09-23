@@ -17,6 +17,25 @@ This dashboard tracks conversion toward the intended model:
 
 ## Core Systems
 
+### Renovation quest lifecycle and moved window — 2026-09-23
+
+- Sandra, Melissa and resident Clarissa now give their catalogued renovation
+  requests through existing native talk menus. Melissa's kitchen needs scene
+  leads to the same request after its own event finishes.
+- Three existing-style linear threads own acceptance, ordering, ongoing work,
+  completion and refusal. Tavern-owned absolute due dates still determine
+  physical completion; there is no duplicate quest-progress map.
+- Draupnir exposes accepted orders only. Completion entry scenes finish the
+  quest; the shed scene opens the new washroom. Prices and materials unchanged.
+- The existing guest-room observation object moves into MC's room, retaining
+  its paid unlock and both client observation paths. The duplicate window
+  project/object/procedure are removed; the guest-room action is gone.
+- Save version 100 migrates room object IDs and paid construction without
+  resetting inventories, relationships, or existing quest progress.
+- Verification details: `devdocs/tavern_renovations.md` and
+  `tools/external_tavern_renovations_test.py`. This is a scoped feature,
+  not a claim of whole-game completion.
+
 ### Pregnancy lifecycle corrections — 2026-09-22
 
 This is a verified slice, not a claim that every NPC branch is complete.

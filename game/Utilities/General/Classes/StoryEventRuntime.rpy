@@ -2421,9 +2421,9 @@ define birthThreadList = [
 
 define threadListsByGirl = {
     "amanda": amandaThreadList,
-    "melissa": melissaThreadList,
-    "sandra": sandraThreadList,
-    "clara": claraThreadList,
+    "melissa": melissaThreadList + [row for row in tavernRenovationThreadList if row.person == "melissa"],
+    "sandra": sandraThreadList + [row for row in tavernRenovationThreadList if row.person == "sandra"],
+    "clara": claraThreadList + [row for row in tavernRenovationThreadList if row.person == "clara"],
     "mongol": mongolThreadList,
     "cityguard": cityGuardThreadList,
     "robin": robinThreadList,
@@ -2461,6 +2461,7 @@ define threadList = (
     + tavernThreadList
     + cityThreadList
     + birthThreadList
+    + tavernRenovationThreadList
 )
 
 define threadData = loadThreadData(threadList)

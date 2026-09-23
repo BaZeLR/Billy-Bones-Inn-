@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 99
+define currentVersion = 100
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -812,6 +812,9 @@ init -100 python:
         if loaded_version < 99:
             updateSave_V98()
             loaded_version = 99
+        if loaded_version < 100:
+            updateSave_V99()
+            loaded_version = 100
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3175,6 +3178,25 @@ init -100 python:
         # A new NPC instance is supplied by Ren'Py default on old saves.
         # Register it once; room visits must never recreate her state.
         people.register(PaulineStaticData, Pauline)
+
+    def updateSave_V99():
+        # Move the existing observation object, not its paid-unlock state.
+        # Never rebuild inventories or reset an already advanced quest.
+        initThreads()
+        guest_room = rooms.get("TavernEmptyRoom")
+        guest_room.game_items = [item for item in guest_room.game_items if get_object_id(item) != "tavern_empty_room_peephole"]
+        if guest_room.custom_properties.get("object_menu_label") == "TavernEmptyRoomObjectMenu":
+            guest_room.custom_properties.pop("object_menu_label")
+        bedroom = rooms.get("TavernMyRoom")
+        bedroom.game_items = [item for item in bedroom.game_items if get_object_id(item) not in ("myroom_guest_peephole", "tavern_empty_room_peephole")]
+        _room_add_item_by_id(bedroom, "tavern_empty_room_peephole")
+        if tavern.renovation_due_days.pop("player_peephole", None) is not None:
+            player.tavern_management.client_room_hole = max(1, int(player.tavern_management.client_room_hole or 0))
+        for code, project in TAVERN_RENOVATIONS.items():
+            thread = threads[project.thread_name]
+            if code in tavern.renovation_due_days and thread.num < 2 and not thread.aborted:
+                thread.enable()
+                thread.advanceTo(2)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.
