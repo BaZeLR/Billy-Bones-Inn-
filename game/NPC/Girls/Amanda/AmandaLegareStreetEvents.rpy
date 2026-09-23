@@ -1,5 +1,5 @@
 label story_amanda_tavern_seduction_0:
-    $ renpy.dynamic("_amanda_seduction_finish", "_amanda_seduction_profile")
+    $ renpy.dynamic("_amanda_seduction_finish", "_amanda_seduction_profile", "_amanda_seduction_bedroom")
     $ main_ui_begin_native_scene_state("Флирт Аманды")
     show screen main_ui
     call ShowImage("", "", AmandaStaticData.portrait)
@@ -19,43 +19,93 @@ label story_amanda_tavern_seduction_0:
             $ main_ui_end_native_scene_state()
             return True
         "Позвать наверх" if int(Amanda.rel or 0) >= 12 and int(Amanda.corruption or 0) >= 35 and not bool(Amanda.sex_stat("virginity", True)) and Amanda.date_intimacy_available() and player.intimacy.can_cum():
-            $ scene_runtime.text = "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+            $ _amanda_seduction_bedroom = procedural_random("amanda_tavern_seduction_bedroom") < 0.5
+            if _amanda_seduction_bedroom:
+                $ main_ui_runtime.action_title = "Аманда — наверху"
+                $ scene_runtime.text = "you decided to wait a liltle bit and when follows Amanda upstares to her room."
+                menu:
+                    "Далее":
+                        pass
 
-            $ main_ui_runtime.action_title = "Аманда у окна"
-            vscene "NPC/Girls/Amanda/flirts_new room.jpg"
-            $ scene_runtime.text = "Едва дверь закрылась, Аманда подвела вас к окну и чуть раздвинула занавеску. Во дворе снова разыгрывалось знакомое представление.\n\n" + attic_neighbor_sex_scene_text()
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+                vscene "images/amanda/Room/flirtUpstares/close up.jpg"
+                $ Amanda.wear_night_clothes(0)
+                $ scene_runtime.text = "Aamanda ,already in her neglege runs into you trembling with passion, and kisses you pationately ."
+                menu:
+                    "Далее":
+                        pass
 
-            $ scene_runtime.text = "Аманда смотрела не отрываясь. Потом она обернулась, задрала подол до пояса и, опершись ладонями о подоконник, вызывающе подалась к вам бедрами."
-            $ scene_runtime.location_text = scene_runtime.text
-            menu:
-                "Подойти к Аманде сзади":
-                    pass
+                vscene "images/amanda/Room/flirtUpstares/onbed.jpg"
+                $ scene_runtime.text = "then she stops and goes toward second bed, which is empty. smailes misteriously ."
+                menu:
+                    "Далее":
+                        pass
+
+                vscene "images/amanda/Room/flirtUpstares/Boobs.png"
+                $ Amanda.wear_night_clothes(2)
+                $ scene_runtime.text = "she slowly removes her last cloth giggling...and quickly hydes her lower body under blanket,,,"
+                menu:
+                    "Далее":
+                        pass
+
+                vscene "images/amanda/Room/flirtUpstares/onbedCloseUp.jpg"
+                $ scene_runtime.text = "like what you see, maister?"
+                menu:
+                    "Далее":
+                        pass
+
+                $ scene_runtime.text = "You came claose and stand near bed,..."
+                menu:
+                    "Далее":
+                        pass
+
+                vscene "images/amanda/Room/flirtUpstares/beforeSex.jpg"
+                $ scene_runtime.text = "Amanda removes her blanket ... make it quick how ever I want you to make me come,,,"
+                menu:
+                    "Далее":
+                        pass
+
+            else:
+                $ scene_runtime.text = "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
+
+                $ main_ui_runtime.action_title = "Аманда у окна"
+                vscene "images/amanda/Room/flirtUpstares/flirts_new room.jpg"
+                $ scene_runtime.text = "Едва дверь закрылась, Аманда подвела вас к окну и чуть раздвинула занавеску. Во дворе снова разыгрывалось знакомое представление.\n\n" + attic_neighbor_sex_scene_text()
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
+
+                $ scene_runtime.text = "Аманда смотрела не отрываясь. Потом она обернулась, задрала подол до пояса и, опершись ладонями о подоконник, вызывающе подалась к вам бедрами."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Подойти к Аманде сзади":
+                        pass
 
             call BeginPaidSexModule("amanda", "TavernAmandaRoom")
-            $ Amanda.set_layer_raised("bottom", 1)
-            $ Amanda.remove_clothing_layer("panties")
+            if not _amanda_seduction_bedroom:
+                $ Amanda.set_layer_raised("bottom", 1)
+                $ Amanda.remove_clothing_layer("panties")
             $ Amanda.set_cock_position("pussy")
             $ Amanda.set_var_int("knownotvirgin", 1)
             $ Amanda.set_var_int("fuckyou", 1)
             $ player.intimacy.set_arousal(100)
             $ Amanda.set_arousal(100)
-            $ scene_runtime.text = "Вы вошли в Аманду одним уверенным движением и быстро взяли жесткий ритм. Она не отводила взгляда от соседнего двора и двигалась вам навстречу, будто старалась попасть в такт доносившимся оттуда ударам и стонам."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+            if _amanda_seduction_bedroom:
+                $ scene_runtime.text = "you enter her hot and wet shell which trebling with desires... deep moan is coming out of Amanda oohhh  I am cummining come inside me ,master gimme all your sweet skunk feel me with love..."
+            else:
+                $ scene_runtime.text = "Вы вошли в Аманду одним уверенным движением и быстро взяли жесткий ритм. Она не отводила взгляда от соседнего двора и двигалась вам навстречу, будто старалась попасть в такт доносившимся оттуда ударам и стонам."
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
 
-            menu:
-                "Шлепнуть Аманду по ягодицам":
-                    $ scene_runtime.text = "Ваша ладонь звонко опустилась на ее ягодицу. Аманда вскрикнула, тут же прикусила край занавески, но уже через мгновение сама подставилась под следующий шлепок."
-                    $ scene_runtime.location_text = scene_runtime.text
-                    "[scene_runtime.text]"
+                menu:
+                    "Шлепнуть Аманду по ягодицам":
+                        $ scene_runtime.text = "Ваша ладонь звонко опустилась на ее ягодицу. Аманда вскрикнула, тут же прикусила край занавески, но уже через мгновение сама подставилась под следующий шлепок."
+                        $ scene_runtime.location_text = scene_runtime.text
+                        "[scene_runtime.text]"
 
-            $ scene_runtime.text = "Вы ускорились. Аманда больше не пыталась сдерживаться: ее громкие стоны смешались со стонами женщины за окном, и на несколько минут обе пары словно устроили негласное соревнование. Наконец Аманда задрожала всем телом и шумно кончила, продолжая прижиматься к вам."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+                $ scene_runtime.text = "Вы ускорились. Аманда больше не пыталась сдерживаться: ее громкие стоны смешались со стонами женщины за окном, и на несколько минут обе пары словно устроили негласное соревнование. Наконец Аманда задрожала всем телом и шумно кончила, продолжая прижиматься к вам."
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
             $ Amanda.record_orgasm_given()
             $ Amanda.set_arousal(20)
 
@@ -75,14 +125,20 @@ label story_amanda_tavern_seduction_0:
                     $ Amanda.player_cum("outside")
 
             $ _amanda_seduction_profile = build_girl_decision_profile("amanda")
-            if bool(_amanda_seduction_profile.get("likes_player", 0.0)):
+            if _amanda_seduction_bedroom or bool(_amanda_seduction_profile.get("likes_player", 0.0)):
                 vscene "images/amanda/sexroom/minet9.jpg"
                 $ scene_runtime.text = "Когда вы отступили, Аманда развернулась, опустилась перед вами на колени и с неожиданной заботой взяла ваш обмякший член в рот. Она медленно очистила его губами и языком, не оставив ни капли, а потом подняла на вас довольный взгляд."
                 $ scene_runtime.location_text = scene_runtime.text
-                "[scene_runtime.text]"
+                if _amanda_seduction_bedroom:
+                    $ scene_runtime.text += "\n\nslurp slurp..."
+                    menu:
+                        "Далее":
+                            pass
+                else:
+                    "[scene_runtime.text]"
                 $ Amanda.set_var_int("suckyou", 1)
             else:
-                vscene "NPC/Girls/Amanda/flirts_new room.jpg"
+                vscene "images/amanda/Room/flirtUpstares/flirts_new room.jpg"
                 $ scene_runtime.text = "Аманда торопливо привела себя в порядок и протянула вам кусок ткани, чтобы вытереться."
                 $ scene_runtime.location_text = scene_runtime.text
                 "[scene_runtime.text]"
@@ -90,6 +146,10 @@ label story_amanda_tavern_seduction_0:
             $ scene_runtime.text = "Вы оба быстро оделись и вернулись в зал по одному, стараясь не привлекать внимания посетителей."
             $ scene_runtime.location_text = scene_runtime.text
             "[scene_runtime.text]"
+            if _amanda_seduction_bedroom:
+                menu:
+                    "Завершить":
+                        pass
             $ Amanda.set_arousal(0)
             $ Amanda.set_sex_busy(False)
             call FinishPaidSexModule("amanda", "TavernAmandaRoom")

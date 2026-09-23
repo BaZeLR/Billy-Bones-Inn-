@@ -99,7 +99,7 @@ python early:
             return
         try:
             filename = renpy.python.py_eval(source)
-            if filename and not renpy.loadable(filename):
+            if filename and not renpy.loadable(filename) and not renpy.has_image(filename):
                 renpy.error("Unable to find %s" % filename)
         except Exception:
             return

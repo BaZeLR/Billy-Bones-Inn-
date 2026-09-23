@@ -802,7 +802,7 @@ def test_amanda_tavern_seduction_upstairs_stays_in_the_event_and_uses_owned_sex_
     assert "Amanda.date_intimacy_available()" in event
     assert "player.intimacy.can_cum()" in event
     assert "jump TavernAmandaRoom" not in event
-    assert 'vscene "NPC/Girls/Amanda/flirts_new room.jpg"' in event
+    assert 'vscene "images/amanda/Room/flirtUpstares/flirts_new room.jpg"' in event
     assert "attic_neighbor_sex_scene_text()" in event
     assert '"Шлепнуть Аманду по ягодицам"' in event
     assert "Amanda.record_orgasm_given()" in event
@@ -895,7 +895,7 @@ def test_amanda_talk_and_dress_are_direct_menus_while_room_actions_use_events():
         "class AmandaMorningWindowEpisodeEvent(AmandaEvent):",
         "class AmandaNightBowlWindowEvent(AmandaEvent):",
         '"story_amanda_room_grope_0"',
-        '"story_amanda_room_morning_window_0"',
+        '"story_amanda_room_morning_window_%d" % stage',
         '"story_amanda_night_bowl_window_0"',
     ):
         assert token in event_model

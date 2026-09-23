@@ -1631,7 +1631,10 @@ label TavernKitchenBreakfastMorningIssue:
             call HouseholdMorningIssueWarmDrink(_breakfast_issue_girl)
 
         "Разбудить [_breakfast_issue_name]" if _breakfast_issue_code == "sleepy":
-            call HouseholdWakeSleepyGirl(_breakfast_issue_girl)
+            if _breakfast_issue_girl == "amanda" and threads["amandaMorningWindowEpisode"].getAvailableEvents():
+                jump TavernAmandaRoom
+            else:
+                call HouseholdWakeSleepyGirl(_breakfast_issue_girl)
 
         "Оставить это до конца завтрака":
             return

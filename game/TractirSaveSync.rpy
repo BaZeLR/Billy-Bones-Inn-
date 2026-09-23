@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 101
+define currentVersion = 102
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -820,6 +820,9 @@ init -100 python:
         if loaded_version < 101:
             updateSave_V100()
             loaded_version = 101
+        if loaded_version < 102:
+            updateSave_V101()
+            loaded_version = 102
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3266,6 +3269,17 @@ init -100 python:
             if code is not None:
                 action.target = "DraupnirRenovationOrder"
                 action.args = (code,)
+
+    def updateSave_V101():
+        # Add the guest-room stove and connecting door without rebuilding
+        # inventories, furniture purchases, fire state or paid renovations.
+        guest_room = rooms.get("TavernEmptyRoom")
+        if not _room_has_item_by_id(guest_room, "guest_room_stove_001"):
+            _room_add_item_by_id(guest_room, "guest_room_stove_001")
+        for room_code, target in (("TavernEmptyRoom", "TavernGloryHole"), ("TavernGloryHole", "TavernEmptyRoom")):
+            room = rooms.get(room_code)
+            if not any(exit.target == target for exit in room.exits):
+                room.exits.append(next(exit for exit in roomDefinitions[room_code].exits if exit.target == target))
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

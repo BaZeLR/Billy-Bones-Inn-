@@ -30,6 +30,12 @@ init python:
             [get_object_id(item) for item in rooms.get("Shed").game_items],
             {key: info.mana for key, info in people.girl_items()},
         )
+        rooms.get("TavernEmptyRoom").game_items = ["soap_001"]
+        Sofa.installed = True
+        TavernGuestRoomStoveObject.state["chopped_wood_stock"] = 3
+        TavernGuestRoomStoveObject.state["fire_until_minute"] = _pc_calendar_total_minutes() + 600
+        TavernGuestRoomStoveObject.state["ash_dirty"] = 1
+        renpy.session["guest_stove_load_expected"] = dict(TavernGuestRoomStoveObject.state)
         tavern = TavernInfo.__new__(TavernInfo)
         tavern.renovation_due_days = {"shed": 34}
         player.tavern_management.slogan_state = 2
@@ -43,13 +49,17 @@ init python:
         expected = renpy.session.pop("renovation_load_expected", None)
         if expected is None:
             return
-        assert saveVersion == 101
+        assert saveVersion == currentVersion
         assert tavern.renovation_complete("peephole") and tavern.renovation_complete("sign")
         assert tavern.renovations["roof"].due_day == 32 and tavern.renovations["shed"].due_day == 34
         assert tavern.renovations["glory_hole"].status == "building"
         assert not hasattr(tavern, "renovation_due_days")
         assert not hasattr(player.tavern_management, "client_room_hole")
         assert expected == (player.economy.money, dict(player.inventory.items), [get_object_id(item) for item in rooms.get("Shed").game_items], {key: info.mana for key, info in people.girl_items()})
+        assert rooms.get("TavernEmptyRoom").game_items == ["soap_001", "guest_room_stove_001"]
+        assert TavernGuestRoomStoveObject.state == renpy.session.pop("guest_stove_load_expected")
+        assert get_game_object("guest_room_stove_001") is TavernGuestRoomStoveObject
+        assert Sofa.installed and people.location("sofa") == "TavernEmptyRoom"
         print("RENOVATION_FULL_LOAD_PASSED", flush=True)
         renpy.quit(0)
 
@@ -67,6 +77,8 @@ init python:
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None
         tavern.renovations = {key: TavernRenovation(key) for key in TAVERN_RENOVATIONS}
+        Sofa.installed = False
+        TavernGuestRoomStoveObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
         rooms.get("ShedWashroom").is_hidden = False
         player.set_money(5000)
         player.inventory.items["lumber_001"] = 5
@@ -398,6 +410,108 @@ testcase external_roof_keeps_melissa_story:
     pause 0.1
     assert eval (threads["melissaBatProblem"].num == 7 and not threads["melissaBatProblem"].completed)
     assert eval (story_event_available("talk_melissa", "melissa_breakfast_invite"))
+
+testcase external_guest_room_day_night_views:
+    parameter hour = [9, 21]
+    parameter installed = [False, True]
+    parameter fire_lit = [False, True]
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare("guest_room")
+    $ tavern.renovations["guest_room"].status = "completed"
+    $ threads["tavernRenovations"].seen(list(TAVERN_RENOVATIONS).index("guest_room"))
+    $ calendar_v2.hour = hour
+    $ Sofa.installed = installed
+    if eval (fire_lit):
+        $ _set_object_state_int(TavernGuestRoomStoveObject, "fire_until_minute", _pc_calendar_total_minutes() + 720)
+    run Jump("TavernEmptyRoom")
+    advance until eval (rooms.current_code == "TavernEmptyRoom" and main_ui_runtime.action_title == rooms.current.display_name) timeout 20.0
+    assert eval (scene_runtime.picture == "images/tavern/guest_room/%s_%s_%s.png" % ("sofa" if installed else "lounge", "day" if hour == 9 else "night", "lit" if fire_lit else "cold"))
+    assert eval (_media_asset_exists(scene_runtime.picture))
+    $ rooms.enter("TavernMyRoom")
+    run Call("TavernEmptyRoomPeekEmpty")
+    advance until screen "choice" timeout 20.0
+    assert eval (scene_runtime.picture == "guest_room_peek" and renpy.has_image("guest_room_peek"))
+    pause 0.1
+    $ renpy.screenshot(config.basedir + "/guest-peek-%s-%s-%s.png" % (hour, installed, fire_lit))
+    click id (external_renovation_button("Закрыть окошко")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+
+testcase external_sofa_own_portrait_and_talk:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare("guest_room")
+    $ Sofa.installed = True
+    $ rooms.enter("TavernEmptyRoom")
+    run Call("IntSofaTalk")
+    advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "talk")
+    assert eval (scene_runtime.picture == SofaStaticData.portrait == "images/tavern/guest_room/sofa_day_cold.png")
+    assert eval (people.location("sofa") == "TavernEmptyRoom")
+    assert eval (SofaStaticData.selectIcon() == SofaStaticData.portrait and _media_asset_exists(SofaStaticData.portrait))
+    click id (external_renovation_button("Закончить разговор")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+
+testcase external_guest_stove_fire_clean_and_back:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare("guest_room")
+    $ tavern.renovations["guest_room"].status = "completed"
+    $ threads["tavernRenovations"].seen(list(TAVERN_RENOVATIONS).index("guest_room"))
+    $ Sofa.installed = True
+    $ player.condition.fun = 100
+    $ player.condition.energy = 100
+    $ player.inventory.items["chopped_wood_001"] = 2
+    $ _hall_fire_before = dict(TavernMainFireplaceObject.state)
+    $ _kitchen_fire_before = dict(TavernKitchenHearthObject.state)
+    run Jump("TavernEmptyRoom")
+    advance until eval (rooms.current_code == "TavernEmptyRoom") timeout 20.0
+    click id ("choice_panel_button_%d" % [item.caption for item in main_ui_runtime.action_items].index("Каменная печь")) pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval (_guest_stove_fire_caption == "Разжечь огонь")
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    assert eval (_pc_fire_is_active(TavernGuestRoomStoveObject) and player.item_count("chopped_wood_001") == 1)
+    assert eval (scene_runtime.picture.endswith("sofa_day_lit.png"))
+    $ renpy.screenshot(config.basedir + "/guest-stove-lit.png")
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval ("Вычистить золу" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Вычистить золу")) pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    assert eval (_object_state_int(TavernGuestRoomStoveObject, "ash_dirty", 0) == 0)
+    assert eval (_hall_fire_before == dict(TavernMainFireplaceObject.state) and _kitchen_fire_before == dict(TavernKitchenHearthObject.state))
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval ("Назад" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Назад")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+    assert eval (rooms.current_code == "TavernEmptyRoom" and scene_runtime.picture.endswith("sofa_day_lit.png"))
+
+testcase external_guest_door_and_save_upgrade:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare("guest_room")
+    $ _guest = rooms.get("TavernEmptyRoom")
+    assert eval (not any(exit.target == "TavernGloryHole" for exit in _guest.visible_exits()))
+    $ tavern.renovations["glory_hole"].status = "completed"
+    assert eval (any(exit.target == "TavernGloryHole" for exit in _guest.visible_exits()))
+    assert eval (any(exit.target == "TavernEmptyRoom" for exit in rooms.get("TavernGloryHole").visible_exits()))
+    assert eval (any(exit.target == "TavernMain" for exit in rooms.get("TavernGloryHole").visible_exits()))
+    $ _guest.game_items = ["soap_001"]
+    $ TavernGuestRoomStoveObject.state["chopped_wood_stock"] = 3
+    $ Sofa.installed = True
+    $ updateSave_V101()
+    $ updateSave_V101()
+    assert eval (_guest.game_items == ["soap_001", "guest_room_stove_001"])
+    assert eval (Sofa.installed and TavernGuestRoomStoveObject.state["chopped_wood_stock"] == 3)
+    $ threads["tavernRenovations"].seen(list(TAVERN_RENOVATIONS).index("glory_hole"))
+    run Jump("TavernEmptyRoom")
+    advance until eval (rooms.current_code == "TavernEmptyRoom") timeout 20.0
+    click id ("choice_panel_button_%d" % [item.caption for item in main_ui_runtime.action_items].index("Пройти к глорихолу")) pos (0.5, 0.5)
+    advance until eval (rooms.current_code == "TavernGloryHole") timeout 20.0
+    assert eval (any(item.caption == "Вернуться в гостевую" for item in main_ui_runtime.action_items))
+    click id ("choice_panel_button_%d" % [item.caption for item in main_ui_runtime.action_items].index("Вернуться в гостевую")) pos (0.5, 0.5)
+    advance until eval (rooms.current_code == "TavernEmptyRoom") timeout 20.0
+    assert eval (scene_runtime.picture == tavern_empty_room_picture() and scene_runtime.text == tavern_empty_room_description())
 
 testcase external_renovation_old_save_full_load:
     enabled False

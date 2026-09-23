@@ -46,6 +46,7 @@ init 6 python:
             ),
         ],
         exits=[
+            RoomExit(label="Вернуться в гостевую", target="TavernEmptyRoom"),
             RoomExit(label="Вернуться в главный зал", target="TavernMain"),
         ],
         action_menus=[

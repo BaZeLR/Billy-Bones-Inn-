@@ -92,8 +92,33 @@ New day/night image pairs are under `game/images/tavern/backyard/shed/`:
 - `washroom.png`, `washroom_night.png` (separate wet room)
 
 Original images are retained. The combined first preview is not used in-game.
-The existing `backyard_renewal.png` and `images/amanda/Room/emptyroom.jpg`
-provide the renovated yard and furnished guest-room views.
+The existing `backyard_renewal.png` provides the renovated yard view.
+The guest lounge's current small-room image set is based on the existing
+`images/amanda/gloryfirst/glory room.png`. The sofa stands opposite the stone
+stove; a latched door beside it connects to the existing glory-hole cubicle.
+The originals, earlier daylight companions and oversized sofa draft remain
+on disk; no existing images were overwritten.
+
+`tavern_empty_room_picture` selects `images/tavern/guest_room/`
+`{sofa|lounge}_{day|night}_{lit|cold}.png` from actual sofa ownership, hour
+(06:00-17:59 daylight) and the guest stove's shared fire timer. Entry,
+inspection and the empty-room peephole use that same state. The peephole
+adds a transparent foreground frame from the player-room side; occupied
+events retain their scene pictures. Before renovation or sofa installation,
+the previous room backgrounds remain available.
+
+`SofaData` places the sofa in `TavernEmptyRoom`, with `sofa_day_cold.png` as
+its card portrait; conversation uses current room lighting. Purchase price
+and prerequisites are unchanged. The original gathering prerequisite still
+uses the Hall as the meeting point before inviting the participants upstairs.
+The sofa description and delivery text no longer place it in the Hall.
+
+The two room definitions own their connecting exits. The new entrance is
+available after glory-hole construction; the existing Hall entrance stays.
+`TavernGuestRoomStoveObject` owns its independent saved fuel/fire/ash state
+and native object menu, using the shared `MakeFire` and `Clean` procedures.
+It does not share the Hall or kitchen fire state. See
+[assets, exact prompts and verification](sofa_guest_room_art.md).
 
 ### Image prompt set (built-in image generation)
 
@@ -123,6 +148,8 @@ geometry with moonlight and soft off-frame candlelight. All images landscape
 Version 100 moved the existing observation object. Version 101 transfers old
 Player flags, Draupnir quotes, Melissa's roof deadline and Tavern's old date map
 into renovation objects, then removes those retired fields and threads.
+Version 102 adds the guest stove object to old room inventories and the new
+connecting exits only when absent, preserving existing room items and fire state.
 Existing inventories, resources, room identities, story progress and paid dates
 are not rebuilt. Previously paid overlapping jobs keep their deadlines; only
 new orders obey the single-builder limit. An old sign/glory-hole job lacking a
@@ -144,13 +171,18 @@ this is not a guarantee that arbitrary old mid-scene return addresses survive.
   completion and Draupnir's actual location, preserve roof-story continuation,
   bath navigation and both existing Hall/bedroom observation routes.
 - Melissa's kitchen event suite remains a separate regression check.
-- Final checks: 103 focused Python tests; 22 native renovation cases with
+- Original renovation baseline checks: 103 focused Python tests; 22 native renovation cases with
   165 assertions; 22 native Melissa kitchen cases with 125 assertions.
   A separate native save/load run uses an actual Ren'Py statement checkpoint
   and verifies version-100 state conversion, resources and motivation via
   seven post-load assertions. It exits after the verification marker, rather
   than depending on the test runner resuming across a loaded call stack.
   Ren'Py 8.5.2 compile/lint pass (only generated test-code reachability notes).
+- Guest-room follow-up: 199 focused Python checks, 33 native cases / 207
+  assertions, and a separate successful full save/load check covering the
+  stove registry identity, saved fire/fuel/ash, sofa placement and old room
+  item migration. Ren'Py 8.5.2 compile/lint passed; the only lint notes are
+  unreachable generated test statements. See the asset document for logs.
 - Source-based tests that demand saveVersion 92 or an obsolete unrelated
   girl-decision expression already fail on the pre-change baseline; they
   are not treated as gameplay failures or repaired in this change.

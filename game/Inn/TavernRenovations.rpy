@@ -269,7 +269,7 @@ label story_tavern_renovation_complete:
         vscene "images/tavern/backyard/backyard_renewal.png"
         "Двор приведён в порядок: дорожки осушены, забор и нужник починены. Воду и хозяйственные припасы теперь можно носить без прежних неудобств."
     elif _renovation.code == "guest_room":
-        vscene "images/amanda/Room/emptyroom.jpg"
+        vscene tavern_empty_room_picture()
         "Вместо пустой комнаты вас встречает уютная гостиная: добротная кровать, шкаф, стол и занавеси. Теперь здесь можно спокойно принять гостей."
     else:
         $ _renovation_picture = rooms.current.bg_picture

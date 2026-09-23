@@ -51,9 +51,15 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "GloryHoleTry", None, [
         AmandaGloryHoleTry,
     ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "MorningWindowEpisode", None, [
+    LThreadData(0, "amanda", "MorningWindowEpisode", "#Amanda.attic_busted()", [
         AmandaMorningWindowEpisode,
-    ], highlight=False, threaded=False),
+        AmandaMorningWindowSecret,
+        AmandaMorningWindowTease,
+        AmandaMorningWindowTogether,
+    ], highlight=True, threaded=True),
+    LThreadData(0, "amanda", "MorningWood", "#False", [
+        AmandaMorningWood,
+    ], highlight=True, threaded=True),
     LThreadData(0, "amanda", "KitchenWindowFavor", None, [
         AmandaKitchenWindowFavor,
     ], highlight=False, threaded=False),
@@ -1042,7 +1048,7 @@ define claraThreadList = [
     # clara_forest_sofa
     #
     # The thread owns only ordered story availability. The clue and shovel are
-    # inventory items, the installed sofa belongs to TavernMain, and the final
+    # inventory items, the installed sofa belongs to TavernEmptyRoom, and the final
     # capacity reward belongs to PlayerIntimacy.
     LThreadData(1, "clara", "ForestSofa", [
         "#int(threads['claraBookletMarket'].num or 0) >= 3",

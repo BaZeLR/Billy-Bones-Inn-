@@ -12,7 +12,7 @@ def test_empty_room_has_direct_actions_without_build_loop():
     assert "while _empty_room_ui_return" not in source
     assert 'Call("UpstairsRoomSearch", "TavernEmptyRoom")' in source
     assert 'Call("TavernEmptyRoomObjectMenu"' not in source
-    assert "game_items=[]" in source
+    assert 'game_items=["guest_room_stove_001"]' in source
     assert "rooms.get(\"TavernEmptyRoom\").visible_exits()" in source
 
 

@@ -9,9 +9,10 @@ init python:
                 fullname="Старинный диван",
                 genitive="старинного дивана",
                 dative="старинному дивану",
+                portrait="images/tavern/guest_room/sofa_day_cold.png",
                 default_location="",
                 description="Неожиданно роскошный для вашего трактира диван. Резные ножки похожи на звериные лапы, а из глубины обивки временами доносится недовольное ворчание.",
-                schedule_entries=[NPCScheduleEntry(location="TavernMain")],
+                schedule_entries=[NPCScheduleEntry(location="TavernEmptyRoom")],
             )
 
         def schedule_resolve(self, weekday_value=None, time_value=None):
@@ -45,7 +46,7 @@ label register_sofa_secondary:
 
 label IntSofaTalk:
     $ main_ui_begin_talk_state("Говорящий диван", "sofa")
-    vscene resolve_room_background_media(rooms.get("TavernMain"))
+    vscene tavern_empty_room_picture()
     $ scene_runtime.text = SofaStaticData.description
     while True:
         menu:
@@ -87,7 +88,7 @@ label CursedSofaRitualRequirements:
     elif not Clara.sex_stat("virginity", True) or not Melissa.sex_stat("virginity", True):
         $ scene_runtime.text = "Диван долго сопит обивкой и признает, что условие проклятия уже нельзя выполнить этой парой: обе девушки должны сохранить невинность до ритуала."
     elif str(people.location("clara") or "") != "TavernMain" or str(people.location("melissa") or "") != "TavernMain":
-        $ scene_runtime.text = "Диван требует привести Клариссу и Мелиссу вместе в главную залу. Одной девушки или разговоров о них ему недостаточно."
+        $ scene_runtime.text = "Диван просит дождаться, пока Кларисса и Мелисса соберутся в главной зале, чтобы пригласить обеих в гостевую. Одной девушки или разговоров о них ему недостаточно."
     else:
         $ scene_runtime.text = "Все условия выполнены. Похоже, стоит снова заговорить с диваном."
     $ scene_runtime.location_text = scene_runtime.text

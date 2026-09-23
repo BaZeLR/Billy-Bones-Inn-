@@ -117,24 +117,45 @@ init -24 python:
 
 
     class AmandaMorningWindowEpisodeEvent(AmandaEvent):
-        def __init__(self):
+        def __init__(self, stage=0):
             super(AmandaMorningWindowEpisodeEvent, self).__init__(
-                "morning_window_episode",
-                "story_amanda_room_morning_window_0",
+                "morning_window_episode_%d" % stage,
+                "story_amanda_room_morning_window_%d" % stage,
                 None,
-                (6, 7),
+                (6, 11),
                 1,
                 "TavernAmandaRoom",
                 "enter",
                 25,
-                source_refs=["TavernAmandaRoom.rpy"],
+                source_refs=["AmandaMorningWindowEvents.rpy"],
+                event_day=None if stage == 0 else 1,
             )
 
         def checkAmandaConditions(self):
             return (
                 Amanda.attic_busted()
-                and str(household_morning_issue_type("amanda") or "") == "sleepy"
+                and str(people.location("amanda") or "") == "TavernAmandaRoom"
+                and household_morning_issue_type("amanda") != "sick"
+                and not Amanda.room_entry_blocked_today
+                and not player.tavern_management.breakfast.today
+                and not (
+                    player.tavern_management.breakfast.event_active
+                    and "amanda" in (player.tavern_management.breakfast.present_ids or [])
+                )
             )
+
+
+    class AmandaMorningWoodEvent(AmandaEvent):
+        def __init__(self):
+            super(AmandaMorningWoodEvent, self).__init__(
+                "morning_wood", "story_amanda_morning_wood_0",
+                None, (6, 7), 1, "TavernMyRoom", "morning", 25,
+                source_refs=["AmandaMorningWindowEvents.rpy"],
+                event_day=1,
+            )
+
+        def checkAmandaConditions(self):
+            return household_morning_issue_type("amanda") != "sick"
 
 
     class AmandaNightBowlWindowEvent(AmandaEvent):
@@ -294,6 +315,10 @@ init -24 python:
     AmandaRoomNightApproach = AmandaRoomNightApproachEvent()
     AmandaGloryHoleTry = AmandaGloryHoleTryEvent()
     AmandaMorningWindowEpisode = AmandaMorningWindowEpisodeEvent()
+    AmandaMorningWindowSecret = AmandaMorningWindowEpisodeEvent(1)
+    AmandaMorningWindowTease = AmandaMorningWindowEpisodeEvent(2)
+    AmandaMorningWindowTogether = AmandaMorningWindowEpisodeEvent(3)
+    AmandaMorningWood = AmandaMorningWoodEvent()
     AmandaNightBowlWindow = AmandaNightBowlWindowEvent()
     AmandaKitchenWindowFavor = AmandaKitchenWindowFavorEvent()
     AmandaBirth = AmandaBirthEvent()

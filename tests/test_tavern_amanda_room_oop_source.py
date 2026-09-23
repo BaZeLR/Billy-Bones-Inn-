@@ -4,6 +4,7 @@ from pathlib import Path
 SOURCE = (Path(__file__).resolve().parents[1] / "game/Inn/TavernAmandaRoom.rpy").read_text(encoding="utf-8-sig")
 SEX_FLOW_SOURCE = (Path(__file__).resolve().parents[1] / "game/NPC/Girls/Amanda/AmandaAtHomeCode.rpy").read_text(encoding="utf-8-sig")
 HOUSEHOLD_SOURCE = (Path(__file__).resolve().parents[1] / "game/Inn/HouseholdRuntimeEvents.rpy").read_text(encoding="utf-8-sig")
+MORNING_SOURCE = (Path(__file__).resolve().parents[1] / "game/NPC/Girls/Amanda/AmandaMorningWindowEvents.rpy").read_text(encoding="utf-8-sig")
 ROOM_ASSETS = Path(__file__).resolve().parents[1] / "game/images/amanda/Room"
 
 
@@ -46,10 +47,10 @@ def test_amanda_room_picture_catalog_uses_corruption_and_owned_arousal_state():
         "amanda_sleeps_9.png",
         "amanda_sleeps_10.png",
         "amanda_sleeps_11.png",
-        "amanda_bedroom_001.jpeg",
-        "amanda_bedroom_002.jpeg",
-        "amanda_bedroom_003.jpeg",
-        "amanda_bedroom_004.jpeg",
+        "Masturbation/amanda_bedroom_001.jpeg",
+        "Masturbation/amanda_bedroom_002.jpeg",
+        "Masturbation/amanda_bedroom_003.jpeg",
+        "Masturbation/amanda_bedroom_004.jpeg",
         "amanda_bedroom_005.jpeg",
         "wakedress.jpg",
         "wakenaked.jpg",
@@ -96,20 +97,20 @@ def test_amanda_room_preserves_events_issues_search_objects_and_exits():
     assert "TavernAmandaRoomGropeAction" not in SOURCE
 
 
-def test_called_morning_episode_returns_without_overriding_schedule_location():
-    block = SOURCE.split("label story_amanda_room_morning_window_0:", 1)[1].split("label story_amanda_room_grope_0:", 1)[0]
-
-    assert "jump TavernAmandaRoom" not in block
+def test_morning_episode_uses_owned_scene_and_returns_to_requested_kitchen():
+    block = MORNING_SOURCE.split("label story_amanda_room_morning_window_0:", 1)[1].split("label story_amanda_room_morning_window_1:", 1)[0]
     assert 'Amanda.location = "TavernAmandaRoom"' not in block
     assert "tavern_amanda_morning_window_episode_ready" not in SOURCE
     assert "attic_window_morning_day" not in SOURCE
-    assert 'main_ui_begin_native_scene_state("Аманда у окна")' in block
-    assert "vscene _amanda_room_picture" in block
+    assert 'main_ui_begin_native_scene_state("Аманда у окна")' in MORNING_SOURCE
+    assert "vscene picture" in MORNING_SOURCE
     assert block.count("menu:") == 2
     assert '"Продолжить":' in block
-    assert '"Оставить Аманду собираться":' in block
+    assert '"Вернуться на кухню":' in block
     assert "main_ui_end_native_scene_state()" in block
-    assert "main_ui_runtime.action_items = tavern_amanda_room_action_items()" in block
+    assert "jump TavernKitchen" in block
+    assert "event_runtime.active_thread.advance()" in block
+    assert "attic_window_favor_stage" not in MORNING_SOURCE
 
 
 def test_knock_uses_authoritative_schedule_presence_before_any_response_roll():
