@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 98
+define currentVersion = 99
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -809,6 +809,9 @@ init -100 python:
         if loaded_version < 98:
             updateSave_V97()
             loaded_version = 98
+        if loaded_version < 99:
+            updateSave_V98()
+            loaded_version = 99
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3167,6 +3170,11 @@ init -100 python:
                 # The daily producer never schedules birth at 240 days or less.
                 if birth_info is not None and birth_info.pregnancy_days() <= 240:
                     daily_events.rows.remove(row)
+
+    def updateSave_V98():
+        # A new NPC instance is supplied by Ren'Py default on old saves.
+        # Register it once; room visits must never recreate her state.
+        people.register(PaulineStaticData, Pauline)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

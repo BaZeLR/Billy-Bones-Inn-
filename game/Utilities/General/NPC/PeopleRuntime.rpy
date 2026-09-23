@@ -1939,6 +1939,7 @@ label InitGameNPCs:
     call InitBecky
     call InitIrma
     call InitClara
+    call InitPauline
     call InitGeorgett
     call InitLiza
     call InitInga

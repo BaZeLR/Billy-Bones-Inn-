@@ -14,6 +14,8 @@ init python:
         return 6 * 60 <= current_minutes <= 17 * 60
 
     def wine_store_seller_id():
+        if str(people.location("pauline") or "") == "WineStore" and bool(people.can_talk("pauline")):
+            return "pauline"
         if str(people.location("alber") or "") == "WineStore" and bool(people.can_talk("alber")):
             return "alber"
         if str(people.location("clara") or "") == "WineStore" and bool(people.can_talk("clara")):
@@ -22,6 +24,8 @@ init python:
 
     def wine_store_seller_name():
         seller_id = wine_store_seller_id()
+        if seller_id == "pauline":
+            return people_display_name(seller_id)
         if seller_id == "clara":
             return "Кларисса"
         if seller_id == "alber":
@@ -30,6 +34,8 @@ init python:
 
     def wine_store_scene_picture():
         seller_id = wine_store_seller_id()
+        if seller_id == "pauline":
+            return PaulineStaticData.portrait
         if seller_id == "clara":
             picture = Clara.wine_store_talk_picture()
         elif seller_id == "alber":
@@ -43,7 +49,9 @@ init python:
     def wine_store_entry_text():
         base_text = rooms.get("WineStore").descriptions[0].text
         seller_id = wine_store_seller_id()
-        if seller_id == "clara":
+        if seller_id == "pauline":
+            base_text += "\n\nКларисса теперь живёт в вашем трактире. За прилавком вместо неё Полина, воспитанница пансиона Элоизы. Она проверяет записи о товаре и готова обслужить покупателя."
+        elif seller_id == "clara":
             base_text += "\n\nСейчас утро, и за прилавком стоит Кларисса, старшая дочь мессира Легаре. Это привлекательная блондинка чуть младше вас."
             if current_game_day() > 40 and current_game_day() <= 90:
                 base_text += "\n\nВы знаете, что Мелисса с ней недавно подружилась."

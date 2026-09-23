@@ -39,14 +39,6 @@ label IntSandraTalk(girl_name="sandra"):
             $ main_ui_end_talk_state()
             call HouseholdSexEngine(girl_name, rooms.current_code, "sex")
             return
-        "Попросить Сандру помочь рукой" if Sandra.relationship_allows("intimacy") and str(rooms.current_code or "") == "TavernSandraRoom" and player.intimacy.can_cum():
-            $ main_ui_end_talk_state()
-            call HouseholdSexEngine(girl_name, rooms.current_code, "handjob")
-            return
-        "Попросить Сандру сделать минет" if Sandra.relationship_allows("intimacy") and str(rooms.current_code or "") == "TavernSandraRoom" and player.intimacy.can_cum():
-            $ main_ui_end_talk_state()
-            call HouseholdSexEngine(girl_name, rooms.current_code, "blowjob")
-            return
         "Назад":
             $ main_ui_end_talk_state()
             return

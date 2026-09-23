@@ -151,9 +151,6 @@ init 6 python:
         items.extend(story_event_action_items("TavernSandraRoom"))
         if Sandra.relationship_allows("intimacy") and str(people.location("sandra") or "") == "TavernSandraRoom":
             items.append(MenuItem("Заняться сексом с Сандрой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "sex")))
-            if player.intimacy.can_cum():
-                items.append(MenuItem("Попросить Сандру помочь рукой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "handjob")))
-                items.append(MenuItem("Попросить Сандру сделать минет", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "blowjob")))
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernSandraRoom")))

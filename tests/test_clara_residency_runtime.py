@@ -71,6 +71,21 @@ def test_residency_rule_reads_the_same_owner_for_both_polarities(runtime):
     assert rule(positive) and not rule(negative)
 
 
+@pytest.mark.parametrize("route", ["paintings", "accusation"])
+def test_resident_stays_on_job_roster_without_an_assignment(runtime, route):
+    assert not runtime.clara.is_tavern_worker()
+    if route == "paintings":
+        runtime.paintings.num = 14
+    else:
+        runtime.case.completed = True
+    assert runtime.clara.is_tavern_worker()
+    for job in ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow"):
+        assert runtime.clara.tavern_job_available(job)
+    runtime.clara.jobs.clear()
+    assert runtime.clara.is_tavern_worker()
+    assert runtime.clara.name in runtime.household.resident_ids()
+
+
 def test_merchant_visit_is_preserved_for_nonresident_and_released_resident(runtime):
     _set_day(runtime.calendar, runtime.merchant.monthly_visit_days()[0])
     runtime.calendar.hour = 12

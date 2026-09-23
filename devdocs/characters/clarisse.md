@@ -155,12 +155,14 @@ These are **not completed** by the arrest/shared-escape patch:
    wine cellar and flees. **Sale price awaits user value**; no current wine-shop
    property ownership API or implemented sale was found. Keep this consequence
    separate from merely feeding Clara and from the later fiance investigation.
-3. Pauline becomes the wine-shop NPC when Clara settles in the tavern through
-   either story route. Pauline currently exists only in lore, not as a registered
-   NPC. Create her definition/runtime once through PeopleRegistry; subsequent
-   shop assignments must preserve her relationships, wardrobe and story stages.
-   Her presence/seller menu must follow the shop's actual opening hours. After
-   Legare leaves, she runs it without his normal seller/talk presence.
+3. Implemented 2026-09-23: Pauline is registered once through PeopleRegistry
+   and replaces Clara at the wine shop when Clara becomes a tavern resident
+   through either route. Her schedule follows the shop's actual opening hours;
+   known state, wardrobe and relationships survive registration/load. Clara's
+   residency also keeps her on the worker roster when no job is assigned.
+   Pauline's dedicated portrait remains pending (`#000` placeholder); no
+   unrelated image is substituted. Legare leaving is still part of item 2,
+   not inferred merely from Clara moving into the tavern.
 4. Preserve the returner's lack of money and disclosed injury. Integrate the
    previously approved care/ointment continuation without falsely completing
    her fiance, confession or education milestones. The current arrival mentions

@@ -464,10 +464,9 @@ def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
     assert "call PlayerCardGiftToFixedTargetMenu" in talk_source
     assert '"Заняться сексом с Сандрой"' in talk_source
     assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "sex")' in talk_source
-    assert '"Попросить Сандру помочь рукой"' in talk_source
-    assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "handjob")' in talk_source
-    assert '"Попросить Сандру сделать минет"' in talk_source
-    assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "blowjob")' in talk_source
+    assert talk_source.count("call HouseholdSexEngine(") == 1
+    assert '"Попросить Сандру помочь рукой"' not in talk_source
+    assert '"Попросить Сандру сделать минет"' not in talk_source
     assert "call OldPointKinoAttempt" not in talk_source
     assert "call OldPointApology" not in talk_source
     assert 'if not getPersonInfo(girl_name).social_action_allowed("talk"):' not in talk_source

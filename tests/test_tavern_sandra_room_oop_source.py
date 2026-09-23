@@ -24,11 +24,16 @@ def test_sandra_room_preserves_reputation_events_search_objects_and_exits():
         'Call("TavernSandraLedgerScene")',
         'story_event_action_items("TavernSandraRoom")',
         'Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "sex")',
-        'Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "handjob")',
-        'Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "blowjob")',
         'Call("UpstairsRoomSearch", "TavernSandraRoom")',
         "rooms.get(\"TavernSandraRoom\").visible_game_items()",
         "rooms.get(\"TavernSandraRoom\").visible_exits()",
     ):
         assert token in ROOM
     assert EVENTS.count("tavern_sandra_room_action_items()") == 2
+
+
+def test_sandra_room_has_one_intimacy_entry_not_shortcuts_to_same_menu():
+    actions = ROOM.split("def tavern_sandra_room_action_items():", 1)[1].split("TavernSandraRoomRoomDefinition =", 1)[0]
+    assert actions.count('Call("HouseholdSexEngine",') == 1
+    assert '"Попросить Сандру помочь рукой"' not in actions
+    assert '"Попросить Сандру сделать минет"' not in actions

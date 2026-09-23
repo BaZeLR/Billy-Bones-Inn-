@@ -204,6 +204,9 @@ init python:
                 return False
             return bool(thread_info.completed) or int(thread_info.num or 0) >= 14
 
+        def is_tavern_worker(self):
+            return self.tavern_resident()
+
         def relationship_allows(self, action_code="talk"):
             action_key = str(action_code or "talk").strip().lower()
             if action_key == "talk":
