@@ -1348,26 +1348,16 @@ define claraThreadList = [
             3,
         ),
     ], highlight=False, threaded=True),
-    # The two lessons are their own ordered story: first cards in the Wine
-    # Store cellar, then noble service at the tavern. Existing tavern values
-    # receive the results; no parallel education flag is introduced.
+    # One education thread: the currently authored steps are cards and manners.
+    # Later fashion/beauty, sex education, art and intrigue lessons extend this
+    # same sequence (with explicit saved-progress migration), not parallel flags.
     LThreadData(0, "clara", "TavernEducation", [
         "#bool(threads['claraPaintingsPath'].completed)",
         "#bool(threads['claraTavernVisit'].completed)",
         "#tavern.renovation_complete('peephole')",
         "#tavern.renovation_complete('glory_hole')",
     ], [
-        (
-            "story_clara_tavern_education_cards_0",
-            [1, 2, 3, 4, 5, 6], (6, 17), None,
-            1,
-            None,
-            ["#not Clara.mongol_case_detained()"],
-            None,
-            "WineStore",
-            "clara_education_cards",
-            0,
-        ),
+        [claraEducationWhispersEvent, claraEducationAbsenceEvent, claraEducationCardsEvent],
         (
             "story_clara_tavern_education_manners_1",
             [1, 2, 3, 4, 5, 6], (12, 17), 1,

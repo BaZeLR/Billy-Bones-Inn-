@@ -88,29 +88,6 @@ label story_clara_legare_revenge_fight_2:
     return True
 
 
-label story_clara_tavern_education_cards_0:
-    $ main_ui_begin_native_scene_state("Урок карт Клариссы")
-    show screen main_ui
-    vscene "images/clara/wineSellar_clara_talk_6.png"
-    $ scene_runtime.text = "Кларисса собирает женщин трактира в дальнем подвале винной лавки, где никто не мешает занятию. На стол ложатся колода, несколько монет и пустые кружки. Она объясняет не только правила игры, но и то, как по ставкам, паузам и взглядам понять характер гостя."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить урок":
-            pass
-
-    $ scene_runtime.text = "Сандра быстро замечает попытки жульничать, Лизетта без труда отвлекает соперниц разговором, а Аманда с Мелиссой несколько раз выдают свои карты лицом. К концу занятия каждая уже умеет поддержать игру за столом и вовремя остановить спор, прежде чем он испортит вечер в трактире."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Закончить занятие":
-            pass
-
-    $ Clara.change_social(friend_delta=1)
-    $ event_runtime.active_thread.advance()
-    $ event_runtime.evaluation_time = None
-    $ main_ui_end_native_scene_state()
-    return True
-
-
 label story_clara_tavern_education_manners_1:
     $ main_ui_begin_native_scene_state("Урок хороших манер")
     show screen main_ui

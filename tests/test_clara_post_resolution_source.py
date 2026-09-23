@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy"
 VISITS = ROOT / "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy"
 POST = ROOT / "game/NPC/Girls/Clara/ClaraPostResolutionThreads.rpy"
+CARDS = ROOT / "game/NPC/Girls/Clara/ClaraEducationCards.rpy"
 WINE_STORE = ROOT / "game/Town/WineStore.rpy"
 
 
@@ -91,7 +92,7 @@ def test_revenge_is_an_ordered_three_event_story_and_fight_retries():
     assert "legare_departure_code" not in fight
 
 
-def test_education_waits_for_existing_innovations_and_uses_room_actions():
+def test_education_keeps_gates_and_uses_market_discovery():
     runtime = source(RUNTIME)
     post = source(POST)
     wine = source(WINE_STORE)
@@ -102,21 +103,21 @@ def test_education_waits_for_existing_innovations_and_uses_room_actions():
     for condition in (
         "threads['claraPaintingsPath'].completed",
         "threads['claraTavernVisit'].completed",
-        "player.tavern_management.client_room_hole",
-        "player.tavern_management.glory_hole",
+        "tavern.renovation_complete('peephole')",
+        "tavern.renovation_complete('glory_hole')",
     ):
         assert condition in thread
-    assert thread.index("story_clara_tavern_education_cards_0") < thread.index(
+    assert thread.index("claraEducationCardsEvent") < thread.index(
         "story_clara_tavern_education_manners_1"
     )
-    assert '"WineStore"' in thread
-    assert '"clara_education_cards"' in thread
+    card_source = source(CARDS)
+    assert 'range(1, 7, 5), (20, 23)' in card_source
+    assert 'None, "MarketPlace", "enter", 0, True' in card_source
     assert '"TavernMain"' in thread
     assert '"bar_001"' in thread
-    assert 'story_event_available("WineStore", "clara_education_cards")' in wine
-    assert 'Call("checkTriggers", "WineStore", "clara_education_cards", 0)' in wine
+    assert '"clara_education_cards"' not in wine
 
-    cards = label_block(post, "story_clara_tavern_education_cards_0")
+    cards = label_block(card_source, "story_clara_tavern_education_cards_0")
     manners = label_block(post, "story_clara_tavern_education_manners_1")
     for block in (cards, manners):
         assert "main_ui_begin_native_scene_state(" in block
@@ -127,6 +128,38 @@ def test_education_waits_for_existing_innovations_and_uses_room_actions():
     assert 'skills["waitress"]' in manners
     assert "player.tavern_management.visitors" in manners
     assert "player.change_tavern_fame(3)" in manners
+
+
+def test_card_images_and_native_choices_follow_numeric_order():
+    cards = label_block(source(CARDS), "story_clara_tavern_education_cards_0")
+    pictures = ['vscene "images/clara/education/cardplay%d.jpg"' % n for n in range(9)]
+    assert [cards.index(picture) for picture in pictures] == sorted(cards.index(picture) for picture in pictures)
+    assert cards.index('"Пойти проверить"') < cards.index('"Обойти лавку"') < cards.index('"Заглянуть в окно"') < cards.index(pictures[0])
+    assert cards.count('"Уйти":') == 8
+    assert cards.count("active_thread.advance()") == 1
+    assert cards.index('"Закончить наблюдение и вернуться на рынок"') < cards.index("active_thread.advance()")
+    assert "change_social" not in cards
+    assert "jump MarketPlace" not in cards
+    for forbidden in ("QueuePagedPanelText", "main_ui_set_action_panel", "main_ui_runtime.action_items", "while True"):
+        assert forbidden not in cards
+
+
+def test_hints_and_schedules_do_not_own_another_progress_state():
+    content = source(CARDS)
+    for name in ("story_clara_education_whispers", "story_clara_education_absence"):
+        hint = label_block(content, name)
+        assert "advance()" not in hint
+        assert "set_var" not in hint
+    assert "start_hour=_education_event.hour[0]" in content
+    assert "weekdays=list(_education_event.day)" in content
+    assert 'location=_education_location' in content
+    assert '"WineStoreBasement"' in content
+    assert "default " not in content
+
+
+def test_card_assets_exist():
+    for name in ["basement_window_night.png"] + ["cardplay%d.jpg" % n for n in range(9)]:
+        assert (ROOT / "game/images/clara/education" / name).is_file()
 
 
 def test_post_resolution_images_exist():

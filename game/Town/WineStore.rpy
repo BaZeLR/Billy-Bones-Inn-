@@ -95,8 +95,6 @@ init python:
             items.append(MenuItem(room_object.name, Call("WineStoreObjectMenu", room_object.object_id)))
         if story_event_available("WineStore", "clara_paintings"):
             items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
-        if story_event_available("WineStore", "clara_education_cards"):
-            items.append(MenuItem("Начать урок карт с Клариссой", Call("checkTriggers", "WineStore", "clara_education_cards", 0)))
         items.extend(rooms.get("WineStore").build_exit_items())
         return items
 
@@ -118,6 +116,18 @@ init python:
             ObjectAction(action_id="find_clara_pantaloons", label="Осмотреть пол между бочками", hook="call", target="WineStoreFindClaraPantaloons", condition=wine_store_clara_pantaloons_available),
             ObjectAction(action_id="examine_cellar", label="Осмотреть подвал", hook="text", target="Подвал забит винными запасами еще плотнее, чем сама лавка."),
         ],
+    )
+
+    # A room inside the shop, not a second store. The observer stays outside;
+    # no public entrance to this private gathering is added to room navigation.
+    WineStoreBasementRoomDefinition = Room(
+        code_name="WineStoreBasement",
+        display_name="Подвал винной лавки",
+        group_name=ROOM_GROUP_CITY,
+        is_hidden=True,
+        bg_picture="images/clara/education/cardplay0.jpg",
+        descriptions=[RoomDescription(text="В дальнем подвале винной лавки между бочками стоит стол. Под потолком виднеется маленькое окно, выходящее в переулок позади лавки.")],
+        exits=[RoomExit(label="Подняться в лавку", target="WineStore", minutes_to_pass=5)],
     )
 
     WineStoreRoomDefinition = Room(

@@ -225,8 +225,8 @@ def test_education_updates_domain_owners_without_replacing_melissa_sex_rules():
     melissa = read(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "InitMelissa.rpy")
 
     assert '"clara", "TavernEducation"' in runtime
-    assert "#int(player.tavern_management.client_room_hole or 0) > 0" in runtime
-    assert "#int(player.tavern_management.glory_hole or 0) == 2" in runtime
+    assert "#tavern.renovation_complete('peephole')" in runtime
+    assert "#tavern.renovation_complete('glory_hole')" in runtime
     assert '_clara_student.skills["waitress"]' in labels
     assert "player.tavern_management.visitors" in labels
     assert "clara_anal_training" not in runtime

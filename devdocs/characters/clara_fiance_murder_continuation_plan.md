@@ -656,24 +656,71 @@ mechanics where applicable.
 
 ### `claraTavernEducation`
 
-Linear teaching thread with at least two authored phases:
+One ordered education thread, not a card-only thread and not one thread per
+subject. Each lesson is an Event with its own location, prerequisites, timing,
+scene label and completion point. The aim is the tavern team's progression
+from wenches to ladies.
 
-1. Clarissa teaches the tavern girls to play cards in the Wine Store basement.
-2. Clarissa teaches noble manners at the tavern.
+| Order | Lesson | Location | Implementation scope |
+| --- | --- | --- | --- |
+| 0 | Playing cards | Wine Store basement, observed from outside | New discovery sequence below |
+| 1 | Manners and noble service | Tavern Hall | Existing event retained unchanged |
+| 2 | Fashion and beauty | To be authored | Planned; no placeholder completion |
+| 3 | Sex education | To be authored | Planned; no placeholder completion |
+| 4 | Art | To be authored | Future lesson |
+| 5 | Intrigue | To be authored | Future lesson |
 
-The card lesson is a scheduled multi-NPC event, not a permanent schedule
-rewrite. Its exact appointment must be selected from the intersection of every
-participant's hourly schedule; if held after the Wine Store's normal hours, the
-event temporarily owns access and visuals for that scene only.
+#### Card lesson: implemented discovery route (2026-09-23)
 
-The manners lessons increase one tavern-owned integer progression value (for
-example `player.tavern_management.noble_patronage_level`). Client generation
-reads that one value to add more noble guests. Do not maintain a second
-`Clara.nobles_unlocked` flag.
+- Participants: Clarissa, Melissa and Amanda. MC only observes from outside.
+- Existing unlock gates are retained: `claraPaintingsPath` and
+  `claraTavernVisit` completed, peephole and glory-hole renovations completed.
+- Monday/Saturday 19:00–19:59: optional Tavern Hall entry event shows the three
+  whispering and giggling. This clue does not advance the lesson.
+- Monday/Saturday **20:00–23:59**: they are scheduled in `WineStoreBasement`.
+  Entering Tavern Hall gives an optional absence clue, once that evening.
+- Market entry during that window starts the discovery: empty market →
+  **Пойти проверить** → closed shop → **Обойти лавку** → illuminated low
+  basement window → **Заглянуть в окно** → `cardplay0.jpg` through `cardplay8.jpg`.
+- Each picture has one paragraph and native Continue/Leave choices. New text
+  is non-graphic card-table banter. Existing supplied pictures are unchanged.
+- The lesson advances only after the last explicit finish choice. Leaving
+  earlier returns to the Market and permits another attempt while eligible.
+  Hints alone never complete it. No new friendship, clothing or time effects.
+- `claraEducationCardsEvent` owns the actual days/hours and conditions.
+  Its schedule projection uses those same values for all three NPCs, overrides
+  ordinary bedtime through 23:59, and releases them when the lesson completes,
+  becomes unavailable or reaches midnight. Active intimate interactions and
+  Clarissa's detention block the outing.
+- The basement is a hidden Room owned by the Wine Store location. It does not
+  add public access through a closed shop. The ordinary cellar object remains
+  unchanged; the old daytime **Начать урок карт** action is removed.
+- Event labels own text, pictures and native menus. The Market owns return
+  navigation and restores its night description/image. No extra education
+  cursor, daily appointment flag, menu dispatcher or mirrored schedule state.
 
-Exact participants, lesson count, stat deltas, and appointment hours remain
-authoring decisions and must be confirmed before implementation. They are not
-silently invented by this plan.
+The live thread still has its original two authored steps. Existing saves at
+step 1 or completed step 2 are preserved, not reset to replay cards. This is
+not a claim that the whole planned curriculum is implemented. When later
+lessons are authored, append their Events to this same thread and explicitly
+migrate completed two-step saves to the first new lesson, preserving all
+already completed steps. Do not mark unwritten lessons completed or create
+parallel subject-completion flags.
+
+The existing manners event and its waitress-skill, visitor and fame effects
+are outside the card-lesson change and remain untouched.
+
+Validation on 2026-09-23: 60 focused pytest checks passed; isolated Ren'Py
+8.5.2 compile and lint exited successfully. The native runner
+`tools/external_clara_education_test.py` passed 25 of 26 cases: actual weekday
+and minute boundaries, prerequisites, detention/busy/abort gates, both tavern
+clues, all nine pictures, text placement, exits, schedule release and existing
+completed progress. The remaining failing regression is a **full mid-event
+reload**: shared `tractir_save_clear_room_ui_cache` and
+`tractir_after_load_restore_ui` force room mode and discard the event's return
+context. Save serialization itself succeeds. Correction of those shared
+functions is awaiting approval; no event-local workaround was added. Do not
+report this reload case or the whole curriculum as complete.
 
 ## Save Migration
 
