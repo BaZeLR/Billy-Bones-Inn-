@@ -14,7 +14,7 @@ def test_breakfast_authored_decisions_use_native_label_menus():
     slices = (
         ("TavernKitchenBreakfastAmandaAtticMock:", "TavernKitchenBreakfastAmandaAtticExpose:"),
         ("TavernKitchenBreakfastMelissaAmandaGerhard:", "TavernKitchenBreakfastMelissaAmandaGerhardNatural:"),
-        ("TavernKitchenBreakfastTease:", "TavernKitchenBreakfastTeasePrivate"),
+        ("TavernKitchenBreakfastTease(girl_name=\"\"):", "TavernKitchenBreakfastTeasePrivate"),
         ("TavernKitchenBreakfastMorningIssue:", "TavernKitchenBreakfastMarketTalk:"),
         ("TavernKitchenBreakfastPerkMenu:", "TavernKitchenBreakfastLookAtGirl"),
     )
@@ -148,7 +148,7 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     source = SOURCE.read_text(encoding="utf-8-sig")
     sandra_source = (ROOT / "game/NPC/Girls/Sandra/InitSandra.rpy").read_text(encoding="utf-8-sig")
     migration_source = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
-    candidate = source.split("def tavern_breakfast_tease_candidate():", 1)[1].split(
+    candidate = source.split("def tavern_breakfast_tease_candidate(npc_filter=\"\"):", 1)[1].split(
         "def tavern_breakfast_tease_ready():", 1
     )[0]
     private_date = _label_block(
@@ -160,7 +160,7 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     assert 'npc_id not in ("sandra", "amanda", "melissa")' in candidate
     assert "if info is None or not info.date_intimacy_available():" in candidate
     assert 'getattr(info, "breakfast_tease_day", -1)' in candidate
-    tease = _label_block(source, "TavernKitchenBreakfastTease:", "TavernKitchenBreakfastTeasePrivate")
+    tease = _label_block(source, "TavernKitchenBreakfastTease(girl_name=\"\"):", "TavernKitchenBreakfastTeasePrivate")
     assert "_tease_private_unlocked" not in tease
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")' in tease
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")' in tease
@@ -168,7 +168,9 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     assert 'call TavernKitchenBreakfastOutdoorDate(_tease_girl, "lake")' in tease
     assert 'call TavernKitchenBreakfastOutdoorDate(_tease_girl, "horse")' in tease
     assert "self.breakfast_tease_day = -1" in sandra_source
-    assert '"flirt": ["images/sandra/thanks/sandra_thanks.webm"]' in sandra_source
+    assert '"flirt": ["images/sandra/talk_0.png"]' in sandra_source
+    assert '"thanks": ["images/sandra/thanks/sandra_thanks.webm"]' in sandra_source
+    assert '"[scene_runtime.text]"' not in tease
     assert 'return SandraStaticData.image_path("breakfast", "flirt")' in source
     assert 'if not hasattr(Sandra, "breakfast_tease_day"):' in migration_source
     assert "Sandra.breakfast_tease_day = -1" in migration_source

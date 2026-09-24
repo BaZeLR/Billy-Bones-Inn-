@@ -53,7 +53,7 @@ init python:
                     ],
                 },
                 "breakfast": {
-                    "flirt": ["images/sandra/thanks/sandra_thanks.webm"],
+                    "flirt": ["images/sandra/talk_0.png"],
                 },
                 "weekly_evaluation": {
                     "standing": ["images/sandra/player_room_sandra_0.jpg"],

@@ -314,9 +314,11 @@ init python:
             return "amanda"
         return ""
 
-    def tavern_breakfast_tease_candidate():
+    def tavern_breakfast_tease_candidate(npc_filter=""):
         candidates = []
         for npc_id in list(tavern_breakfast_present_ids() or []):
+            if npc_filter and npc_id != str(npc_filter).strip().lower():
+                continue
             if npc_id not in ("sandra", "amanda", "melissa"):
                 continue
             info = people.get_info(npc_id)
@@ -487,13 +489,45 @@ init python:
         name = _action_display_name(key)
         if key not in list(tavern_breakfast_present_ids() or []):
             return "%s сейчас не сидит за завтраком, так что разглядывать за столом некого." % name
+        info = people.get_info(key)
+        data = people.get_data(key)
+        if info is None:
+            return "%s сидит за общим столом." % name
         if key == "sandra":
-            return "Вы внимательнее смотрите на Сандру за завтраком. Она держит стол в хозяйском порядке даже тогда, когда молчит: взглядом поправляет ленивых, замечает пустую миску раньше остальных и одним своим присутствием не дает кухне развалиться в балаган."
-        if key == "melissa":
-            return "Вы присматриваетесь к Мелиссе за завтраком. Она сидит ровно, ест аккуратно, но под глазами у нее усталость: ночные шорохи, крысы и летучие мыши сделали ее злой еще до первой ложки."
-        if key == "amanda":
-            return "Вы смотрите, как Аманда ведет себя за завтраком. Она играет ложкой, чуть наглее обычного садится за столом и ловит чужие взгляды, будто проверяет, кто первым полезет с замечанием."
-        return "%s сидит за общим столом, и этого уже достаточно, чтобы разговоры и настроение завтрака шли иначе." % name
+            intro = "Вы внимательнее смотрите на Сандру за завтраком. Она держит стол в хозяйском порядке и замечает пустую миску раньше остальных."
+        elif key == "melissa":
+            intro = "Вы присматриваетесь к Мелиссе за завтраком. Она сидит ровно и ест аккуратно."
+        elif key == "amanda":
+            intro = "Вы смотрите, как Аманда ведет себя за завтраком. Она ловит чужие взгляды и замечает, кто первым обратит на нее внимание."
+        else:
+            intro = "%s сидит за общим столом." % name
+        description = str(getattr(data, "description", "") or "").strip()
+        dress_code = str(info.current_dress() or "")
+        clothing = []
+        if dress_code and dress_code in ShortDressName:
+            clothing.append(ShortDressName[dress_code].lower())
+        else:
+            for layer in ("top", "bottom"):
+                part = str(info.clothing_layer(layer) or "")
+                if part:
+                    clothing.append(str(DressPartDesc.get(part, ShortDressName.get(part, part))).lower())
+        for layer, label in (("bra", "лиф"), ("panties", "панталончики"), ("legs", "чулки"), ("shoes", "обувь")):
+            part = str(info.clothing_layer(layer) or "")
+            if part:
+                clothing.append("%s: %s" % (label, str(ShortDressName.get(part, FullDressDesc.get(part, part))).lower()))
+            elif layer in ("bra", "panties"):
+                clothing.append("%s: нет" % label)
+        clothing_text = ", ".join(clothing) if clothing else "на ней сейчас ничего нет"
+        mood_key = str(getattr(info, "mood", "neutral") or "neutral").lower()
+        if relationship_anger(key) > 0 or mood_key == "cold":
+            mood_text = "сердитое" if relationship_anger(key) > 0 else "холодное"
+        elif mood_key == "softened" or int(getattr(info, "fun", 0) or 0) > 0:
+            mood_text = "оживлённое"
+        else:
+            mood_text = "спокойное"
+        beauty = int(info.sex_stat("beauty", 0) or 0)
+        care_text = "неухоженный" if beauty < 40 else ("ухоженный" if beauty >= 65 else "обычный")
+        return "%s\n\n%s\n\nСейчас на ней: %s. Настроение: %s. Вид кожи и уход за собой: %s." % (intro, description, clothing_text, mood_text, care_text)
 
     def tavern_breakfast_record_group_perk(item_id="", score=1, targets=None):
 
@@ -1244,15 +1278,6 @@ label TavernKitchenBreakfastMenu:
             "Поговорить с Амандой о новом платье" if _breakfast_dress_girl == "amanda":
                 call AmandaDressRequestEvent
 
-            "Предложить Сандре сходить к Серджио" if household_barber_request_ready("sandra", "breakfast"):
-                call HouseholdBarberRequestEvent("sandra")
-
-            "Предложить Мелиссе сходить к Серджио" if household_barber_request_ready("melissa", "breakfast"):
-                call HouseholdBarberRequestEvent("melissa")
-
-            "Предложить Аманде сходить к Серджио" if household_barber_request_ready("amanda", "breakfast"):
-                call HouseholdBarberRequestEvent("amanda")
-
             "Предложить Лизетте сходить к Серджио" if household_barber_request_ready("liza", "breakfast"):
                 call HouseholdBarberRequestEvent("liza")
 
@@ -1427,9 +1452,9 @@ label TavernKitchenBreakfastAmandaAtticStop:
     return
 
 
-label TavernKitchenBreakfastTease:
+label TavernKitchenBreakfastTease(girl_name=""):
     $ renpy.dynamic("_tease_data", "_tease_girl", "_tease_tier", "_breakfast_tease_picture", "_tease_info")
-    $ _tease_data = tavern_breakfast_tease_candidate()
+    $ _tease_data = tavern_breakfast_tease_candidate(girl_name)
     $ _tease_girl = str(_tease_data.get("girl", "") or "")
     $ _tease_tier = int(_tease_data.get("tier", 0) or 0)
     if _tease_girl == "":
@@ -1457,7 +1482,6 @@ label TavernKitchenBreakfastTease:
     $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nУже тише {} предлагает после завтрака выбраться вдвоем: можно уединиться в трактире, прогуляться к лесному озеру или, если у вас есть лошадь, прокатиться за городом.".format(people_display_name(_tease_girl))
     $ scene_runtime.location_text = scene_runtime.text
     call stat
-    "[scene_runtime.text]"
     menu:
         "Предложить встретиться на складе после завтрака" if tavern_breakfast_private_date_available(_tease_girl):
             call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")
@@ -1702,17 +1726,53 @@ label TavernKitchenBreakfastPerkMenu:
 
 
 label TavernKitchenBreakfastLookAtGirl(girl_name=""):
-    $ renpy.dynamic("_breakfast_look_girl", "_breakfast_look_picture")
+    $ renpy.dynamic("_breakfast_look_girl", "_breakfast_look_info", "_breakfast_look_picture", "_breakfast_look_origin_picture", "_breakfast_look_origin_text")
     $ _breakfast_look_girl = str(girl_name or "").strip().lower()
     if _breakfast_look_girl not in list(tavern_breakfast_present_ids() or []):
         return
+    $ _breakfast_look_info = people.get_info(_breakfast_look_girl)
+    if _breakfast_look_info is None:
+        return
+    $ _breakfast_look_origin_picture = str(scene_runtime.picture or "")
+    $ _breakfast_look_origin_text = str(scene_runtime.text or "")
     $ _breakfast_look_picture = tavern_breakfast_look_picture(_breakfast_look_girl)
     if str(_breakfast_look_picture or "").strip():
         vscene _breakfast_look_picture
     $ scene_runtime.text = tavern_breakfast_look_text(_breakfast_look_girl)
     $ scene_runtime.location_text = scene_runtime.text
-    call TavernKitchenBreakfastShowText(scene_runtime.text)
-    return
+    while True:
+        menu:
+            "Предложить сходить к Серджио" if household_barber_request_ready(_breakfast_look_girl, "breakfast"):
+                call HouseholdBarberRequestEvent(_breakfast_look_girl, "breakfast")
+
+            "Ответить на её поддразнивание" if tavern_breakfast_tease_candidate(_breakfast_look_girl).get("girl") == _breakfast_look_girl:
+                call TavernKitchenBreakfastTease(_breakfast_look_girl)
+                return
+
+            "Сделать комплимент" if int(_breakfast_look_info.var.get("breakfast_comment_day", -1)) != current_game_day():
+                $ _breakfast_look_info.fun = min(100, int(getattr(_breakfast_look_info, "fun", 0) or 0) + 2)
+                $ _breakfast_look_info.var["breakfast_comment_day"] = current_game_day()
+                $ scene_runtime.text = "Вы делаете {} искренний комплимент. Она заметно оживляется. Настроение +2.".format(people_display_name(_breakfast_look_girl))
+                $ scene_runtime.location_text = scene_runtime.text
+
+            "Сделать замечание" if int(_breakfast_look_info.var.get("breakfast_comment_day", -1)) != current_game_day():
+                $ _breakfast_look_info.fun = max(0, int(getattr(_breakfast_look_info, "fun", 0) or 0) - 2)
+                $ _breakfast_look_info.var["breakfast_comment_day"] = current_game_day()
+                $ scene_runtime.text = "Вы делаете {} замечание за завтраком. Она замолкает и заметно хмурится.".format(people_display_name(_breakfast_look_girl))
+                $ scene_runtime.location_text = scene_runtime.text
+
+            "Предложить сходить к Ирме за новым нарядом" if _breakfast_look_info.can_request_favor("tailor"):
+                call HouseholdOutfitRequestTerms(_breakfast_look_girl)
+
+            "Вручить подарок":
+                $ main_ui_begin_talk_state("Разговор", _breakfast_look_girl)
+                call PlayerCardGiftToFixedTargetMenu(_breakfast_look_girl)
+                $ main_ui_end_talk_state()
+
+            "Вернуться к завтраку":
+                $ tavern_breakfast_restore_ui_state(_breakfast_look_origin_text)
+                $ scene_runtime.picture = _breakfast_look_origin_picture
+                return
 
 
 label TavernKitchenBreakfastPerkFood(item_id=""):

@@ -172,6 +172,7 @@ label _external_amanda_breakfast_tease_for_test:
     $ Amanda.set_sex_stat("sexacts", 0)
     $ Amanda.var["suckyou"] = 0
     $ Amanda.var["fuckyou"] = 0
+    $ Amanda.set_var_int("lizafriends", 1)
     $ Melissa.breakfast_tease_day = current_game_day()
     call TavernKitchenBreakfastTease
     return
@@ -2019,8 +2020,73 @@ testcase external_amanda_breakfast_tease_picture_series:
     assert eval (all(renpy.loadable(path) for path in MELISSA_BREAKFAST_TEASE_PICTURES.values())) timeout 5.0
     assert eval (renpy.loadable(BREAKFAST_GIRLS_TEASE_PICTURE)) timeout 5.0
     run Call("_external_amanda_breakfast_tease_for_test")
-    advance until screen "say" timeout 20.0
+    advance until screen "choice" timeout 20.0
     assert eval (str(scene_runtime.picture or "") == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
+    assert eval ("Предложить встретиться на складе после завтрака" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Продолжить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
+testcase external_breakfast_look_npc_menu_and_current_wear:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is Sandra) timeout 20.0
+    $ rooms.enter("TavernKitchen")
+    $ player.tavern_management.breakfast.event_active = True
+    $ player.tavern_management.breakfast.present_ids = ["sandra"]
+    $ Sandra.wear_night_clothes()
+    $ Sandra.rel = 15
+    $ Sandra.openness = 6
+    $ Sandra.talked_today = 0
+    $ household.barber_appointments.pop("sandra", None)
+    $ household.barber_visit_last_day["sandra"] = current_game_day() - 14
+    $ household.barber_request_last_day["sandra"] = current_game_day() - 14
+    $ Sandra.fun = 0
+    $ Sandra.mood = "neutral"
+    $ Sandra.var.pop("breakfast_comment_day", None)
+    $ scene_runtime.text = "Тестовый завтрак."
+    $ scene_runtime.location_text = scene_runtime.text
+    assert eval ("sandra" in list(tavern_breakfast_present_ids() or [])) timeout 5.0
+    run Call("TavernKitchenBreakfastLookAtGirl", "sandra")
+    advance until screen "choice" timeout 20.0
+    assert eval ("ночная рубашка" in str(scene_runtime.text or "") and "Настроение:" in str(scene_runtime.text or "") and "Вид кожи" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Сделать комплимент" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Предложить сходить к Серджио" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Сделать замечание" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Предложить сходить к Ирме за новым нарядом" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Вручить подарок" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Вернуться к завтраку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Продолжить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _compliment_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сделать комплимент")
+    click id ("choice_panel_button_%d" % int(_compliment_index)) pos (0.5, 0.5) until eval ("Настроение +2" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (int(Sandra.fun or 0) == 2 and int(Sandra.var.get("breakfast_comment_day", -1)) == current_game_day()) timeout 5.0
+    assert eval ("Сделать комплимент" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _gift_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Вручить подарок")
+    click id ("choice_panel_button_%d" % int(_gift_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and str(main_ui_runtime.action_title or "") == "Подарок") timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Вернуться к завтраку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
+testcase external_breakfast_look_tease_opens_choices_directly:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("amanda") is Amanda) timeout 20.0
+    $ rooms.enter("TavernKitchen")
+    $ player.tavern_management.breakfast.event_active = True
+    $ player.tavern_management.breakfast.present_ids = ["amanda"]
+    $ Amanda.rel = 11
+    $ Amanda.openness = 7
+    $ Amanda.corruption = 45
+    $ Amanda.breakfast_tease_day = -1
+    $ Amanda.fucked_today = 0
+    $ Amanda.set_var_int("lizafriends", 1)
+    $ Amanda.set_arousal(65)
+    $ scene_runtime.text = "Тестовый завтрак."
+    $ scene_runtime.location_text = scene_runtime.text
+    assert eval (tavern_breakfast_tease_candidate("amanda").get("girl") == "amanda") timeout 5.0
+    run Call("TavernKitchenBreakfastLookAtGirl", "amanda")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Ответить на её поддразнивание" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _tease_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Ответить на её поддразнивание")
+    click id ("choice_panel_button_%d" % int(_tease_index)) pos (0.5, 0.5) until eval ("Предложить встретиться на складе после завтрака" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Продолжить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and str(scene_runtime.picture or "") == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
 
 testcase external_breakfast_attendance_location_wins:
     run Call("InitGameNPCs")
@@ -2191,7 +2257,7 @@ testcase external_sandra_breakfast_flirt_date_destination:
     assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
     assert eval (not threads["sandraWeeklyEvaluation"].completed and Sandra.intimacy_story_ready() and tavern_breakfast_private_date_available("sandra")) timeout 5.0
     $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
-    assert eval (SandraStaticData.image_path("breakfast", "flirt") == "images/sandra/thanks/sandra_thanks.webm" and renpy.loadable(SandraStaticData.image_path("breakfast", "flirt"))) timeout 5.0
+    assert eval (SandraStaticData.image_path("breakfast", "flirt") == "images/sandra/talk_0.png" and renpy.loadable(SandraStaticData.image_path("breakfast", "flirt"))) timeout 5.0
     $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda", "melissa"]
     $ _sandra_open_table_result = tavern_breakfast_talk_result()
     assert eval (str(_sandra_open_table_result.get("speaker", "") or "") == "sandra" and "Жить свободно" in str(_sandra_open_table_result.get("text", "") or "")) timeout 5.0
@@ -9754,6 +9820,8 @@ def main() -> int:
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_amanda_breakfast_tease_picture_series",
+            "external_breakfast_look_npc_menu_and_current_wear",
+            "external_breakfast_look_tease_opens_choices_directly",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",
@@ -9964,6 +10032,8 @@ def main() -> int:
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_amanda_breakfast_tease_picture_series",
+            "external_breakfast_look_npc_menu_and_current_wear",
+            "external_breakfast_look_tease_opens_choices_directly",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",
