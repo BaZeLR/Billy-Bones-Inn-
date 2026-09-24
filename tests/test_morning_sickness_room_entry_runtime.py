@@ -54,11 +54,18 @@ def test_clock_boundaries_use_actual_hours(runtime, hour, minute, ready):
     assert runtime.tavern_morning_sickness_girl() == ("new_worker" if ready else "")
 
 
-@pytest.mark.parametrize("room", ["TavernMain", "TavernKitchen", "TavernMyRoom", "TavernAtic", "TavernSandraRoom", "TavernGloryHole", "Backyard", "Shed", "ShedWashroom"])
+@pytest.mark.parametrize("room", ["TavernMain", "TavernKitchen", "TavernAtic", "TavernSandraRoom", "TavernGloryHole", "Backyard", "Shed", "ShedWashroom"])
 def test_any_physical_tavern_room_uses_its_explicit_entry_code(runtime, room):
     runtime.rooms.current_code = "Church"
     assert runtime.tavern_morning_sickness_girl(room) == "new_worker"
     assert runtime.tavern_morning_sickness_girl() == ""
+
+
+def test_mc_room_does_not_start_or_consume_morning_sickness(runtime):
+    runtime.rooms.current_code = "TavernMyRoom"
+    assert runtime.tavern_morning_sickness_girl() == ""
+    assert len(runtime.daily_events.rows) == 3
+    assert runtime.tavern_morning_sickness_girl("TavernMain") == "new_worker"
 
 
 @pytest.mark.parametrize("room", ["Church", "StreetTavern", "Forest", "GroceryStore"])
@@ -105,7 +112,7 @@ def test_old_kitchen_rows_migrate_without_changing_other_daily_state(runtime):
     row.update(Location="TavernKitchen", KeepNextDay=3, ChanceToMeet=5)
     runtime.daily_events.add("new_worker", "TavernKitchen", 7, "=", 1, 99, "Unrelated", "Unrelated", "girl")
     before = [dict(item) for item in runtime.daily_events.rows]
-    migration = source("game/TractirSaveSync.rpy").split("    def updateSave_V97():", 1)[1].split("    # Saved objects", 1)[0]
+    migration = source("game/TractirSaveSync.rpy").split("    def updateSave_V97():", 1)[1].split("    def updateSave_V98():", 1)[0]
     namespace = {"daily_events": runtime.daily_events}
     exec("def migrate():\n" + textwrap.indent(textwrap.dedent(migration), "    "), namespace)
     namespace["migrate"]()

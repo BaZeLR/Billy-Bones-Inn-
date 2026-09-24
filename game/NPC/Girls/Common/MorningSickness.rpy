@@ -6,6 +6,8 @@ init python:
         current_room = str(room_code or rooms.current_code or "").strip()
         if not room_in_group(current_room, ROOM_GROUP_TAVERN):
             return ""
+        if current_room == "TavernMyRoom":
+            return ""
         if not 6 <= int(calendar_v2.hour or 0) < 11:
             return ""
         if player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active:
