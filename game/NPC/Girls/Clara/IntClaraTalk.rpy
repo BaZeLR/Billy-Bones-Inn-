@@ -32,18 +32,21 @@ label IntClaraTalk(girl_name="clara"):
                 $ _clara_repeat_menu = True
 
             "Флиртовать" if social_interaction_allowed_for_npc(girl_name, "flirt"):
-                $ _clara_flirted_before = Clara.flirted_today
-                if str(rooms.current_code or "") in ("ForestClearing", "ForestSpring", "ForestLake"):
-                    $ _clara_picture = Clara.forest_picture(str(rooms.current_code or ""))
-                    if str(_clara_picture or "").strip():
-                        vscene _clara_picture
-                elif str(rooms.current_code or "") == "WineStore":
-                    $ _clara_picture = Clara.wine_store_flirt_picture()
-                    if str(_clara_picture or "").strip():
-                        vscene _clara_picture
-                call SocialTalkTopicMenu(girl_name, "flirt")
-                if Clara.flirted_today > _clara_flirted_before:
-                    $ Clara.flirt_count = max(0, int(Clara.flirt_count or 0)) + 1
+                if story_event_available("talk_clara", "drawing"):
+                    call checkTriggers("talk_clara", "drawing", 0)
+                else:
+                    $ _clara_flirted_before = Clara.flirted_today
+                    if str(rooms.current_code or "") in ("ForestClearing", "ForestSpring", "ForestLake"):
+                        $ _clara_picture = Clara.forest_picture(str(rooms.current_code or ""))
+                        if str(_clara_picture or "").strip():
+                            vscene _clara_picture
+                    elif str(rooms.current_code or "") == "WineStore":
+                        $ _clara_picture = Clara.wine_store_flirt_picture()
+                        if str(_clara_picture or "").strip():
+                            vscene _clara_picture
+                    call SocialTalkTopicMenu(girl_name, "flirt")
+                    if Clara.flirted_today > _clara_flirted_before:
+                        $ Clara.flirt_count = max(0, int(Clara.flirt_count or 0)) + 1
                 $ _clara_repeat_menu = True
 
             "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift") and Clara.has_giftable_entries():

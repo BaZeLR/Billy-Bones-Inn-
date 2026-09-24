@@ -170,8 +170,13 @@ def _clara_runtime():
         "current_game_day": lambda: calendar.daysInGame,
         "household_morning_issue_matches": lambda *args, **kwargs: False,
         "household": SimpleNamespace(barber_appointments={}),
+        "tavern": SimpleNamespace(renovation_complete=lambda code: False),
         "player": SimpleNamespace(tavern_management=SimpleNamespace(
             breakfast=SimpleNamespace(event_active=False, present_ids=[]),
+            is_open_at=lambda weekday=None, hour=None: (
+                (calendar.week if weekday is None else weekday) != 7
+                and 720 <= namespace["npc_schedule_clock_minute"](hour) <= 1230
+            ),
         )),
         "threads": {
             "claraMongolAccusation": SimpleNamespace(done=[False] * 4, completed=False),
@@ -202,6 +207,7 @@ def _clara_runtime():
     clara.day_location_override_day = -1
     clara.day_location_override_code = ""
     namespace["Clara"] = clara
+    namespace["rooms"]["TavernMain"] = SimpleNamespace(state={})
     return clara, hordus_data, calendar, namespace
 
 
@@ -213,6 +219,9 @@ def _clara_runtime():
 def test_late_game_routine_visits_do_not_hide_clara_on_merchant_dates(competing_label, tavern_stage):
     clara, hordus_data, calendar, namespace = _clara_runtime()
     namespace["threads"]["claraTavernVisit"].num = tavern_stage
+    if competing_label != "tavern_resident_day":
+        namespace["threads"]["claraPaintingsPath"].num = 0
+        namespace["threads"]["claraPaintingsPath"].completed = False
     calendar.hour = 16
     for period in range(1, 13):
         calendar.period = period
@@ -294,7 +303,7 @@ def test_amanda_friday_claim_checks_clara_at_nineteen_even_during_merchant_visit
 
 
 @pytest.mark.parametrize("job", ["jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole"])
-def test_registered_clara_merchant_entry_has_priority_over_real_tavern_jobs(job):
+def test_registered_resident_keeps_assigned_shift_on_merchant_day(job):
     clara, hordus_data, calendar, namespace = _clara_runtime()
     _set_day(calendar, hordus_data.monthly_visit_days()[0])
     calendar.hour = 16
@@ -314,6 +323,9 @@ def test_registered_clara_merchant_entry_has_priority_over_real_tavern_jobs(job)
     assert competing is not None and competing.matches()
     assert competing.priority < merchant_visit.priority
     assert registry.get_info("clara") is clara
+    assert registry.schedule_entry("clara").label == competing.label
+    assert registry.location("clara") == competing.selected_location()
+    assert hordus_data.getLocation() == "MarketPlace"
+    clara.jobs.clear()
     assert registry.schedule_entry("clara") is merchant_visit
     assert registry.location("clara") == "MarketPlace"
-    assert registry.action_data_for_room("clara", "MarketPlace") is None

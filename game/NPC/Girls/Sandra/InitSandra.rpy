@@ -86,6 +86,7 @@ init python:
 
         def __init__(self):
             super().__init__("sandra")
+            self.renovation_requests["shed"] = False
             self.code_name = "sandra"
             self.data = SandraStaticData
             self.rel = 5

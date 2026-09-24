@@ -1418,6 +1418,7 @@ init -999 python:
             self.reaction_state = {}
             self.reaction_log = []
             self.detailed_sex_history = []
+            self.renovation_requests = {}
             self.wardrobe = GirlWardrobeState()
             self.temporary_fertility = {"item_id": "", "until_day": -1}
 
@@ -1427,6 +1428,7 @@ init -999 python:
             self.__dict__.setdefault("rebellion", 0)
             self.__dict__.setdefault("reaction_state", {})
             self.__dict__.setdefault("reaction_log", [])
+            self.__dict__.setdefault("renovation_requests", {})
             base_clothing = getattr(getattr(self, "data", None), "base_clothing", {})
             self.wardrobe = GirlWardrobeState.from_saved(
                 getattr(self, "wardrobe", None),

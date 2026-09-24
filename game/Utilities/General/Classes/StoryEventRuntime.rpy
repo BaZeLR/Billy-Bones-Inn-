@@ -580,6 +580,18 @@ define claraMongolMarketConditions = [
 ]
 
 define claraThreadList = [
+    # Repeatable household life, with once-per-day entry/breakfast events.
+    # NPC state and the schedule own presence; no second resident cursor.
+    RThreadData(0, "clara", "ResidentLife", ["#Clara.tavern_resident()"], [1, [
+        ("story_clara_drawing_work", None, (9, 11), None, 1, None,
+         ["#Clara.drawing_now()"], None, "TavernMyRoom", "enter", 80),
+        ("story_clara_drawing_work", None, (9, 11), None, 1, None,
+         ["#Clara.drawing_now()"], None, "talk_clara", "drawing", 80, True),
+        ("story_clara_breakfast_banter", None, (6, 11), None, 1, None,
+         ["#player.tavern_management.breakfast.event_active",
+          "#'clara' in tavern_breakfast_present_ids()"],
+         None, "TavernKitchen", "breakfast", 80),
+    ]], highlight=False, threaded=False),
     LThreadData(0, "clara", "BookletMarket", None, [
         (
             "story_clara_market_booklet_0",

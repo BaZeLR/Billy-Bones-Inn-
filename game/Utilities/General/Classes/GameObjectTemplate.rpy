@@ -58,6 +58,8 @@ init -50 python:
             return bool(Clara.melissa_room_visit_active())
         if rule_name == "clara_tavern_resident":
             return bool(Clara.tavern_resident()) == bool(row.get("resident", True))
+        if rule_name == "clara_drawing_work":
+            return Clara.drawing_work_available()
         if rule_name == "household_morning_issue":
             person = str(row.get("person", "") or "").strip().lower()
             issue = str(row.get("issue", "") or "").strip()

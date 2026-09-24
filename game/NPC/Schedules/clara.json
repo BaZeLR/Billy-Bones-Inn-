@@ -2,6 +2,27 @@
   "npc_id": "clara",
   "entries": [
     {
+      "label": "tavern_resident_breakfast",
+      "start": "08:00", "end": "08:59",
+      "location": "TavernKitchen",
+      "awake": true, "talkable": true, "priority": 800,
+      "condition": {"rule": "clara_tavern_resident"}
+    },
+    {
+      "label": "sunday_dinner",
+      "weekdays": [7], "start": "12:30", "end": "13:30",
+      "location": "TavernKitchen",
+      "awake": true, "talkable": true, "priority": 800,
+      "condition": {"rule": "clara_tavern_resident"}
+    },
+    {
+      "label": "tavern_drawing",
+      "start": "09:00", "end": "11:59",
+      "location": "TavernMyRoom",
+      "awake": true, "talkable": true, "working": true, "priority": 500,
+      "condition": {"rule": "clara_drawing_work"}
+    },
+    {
       "label": "tavern_resident_sleep",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "23:00",
@@ -91,7 +112,8 @@
         "location_probabilities": [0.25],
         "awake": true,
         "talkable": false,
-        "priority": 250
+        "priority": 250,
+        "condition": {"rule": "clara_tavern_resident", "resident": false}
     },
       {
         "label": "evening_tavern_event",

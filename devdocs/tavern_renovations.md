@@ -25,7 +25,8 @@ one day, ready next morning, without resetting the hour or charging again.
 ## Standard lifecycle
 
 `unrequested -> requested -> accepted -> building -> completed`.
-Postponement leaves the request available. Explicit refusal marks that item
+Postponement leaves the carpenter's order available without replaying the NPC
+demand. Explicit refusal marks that item
 `declined`, never aborting unrelated improvements.
 
 Each saved renovation contains requester, request/start/due/completion days,
@@ -39,8 +40,15 @@ the inspection/follow-up having been played (or explicit refusal), **not**
 physical completion. `num` counts resolved items. Each native event label owns
 its text, picture, menu and return; no new dispatch/refresh labels.
 
-- Request events record the NPC on the same object; no NPC-side request flag.
-- The shared `DraupnirRenovationOrder` checks acceptance, workshop hours,
+- Melissa (`backyard`), Sandra (`shed`) and Clarissa (`guest_room`) own boolean
+  entries in `renovation_requests`, initially false. After the demand text is
+  displayed the entry becomes true. This is an outstanding request, not a
+  second construction/completion flag. It stays true while the work is pending
+  or building, and clears on completion or explicit refusal.
+- Their request booleans unlock Draupnir's options; no extra promise to the NPC
+  is required after hearing the demand. The four older projects retain their
+  existing acceptance prerequisites. No resource price or duration changes.
+- The shared `DraupnirRenovationOrder` checks this unlock, workshop hours,
   builder availability, money and timber before charging exactly once.
 - Draupnir accepts one new construction order at a time. His runtime
   `getLocation` reads the active job and places him at its construction site,
@@ -150,6 +158,9 @@ Player flags, Draupnir quotes, Melissa's roof deadline and Tavern's old date map
 into renovation objects, then removes those retired fields and threads.
 Version 102 adds the guest stove object to old room inventories and the new
 connecting exits only when absent, preserving existing room items and fire state.
+Version 103 seeds missing member-request booleans from the prior saved lifecycle
+once (`requested`, `accepted` or `building` means pending). Already-present
+booleans are not overwritten. There is no ongoing reverse synchronization.
 Existing inventories, resources, room identities, story progress and paid dates
 are not rebuilt. Previously paid overlapping jobs keep their deadlines; only
 new orders obey the single-builder limit. An old sign/glory-hole job lacking a
@@ -164,6 +175,10 @@ this is not a guarantee that arbitrary old mid-scene return addresses survive.
 
 ## Verification
 
+- NPC request-flag follow-up (version 103): 167 focused tests passed; the
+  combined resident/renovation native suite passed 40 cases / 276 assertions
+  plus the separate full old-save load check. Details and the unchanged stale
+  version-number assertion are recorded in [resident verification](clara_resident_routine.md#results-2026-09-23).
 - Focused runtime checks: all seven exact costs/durations, no double charges,
   one builder, exact-once team/requester rewards, preservation of paid state
   and resources, rejection/refusal, and residual-authority scan.

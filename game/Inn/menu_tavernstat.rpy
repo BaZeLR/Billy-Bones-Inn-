@@ -207,6 +207,10 @@ init python:
         ]
         if str(people.location("becky") or "") == "TavernKitchen":
             attendees.append("becky")
+        if (Clara.tavern_resident() and not Clara.mongol_case_detained()
+                and not Clara.fiance_case_detained()
+                and household_morning_issue_type("clara") == ""):
+            attendees.append("clara")
         return attendees
 
     def household_breakfast_absence_lines():

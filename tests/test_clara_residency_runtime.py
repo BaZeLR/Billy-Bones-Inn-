@@ -136,3 +136,39 @@ def test_custody_hides_clara_even_when_original_residency_was_reached(runtime):
     runtime.case.done[0] = True
     assert runtime.clara.tavern_resident()
     assert runtime.clara.getLocation() == ""
+
+
+@pytest.mark.parametrize("stage", [0, 1, 2, 3, 4, 5, 6])
+def test_resident_visitor_branches_cannot_override_jobs(runtime, stage):
+    runtime.case.completed = True
+    runtime.namespace["threads"]["claraTavernVisit"].num = stage
+    runtime.calendar.week, runtime.calendar.hour = 2, 16
+    runtime.clara.set_job_value("jobwaitress", 1)
+    assert not runtime.clara.tavern_visit_active()
+    assert not runtime.clara.melissa_room_visit_active()
+    assert runtime.clara.schedule_entry().label == "tavern_hall_shift"
+    assert runtime.clara.getLocation() == "TavernMain"
+
+
+@pytest.mark.parametrize("resident", [False, True])
+@pytest.mark.parametrize("peephole", [False, True])
+@pytest.mark.parametrize("minute", [539, 540, 719, 720])
+def test_drawing_uses_residency_paid_peephole_and_exact_hour(runtime, resident, peephole, minute):
+    runtime.case.completed = resident
+    runtime.namespace["tavern"].renovation_complete = lambda code: code == "peephole" and peephole
+    runtime.calendar.hour, runtime.calendar.minute = divmod(minute, 60)
+    assert runtime.clara.drawing_now() is (resident and peephole and 540 <= minute <= 719)
+    if runtime.clara.drawing_now():
+        assert runtime.clara.getLocation() == "TavernMyRoom"
+
+
+@pytest.mark.parametrize("weekday,minute,label", [
+    (2, 480, "tavern_resident_breakfast"), (2, 539, "tavern_resident_breakfast"),
+    (7, 750, "sunday_dinner"), (7, 810, "sunday_dinner"),
+])
+def test_resident_uses_team_meal_intervals(runtime, weekday, minute, label):
+    runtime.case.completed = True
+    runtime.calendar.week = weekday
+    runtime.calendar.hour, runtime.calendar.minute = divmod(minute, 60)
+    assert runtime.clara.schedule_entry().label == label
+    assert runtime.clara.getLocation() == "TavernKitchen"

@@ -72,7 +72,7 @@ def _runtime(day=30, money=10000, logs=40):
         spent.append(amount)
         return True
     player.spend_money = spend_money
-    team = [(key, SimpleNamespace(is_tavern_worker=lambda: True, reward_need_fulfilled=lambda amount, reason, key=key: rewards.append((key, amount, reason)))) for key in ("amanda", "melissa", "sandra", "clara", "liza", "georgett")]
+    team = [(key, SimpleNamespace(renovation_requests={}, is_tavern_worker=lambda: True, reward_need_fulfilled=lambda amount, reason, key=key: rewards.append((key, amount, reason)))) for key in ("amanda", "melissa", "sandra", "clara", "liza", "georgett")]
     team.append(("becky", SimpleNamespace(is_tavern_worker=lambda: False)))
     namespace = {
         "calendar_v2": calendar, "player": player,
@@ -147,6 +147,8 @@ def test_exact_once_payment_completion_and_motivation(code, day):
 @pytest.mark.parametrize("code", EXPECTED)
 @pytest.mark.parametrize("failure", ["unrequested", "requested", "declined", "poor", "closed", "busy"])
 def test_rejected_orders_never_change_resources(code, failure):
+    if failure == "requested" and code in ("backyard", "shed", "guest_room"):
+        pytest.skip("Hearing a member request now permits ordering without a promise")
     r = _runtime()
     job = accept(r, code)
     if failure in ("unrequested", "requested", "declined"):
@@ -239,3 +241,48 @@ def test_authored_followups_use_existing_unordered_thread_not_dispatchers():
     assert 'UThreadData(0, "tavern", "Renovations"' in source
     assert "event_runtime.active_thread.seen(" in source
     assert not re.search(r"^label\s+\w*(?:Refresh|Rebuild|Dispatch)\w*", source, re.MULTILINE)
+
+
+@pytest.mark.parametrize("code", ["backyard", "shed", "guest_room"])
+def test_npc_boolean_unlocks_on_request_and_clears_on_completion(code):
+    r = _runtime()
+    project, job = r.catalog[code], r.owner.renovations[code]
+    giver = r.namespace["people"].get_info(project.quest_giver)
+    assert not project.order_visible
+    job.request(project.quest_giver)
+    assert giver.renovation_requests[code] is True
+    assert job.status == "requested" and project.order_visible
+    assert r.owner.order_renovation(code)
+    assert project.order_visible and giver.renovation_requests[code] is True
+    r.calendar.daysInGame = job.due_day
+    r.owner.finish_due_renovations()
+    assert r.owner.renovation_complete(code)
+    assert giver.renovation_requests[code] is False and not project.order_visible
+
+
+@pytest.mark.parametrize("status,pending", [
+    ("unrequested", False), ("requested", True), ("accepted", True),
+    ("building", True), ("completed", False), ("declined", False),
+])
+def test_v102_migrates_request_flags_once_without_rebuilding_jobs(status, pending):
+    r = _runtime()
+    for code in ("backyard", "shed", "guest_room"):
+        r.owner.renovations[code].status = status
+        del r.namespace["people"].get_info(r.catalog[code].quest_giver).renovation_requests
+    before = snapshot(r)
+    _exec_definitions("TractirSaveSync.rpy", {"updateSave_V102"}, r.namespace)
+    r.namespace["updateSave_V102"]()
+    for code in ("backyard", "shed", "guest_room"):
+        giver = r.namespace["people"].get_info(r.catalog[code].quest_giver)
+        assert giver.renovation_requests[code] is pending
+        giver.renovation_requests[code] = not pending
+    r.namespace["updateSave_V102"]()
+    for code in ("backyard", "shed", "guest_room"):
+        assert r.namespace["people"].get_info(r.catalog[code].quest_giver).renovation_requests[code] is not pending
+    assert snapshot(r) == before
+
+
+def test_request_recorded_after_authored_demand_not_at_entry():
+    source = (GAME / "Inn/TavernRenovations.rpy").read_text(encoding="utf-8-sig")
+    scene = source.split("label story_tavern_renovation_request:", 1)[1].split("label DraupnirRenovations:", 1)[0]
+    assert scene.index("Закажите ремонт Драупниру.") < scene.index(".request(_renovation.quest_giver)") < scene.index("    menu:")

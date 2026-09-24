@@ -28,17 +28,25 @@ init python:
 
         def schedule_resolve(self, weekday_value=None, time_value=None):
             merchant_visit = HordusStaticData.schedule_resolve(weekday_value, time_value)
+            # Selling drawings is a planned outing, not a reason to miss an
+            # assigned shift. Ordinary off-duty merchant meetings stay intact.
             if merchant_visit is not None:
-                return merchant_visit
+                on_shift = any(entry is not None for entry in (
+                    Clara.tavern_regular_job_schedule_entry(weekday_value, time_value),
+                    Clara.tavern_service_schedule_entry(weekday_value, time_value),
+                ))
+                if not on_shift:
+                    return merchant_visit
             return super(ClaraData, self).schedule_resolve(weekday_value, time_value)
 
     class ClaraInfo(Girl):
         """Clara runtime: wine store, market booklet, paintings thread, social state."""
         talk_label = "IntClaraTalk"
         unknown_name = "Незнакомка"
-        work_socializing_locations = ("WineStore",)
+        work_socializing_locations = ("WineStore", "TavernMyRoom")
         def __init__(self):
             super().__init__("clara")
+            self.renovation_requests["guest_room"] = False
             self.code_name = "clara"
             self.data = ClaraStaticData
             self.rel = 0
@@ -207,6 +215,16 @@ init python:
         def is_tavern_worker(self):
             return self.tavern_resident()
 
+        def drawing_work_available(self):
+            return self.tavern_resident() and tavern.renovation_complete("peephole")
+
+        def drawing_now(self):
+            entry = self.schedule_entry()
+            return (
+                entry is not None and entry.label == "tavern_drawing"
+                and self.getLocation() == "TavernMyRoom"
+            )
+
         def relationship_allows(self, action_code="talk"):
             action_key = str(action_code or "talk").strip().lower()
             if action_key == "talk":
@@ -278,6 +296,8 @@ init python:
             return int(player_charisma_breakdown().get("charisma", 0) or 0) >= 70 and int(self.rel or 0) >= 5
 
         def tavern_visit_active(self):
+            if self.tavern_resident():
+                return False
             if int(threads["claraTavernVisit"].num or 0) not in (0, 1, 2, 6):
                 return False
             clock_value = (int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)) % 1440
@@ -289,7 +309,7 @@ init python:
             return ((current_game_day() + week_value) % 4) == 0
 
         def melissa_room_visit_active(self):
-            return int(threads["claraTavernVisit"].num or 0) in (3, 4, 5)
+            return not self.tavern_resident() and int(threads["claraTavernVisit"].num or 0) in (3, 4, 5)
 
         def can_receive_gifts(self):
             update_stat_state()

@@ -14,6 +14,8 @@ init -30 python:
 
         @property
         def order_visible(self):
+            if self.code in ("backyard", "shed", "guest_room"):
+                return people.get_info(self.quest_giver).renovation_requests.get(self.code, False)
             return tavern.renovations[self.code].status in ("accepted", "building", "completed")
 
         @property
@@ -37,6 +39,8 @@ init -30 python:
                 self.status = "requested"
                 self.requester = requester
                 self.requested_day = int(calendar_v2.daysInGame)
+            if self.code in ("backyard", "shed", "guest_room") and self.status in ("requested", "accepted"):
+                people.get_info(requester).renovation_requests[self.code] = True
 
         def accept(self):
             if self.status == "requested":
@@ -69,7 +73,10 @@ init -30 python:
             job = self.renovations[code]
             if job.status in ("building", "completed"):
                 return "Эта работа уже выполнена." if self.renovation_complete(code) else "Этот заказ уже выполняется."
-            if job.status != "accepted":
+            if code in ("backyard", "shed", "guest_room"):
+                if not project.order_visible or job.status not in ("requested", "accepted"):
+                    return "Сначала нужно услышать просьбу об этом улучшении."
+            elif job.status != "accepted":
                 return "Сначала нужно принять просьбу об этом улучшении."
             if self.active_renovation is not None:
                 return "Драупнир сначала должен закончить текущий заказ."
@@ -104,6 +111,8 @@ init -30 python:
                     continue
                 job.status = "completed"
                 job.completed_day = today
+                if job.code in ("backyard", "shed", "guest_room"):
+                    people.get_info(job.requester).renovation_requests[job.code] = False
                 for girl_id, info in people.girl_items():
                     if info.is_tavern_worker():
                         info.reward_need_fulfilled(1, "renovation_" + job.code)
@@ -128,10 +137,14 @@ define tavernRenovationThreadList = [
          ["#people.location('%s') == rooms.current_code" % project.quest_giver,
           "#rooms.current.group_name == ROOM_GROUP_TAVERN",
           "#tavern.renovations['%s'].status in ('unrequested', 'requested')" % project.code]
+         + ["#not people.get_info('%s').renovation_requests.get('%s', False)" % (project.quest_giver, project.code)]
          + (["#Clara.tavern_resident()"] if project.quest_giver == "clara" else []),
          None, "talk_" + project.quest_giver, "renovation", 60, True)] if project.code in ("backyard", "shed", "guest_room") else []) + [
         ("DraupnirRenovationOrder", None, None, None, 1, None,
-         ["#tavern.renovations['%s'].status == 'accepted'" % project.code],
+         (["#people.get_info('%s').renovation_requests.get('%s', False)" % (project.quest_giver, project.code),
+           "#tavern.renovations['%s'].status in ('requested', 'accepted')" % project.code]
+          if project.code in ("backyard", "shed", "guest_room")
+          else ["#tavern.renovations['%s'].status == 'accepted'" % project.code]),
          None, "talk_draupnir", "renovation_" + project.code, 60, True),
         ("story_tavern_renovation_complete", None, None, None, 1, None,
          ["#tavern.renovation_complete('%s')" % project.code],
@@ -167,7 +180,6 @@ init 5 python:
 label story_tavern_renovation_request:
     $ renpy.dynamic("_renovation")
     $ _renovation = next(project for project in TAVERN_RENOVATIONS.values() if project.code in ("backyard", "shed", "guest_room") and "talk_" + project.quest_giver == evt.location)
-    $ tavern.renovations[_renovation.code].request(_renovation.quest_giver)
     $ main_ui_begin_native_scene_state(_renovation.title)
     show screen main_ui
     if _renovation.code == "shed":
@@ -179,6 +191,7 @@ label story_tavern_renovation_request:
     else:
         vscene "images/clara/portrait.png"
         "— Раз уж я теперь живу здесь, скажу прямо: гостевую нужно привести в порядок, — заявляет Кларисса. — Кровать, шкаф, стол, занавеси — и получится приличная гостиная. Можно будет принимать гостей и беседовать, а не стоять посреди голых стен. Закажите ремонт Драупниру."
+    $ tavern.renovations[_renovation.code].request(_renovation.quest_giver)
     menu:
         "Хорошо, закажу работу у Драупнира":
             $ event_runtime.active_thread.enable()
@@ -187,6 +200,7 @@ label story_tavern_renovation_request:
         "Обсудим это позже":
             "Вы пока не даёте обещаний. К разговору можно будет вернуться позже."
         "Отказаться от этого улучшения":
+            $ people.get_info(_renovation.quest_giver).renovation_requests[_renovation.code] = False
             $ tavern.renovations[_renovation.code].status = "declined"
             $ event_runtime.active_thread.seen(list(TAVERN_RENOVATIONS).index(_renovation.code))
             "Вы решаете отказаться от этой затеи. Заказ мастеру передан не будет."

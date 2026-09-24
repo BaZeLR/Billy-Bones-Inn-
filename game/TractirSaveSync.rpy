@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 102
+define currentVersion = 103
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -823,6 +823,9 @@ init -100 python:
         if loaded_version < 102:
             updateSave_V101()
             loaded_version = 102
+        if loaded_version < 103:
+            updateSave_V102()
+            loaded_version = 103
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3280,6 +3283,16 @@ init -100 python:
             room = rooms.get(room_code)
             if not any(exit.target == target for exit in room.exits):
                 room.exits.append(next(exit for exit in roomDefinitions[room_code].exits if exit.target == target))
+
+    def updateSave_V102():
+        # Seed the NPC's outstanding requests once. Do not reset construction,
+        # payment, completion, or a flag already saved by this version.
+        for code in ("backyard", "shed", "guest_room"):
+            info = people.get_info(TAVERN_RENOVATIONS[code].quest_giver)
+            info.__dict__.setdefault("renovation_requests", {})
+            info.renovation_requests.setdefault(
+                code, tavern.renovations[code].status in ("requested", "accepted", "building")
+            )
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

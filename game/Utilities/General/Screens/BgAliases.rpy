@@ -3,7 +3,7 @@
 # ================================================================================
 # Core location background aliases for converted Inn labels.
 image bg TavernMain = "images/tavern/mainhall/main_hall.png"
-image bg TavernKitchen = "images/tavern/kitchen/kitchen_room.png"
+image bg TavernKitchen = "images/kitchen/renewed/kitchen_room_day.png"
 image bg StreetTavern = "images/general/LocStreetTavern1.jpg"
 image bg myroom = "images/player_room/player_room.png"
 image bg amanda_room_day = "images/tavern/secondfloor/girls_room_day.png"

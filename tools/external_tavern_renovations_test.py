@@ -44,6 +44,8 @@ init python:
         Draupnir.glory_hole_quote_received = True
         Melissa.roof_repair_complete_day = 32
         saveVersion = 100
+        for info in (Sandra, Melissa, Clara):
+            del info.renovation_requests
 
     def external_renovation_verify_loaded_owner():
         expected = renpy.session.pop("renovation_load_expected", None)
@@ -60,6 +62,8 @@ init python:
         assert TavernGuestRoomStoveObject.state == renpy.session.pop("guest_stove_load_expected")
         assert get_game_object("guest_room_stove_001") is TavernGuestRoomStoveObject
         assert Sofa.installed and people.location("sofa") == "TavernEmptyRoom"
+        assert Sandra.renovation_requests["shed"] is True
+        assert Clara.renovation_requests["guest_room"] is False
         print("RENOVATION_FULL_LOAD_PASSED", flush=True)
         renpy.quit(0)
 
@@ -77,6 +81,8 @@ init python:
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None
         tavern.renovations = {key: TavernRenovation(key) for key in TAVERN_RENOVATIONS}
+        for code_key in ("backyard", "shed", "guest_room"):
+            people.get_info(TAVERN_RENOVATIONS[code_key].quest_giver).renovation_requests[code_key] = False
         Sofa.installed = False
         TavernGuestRoomStoveObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
         rooms.get("ShedWashroom").is_hidden = False
@@ -135,6 +141,11 @@ testcase external_renovation_real_request_order_build_and_complete:
     advance until eval ("Хорошо, закажу работу у Драупнира" in external_renovation_choices()) timeout 20.0
     assert eval (main_ui_runtime.mode == "event")
     assert eval (len(external_renovation_choices()) == 3)
+    assert eval (people.get_info(_project.quest_giver).renovation_requests[code] is True and _project.order_visible)
+    assert eval (story_event_available("talk_draupnir", "renovation_" + code))
+    $ renpy.save("pending-member-request", include_screenshot=False)
+    $ _saved_requester_name = {"backyard": "Melissa", "shed": "Sandra", "guest_room": "Clara"}[code]
+    assert eval (renpy.get_save_data("pending-member-request")[_saved_requester_name].renovation_requests[code] is True)
     click id (external_renovation_button("Хорошо, закажу")) pos (0.5, 0.5)
     advance until eval ("Вернуться к разговору" in external_renovation_choices()) timeout 20.0
     assert eval (_quest.enabled and tavern.renovations[code].status == "accepted" and _project.order_visible)
@@ -179,6 +190,7 @@ testcase external_renovation_real_request_order_build_and_complete:
     run Jump(_project.room)
     advance until eval ("Осмотреть готовую работу" in external_renovation_choices()) timeout 20.0
     assert eval (tavern.renovation_complete(code) and not _quest.completed and main_ui_runtime.mode == "event")
+    assert eval (people.get_info(_project.quest_giver).renovation_requests[code] is False and not _project.order_visible)
     click id (external_renovation_button("Осмотреть готовую работу")) pos (0.5, 0.5)
     advance until eval (not external_renovation_choices()) timeout 20.0
     assert eval (_quest.num == 1 and _quest.done[list(TAVERN_RENOVATIONS).index(code)] and not _quest.completed)
@@ -205,10 +217,11 @@ testcase external_renovation_postpone_or_abort:
         quest = threads["tavernRenovations"]
         assert not quest.completed and not quest.aborted
         assert (tavern.renovations["shed"].status == "declined") == (decision == "Отказаться от этого улучшения")
-        assert not TAVERN_RENOVATIONS["shed"].order_visible
-        assert not tavern.order_renovation("shed")
+        assert TAVERN_RENOVATIONS["shed"].order_visible == (decision == "Обсудим это позже")
+        assert Sandra.renovation_requests["shed"] == (decision == "Обсудим это позже")
         calendar_v2.daysInGame += 1
-        assert story_event_available("talk_sandra", "renovation") == (tavern.renovations["shed"].status != "declined")
+        assert not story_event_available("talk_sandra", "renovation")
+        assert tavern.order_renovation("shed") == (decision == "Обсудим это позже")
 
 testcase external_renovation_insufficient_money_then_retry_same_day:
     run Jump("dev_after_report_checkpoint")

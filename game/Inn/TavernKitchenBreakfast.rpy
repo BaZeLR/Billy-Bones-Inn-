@@ -55,9 +55,9 @@ init python:
         seen = set()
         for npc_id in present:
             key = str(npc_id or "").strip().lower()
-            if key not in ("sandra", "melissa", "amanda", "becky"):
+            if key not in ("sandra", "melissa", "amanda", "becky", "clara"):
                 continue
-            if key in ("sandra", "melissa", "amanda") and household_morning_issue_type(key) in ("sick", "sleepy"):
+            if key in ("sandra", "melissa", "amanda", "clara") and household_morning_issue_type(key) in ("sick", "sleepy"):
                 continue
             if key in seen:
                 continue
@@ -836,6 +836,7 @@ init python:
 
     def tavern_kitchen_breakfast_picture():
         candidates = [
+            "images/kitchen/renewed/breakfast_core.png",
             "images/kitchen/kitchen_breakfast.jpg",
             "images/tavern/kitchen/kitchen_breakfast.jpg",
             "images/breakfast/tavern_girls_impregnat.jpg",
@@ -867,6 +868,13 @@ init python:
         return tavern_kitchen_breakfast_picture()
 
     def tavern_kitchen_sunday_dinner_picture():
+        present_ids = tavern_sunday_dinner_present_ids()
+        if "clara" in present_ids and "melissa" in present_ids:
+            if Clara.current_dress() == "nightshirt":
+                return "images/kitchen/renewed/sunday_clarissa_homewear.png"
+            return "images/kitchen/renewed/sunday_clarissa.png"
+        if renpy.loadable("images/kitchen/renewed/sunday_core.png"):
+            return "images/kitchen/renewed/sunday_core.png"
         return tavern_kitchen_event_picture("kitchen_sundaydinnerAll_0")
 
     def tavern_sunday_dinner_present_ids():
@@ -1856,13 +1864,16 @@ label TavernKitchenSundayDinnerMenu:
 
 
 label TavernKitchenSundayDinner(serve_spicy=0):
-    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_intro_lines", "_sunday_line_index", "_sunday_dinner_active", "_sunday_table_talk_played", "_sunday_church_talk_played", "_sunday_topic_lines", "_sunday_topic_line_index", "_sunday_gift_target", "_sunday_gift_target_name", "_sunday_gift_item", "_sunday_gift_text", "_sunday_finish_lines", "_sunday_lake_girl", "_sunday_lake_name")
+    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_intro_lines", "_sunday_line_index", "_sunday_dinner_active", "_sunday_table_talk_played", "_sunday_church_talk_played", "_sunday_clara_story_played", "_sunday_clara_homewear", "_sunday_topic_lines", "_sunday_topic_line_index", "_sunday_gift_target", "_sunday_gift_target_name", "_sunday_gift_item", "_sunday_gift_text", "_sunday_finish_lines", "_sunday_lake_girl", "_sunday_lake_name")
     if not tavern_sunday_dinner_available():
         $ scene_runtime.text = "Сегодня вы уже сидели за воскресным обедом."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
     $ _sunday_present_ids = list(tavern_sunday_dinner_present_ids() or [])
+    $ _sunday_clara_homewear = "clara" in _sunday_present_ids and "melissa" in _sunday_present_ids and Clara.current_dress() == "greenworkdress" and Clara.preferred_dress() == "greenworkdress" and (int(current_game_day() or 0) // 7) % 2 == 1
+    if _sunday_clara_homewear:
+        $ Clara.wear_temporary_dress("nightshirt")
     $ main_ui_begin_native_scene_state("Воскресный обед")
     $ scene_runtime.picture = tavern_kitchen_sunday_dinner_picture()
     vscene scene_runtime.picture
@@ -1894,6 +1905,7 @@ label TavernKitchenSundayDinner(serve_spicy=0):
     $ _sunday_dinner_active = True
     $ _sunday_table_talk_played = False
     $ _sunday_church_talk_played = False
+    $ _sunday_clara_story_played = False
     while _sunday_dinner_active:
         $ _sunday_gift_target = ""
         menu:
@@ -1922,6 +1934,25 @@ label TavernKitchenSundayDinner(serve_spicy=0):
                     menu:
                         "Продолжить":
                             $ _sunday_topic_line_index += 1
+
+            "Послушать историю Клариссы" if "clara" in _sunday_present_ids and "melissa" in _sunday_present_ids and not _sunday_clara_story_played:
+                $ _sunday_clara_story_played = True
+                $ scene_runtime.picture = "images/kitchen/renewed/clarissa_story_homewear.png" if Clara.current_dress() == "nightshirt" else "images/kitchen/renewed/clarissa_story_cozy.png"
+                vscene scene_runtime.picture
+                $ scene_runtime.text = "Кларисса устраивается рядом с Мелиссой и, дождавшись, пока за столом станет тише, начинает историю. — Один купец так берег верность жены, что запирал её комнату, а ключ доверил своему лучшему другу. Через неделю друг попросил второй ключ: первый уже совсем истёрся!"
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Слушать дальше":
+                        pass
+                $ scene_runtime.text = "Мелисса прыскает со смеху и прячет улыбку за кружкой. Сандра закатывает глаза: — Хоть за столом-то не роняйте посуду. Кларисса невинно разводит руками: — Так я же о доверии рассказываю!"
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Вернуться к обеду":
+                        pass
+                $ scene_runtime.picture = tavern_kitchen_sunday_dinner_picture()
+                vscene scene_runtime.picture
+                $ scene_runtime.text = "За воскресным столом продолжается общий разговор."
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Спросить, кто хочет дополнительно заработать" if len(tavern_sunday_dinner_service_offer_ids(_sunday_present_ids)) > 0:
                 menu:
@@ -2021,12 +2052,16 @@ label TavernKitchenSundayDinner(serve_spicy=0):
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Согласиться на прогулку с [_sunday_lake_name]":
+                if _sunday_clara_homewear:
+                    $ Clara.wear_day_clothes()
                 $ main_ui_end_native_scene_state()
                 call TavernKitchenBreakfastOutdoorDate(_sunday_lake_girl, "lake", "sunday_dinner")
                 return True
 
             "Сегодня остаться в трактире":
                 pass
+    if _sunday_clara_homewear:
+        $ Clara.wear_day_clothes()
     $ main_ui_end_native_scene_state()
     $ scene_runtime.picture = tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None
     if str(scene_runtime.picture or "").strip():

@@ -184,6 +184,7 @@ init python:
         unknown_name = "Незнакомка"
         def __init__(self):
             super().__init__("melissa")
+            self.renovation_requests["backyard"] = False
             self.code_name = "melissa"
             self.data = MelissaStaticData
             self.rel = 5
