@@ -80,6 +80,23 @@ def test_peephole_frame_has_a_real_transparent_opening():
         assert image.getpixel((10, 10))[3] > 200
 
 
+def test_closed_peephole_shutter_blocks_the_opening():
+    from PIL import Image
+
+    with Image.open(GAME / "images/tavern/guest_room/peephole_closed.png") as image:
+        assert image.size == (1536, 1024)
+        assert image.convert("RGBA").getpixel((768, 512))[3] == 255
+
+
+def test_client_action_images_keep_open_shutter_only_from_mc_room():
+    scene = (GAME / "Inn/TavernProstClients.rpy").read_text(encoding="utf-8-sig")
+    screen = (GAME / "Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
+    assert 'if return_room == "TavernMyRoom":\n        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"' in scene
+    assert '$ scene_runtime.picture_overlay = ""\n    return' in scene
+    assert 'use BGIMAGE(picture, getattr(scene_runtime, "picture_overlay", ""))' in screen
+    assert 'if overlay_ref:\n            add Transform(overlay_ref, fit="contain", xalign=0.5, yalign=0.0)' in screen
+
+
 @pytest.mark.parametrize("source,loadable,registered,errors", [
     ('"guest_room_peek"', False, True, []),
     ('"images/tavern/guest_room/sofa_day_cold.png"', True, False, []),

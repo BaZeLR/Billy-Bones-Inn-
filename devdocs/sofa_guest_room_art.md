@@ -22,6 +22,9 @@ The current files are all 1536 x 1024 under `game/images/tavern/guest_room/`:
 `peephole_frame.png` is an RGBA foreground with a genuinely transparent
 opening. The registered `guest_room_peek` image draws that frame over the
 same current room background; it does not have another sofa/fire state.
+`peephole_closed.png` is the closed wooden-shutter view in the MC-room object
+menu. Its single opening action reveals `guest_room_peek` before the existing
+occupied-room event, or shows the empty-room observation when nobody is there.
 Room selection reads `Sofa.installed`, actual clock hour (day 06:00-17:59),
 and `TavernGuestRoomStoveObject`'s existing shared fire timer. Before either
 renovation completion or sofa delivery, the original room view is preserved.

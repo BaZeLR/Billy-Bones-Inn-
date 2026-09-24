@@ -38,29 +38,18 @@ init 6 python:
             return 13 <= int(calendar_v2.hour or 0) <= 15 and Georgett.can_work_tavern() and CheckIfSexEventExist("georgett", 3, "Prostitution") > 0
         return story_event_available("TavernEmptyRoom", "tavern_client_room")
 
-    def tavern_empty_room_peephole_no_client():
-        return tavern.renovation_complete('peephole') and not tavern_empty_room_peephole_has_client()
-
     TavernEmptyRoomPeepholeObject = GameObject(
         object_id="tavern_empty_room_peephole",
         name="Потайное окошко",
-        description="В стене вашей комнаты спрятано потайное окошко, за которое вы заплатили Драупниру. Отсюда можно наблюдать за происходящим в гостевой.",
-        picture="images/amanda/Room/emptyroom.jpg",
+        description="В стене вашей комнаты спрятано потайное окошко, за которое вы заплатили Драупниру. Деревянная заслонка закрыта; за ней находится гостевая.",
+        picture="images/tavern/guest_room/peephole_closed.png",
         condition=tavern_empty_room_peephole_visible,
         actions=[
             ObjectAction(
                 action_id="peek_client_room",
-                label="Подглядеть в комнату",
+                label="Осторожно открыть окошко",
                 hook="call",
                 target="TavernEmptyRoomPeekClient",
-                condition=tavern_empty_room_peephole_has_client,
-            ),
-            ObjectAction(
-                action_id="peek_empty_client_room",
-                label="Проверить окошко",
-                hook="call",
-                target="TavernEmptyRoomPeekEmpty",
-                condition=tavern_empty_room_peephole_no_client,
             ),
         ],
         custom_properties={},
@@ -131,7 +120,7 @@ label TavernEmptyRoomPeekEmpty:
     $ main_ui_begin_native_scene_state("Потайное окошко")
     show screen main_ui
     vscene "guest_room_peek"
-    "Вы осторожно проверяете потайное окошко из своей комнаты, но в гостевой сейчас никого нет. Остается только вернуться позже."
+    "Вы осторожно открываете потайное окошко, медленно сдвигая деревянную заслонку. В гостевой сейчас никого нет; остается вернуться позже."
     menu:
         "Закрыть окошко":
             pass

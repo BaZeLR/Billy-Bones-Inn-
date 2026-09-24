@@ -49,6 +49,7 @@ init python:
             "main_text": scene_runtime.text,
             "location_text": scene_runtime.location_text,
             "picture": str(scene_runtime.picture or ""),
+            "picture_overlay": str(getattr(scene_runtime, "picture_overlay", "") or ""),
         }
 
     def main_ui_restore_context(snapshot=None):
@@ -64,6 +65,7 @@ init python:
         scene_runtime.text = state.get("main_text", scene_runtime.text)
         scene_runtime.location_text = state.get("location_text", scene_runtime.location_text)
         scene_runtime.picture = str(state.get("picture", scene_runtime.picture) or "")
+        scene_runtime.picture_overlay = str(state.get("picture_overlay", "") or "")
 
     def main_ui_restart_interaction():
         restart_fn = getattr(renpy_module, "restart_interaction", None)
@@ -344,10 +346,12 @@ screen main_ui_hud_button(caption, action_value, selected_value=False, button_id
         action action_value
 
 
-screen BGIMAGE(media_ref=None):
+screen BGIMAGE(media_ref=None, overlay_ref=None):
     $ _bg_source = media_ref if media_ref else media_displayable(BGDeclare())
     if _bg_source:
         add Transform(_bg_source, fit="contain", xalign=0.5, yalign=0.0)
+        if overlay_ref:
+            add Transform(overlay_ref, fit="contain", xalign=0.5, yalign=0.0)
     else:
         add Solid("#000000")
 
@@ -693,7 +697,7 @@ screen main_ui_left_panel(room_name, desc, picture, dialogue=False, who=None):
             fixed:
                 xfill True
                 ymaximum int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * 0.72)
-                use BGIMAGE(picture)
+                use BGIMAGE(picture, getattr(scene_runtime, "picture_overlay", ""))
 
             frame:
                 id ("window" if dialogue else "main_ui_scene_text")

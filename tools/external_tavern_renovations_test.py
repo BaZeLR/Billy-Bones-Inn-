@@ -333,15 +333,41 @@ testcase external_relocated_window_observes_existing_guest_scene:
     else:
         run Call("TavernMyRoomObjectMenu", "tavern_empty_room_peephole")
         advance until eval (main_ui_runtime.object_id == "tavern_empty_room_peephole") timeout 20.0
-        run (next(item.action for item in main_ui_runtime.action_items if item.caption == "Подглядеть в комнату"))
+        assert eval (scene_runtime.picture == "images/tavern/guest_room/peephole_closed.png")
+        run (next(item.action for item in main_ui_runtime.action_items if item.caption == "Осторожно открыть окошко"))
     advance until eval ("Подсмотреть" in external_renovation_choices()) timeout 20.0
-    assert eval ("Из своей комнаты" in scene_runtime.text)
+    if eval (origin == "TavernMyRoom"):
+        assert eval (scene_runtime.picture == "guest_room_peek" and "осторожно открываете" in scene_runtime.text)
+    else:
+        assert eval ("Из своей комнаты" in scene_runtime.text)
     click id (external_renovation_button("Подсмотреть")) pos (0.5, 0.5)
     advance until eval (external_renovation_choices() == ["Вернуться"]) timeout 20.0
     assert eval (_media_asset_exists(scene_runtime.picture) and rooms.current_code == origin)
+    assert eval (str(getattr(scene_runtime, "picture_overlay", "") or "") == ("images/tavern/guest_room/peephole_frame.png" if origin == "TavernMyRoom" else ""))
     click id (external_renovation_button("Вернуться")) pos (0.5, 0.5)
     advance until eval (not external_renovation_choices()) timeout 20.0
-    assert eval (rooms.current_code == origin and main_ui_runtime.scene_origin is None)
+    assert eval (rooms.current_code == origin and main_ui_runtime.scene_origin is None and not getattr(scene_runtime, "picture_overlay", ""))
+
+testcase external_relocated_window_opens_empty_guest_room:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare()
+    $ tavern.renovations["peephole"].status = "completed"
+    $ rooms.get("TavernMain").state["client_room_girl"] = ""
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom") timeout 20.0
+    run Call("TavernMyRoomObjectMenu", "tavern_empty_room_peephole")
+    advance until eval (main_ui_runtime.object_id == "tavern_empty_room_peephole") timeout 20.0
+    assert eval (scene_runtime.picture == "images/tavern/guest_room/peephole_closed.png")
+    run (next(item.action for item in main_ui_runtime.action_items if item.caption == "Осторожно открыть окошко"))
+    advance until screen "choice" timeout 20.0
+    assert eval (scene_runtime.picture == "guest_room_peek" and "никого нет" in scene_runtime.text)
+    click id (external_renovation_button("Закрыть окошко")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+    assert eval (rooms.current_code == "TavernMyRoom" and scene_runtime.picture != "guest_room_peek" and main_ui_runtime.scene_origin is None)
+    run Call("TavernMyRoomObjectMenu", "tavern_empty_room_peephole")
+    advance until eval (main_ui_runtime.object_id == "tavern_empty_room_peephole") timeout 20.0
+    assert eval (scene_runtime.picture == "images/tavern/guest_room/peephole_closed.png")
 
 testcase external_renovation_object_returns:
     parameter label_name = ["ShedRuinedStove", "ShedHotWaterStove"]

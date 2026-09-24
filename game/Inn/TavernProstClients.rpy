@@ -21,7 +21,11 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
         $ main_ui_end_native_scene_state()
         return
 
-    $ scene_runtime.text = "Из своей комнаты вы смотрите через потайное окошко в гостевую. Отсюда хорошо видно происходящее внутри."
+    if return_room == "TavernMyRoom":
+        vscene "guest_room_peek"
+        $ scene_runtime.text = "Вы осторожно открываете потайное окошко, медленно сдвигая деревянную заслонку. Отсюда хорошо видно происходящее в гостевой."
+    else:
+        $ scene_runtime.text = "Из своей комнаты вы смотрите через потайное окошко в гостевую. Отсюда хорошо видно происходящее внутри."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
@@ -58,6 +62,9 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
         menu:
             "Вернуться":
                 return
+
+    if return_room == "TavernMyRoom":
+        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"
 
     if girl_name == "liza":
         $ Liza.portstreet_clients_seen_today = True
@@ -128,4 +135,5 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
     menu:
         "Вернуться":
             pass
+    $ scene_runtime.picture_overlay = ""
     return

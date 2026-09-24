@@ -24,6 +24,7 @@ python early:
     class SceneRuntimeState(object):
         def __init__(self):
             self.picture = ""
+            self.picture_overlay = ""
             self.text = ""
             self.location_text = ""
             self.movie = False
