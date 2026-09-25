@@ -41,8 +41,16 @@ init 6 python:
             if str(people.location("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
         if tavern.renovation_complete("backyard"):
-            return "images/tavern/backyard/backyard_renewal.png"
+            hour = int(calendar_v2.hour or 0)
+            if hour < 6 or hour >= 19:
+                return "images/tavern/backyard/backyard_renewal_night.png"
+            if procedural_randint(1, 3, "backyard_renewal_rain_%s" % current_game_day()) == 1:
+                return "images/tavern/backyard/backyard_renewal_rain.png"
+            return "images/tavern/backyard/backyard_renewal_day.png"
         return str(rooms.get("Backyard").bg_picture or "")
+
+    def backyard_toilet_ready():
+        return tavern.renovation_complete("backyard")
 
     def player_has_plain_soap():
         return player.item_count("soap_001") > 0
@@ -83,10 +91,11 @@ init 6 python:
 
     BackyardToiletObject = GameObject(
         object_id="backyard_toilet",
-        name="Старый деревянный нужник",
+        name="Дворовый нужник",
         description="Покосившийся деревянный нужник стоит у самого забора. Дверца перекошена, петли скрипят, а внутри пахнет так, как и положено подобному месту.",
         actions=[
             ObjectAction(action_id="examine_toilet", label="Осмотреть нужник", hook="call", target="BackyardToiletExamine"),
+            ObjectAction(action_id="use_toilet", label="Воспользоваться нужником", hook="call", target="BackyardUseToilet", condition=backyard_toilet_ready),
         ],
     )
 
@@ -273,11 +282,43 @@ label BackyardObjectText(object_id="", action_id=""):
 label BackyardToiletExamine:
     if bool(BackyardToiletObject.state.get("busy", False)):
         $ scene_runtime.text = "Дверца нужника заперта изнутри. Похоже, там сейчас занято."
+    elif tavern.renovation_complete("backyard"):
+        $ scene_runtime.text = "Дверца нового нужника приоткрыта. Внутри сухо, доски подогнаны плотно, а на стенах виднеются чьи-то озорные рисунки."
     else:
         $ scene_runtime.text = "Дверца нужника приоткрыта. Сейчас внутри свободно, хотя заходить туда без нужды желания не возникает."
     $ scene_runtime.location_text = scene_runtime.text
     call BackyardObjectMenu("backyard_toilet", scene_runtime.text)
     return
+
+
+label BackyardUseToilet:
+    if story_event_available("Backyard", "toilet_first_use"):
+        call checkTriggers("Backyard", "toilet_first_use", 0)
+        return
+    $ scene_runtime.picture = "images/tavern/backyard/backyard_toilet_renewed_inside.png"
+    $ scene_runtime.text = "В отремонтированном нужнике сухо, дверца закрывается плотно. Можно наконец уединиться без опасения, что постройка рухнет на голову."
+    $ scene_runtime.location_text = scene_runtime.text
+    call BackyardObjectMenu("backyard_toilet", scene_runtime.text)
+    return
+
+
+label story_backyard_toilet_first_use:
+    $ main_ui_begin_native_scene_state("Нужник с удобствами")
+    show screen main_ui
+    vscene "images/tavern/backyard/backyard_toilet_renewed_inside.png"
+    $ scene_runtime.text = "Вы закрываете за собой крепкую дверцу. Внутри сухо и даже уютно; на свежих досках кто-то успел нарисовать такие бесстыдные сценки, что вы невольно задерживаете на них взгляд."
+    menu:
+        "Осмотреть рисунки":
+            pass
+    $ scene_runtime.text = "Снаружи раздаётся голос Мелиссы: — Что, мастер Стефан, каменный шедевр никак не выходит? Какой же вы жалкий скульптор! — Она хохочет так громко, что слышно через весь двор. Вы отвечаете ей только после того, как справляетесь со своим делом."
+    menu:
+        "Выйти во двор":
+            pass
+    $ tractir_activate_achievement("shit_with_comfort")
+    call TractirShowPendingAchievements
+    $ event_runtime.active_thread.complete()
+    $ main_ui_end_native_scene_state()
+    return True
 
 
 label BackyardWashAtBarrel:

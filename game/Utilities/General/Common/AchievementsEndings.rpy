@@ -2,6 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 define tractir_achievement_order = [
+    "shit_with_comfort",
     "melissa_full_storeroom",
     "first_month_survived",
     "sandra_secured_future",
@@ -11,6 +12,10 @@ define tractir_achievement_order = [
 ]
 
 define tractir_achievements = {
+    "shit_with_comfort": (
+        "Shit with comfort",
+        "Впервые воспользовались отремонтированным дворовым нужником и пережили насмешки Мелиссы.",
+    ),
     "melissa_full_storeroom": (
         "Полная кладовая",
         "При подсчете запасов на кухне Мелисса обнаружила больше ста порций провизии и не меньше пятидесяти бочонков вина.",

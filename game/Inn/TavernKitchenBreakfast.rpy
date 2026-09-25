@@ -1245,6 +1245,33 @@ label TavernKitchenBreakfast:
     return
 
 
+label story_shed_renovation_breakfast:
+    $ main_ui_begin_native_scene_state("Завтрак после ремонта сарая")
+    show screen main_ui
+    vscene tavern_kitchen_breakfast_picture()
+    $ scene_runtime.text = "За завтраком Сандра ставит чашку на стол и довольно улыбается: — Теперь у нас есть настоящая купальня, горячая вода и место для стирки. Даже бельё больше не приходится полоскать на виду у всего двора. Спасибо, Стефан."
+    menu:
+        "Выслушать остальных":
+            pass
+    if "melissa" in tavern_breakfast_present_ids():
+        $ scene_runtime.text = "Мелисса расправляет чистый рукав и оглядывает соседок: — Вот увидите, теперь гости будут платить не только за эль. Полотенца тоже должны выглядеть так, будто ими не вытирали конюшню."
+        menu:
+            "Продолжить разговор":
+                pass
+    if "amanda" in tavern_breakfast_present_ids():
+        $ scene_runtime.text = "— А я думала, самое ценное в купальне — дверь с крепким засовом, — замечает Аманда. Она ловит ваш взгляд и добавляет с невинным видом: — Чтобы вода не убегала, разумеется. Сандра прыскает в чашку."
+        menu:
+            "Улыбнуться":
+                pass
+    $ scene_runtime.text = "Сарай всё ещё пахнет свежим деревом, но за столом уже спорят, кому достанется первая горячая вода и кто опять оставит после себя мокрый пол. Дом вдруг кажется немного теплее — не только из-за новой печи."
+    menu:
+        "Продолжить завтрак":
+            pass
+    $ event_runtime.active_thread.complete()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label TavernKitchenBreakfastMenu:
     $ renpy.dynamic("_breakfast_soap_girl", "_breakfast_dress_girl", "_breakfast_issue_girl", "_breakfast_issue_name")
     if not player.tavern_management.breakfast.event_active:

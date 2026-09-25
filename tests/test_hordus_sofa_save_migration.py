@@ -125,11 +125,14 @@ def test_migration_is_repeatable_and_keeps_money_inventory_and_story_progress():
 def test_new_npcs_have_fresh_and_loaded_registration_paths():
     save_source = SAVE_PATH.read_text(encoding="utf-8-sig")
     people_source = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
-    assert "define currentVersion = 93" in save_source
+    assert int(save_source.split("define currentVersion = ", 1)[1].splitlines()[0]) >= 104
     assert "if loaded_version < 93:\n            updateSave_V92()\n            loaded_version = 93" in save_source
     fresh = people_source.split("label InitGameNPCs:", 1)[1]
     assert "call register_hordus_secondary" in fresh
+    assert "call register_nostar_secondary" in fresh
     assert "call register_sofa_secondary" in fresh
+    assert "if loaded_version < 104:\n            updateSave_V103()\n            loaded_version = 104" in save_source
+    assert "people.register(NostarStaticData, Nostar)" in save_source
     for key in ("merchant_contact_unlocked", "merchant_contact_month_key", "market_day_roll_day", "market_day_roll"):
         assert "Clara.%s =" % key not in save_source
 

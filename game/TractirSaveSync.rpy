@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 103
+define currentVersion = 104
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -826,6 +826,9 @@ init -100 python:
         if loaded_version < 103:
             updateSave_V102()
             loaded_version = 103
+        if loaded_version < 104:
+            updateSave_V103()
+            loaded_version = 104
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3293,6 +3296,16 @@ init -100 python:
             info.renovation_requests.setdefault(
                 code, tavern.renovations[code].status in ("requested", "accepted", "building")
             )
+
+    def updateSave_V103():
+        # Saved rooms keep object ids; the toilet's new action comes from its
+        # canonical GameObject definition, not from a saved room copy.
+        people.register(NostarStaticData, Nostar)
+        rooms.repair()
+        artisans = rooms.get("ArtisansQuarter")
+        if artisans is not None and not any(exit.target == "NobilityQuarters" for exit in artisans.exits):
+            artisans.exits.append(next(exit for exit in roomDefinitions["ArtisansQuarter"].exits if exit.target == "NobilityQuarters"))
+        initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

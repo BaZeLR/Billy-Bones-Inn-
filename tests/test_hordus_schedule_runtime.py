@@ -147,7 +147,6 @@ def test_market_schedule_owns_eligible_weekdays_and_closure():
 def test_catalog_has_one_price_per_existing_product():
     data, _, _ = _runtime()
     assert data.catalog == {
-        "cursed_sofa_001": 600,
         "luxury_soap_001": 45,
         "libido_tincture_001": 60,
         "special_mushroom_001": 35,

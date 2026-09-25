@@ -1821,6 +1821,18 @@ define sherwoodThreadList = [
     ], highlight=False, threaded=True),
 ]
 define tavernThreadList = [
+    LThreadData(0, "tavern", "ShedRenovationBreakfast", None, [
+        ("story_shed_renovation_breakfast", None, (6, 11), None, 1, None,
+         ["#tavern.renovation_complete('shed')",
+          "#player.tavern_management.breakfast.event_active",
+          "#'sandra' in tavern_breakfast_present_ids()"],
+         None, "TavernKitchen", "breakfast", -30),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "tavern", "BackyardToiletFirstUse", None, [
+        ("story_backyard_toilet_first_use", None, None, None, 1, None,
+         ["#tavern.renovation_complete('backyard')"],
+         None, "Backyard", "toilet_first_use", 0),
+    ], highlight=False, threaded=True),
     RThreadData(0, "tavern", "BathDay", None, [1, [
         ("story_tavern_bathday", 3, (21, 23), None, 1, None,
          tavern_bathday_ready,
@@ -1860,6 +1872,35 @@ define tavernThreadList = [
     ]], highlight=False, threaded=False),
 ]
 define cityThreadList = [
+    # Hordus knows the former owner; Nostar owns the riddle and sale; the
+    # purchased sofa remains owned by SofaInfo in the tavern guest room.
+    LThreadData(0, "nostar", "RosarioSofa", None, [
+        (
+            "story_hordus_nostar_sofa_lead_0", None, (12, 17), None, 1, None,
+            ["#Hordus.known", "#not Sofa.installed",
+             "#str(people.location('hordus') or '') == 'MarketPlace'"],
+            None, "talk_hordus", "guest_room_furniture", 40, True,
+        ),
+        (
+            "story_nostar_rosario_riddle_1", None, (9, 20), None, 1, None,
+            ["#int(threads['claraPaintingsPath'].num or 0) >= 12",
+             "#rooms.get('NostarHouse').is_open()",
+             "#str(people.location('nostar') or '') == 'NostarHouse'"],
+            None, "talk_nostar", "rosario_riddle", 40, True,
+        ),
+        (
+            "story_nostar_sofa_sale_2", None, (9, 20), None, 1, None,
+            ["#rooms.get('NostarHouse').is_open()",
+             "#str(people.location('nostar') or '') == 'NostarHouse'",
+             "#not Sofa.installed"],
+            None, "talk_nostar", "sofa_sale", 40, True,
+        ),
+        (
+            "story_nostar_sofa_delivery_3", None, None, None, 1, None,
+            ["#Sofa.installed"],
+            None, "TavernMain", "enter", -300, True,
+        ),
+    ], highlight=True, threaded=True),
     LThreadData(0, "city", "BlindPirateFall", None, [
         (
             "story_city_blind_pirate_fall_0",

@@ -66,6 +66,9 @@ init python:
         assert ShedHotWaterStoveObject.state == renpy.session.pop("shed_stove_load_expected")
         assert get_game_object("shed_hot_water_stove") is ShedHotWaterStoveObject
         assert Sofa.installed and people.location("sofa") == "TavernEmptyRoom"
+        assert people.get_info("nostar") is Nostar
+        assert rooms.get("NostarHouse") is not None and rooms.get("NobilityQuarters") is not None
+        assert any(exit.target == "NobilityQuarters" for exit in rooms.get("ArtisansQuarter").exits)
         assert Sandra.renovation_requests["shed"] is True
         assert Clara.renovation_requests["guest_room"] is False
         print("RENOVATION_FULL_LOAD_PASSED", flush=True)
@@ -332,6 +335,47 @@ testcase external_renovation_room_navigation_and_bathing:
     advance until eval (not external_renovation_choices()) timeout 20.0
     assert eval (calendar_v2.hour == 10 and calendar_v2.minute == 15 and rooms.current_code == "ShedWashroom")
     assert eval (main_ui_context_snapshot() == _bath_origin)
+
+testcase external_shed_first_breakfast_reaction_once:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare()
+    python:
+        tavern.renovations["shed"].status = "completed"
+        threads["tavernShedRenovationBreakfast"] = createThread(threadData["tavernShedRenovationBreakfast"])
+        player.tavern_management.breakfast.event_active = True
+        player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+        rooms.enter("TavernKitchen")
+        findAvailableEvents(True)
+    assert eval (story_event_available("TavernKitchen", "breakfast"))
+    run Call("checkTriggers", "TavernKitchen", "breakfast", 0)
+    advance until eval ("Выслушать остальных" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Выслушать остальных")) pos (0.5, 0.5) until eval ("Продолжить разговор" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Продолжить разговор")) pos (0.5, 0.5) until eval ("Улыбнуться" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Улыбнуться")) pos (0.5, 0.5) until eval ("Продолжить завтрак" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Продолжить завтрак")) pos (0.5, 0.5) until eval (threads["tavernShedRenovationBreakfast"].completed) timeout 20.0
+    assert eval (not story_event_available("TavernKitchen", "breakfast"))
+
+testcase external_repaired_backyard_toilet_scene_once:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare("backyard")
+    python:
+        tavern.renovations["backyard"].status = "completed"
+        threads["tavernBackyardToiletFirstUse"] = createThread(threadData["tavernBackyardToiletFirstUse"])
+        calendar_v2.hour = 13
+        findAvailableEvents(True)
+    $ rooms.enter("Backyard")
+    assert eval (backyard_dynamic_picture() in ("images/tavern/backyard/backyard_renewal_day.png", "images/tavern/backyard/backyard_renewal_rain.png"))
+    run Call("BackyardObjectMenu", "backyard_toilet")
+    assert eval ("BackyardUseToilet" in [str(getattr(getattr(item, "action", None), "label", "") or "") for item in main_ui_runtime.action_items]) timeout 5.0
+    run Call("BackyardUseToilet")
+    advance until eval ("Осмотреть рисунки" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Осмотреть рисунки")) pos (0.5, 0.5) until eval ("Выйти во двор" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Выйти во двор")) pos (0.5, 0.5) until eval (threads["tavernBackyardToiletFirstUse"].completed) timeout 20.0
+    assert eval ("shit_with_comfort" in tractir_progress.achieved and not story_event_available("Backyard", "toilet_first_use"))
+    $ calendar_v2.hour = 21
+    assert eval (backyard_dynamic_picture() == "images/tavern/backyard/backyard_renewal_night.png")
 
 testcase external_shed_bathday_requires_hot_water_and_plays_three_pictures:
     run Jump("dev_after_report_checkpoint")

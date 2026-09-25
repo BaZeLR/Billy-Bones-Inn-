@@ -20,6 +20,10 @@ label story_clara_hordus_market:
         "Кларисса снова продает Хорди свои рисунки. Торговец придирчиво проверяет сверток, отсчитывает деньги и прячет бумаги от чужих глаз. Заметив вас, оба приветственно кивают. Похоже, их торговля продолжается своим чередом."
 
     menu:
+        "Спросить о мебели для гостевой" if story_event_available("talk_hordus", "guest_room_furniture"):
+            $ main_ui_end_native_scene_state()
+            call checkTriggers("talk_hordus", "guest_room_furniture", 0)
+            return True
         "Посмотреть товары Хордуса":
             call HordusMerchandise
         "Вернуться к своим делам":
@@ -41,6 +45,8 @@ label IntHordusTalk:
                 $ scene_runtime.text = "— В столице охотно платят за то, о чем здесь предпочитают молчать, — отвечает Хорди. — Я лишь помогаю вещам найти своих хозяев. Иногда и хозяевам — свои вещи."
             "Посмотреть товары" if Hordus.known:
                 call HordusMerchandise
+            "Спросить о мебели для гостевой" if story_event_available("talk_hordus", "guest_room_furniture"):
+                call checkTriggers("talk_hordus", "guest_room_furniture", 0)
             "Закончить разговор":
                 $ main_ui_end_talk_state()
                 return
@@ -52,8 +58,6 @@ label HordusMerchandise:
     $ scene_runtime.text = "Хордус откидывает край покрывала. — Выбирай внимательно. Один редкий товар за месяц; остальное пусть пока подождет своего часа."
     while True:
         menu:
-            "Старинный диван — [HordusStaticData.catalog['cursed_sofa_001']] мараведи" if threads["claraPaintingsPath"].completed and tavern.renovation_complete('peephole') and tavern.renovation_complete('glory_hole') and int(threads["claraForestSofa"].num or 0) == 6 and not Sofa.installed:
-                $ _hordus_item = "cursed_sofa_001"
             "Роскошное мыло — [HordusStaticData.catalog['luxury_soap_001']] мараведи":
                 $ _hordus_item = "luxury_soap_001"
             "Пряная настойка — [HordusStaticData.catalog['libido_tincture_001']] мараведи":
@@ -73,10 +77,23 @@ label HordusMerchandise:
         else:
             $ player.spend_money(_hordus_price)
             $ Hordus.last_trade_month = int(calendar_v2.cycle) * 100 + int(calendar_v2.period)
-            if _hordus_item == "cursed_sofa_001":
-                $ Sofa.installed = True
-                $ scene_runtime.text = "Хордус принимает деньги и распоряжается доставить старинный диван в гостевую комнату вашего трактира, к каменной печи. — Если начнет ворчать, не пугайся. Прежний хозяин тоже жаловался… а потом внезапно уехал из города."
-            else:
-                $ player.add_item(_hordus_item, 1)
-                $ scene_runtime.text = "Хорди передает вам сверток и прячет деньги. — На этот месяц сделка состоялась. Пользуйся с умом."
+            $ player.add_item(_hordus_item, 1)
+            $ scene_runtime.text = "Хорди передает вам сверток и прячет деньги. — На этот месяц сделка состоялась. Пользуйся с умом."
             call stat
+
+
+label story_hordus_nostar_sofa_lead_0:
+    $ main_ui_begin_native_scene_state("Мебель для гостевой")
+    show screen main_ui
+    vscene "images/market/mistery_merchant.png"
+    $ scene_runtime.text = "— Не подберёшь ли что-нибудь для гостевой? — спрашиваете вы, когда Хорди вновь показывает редкости. Торговец складывает покрывало и понижает голос: — Я бы продал тебе диван, хозяин, но месяц назад его купила леди Ностар Линк. Заплатила сразу, а потом пожаловалась, что он слишком много слышит."
+    menu:
+        "Спросить, где искать леди":
+            pass
+    $ scene_runtime.text = "Хордус смотрит, не прислушивается ли кто-нибудь из покупателей. — За кварталом ремесленников начинается улица знати. Пять цветных домов стоят рядом; её большой дом ты узнаешь по дверям и надменному привратнику. Моего имени не упоминай. Скажи лишь, что ищешь вещь для гостевой и умеешь разгадывать чужие тайны."
+    menu:
+        "Поблагодарить Хорди":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True

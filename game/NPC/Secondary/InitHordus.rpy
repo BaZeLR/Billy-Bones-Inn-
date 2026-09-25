@@ -24,7 +24,6 @@ init python:
                 ],
             )
             self.catalog = {
-                "cursed_sofa_001": 600,
                 "luxury_soap_001": 45,
                 "libido_tincture_001": 60,
                 "special_mushroom_001": 35,

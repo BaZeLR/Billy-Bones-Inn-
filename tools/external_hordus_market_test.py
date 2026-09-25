@@ -41,6 +41,7 @@ init python:
             thread.abort()
         threads["claraBookletMarket"].advanceTo(0, force_active=True)
         threads["claraHordusMarket"].forceEnable()
+        threads["nostarRosarioSofa"].advanceTo(0, force_active=True)
         threads["claraPaintingsPath"].num = 0
         threads["claraPaintingsPath"].completed = False
         threads["claraTavernVisit"].num = 6
@@ -64,6 +65,7 @@ init python:
         Hordus.last_meeting_day = -1
         Hordus.last_trade_month = -1
         Sofa.installed = False
+        Nostar.known = False
         calendar_v2.cycle = 1100
         calendar_v2.period = 1
         external_hordus_date(1)
@@ -150,55 +152,50 @@ testcase external_hordus_shop_cash_monthly_cap_and_back:
     click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
     assert eval (main_ui_runtime.mode == "scene" and rooms.current_code == "MarketPlace") timeout 5.0
 
-testcase external_hordus_sofa_prerequisites:
-    parameter missing = ["paintings", "window", "glory", "forest"]
+testcase external_hordus_sofa_lead_is_not_a_shop_item:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 25.0
-    python:
-        external_hordus_prepare(True)
-        threads["claraPaintingsPath"].completed = missing != "paintings"
-        tavern.renovations["peephole"].status = "available" if missing == "window" else "completed"
-        tavern.renovations["glory_hole"].status = "available" if missing == "glory" else "completed"
-        threads["claraForestSofa"].num = 5 if missing == "forest" else 6
+    $ external_hordus_prepare(True)
     run Call("IntHordusTalk")
-    advance until eval ("Посмотреть товары" in external_hordus_choices()) timeout 20.0
+    advance until eval ("Спросить о мебели для гостевой" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Посмотреть товары")) pos (0.5, 0.5) until eval ("Назад" in external_hordus_choices()) timeout 20.0
     assert eval (not any(caption.startswith("Старинный диван") for caption in external_hordus_choices())) timeout 5.0
     click id (external_hordus_button("Назад")) pos (0.5, 0.5) until eval ("Спросить о столице" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Спросить о мебели для гостевой")) pos (0.5, 0.5) until eval ("Спросить, где искать леди" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Спросить, где искать леди")) pos (0.5, 0.5) until eval ("Поблагодарить Хорди" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Поблагодарить Хорди")) pos (0.5, 0.5) until eval (int(threads["nostarRosarioSofa"].num) == 1) timeout 20.0
     click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
 
-testcase external_hordus_sofa_purchase_and_npc_presence:
+testcase external_nostar_rosario_riddle_purchase_and_npc_presence:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 25.0
     python:
         external_hordus_prepare(True)
-        threads["claraPaintingsPath"].completed = True
-        tavern.renovations["peephole"].status = "completed"
-        tavern.renovations["glory_hole"].status = "completed"
-        Clara.rel = 5
-        threads["claraBookletMarket"].advanceTo(threads["claraBookletMarket"].data.length, complete_at_end=True)
-        threads["claraForestSofa"].advanceTo(6, force_active=True)
-        player.set_money(599)
-    run Call("IntHordusTalk")
-    advance until eval ("Посмотреть товары" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Посмотреть товары")) pos (0.5, 0.5) until eval ("Назад" in external_hordus_choices()) timeout 20.0
-    assert eval (any(caption.startswith("Старинный диван") for caption in external_hordus_choices())) timeout 5.0
-    click id (external_hordus_button("Старинный диван")) pos (0.5, 0.5) until eval ("не хватает денег" in scene_runtime.text) timeout 20.0
-    assert eval (not Sofa.installed and player.economy.money == 599 and Hordus.last_trade_month == -1) timeout 5.0
-    $ player.set_money(600)
-    click id (external_hordus_button("Старинный диван")) pos (0.5, 0.5) until eval (Sofa.installed) timeout 20.0
-    assert eval (player.economy.money == 0 and player.item_count("cursed_sofa_001") == 0) timeout 5.0
-    assert eval (not any(caption.startswith("Старинный диван") for caption in external_hordus_choices())) timeout 5.0
+        threads["nostarRosarioSofa"].advanceTo(1, force_active=True)
+        threads["claraPaintingsPath"].advanceTo(12, force_active=True)
+        player.set_money(1200)
+    run Jump("NostarHouse")
+    advance until eval (rooms.current_code == "NostarHouse") timeout 20.0
+    run Call("IntNostarTalk")
+    advance until eval ("Спросить о пропавшей Розарио" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Спросить о пропавшей Розарио")) pos (0.5, 0.5) until eval ("Взять записи о пяти домах" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Взять записи о пяти домах")) pos (0.5, 0.5) until eval ("Назвать соседку" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Назвать соседку")) pos (0.5, 0.5) until eval ("Тифлинг-колдунья" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Тифлинг-колдунья")) pos (0.5, 0.5) until eval ("Выслушать леди Ностар" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Выслушать леди Ностар")) pos (0.5, 0.5) until eval ("Вернуться к разговору о покупке" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Вернуться к разговору о покупке")) pos (0.5, 0.5) until eval ("Спросить о диване" in external_hordus_choices()) timeout 20.0
+    assert eval (int(threads["nostarRosarioSofa"].num) == 2 and not Sofa.installed) timeout 5.0
+    click id (external_hordus_button("Спросить о диване")) pos (0.5, 0.5) until eval (any(caption.startswith("Заплатить 1200 мараведи") for caption in external_hordus_choices())) timeout 20.0
+    click id (external_hordus_button("Заплатить 1200 мараведи")) pos (0.5, 0.5) until eval ("Вернуться в трактир" in external_hordus_choices()) timeout 20.0
+    assert eval (Sofa.installed and player.economy.money == 0 and int(threads["nostarRosarioSofa"].num) == 3) timeout 5.0
+    click id (external_hordus_button("Вернуться в трактир")) pos (0.5, 0.5) until eval ("Закончить разговор" in external_hordus_choices()) timeout 20.0
     assert eval (people.get_info("sofa") is Sofa and Sofa.registry_group == "secondary" and people.ids_at("TavernEmptyRoom").count("sofa") == 1) timeout 5.0
-    assert eval (not any(getattr(obj, "object_id", "") == "cursed_sofa_001" for obj in rooms.get("TavernMain").visible_objects())) timeout 5.0
-    click id (external_hordus_button("Назад")) pos (0.5, 0.5) until eval ("Спросить о столице" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
-    run Jump("TavernEmptyRoom")
-    advance until eval (rooms.current_code == "TavernEmptyRoom" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_sofa") is not None) timeout 20.0
-    click id "main_ui_entity_button_npc_sofa" pos (0.5, 0.5)
-    advance until eval ("Поговорить с диваном" in external_hordus_choices()) timeout 20.0
-    assert eval (main_ui_runtime.mode == "talk" and main_ui_runtime.selected_char == "sofa") timeout 5.0
-    click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
+    run Jump("TavernMain")
+    advance until eval ("Проводить их в гостевую" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Проводить их в гостевую")) pos (0.5, 0.5) until eval ("Выслушать остальных" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Выслушать остальных")) pos (0.5, 0.5) until eval ("Оставить диван на новом месте" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Оставить диван на новом месте")) pos (0.5, 0.5) until eval (threads["nostarRosarioSofa"].completed) timeout 20.0
 '''
 
 

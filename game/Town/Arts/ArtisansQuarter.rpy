@@ -29,6 +29,7 @@ init python:
             RoomExit(label="Идти в мастерскую столяра Драупнира", target="StolyarWorkshop", minutes_to_pass=10),
             RoomExit(label="Идти в лавку портнихи Фараго", target="DressShop", minutes_to_pass=10),
             RoomExit(label="Зайти в цирюльню Серджио Пета", target="BarberShop", minutes_to_pass=10),
+            RoomExit(label="Идти в квартал знати", target="NobilityQuarters", minutes_to_pass=10),
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
         game_items=[

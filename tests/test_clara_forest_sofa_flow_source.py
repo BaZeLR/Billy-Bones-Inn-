@@ -79,6 +79,7 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
     forest = source("game/Forest/Forest.rpy")
     forest_story = source("game/NPC/Girls/Clara/ClaraForestSofaThread.rpy")
     merchant = source("game/NPC/Secondary/IntHordusTalk.rpy")
+    nostar = source("game/NPC/Secondary/IntNostarTalk.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
 
     assert items.count('object_id="clara_pantaloons_001"') == 1
@@ -87,14 +88,14 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
     assert 'player.add_item("clara_pantaloons_001", 1)' in wine_store
     assert 'int(threads["claraPaintingsPath"].num or 0) >= 2' in wine_store
     assert 'story_event_available(room_code, "clara_stash")' in forest
-    assert '$ Sofa.installed = True' in merchant
+    assert '$ Sofa.installed = True' in nostar
     assert '_room_add_item_by_id' not in merchant
     assert 'player.add_item("cursed_sofa_001"' not in merchant
     assert 'class SofaInfo(BaseNPC):' in sofa
     assert 'class SofaData(PeopleData):' in sofa
     assert 'CursedSofaObject = GameObject(' not in sofa
 
-    combined = "\n".join((items, wine_store, forest, forest_story, merchant, sofa))
+    combined = "\n".join((items, wine_store, forest, forest_story, merchant, nostar, sofa))
     for duplicate_flag in (
         "pantaloons_taken",
         "stash_found",
@@ -106,23 +107,28 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
         assert duplicate_flag not in combined
 
 
-def test_sofa_purchase_waits_for_claras_completed_innovations():
+def test_sofa_sale_moves_from_hordus_to_nostar_after_the_riddle():
     merchant = source("game/NPC/Secondary/IntHordusTalk.rpy")
+    nostar = source("game/NPC/Secondary/IntNostarTalk.rpy")
+    runtime = source("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
-    menu = merchant.split("label HordusMerchandise:", 1)[1]
-
-    for condition in (
-        'threads["claraPaintingsPath"].completed',
-        "int(player.tavern_management.client_room_hole or 0) > 0",
-        "int(player.tavern_management.glory_hole or 0) == 2",
-        'int(threads["claraForestSofa"].num or 0) == 6',
-        "not Sofa.installed",
+    assert '"Спросить о мебели для гостевой"' in merchant
+    assert '"cursed_sofa_001"' not in merchant
+    stages = runtime.split('LThreadData(0, "nostar", "RosarioSofa"', 1)[1].split(
+        'LThreadData(0, "city", "BlindPirateFall"', 1
+    )[0]
+    for event_name in (
+        "story_hordus_nostar_sofa_lead_0",
+        "story_nostar_rosario_riddle_1",
+        "story_nostar_sofa_sale_2",
+        "story_nostar_sofa_delivery_3",
     ):
-        assert condition in menu
-
-    assert 'elif player.economy.money < _hordus_price:' in menu
-    assert 'elif Hordus.last_trade_month ==' in menu
-    assert '$ _hordus_price = HordusStaticData.catalog[_hordus_item]' in menu
+        assert event_name in stages
+    assert "#int(threads['claraPaintingsPath'].num or 0) >= 12" in stages
+    assert 'define NOSTAR_ROSARIO_PRICE = 1200' in nostar
+    assert 'define NOSTAR_ROSARIO_ANSWER = "tiefling"' in nostar
+    assert '$ player.spend_money(NOSTAR_ROSARIO_PRICE)' in nostar
+    assert nostar.count('$ Sofa.installed = True') == 1
 
     requirements = sofa.split("label CursedSofaRitualRequirements:", 1)[1].split(
         "label story_clara_sofa_ritual_7:", 1
@@ -141,8 +147,8 @@ def test_sofa_ritual_uses_existing_story_and_npc_state_then_rewards_once():
     assert "#threads['claraPaintingsPath'].completed" in runtime
     assert "#bool(Clara.sex_stat('virginity', True))" in runtime
     assert "#bool(Melissa.sex_stat('virginity', True))" in runtime
-    assert "#int(player.tavern_management.client_room_hole or 0) > 0" in runtime
-    assert "#int(player.tavern_management.glory_hole or 0) == 2" in runtime
+    assert "#tavern.renovation_complete('peephole')" in runtime
+    assert "#tavern.renovation_complete('glory_hole')" in runtime
     assert "#str(people.location('clara') or '') == 'TavernMain'" in runtime
     assert "#str(people.location('melissa') or '') == 'TavernMain'" in runtime
     assert ritual.count("player.intimacy.can_cum_daily += 1") == 1

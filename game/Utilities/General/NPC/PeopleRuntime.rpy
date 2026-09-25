@@ -1958,6 +1958,7 @@ label InitGameNPCs:
     call register_draupnir_secondary
     call register_mongol_secondary
     call register_hordus_secondary
+    call register_nostar_secondary
     call register_sofa_secondary
     call InitDog
     call InitWerecat
