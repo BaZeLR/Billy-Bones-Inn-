@@ -17,10 +17,11 @@ init python:
         chance = max(0.0, float(girl_info.sex_stat("ConceptionChance", 0) or 0))
         if chance <= 0.0:
             return 0
+        bathday_bonus = 50 if int(getattr(girl_info, "bathday_day", -1)) == current_game_day() else 0
         if str(dad_name or "").strip().lower() in ("you", "вы"):
             temporary_chance = girl_info.temporary_conception_permille(current_game_day())
             if temporary_chance > 0:
-                return temporary_chance
+                return min(800, temporary_chance + bathday_bonus)
         if str(dad_name or "").strip().lower() in ("you", "вы"):
             chance *= 3.0
         if int(is_dude_random or 0) != 0:
@@ -34,7 +35,7 @@ init python:
             and npc_friend_level(girl) >= 2
             and tavern_kitchen_fertility_bonus_active()
         ):
-            return 300
+            return min(800, 300 + bathday_bonus)
         cycle_fertility = max(0.0, min(1.0, float(cycle.get("fertility", 0.45) or 0.0)))
         chance *= 0.55 + cycle_fertility
 
@@ -46,7 +47,7 @@ init python:
             mood_multiplier -= 0.20
         mood_multiplier += max(0.0, min(100.0, float(girl_info.arousal_value() or 0))) / 500.0
         chance *= max(0.5, mood_multiplier)
-        return min(800, max(0, int(round(chance))))
+        return min(800, max(0, int(round(chance)) + bathday_bonus))
 
     def pregnancy_check(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
         """

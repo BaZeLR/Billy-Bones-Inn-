@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 KITCHEN = (ROOT / "game/Inn/TavernKitchen.rpy").read_text(encoding="utf-8-sig")
 PEOPLE = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
 BREAKFAST = (ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+DRUNK = (ROOT / "game/NPC/Girls/Common/GetGirlDrunk.rpy").read_text(encoding="utf-8-sig")
 
 
 def load_function(source, name, namespace):
@@ -37,6 +38,7 @@ def kitchen_fixture(arousal):
     for name in ("sandra", "becky", "melissa"):
         info = npc_type()
         info.rel, info.openness, info.corruption, info.fun = 9, 2, 20, 10
+        info.drunk = 0
         info.sex_state = {"arousal": arousal}
         people[name] = info
 
@@ -60,6 +62,7 @@ def kitchen_fixture(arousal):
         scene_runtime=SimpleNamespace(text=""),
     )
     load_function(BREAKFAST, "tavern_kitchen_spicy_tincture_apply", namespace)
+    load_function(DRUNK, "get_girl_drunk", namespace)
     return namespace, people, stock, consumed, player_stats
 
 
@@ -71,19 +74,19 @@ def execute_effect_lines(branch, namespace):
 
 
 @pytest.mark.parametrize("arousal", [0, 40, 98, 100])
-def test_hot_honey_drink_adds_five_arousal_to_both_without_changing_existing_social_effects(arousal):
+def test_hot_honey_drink_uses_friday_dance_drunk_effect_and_adds_five_arousal(arousal):
     namespace, people, stock, consumed, player_stats = kitchen_fixture(arousal)
     branch = KITCHEN.split('"Подать горячую медовую настойку" if ', 1)[1].split(
-        'vscene "images/tavern/kitchen/becky_visit_1.png"', 1
+        'call BeckySandraTipsyKitchenTalk', 1
     )[0]
     execute_effect_lines(branch, namespace)
 
     for name in ("sandra", "becky"):
         assert people[name].arousal_value() == min(100, arousal + 5)
-        assert (people[name].rel, people[name].openness) == (10, 3)
+        assert (people[name].rel, people[name].openness, people[name].drunk) == (12, 3, 1)
         assert people[name].fun == 10
-    assert people["sandra"].corruption == 21
-    assert people["becky"].corruption == 20
+    assert people["sandra"].corruption == 25
+    assert people["becky"].corruption == 24
     assert people["melissa"].arousal_value() == arousal
     assert (people["melissa"].rel, people["melissa"].openness, people["melissa"].corruption) == (9, 2, 20)
     assert consumed == [("libido_tincture_001", 1)]

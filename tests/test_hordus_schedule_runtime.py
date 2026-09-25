@@ -303,7 +303,7 @@ def test_amanda_friday_claim_checks_clara_at_nineteen_even_during_merchant_visit
 
 
 @pytest.mark.parametrize("job", ["jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole"])
-def test_registered_resident_keeps_assigned_shift_on_merchant_day(job):
+def test_registered_resident_attends_monthly_merchant_appointment(job):
     clara, hordus_data, calendar, namespace = _clara_runtime()
     _set_day(calendar, hordus_data.monthly_visit_days()[0])
     calendar.hour = 16
@@ -323,9 +323,22 @@ def test_registered_resident_keeps_assigned_shift_on_merchant_day(job):
     assert competing is not None and competing.matches()
     assert competing.priority < merchant_visit.priority
     assert registry.get_info("clara") is clara
-    assert registry.schedule_entry("clara").label == competing.label
-    assert registry.location("clara") == competing.selected_location()
+    assert registry.schedule_entry("clara").label == merchant_visit.label
+    assert registry.location("clara") == "MarketPlace"
     assert hordus_data.getLocation() == "MarketPlace"
     clara.jobs.clear()
     assert registry.schedule_entry("clara") is merchant_visit
     assert registry.location("clara") == "MarketPlace"
+
+
+def test_resident_drawing_is_evening_not_before_tavern_opens():
+    clara, hordus_data, calendar, namespace = _clara_runtime()
+    namespace["tavern"].renovation_complete = lambda code: code == "peephole"
+    day = next(day for day in (3, 10, 17, 24) if day not in hordus_data.monthly_visit_days())
+    _set_day(calendar, day)
+    calendar.hour = 10
+    assert clara.schedule_entry().label != "tavern_drawing"
+    calendar.hour = 19
+    assert clara.schedule_entry().label == "tavern_drawing"
+    calendar.hour = 21
+    assert clara.schedule_entry().label != "tavern_drawing"

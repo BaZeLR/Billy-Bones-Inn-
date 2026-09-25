@@ -52,6 +52,8 @@ init -50 python:
             return not room_rule_named_true({"rule": "eddie_absent_week"})
         if rule_name == "becky_sandra_kitchen_visit":
             return bool(npc_schedule_becky_sandra_kitchen_visit_active())
+        if rule_name == "sunday_dinner_pending":
+            return bool(tavern_sunday_dinner_available())
         if rule_name == "clara_tavern_visit":
             return bool(Clara.tavern_visit_active())
         if rule_name == "clara_melissa_room_visit":

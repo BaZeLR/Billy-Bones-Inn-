@@ -118,6 +118,15 @@ label TavernMainBarInviteApply(target_npc=""):
     $ scene_runtime.text = "Вы зовете %s к стойке и ставите по кружке эля. Разговор быстро становится свободнее и теплее обычного." % _action_display_name(_bar_target)
     if str((_bar_effect or {}).get("text", "") or "").strip() != "":
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
+    if _bar_target == "amanda":
+        $ main_ui_begin_native_scene_state("Аманда у стойки")
+        show screen main_ui
+        vscene AmandaStaticData.image_path("tavern", "tipsy")
+        $ scene_runtime.text = "Аманда берёт кружку обеими руками и улыбается вам поверх края. После нескольких глотков щёки у неё розовеют. — А ты умеешь порадовать, хозяин, — говорит она и с довольным видом делает ещё глоток."
+        menu:
+            "Продолжить":
+                pass
+        $ main_ui_end_native_scene_state()
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     call TavernMainObjectMenu("bar_001")

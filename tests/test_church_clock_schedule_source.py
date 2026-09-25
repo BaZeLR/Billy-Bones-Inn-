@@ -75,7 +75,7 @@ def test_sunday_service_npc_schedules_match_the_church_clock_phase():
         assert after_mass[0]["end"] == "12:59", npc_id
 
 
-def test_household_sunday_dinner_uses_one_shared_kitchen_window():
+def test_household_sunday_dinner_stays_scheduled_until_served_after_church():
     schedule_dir = PROJECT_ROOT / "game" / "NPC" / "Schedules"
 
     for npc_id in ("sandra", "melissa", "amanda"):
@@ -83,9 +83,19 @@ def test_household_sunday_dinner_uses_one_shared_kitchen_window():
         dinner_entries = [row for row in payload["entries"] if row.get("label") == "sunday_dinner"]
         assert len(dinner_entries) == 1, npc_id
         assert dinner_entries[0]["weekdays"] == [7], npc_id
-        assert dinner_entries[0]["start"] == "12:30", npc_id
-        assert dinner_entries[0]["end"] == "13:30", npc_id
+        assert dinner_entries[0]["start"] == "11:00", npc_id
+        assert dinner_entries[0]["end"] == "20:29", npc_id
         assert dinner_entries[0]["location"] == "TavernKitchen", npc_id
+        assert dinner_entries[0]["condition"] == {"rule": "sunday_dinner_pending"}, npc_id
+
+
+def test_church_confession_uses_one_event_option_per_unfinished_confession():
+    source = _source(PROJECT_ROOT / "game" / "Town" / "Church" / "ChurchIspoved.rpy")
+
+    assert source.count('"В том, что совокуплялись с Жоржеттой" if') == 1
+    assert source.count('"В том, что совокуплялись с Жоржеттой прямо во время службы" if') == 1
+    assert 'not Georgett.story_value("churchlizaadmit", 0)' in source
+    assert '"[scene_runtime.text]"' not in source
 
 
 def test_church_room_phase_pictures_use_church_folder_vscene_assets():

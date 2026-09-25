@@ -349,9 +349,14 @@ screen main_ui_hud_button(caption, action_value, selected_value=False, button_id
 screen BGIMAGE(media_ref=None, overlay_ref=None):
     $ _bg_source = media_ref if media_ref else media_displayable(BGDeclare())
     if _bg_source:
-        add Transform(_bg_source, fit="contain", xalign=0.5, yalign=0.0)
         if overlay_ref:
-            add Transform(overlay_ref, fit="contain", xalign=0.5, yalign=0.0)
+            add Transform(Composite(
+                (1536, 1024),
+                (0, 0), Transform(_bg_source, xysize=(1536, 1024), fit="contain", xalign=0.5, yalign=0.5),
+                (0, 0), overlay_ref,
+            ), fit="contain", xalign=0.5, yalign=0.0)
+        else:
+            add Transform(_bg_source, fit="contain", xalign=0.5, yalign=0.0)
     else:
         add Solid("#000000")
 

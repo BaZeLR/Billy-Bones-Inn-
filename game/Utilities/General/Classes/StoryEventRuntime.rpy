@@ -583,9 +583,9 @@ define claraThreadList = [
     # Repeatable household life, with once-per-day entry/breakfast events.
     # NPC state and the schedule own presence; no second resident cursor.
     RThreadData(0, "clara", "ResidentLife", ["#Clara.tavern_resident()"], [1, [
-        ("story_clara_drawing_work", None, (9, 11), None, 1, None,
+        ("story_clara_drawing_work", None, (18, 20), None, 1, None,
          ["#Clara.drawing_now()"], None, "TavernMyRoom", "enter", 80),
-        ("story_clara_drawing_work", None, (9, 11), None, 1, None,
+        ("story_clara_drawing_work", None, (18, 20), None, 1, None,
          ["#Clara.drawing_now()"], None, "talk_clara", "drawing", 80, True),
         ("story_clara_breakfast_banter", None, (6, 11), None, 1, None,
          ["#player.tavern_management.breakfast.event_active",
@@ -1543,7 +1543,6 @@ define beckyThreadList = [
         [],
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "GerhardAdvice", [
-        "beckySandraKitchenVisitDone",
         "beckyGerhardAdviceEnabled",
     ], [
         (
@@ -1822,9 +1821,17 @@ define sherwoodThreadList = [
     ], highlight=False, threaded=True),
 ]
 define tavernThreadList = [
+    RThreadData(0, "tavern", "BathDay", None, [1, [
+        ("story_tavern_bathday", 3, (21, 23), None, 1, None,
+         tavern_bathday_ready,
+         None, "ShedWashroom", "enter", -30),
+        ("story_tavern_bathday", 6, (18, 22), None, 1, None,
+         tavern_bathday_ready,
+         None, "ShedWashroom", "enter", -30),
+    ]], highlight=False, threaded=False),
     RThreadData(0, "tavern", "SundayDinner", None, [1, [
         (
-            "TavernKitchenSundayDinnerMenu", 7, (12, 13), None,
+            "TavernKitchenSundayDinnerMenu", 7, (11, 20), None,
             1,
             None,
             tavern_sunday_dinner_available,

@@ -416,7 +416,7 @@ label TavernSandraLedgerScene:
                 $ _premium_person_info = people.get_info(_premium_person)
                 $ _premium_person_corruption = int(_premium_person_info.corruption or 0)
                 $ player.spend_money(_premium_amount)
-                $ _premium_person_info.change_social(friend_delta=1, corruption_delta=1)
+                $ _premium_person_info.change_social(friend_delta=1, corruption_delta=(0 if _premium_person == "amanda" else 1))
                 $ _premium_person_info.reward_need_fulfilled(max(2, _premium_mana_gain), "personal_premium")
                 $ _premium_picture = tavern_premium_reaction_picture(_premium_person)
                 if str(_premium_picture or "").strip():

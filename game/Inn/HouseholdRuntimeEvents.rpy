@@ -824,7 +824,8 @@ label HouseholdMorningIssueWarmDrink(girl_name=""):
     if _issue_info is not None:
         $ _issue_info.mark_talked(1)
     if _issue_girl == "amanda":
-        $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+        $ Amanda.change_social(open_delta=1)
+        $ Amanda.add_arousal(8)
     elif _issue_girl == "melissa":
         $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
     else:
@@ -961,7 +962,6 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     if _wake_girl == "amanda":
         $ _wake_amanda_picture = tavern_amanda_room_wake_picture(_wake_amanda_sleep_dress)
         vscene _wake_amanda_picture
-        $ Amanda.change_social(friend_delta=1)
     elif _wake_girl == "melissa":
         $ Melissa.change_social(friend_delta=1)
     else:
@@ -993,11 +993,11 @@ label HouseholdWakeSleepyGirl(girl_name=""):
         $ scene_runtime.text = "Вы будите Аманду, и та сперва лишь что-то недовольно бурчит в подушку. Но стоит ей понять, что утренний стол уже давно собирается без нее, как она мигом оживает и принимается оправдываться."
         if _wake_indecent:
             $ scene_runtime.text = str(scene_runtime.text or "") + "\nВо сне Аманда успела раскрыться куда сильнее приличного, и вам открывается достаточно, чтобы понять: спать скромницей она умеет не всегда. Поняв по вашему лицу, что вы успели увидеть лишнее, она сперва краснеет, а потом упрямо делает вид, будто это пустяк."
-            $ Amanda.change_social(corruption_delta=1)
+            $ Amanda.add_arousal(2)
         if _wake_bulge:
             if int(Amanda.rel or 0) >= 10 or int(Amanda.corruption or 0) >= 30:
                 $ scene_runtime.text = str(scene_runtime.text or "") + "\nАманда быстро замечает и вашу предательскую выпуклость. Вместо того чтобы смутиться, она хихикает, бросает на вас хитрый взгляд и только потом начинает поспешно поправлять одежду."
-                $ Amanda.change_social(corruption_delta=1)
+                $ Amanda.add_arousal(2)
             else:
                 $ scene_runtime.text = str(scene_runtime.text or "") + "\nСтоит Аманде заметить ваш слишком уж выразительный стояк, как она фыркает, закатывает глаза и тут же прикрывается одеялом уже куда тщательнее."
     $ scene_runtime.location_text = scene_runtime.text

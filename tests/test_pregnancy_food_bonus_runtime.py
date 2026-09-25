@@ -13,9 +13,10 @@ class GirlInfo:
     registry_group = "girl"
     mood = "neutral"
 
-    def __init__(self, worker, temporary_chance=0):
+    def __init__(self, worker, temporary_chance=0, bathday_day=-1):
         self.worker = worker
         self.temporary_chance = temporary_chance
+        self.bathday_day = bathday_day
 
     def sex_stat(self, key, default=0):
         return 20 if key == "ConceptionChance" else default
@@ -30,12 +31,12 @@ class GirlInfo:
         return self.temporary_chance
 
 
-def conception_chance(worker, phase, kitchen_bonus, friend_level=2, dad_name="you", temporary_chance=0):
+def conception_chance(worker, phase, kitchen_bonus, friend_level=2, dad_name="you", temporary_chance=0, bathday_day=-1):
     source = SOURCE.read_text(encoding="utf-8-sig")
     start = source.index("    def pregnancy_conception_chance")
     end = source.index("\n    def pregnancy_check", start)
     function_source = textwrap.dedent(source[start:end])
-    info = GirlInfo(worker, temporary_chance)
+    info = GirlInfo(worker, temporary_chance, bathday_day)
     namespace = {
         "people": SimpleNamespace(get_info=lambda _girl: info),
         "girl_decision_cycle_state": lambda _girl: {"phase": phase, "fertility": 1.0 if phase == "fertile" else 0.45},
@@ -96,6 +97,13 @@ def test_fertility_food_bonus_requires_meat_milk_and_honey(boar, honey, milk, ex
 def test_shared_special_mushroom_overrides_mc_conception_chance_only():
     assert conception_chance(True, "luteal", False, dad_name="you", temporary_chance=550) == 550
     assert conception_chance(True, "luteal", False, dad_name="other", temporary_chance=550) == 20
+
+
+def test_bathday_adds_five_percentage_points_only_on_bath_day():
+    assert conception_chance(True, "luteal", False, bathday_day=10) == 110
+    assert conception_chance(True, "luteal", False, bathday_day=9) == 60
+    assert conception_chance(True, "fertile", True, bathday_day=10) == 350
+    assert conception_chance(True, "luteal", False, temporary_chance=550, bathday_day=10) == 600
 
 
 def test_conception_roll_is_unique_per_girl_and_inside_attempt():

@@ -91,7 +91,10 @@ After renovation there are **two enclosed rooms**, not one open combined room:
   split-firewood storage. Existing inventory and wood chores stay here.
 - `ShedWashroom`: separate laundry/bathing room reached through a door;
   wash trough, bathing tub, linens and a privacy curtain. Bathing uses the
-  existing player appearance/washing method and takes 15 minutes.
+  existing player appearance/washing method and takes 15 minutes. The tub
+  requires hot water from the adjacent stove. The stove's object menu offers one
+  preparation choice that calls the shared `MakeFire` and `BoilWater` chores;
+  the stove's saved hot-water expiry is the sole readiness state.
 
 New day/night image pairs are under `game/images/tavern/backyard/shed/`:
 

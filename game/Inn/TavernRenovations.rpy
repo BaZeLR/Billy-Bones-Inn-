@@ -14,9 +14,11 @@ init -30 python:
 
         @property
         def order_visible(self):
+            if tavern.renovation_complete(self.code):
+                return False
             if self.code in ("backyard", "shed", "guest_room"):
                 return people.get_info(self.quest_giver).renovation_requests.get(self.code, False)
-            return tavern.renovations[self.code].status in ("accepted", "building", "completed")
+            return tavern.renovations[self.code].status in ("accepted", "building")
 
         @property
         def quote(self):
@@ -168,13 +170,15 @@ init 5 python:
         condition={"rule": "tavern_renovation", "code": "shed"},
         actions=[ObjectAction(action_id="use_shed_wash_tub", label="Вымыться", hook="call", target="ShedWashroomBath")],
     )
-    ShedHotWaterStoveObject = GameObject(
-        object_id="shed_hot_water_stove", name="Печь с водяным баком",
-        description="Новая печь греет большой металлический бак. Бревна и колотые дрова сложены отдельно, на безопасном расстоянии от топки; запас топлива по-прежнему общий для хозяйства.",
-        picture="images/tavern/backyard/shed/renovated.png",
-        condition={"rule": "tavern_renovation", "code": "shed"},
-        actions=[ObjectAction(action_id="inspect_shed_stove", label="Печь и запас дров", hook="call", target="ShedHotWaterStove")],
-    )
+
+default ShedHotWaterStoveObject = GameObject(
+    object_id="shed_hot_water_stove", name="Печь с водяным баком",
+    description="Новая печь греет большой металлический бак. Бревна и колотые дрова сложены отдельно, на безопасном расстоянии от топки; запас топлива по-прежнему общий для хозяйства.",
+    picture="images/tavern/backyard/shed/renovated.png",
+    condition={"rule": "tavern_renovation", "code": "shed"},
+    actions=[ObjectAction(action_id="inspect_shed_stove", label="Печь и запас дров", hook="call", target="ShedHotWaterStove")],
+    state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0, "hot_water_until_minute": 0, "boiledWaterToday": 0},
+)
 
 # Each request resolves its own item, never aborting unrelated improvements.
 label story_tavern_renovation_request:
@@ -325,9 +329,12 @@ label ShedRuinedStove:
 label ShedWashroomBath(object_id="shed_wash_tub"):
     $ main_ui_begin_native_scene_state(ShedWashTubObject.name)
     $ scene_runtime.picture = shed_washroom_picture()
-    "В отдельной купальне можно спокойно вымыться. Корыто для белья стоит в стороне, на полке сложены чистые полотенца."
+    if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+        "В отдельной купальне можно спокойно вымыться: вода из бака уже нагрета. Корыто для белья стоит в стороне, на полке сложены чистые полотенца."
+    else:
+        "Купель еще не готова. В соседнем помещении нужно разжечь печь и вскипятить воду в баке; здесь пока ждут чистые полотенца и пустая купель."
     menu:
-        "Вымыться — 15 минут":
+        "Вымыться — 15 минут" if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
             $ player.appearance.wash()
             $ calendar_v2.advance_minutes(15)
             "Вы смываете с себя дорожную пыль и вытираетесь чистым полотенцем."
@@ -341,10 +348,40 @@ label ShedWashroomBath(object_id="shed_wash_tub"):
 
 label ShedHotWaterStove:
     $ main_ui_begin_native_scene_state(ShedHotWaterStoveObject.name)
-    $ scene_runtime.picture = shed_picture()
-    "На месте развалившейся печи теперь стоит крепко сложенная новая, с баком для горячей воды. В этом помещении есть два сухих места хранения: одно для целых бревен, другое для колотых дров. Дверь в перегородке ведет в отдельную прачечную с купальней."
-    menu:
-        "Назад":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
+    show screen main_ui
+    while True:
+        vscene shed_picture()
+        $ scene_runtime.text = "Печь с водяным баком стоит отдельно от прачечной и купальни. Дрова лежат в сарае, вдали от топки."
+        if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+            $ scene_runtime.text += " В баке есть горячая вода."
+        elif _pc_fire_is_active(ShedHotWaterStoveObject):
+            $ scene_runtime.text += " Огонь горит; воду можно вскипятить."
+        else:
+            $ scene_runtime.text += " Печь остыла, горячей воды нет."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Подготовить купальню" if not _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+                if not _pc_fire_is_active(ShedHotWaterStoveObject):
+                    call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")
+                    if _pc_fire_is_active(ShedHotWaterStoveObject):
+                        "Вы кладете колотые дрова в топку и разжигаете печь под медным баком."
+                    else:
+                        "[scene_runtime.text]"
+                if _pc_fire_is_active(ShedHotWaterStoveObject) and not _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+                    call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")
+                    if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+                        "Пока вода закипает, вы приводите купальню в порядок. Затем наполняете купель горячей водой и раскладываете чистые полотенца. Теперь купальня готова."
+                    else:
+                        "[scene_runtime.text]"
+            "Разжечь огонь или подложить дрова":
+                call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")
+                "[scene_runtime.text]"
+            "Вскипятить воду" if _pc_fire_is_active(ShedHotWaterStoveObject):
+                call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")
+                "[scene_runtime.text]"
+            "Вычистить золу" if _object_state_int(ShedHotWaterStoveObject, "ash_dirty", 0) > 0:
+                call Clean("ashes", "Shed", "", "shed_hot_water_stove")
+                "[scene_runtime.text]"
+            "Назад":
+                $ main_ui_end_native_scene_state()
+                return

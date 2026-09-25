@@ -61,7 +61,7 @@ def test_becky_eddie_abort_and_sherwood_handoff_use_thread_lifecycle():
         "define tavernThreadList", 1
     )[0]
 
-    assert '"beckySandraKitchenVisitDone"' in advice_thread
+    assert '"beckySandraKitchenVisitDone"' not in advice_thread
     assert '"beckyGerhardAdviceEnabled"' in advice_thread
     eddie_base_conditions, eddie_events = eddie_thread.split("], [", 1)
     first_join_event = eddie_events.split('"BeckyEddieJoinFirst"', 1)[1].split(
@@ -106,8 +106,8 @@ def test_kitchen_event_distinguishes_tea_from_the_story_advancing_tincture():
     )[1].split('"Подать горячую медовую настойку"', 1)[0]
     tincture_branch = KITCHEN.split(
         '"Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:',
-        1,
-    )[1].split('"Не мешать разговору":', 1)[0]
+        2,
+    )[2].split('"Не мешать разговору":', 1)[0]
 
     assert 'threads["beckyGerhardAdvice"].enable()' not in TOPICS
     assert KITCHEN.count('threads["beckyGerhardAdvice"].enable()') == 1
@@ -121,7 +121,8 @@ def test_kitchen_event_distinguishes_tea_from_the_story_advancing_tincture():
     assert "_becky_sandra_visit_thread.complete()" not in tea_branch
 
     assert 'tavern_kitchen_spicy_tincture_apply(("sandra", "becky"))' in tincture_branch
-    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' in tincture_branch
+    assert 'call BeckySandraTipsyKitchenTalk' in tincture_branch
+    assert 'vscene "images/tavern/kitchen/becky_visit_1.png"' in KITCHEN.split('label BeckySandraTipsyKitchenTalk:', 1)[1]
     assert "Эдди давно" in tincture_branch
     assert "здоровом доме" in tincture_branch
     assert "для хозяйства, и для торговли" in tincture_branch

@@ -42,11 +42,12 @@ label TavernMyRoomWindowLookBackyard:
 
 label story_amanda_night_bowl_window_0:
     $ renpy.dynamic("_window_text")
+    if not getattr(Amanda, "backyard_relief_seen", False):
+        $ Amanda.change_social(corruption_delta=1)
+        $ Amanda.backyard_relief_seen = True
     if Amanda.prefers_backyard_relief():
-        $ Amanda.change_social(corruption_delta=2)
         $ _window_text = "Вы осторожно выглядываете во двор и замечаете, как Аманда, кутаясь в ночную рубашку и недовольно озираясь по сторонам, все равно выбирается наружу. Похоже, даже получив новый горшок, она не до конца отказалась от ночных вылазок. Аманда, краснея даже в темноте, торопливо присаживается у забора, делает свое дело и почти бегом скрывается обратно в доме."
     else:
-        $ Amanda.change_social(corruption_delta=1)
         $ _window_text = "Вы осторожно выглядываете во двор и замечаете, как Аманда, кутаясь в ночную рубашку и недовольно озираясь по сторонам, торопливо выскальзывает наружу. Без своей привычной ночной миски ей приходится искать облегчения во дворе. Аманда, краснея даже в темноте, поспешно присаживается у забора, делает свое дело и почти бегом скрывается обратно в доме."
     $ TavernMyRoomWindowObject.picture = "images/player_room/windowAmand.png"
     call TavernMyRoomObjectMenu("myroom_window_001", _window_text)

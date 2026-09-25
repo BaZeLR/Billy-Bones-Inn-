@@ -39,7 +39,7 @@ def test_zimmer_dialogs_are_explicit_sublabels_not_dispatcher():
         "label IntZimmerTalkHorseProgress:",
         "label IntZimmerTalkSherwoodStory1:",
         "label IntZimmerTalkSherwoodStory2:",
-        "label IntZimmerTalkRobinReport:",
+        "label IntZimmerTalkRobinReport(report_eddie=False):",
         "label IntZimmerTalkPay100:",
         "label IntZimmerTalkHaggle:",
         "label IntZimmerTalkInvestigation:",
@@ -92,7 +92,7 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     ]:
         assert choice in source
 
-    assert 'int(_clara_booklet_thread.num or 0) == 7' in source
+    assert 'int(_clara_booklet_thread.num or 0) == 8' in source
     assert "not Mongol.guard_captain_known" in source
     assert "_mongol_var" not in source
     assert "Mongol.guard_captain_known = True" in source
@@ -100,15 +100,18 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
 
 def test_eddie_complaint_opens_the_existing_zimmer_robin_case():
     source = _source(ZIMMER_TALK)
-    report = source.split("label IntZimmerTalkRobinReport:", 1)[1].split(
+    report = source.split("label IntZimmerTalkRobinReport(report_eddie=False):", 1)[1].split(
         "label IntZimmerTalkPay100:", 1
     )[0]
 
-    assert "Robin.robbery_count > 0 or Eddie.asked_fingal_guard_complaint" in source
-    assert "if Robin.robbery_count > 0:" in report
+    assert '"Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and Robin.robbery_count > 0 and Zimmer.robin_complaint_stage == 0:' in source
+    assert '"Сообщить об избиении Эдди и краже его лошади" if int(Zimmer.talked_today or 0) < 2 and Eddie.fingal_talk_stage >= 2 and Zimmer.robin_complaint_stage == 0:' in source
+    assert "call IntZimmerTalkRobinReport(True)" in source
+    assert "if report_eddie:" in report
     assert "рассказ Эдди" in report
+    assert "его избили, ограбили и отняли лошадь" in report
     assert "Zimmer.robin_complaint_stage = 1" in report
-    assert "Eddie.asked_fingal_guard_complaint =" not in report
+    assert "Eddie.asked_fingal_guard_complaint" not in source
 
 
 def test_zimmer_talk_exposes_robin_camp_report_as_story_event():

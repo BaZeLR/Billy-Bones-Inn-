@@ -35,8 +35,10 @@ label IntZimmerTalk:
                 call IntZimmerTalkSherwoodStory1
             "И что с лесом теперь?" if int(Zimmer.talked_today or 0) < 2 and Becky.knows_blackwood and Zimmer.sherwood_story_stage == 1:
                 call IntZimmerTalkSherwoodStory2
-            "Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and (Robin.robbery_count > 0 or Eddie.asked_fingal_guard_complaint) and Zimmer.robin_complaint_stage == 0:
+            "Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and Robin.robbery_count > 0 and Zimmer.robin_complaint_stage == 0:
                 call IntZimmerTalkRobinReport
+            "Сообщить об избиении Эдди и краже его лошади" if int(Zimmer.talked_today or 0) < 2 and Eddie.fingal_talk_stage >= 2 and Zimmer.robin_complaint_stage == 0:
+                call IntZimmerTalkRobinReport(True)
             "Отдать сотню мараведи" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 1 and player.economy.money >= 100:
                 call IntZimmerTalkPay100
             "Поторговаться" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 1 and player.economy.money >= 100:
@@ -108,13 +110,18 @@ label IntZimmerTalkSherwoodStory2:
     return
 
 
-label IntZimmerTalkRobinReport:
+label IntZimmerTalkRobinReport(report_eddie=False):
     $ renpy.dynamic("_zimmer_name")
     $ _zimmer_name = "zimmer"
-    if Robin.robbery_count > 0:
+    if report_eddie:
+        $ scene_runtime.text = "Вы передаете Циммерману рассказ Эдди: на Шервудской вырубке его избили, ограбили и отняли лошадь."
+        if Robin.robbery_count > 0:
+            $ scene_runtime.text += " Вы добавляете, что эта шайка напала и на вас."
+        $ scene_runtime.text += "\n\n\"Ай-ай, молодой человек, какие ужасы вы рассказываете!\" качает головой десятник. \"Однако вырубка находится далековато, и поддерживать там порядок нам непросто. Если вы компенсируете расходы на расследование, мы поищем эту шайку. Из сочувствия к пострадавшему я готов удовлетвориться сотней мараведи.\""
+    elif Robin.robbery_count > 0:
         $ scene_runtime.text = "\"Ай-ай молодой человек, какие вы ужасы рассказываете. Грабеж? И где вы говорите это произошло? На Шервудской вырубке? Очень, очень жаль. Мы должны защищать добрых горожан нашего славного Коитополиса, однако ж эта вырубка находится далековато. Так что порядок мы там, сами понимаете, поддерживать не можем. Правда, если вы решите компенсировать нам расходы, связанные с расследованием, мы можем и поискать грабителей. Путь неблизкий, но из сочуствия и уважения к вам я готов таки удовлетворится сотней мараведи.\""
-    else:
-        $ scene_runtime.text = "Вы передаете Циммерману рассказ Эдди: на Шервудской вырубке его избили, ограбили и отняли лошадь.\n\n\"Ай-ай, молодой человек, какие ужасы вы рассказываете!\" качает головой десятник. \"Однако вырубка находится далековато, и поддерживать там порядок нам непросто. Если вы компенсируете расходы на расследование, мы поищем эту шайку. Из сочувствия к пострадавшему я готов удовлетвориться сотней мараведи.\""
+        if Eddie.fingal_talk_stage >= 2:
+            $ scene_runtime.text = "Вы также сообщаете десятнику об избиении Эдди, грабеже и краже его лошади.\n\n" + scene_runtime.text
     vscene "images/zimmer/talk.png"
     $ Zimmer.robin_complaint_stage = 1
     $ Zimmer.mark_talked(1)
@@ -139,7 +146,10 @@ label IntZimmerTalkPay100:
 label IntZimmerTalkHaggle:
     $ renpy.dynamic("_zimmer_name")
     $ _zimmer_name = "zimmer"
-    $ scene_runtime.text = "\"Господин Циммерман, вы же сами понимаете, я жертва ограбления, денег у меня мало. Вы уж войдите в мое бедственное положение. Помогите сиротинушке! 50 мараведи?\""
+    if Robin.robbery_count > 0:
+        $ scene_runtime.text = "\"Господин Циммерман, вы же сами понимаете, я жертва ограбления, денег у меня мало. Вы уж войдите в мое бедственное положение. Помогите сиротинушке! 50 мараведи?\""
+    else:
+        $ scene_runtime.text = "\"Господин Циммерман, Эдди избили, ограбили и отняли его лошадь. Я хочу ему помочь, но сотня мараведи — большие деньги. Может, пятьдесят?\""
     if player.economy.money >= 500:
         $ scene_runtime.text += "\n\n\"Не дурите старого Циммермана, молодой человек. Я же прекрасно знаю, сколько у вас на самом деле денег,\" отбрил вас десятник."
     else:

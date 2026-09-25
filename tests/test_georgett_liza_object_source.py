@@ -618,7 +618,7 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert 'Georgett.set_story_value("georgettadmit", 1)' in confession
     assert 'Georgett.set_story_value("churchgeorgettadmit", 1)' in confession
     assert 'Georgett.set_story_value("churchlizaadmit", 1)' in confession
-    assert 'Georgett.story_value("churchgeorgettadmit", 0):' in confession
+    assert 'Georgett.story_value("churchgeorgettadmit", 0) and not Georgett.story_value("churchlizaadmit", 0):' in confession
     assert 'Georgett.story_value("churchgeorgettadmit", 0) == 0:' not in confession
     assert "Georgett.can_trigger_after_sermon_event()" in next_day
     assert "Liza.can_trigger_after_sermon_event()" in next_day

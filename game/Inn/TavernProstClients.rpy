@@ -102,6 +102,7 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
             $ pregnancy_check("georgett", "mouthface", 1, "", 1, "Неизвестный горожанин")
             $ show_image_seq("georgett", "portevents", "event3_", 3)
         elif SexEventType == 99:
+            $ scene_runtime.picture = tavern_empty_room_picture("bedroom")
             if not threads["beckyEddieSex"].completed:
                 if not Eddie.seen_with_georgett:
                     $ scene_runtime.text = "Вы видите голую Жоржетту с рыжим Эдди. Похоже, они играют в какую-то игру."

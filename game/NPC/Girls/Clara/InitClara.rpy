@@ -27,16 +27,10 @@ init python:
             }
 
         def schedule_resolve(self, weekday_value=None, time_value=None):
+            # The twice-monthly sale is a planned market appointment.
             merchant_visit = HordusStaticData.schedule_resolve(weekday_value, time_value)
-            # Selling drawings is a planned outing, not a reason to miss an
-            # assigned shift. Ordinary off-duty merchant meetings stay intact.
             if merchant_visit is not None:
-                on_shift = any(entry is not None for entry in (
-                    Clara.tavern_regular_job_schedule_entry(weekday_value, time_value),
-                    Clara.tavern_service_schedule_entry(weekday_value, time_value),
-                ))
-                if not on_shift:
-                    return merchant_visit
+                return merchant_visit
             return super(ClaraData, self).schedule_resolve(weekday_value, time_value)
 
     class ClaraInfo(Girl):

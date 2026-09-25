@@ -92,9 +92,13 @@ def test_client_action_images_keep_open_shutter_only_from_mc_room():
     scene = (GAME / "Inn/TavernProstClients.rpy").read_text(encoding="utf-8-sig")
     screen = (GAME / "Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
     assert 'if return_room == "TavernMyRoom":\n        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"' in scene
+    assert scene.index('scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"') < scene.index('if girl_name == "liza":') < scene.index('elif girl_name == "georgett":')
+    assert 'elif SexEventType == 99:\n            $ scene_runtime.picture = tavern_empty_room_picture("bedroom")' in scene
     assert '$ scene_runtime.picture_overlay = ""\n    return' in scene
     assert 'use BGIMAGE(picture, getattr(scene_runtime, "picture_overlay", ""))' in screen
-    assert 'if overlay_ref:\n            add Transform(overlay_ref, fit="contain", xalign=0.5, yalign=0.0)' in screen
+    assert 'if overlay_ref:\n            add Transform(Composite(' in screen
+    assert '(0, 0), Transform(_bg_source, xysize=(1536, 1024), fit="contain", xalign=0.5, yalign=0.5)' in screen
+    assert '(0, 0), overlay_ref,' in screen
 
 
 @pytest.mark.parametrize("source,loadable,registered,errors", [

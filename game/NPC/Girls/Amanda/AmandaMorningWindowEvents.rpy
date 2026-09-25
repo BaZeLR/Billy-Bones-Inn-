@@ -55,6 +55,8 @@ label story_amanda_room_morning_window_1:
         "Вернуться на кухню":
             pass
     $ player.intimacy.add_arousal(10)
+    $ Amanda.trust = min(100, int(Amanda.trust or 0) + 1)
+    $ Amanda.add_arousal(4)
     $ household_clear_morning_issue("amanda")
     $ Amanda.wear_day_clothes()
     $ calendar_v2.advance_minutes(20)
@@ -78,6 +80,7 @@ label story_amanda_room_morning_window_2:
         "Вернуться на кухню":
             pass
     $ player.intimacy.add_arousal(10)
+    $ Amanda.add_arousal(5)
     $ household_clear_morning_issue("amanda")
     $ Amanda.wear_day_clothes()
     $ calendar_v2.advance_minutes(20)
@@ -119,7 +122,7 @@ label story_amanda_room_morning_window_3:
     menu:
         "Вернуться на кухню":
             pass
-    $ Amanda.change_social(corruption_delta=1)
+    $ Amanda.add_arousal(5)
     $ Amanda.change_rebellion(-1 if procedural_random("amanda_morning_window_listen") < 0.5 else 1, "morning_window_listen")
     $ household_clear_morning_issue("amanda")
     $ Amanda.wear_day_clothes()

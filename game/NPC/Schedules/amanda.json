@@ -147,12 +147,13 @@
     {
       "label": "sunday_dinner",
       "weekdays": [7],
-      "start": "12:30",
-      "end": "13:30",
+      "start": "11:00",
+      "end": "20:29",
       "location": "TavernKitchen",
       "awake": true,
       "talkable": true,
-      "priority": 600
+      "priority": 900,
+      "condition": {"rule": "sunday_dinner_pending"}
     },
     {
       "label": "sunday_afternoon",

@@ -35,10 +35,13 @@ label AmandaAfterDanceMCMakeOut:
 label AmandaAfterDanceMCWalkHome:
     call ShowImage("amanda", "dance", "you_invite_1")
     "Вы не торопите ее. Просто идете рядом, пока огни площади остаются позади."
+    "В темных проулках то и дело мелькают парные тени. За одной из дверей кто-то приглушенно смеется; из глубины другого двора доносятся шепот и торопливые шаги. Аманда на миг замолкает, потом чуть крепче сжимает вашу ладонь."
     "Аманда сначала молчит, потом начинает рассказывать о музыке, людях и о том, как странно было весь вечер чувствовать на себе ваш взгляд."
     "У дверей трактира она задерживается на миг и мягко сжимает вашу ладонь."
     "\"Спасибо. Сегодня было хорошо.\""
-    $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+    $ Amanda.change_social(friend_delta=1, open_delta=1)
+    $ Amanda.trust = min(100, int(Amanda.trust or 0) + 1)
+    $ Amanda.add_arousal(5)
     $ Amanda.change_mana(1, "friday_dance_walk_home")
     jump AmandaAfterDanceMCFinish
 
@@ -46,7 +49,7 @@ label AmandaAfterDanceMCReturn:
     call ShowImage("amanda", "dance", "wait1")
     "Вы отступаете, давая ей возможность первой решить, что делать дальше. Аманда смотрит на вас с удивлением, потом кивает."
     "\"Наверное, так и правда лучше. Но танец я запомню.\""
-    $ Amanda.change_social(friend_delta=1, corruption_delta=1)
+    $ Amanda.change_social(friend_delta=1)
     jump AmandaAfterDanceMCFinish
 
 label AmandaAfterDanceMCFinish:

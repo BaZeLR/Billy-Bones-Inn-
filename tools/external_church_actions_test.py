@@ -122,7 +122,21 @@ testcase external_church_confession_native_choices_render_once:
     advance until eval (rooms.current_code == "Church") timeout 20.0
     run Call("ChurchIspoved", 1)
     advance until screen "choice" timeout 20.0
-    assert eval (len(external_church_choices()) == 3 and external_church_single_actions(external_church_choices())) timeout 5.0
+    assert eval (external_church_choices() == ["В разных пустяках"] and external_church_single_actions(external_church_choices())) timeout 5.0
+
+testcase external_sunday_dinner_starts_on_late_return_from_church:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ calendar_v2.daysInGame = 34
+    $ calendar_v2.week = 7
+    $ calendar_v2.hour = 14
+    $ calendar_v2.minute = 30
+    $ player.tavern_management.breakfast.sunday_dinner_last_day = -1
+    $ threads["tavernSundayDinner"].forceEnable()
+    assert eval (tavern_sunday_dinner_available()) timeout 5.0
+    run Jump("TavernKitchen")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and "Продолжить" in external_church_choices()) timeout 5.0
 '''
 
 

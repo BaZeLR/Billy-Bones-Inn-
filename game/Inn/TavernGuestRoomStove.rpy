@@ -27,6 +27,8 @@ label TavernGuestRoomStoveMenu(object_id="guest_room_stove_001"):
             $ scene_runtime.text = "Каменная печь холодная. Чтобы разжечь ее, нужны колотые дрова."
         if _object_state_int(TavernGuestRoomStoveObject, "ash_dirty", 0) > 0:
             $ scene_runtime.text += " Внизу скопилась зола; ее можно вычистить."
+        if _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) > 0:
+            $ scene_runtime.text += " Рядом с печью сложены колотые дрова: {b}%s{/b} шт." % _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0)
         $ _guest_stove_fire_caption = "Подложить дрова" if _pc_fire_is_active(TavernGuestRoomStoveObject) else "Разжечь огонь"
         menu:
             "[_guest_stove_fire_caption]":
@@ -35,6 +37,15 @@ label TavernGuestRoomStoveMenu(object_id="guest_room_stove_001"):
                 menu:
                     "Продолжить":
                         pass
+            "Сложить рядом дрова" if player.item_count("chopped_wood_001") > 0:
+                if player.remove_item("chopped_wood_001", 1):
+                    $ _add_object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 1, 0)
+                    $ scene_runtime.text = "Вы складываете колотые дрова рядом с печью. Теперь у печи лежит {b}%s{/b} шт." % _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0)
+                    call stat
+                    vscene tavern_empty_room_picture()
+                    menu:
+                        "Продолжить":
+                            pass
             "Вычистить золу" if _object_state_int(TavernGuestRoomStoveObject, "ash_dirty", 0) > 0:
                 call Clean("ashes", "TavernEmptyRoom", "", "guest_room_stove_001")
                 vscene tavern_empty_room_picture()

@@ -115,6 +115,17 @@ def test_catalog_preserves_prices_and_approved_peephole_duration():
 
 
 @pytest.mark.parametrize("code", EXPECTED)
+def test_completed_project_is_hidden_from_draupnir_menu(code):
+    r = _runtime()
+    job = accept(r, code)
+    assert r.catalog[code].order_visible
+    job.status = "completed"
+    assert r.owner.renovation_complete(code)
+    assert not r.catalog[code].order_visible
+    assert not r.owner.order_renovation(code)
+
+
+@pytest.mark.parametrize("code", EXPECTED)
 @pytest.mark.parametrize("day", [0, 30, 363])
 def test_exact_once_payment_completion_and_motivation(code, day):
     price, logs, days = EXPECTED[code]

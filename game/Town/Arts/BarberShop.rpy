@@ -303,7 +303,9 @@ label BarberShopServePendingGuest:
     $ household.barber_appointments.pop(_barber_guest, None)
     $ _barber_guest_info = people.get_info(_barber_guest)
     if _barber_guest_info is not None:
-        $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
+        $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=(0 if _barber_guest == "amanda" else 2))
+        if _barber_guest == "amanda":
+            $ _barber_guest_info.add_arousal(5)
         $ _barber_guest_info.set_sex_stat("beauty", min(100, int(_barber_guest_info.sex_stat("beauty", 0) or 0) + 3))
         if _barber_guest == "sandra":
             $ _barber_guest_info.change_skill("cooking", 1)

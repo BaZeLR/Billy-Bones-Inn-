@@ -27,6 +27,8 @@ init python:
                 },
                 "tavern": {
                     "angry": ["images/amanda/tavern/angry.jpg"],
+                    "bar": ["images/amanda/tavern/amanda_bar_new.png"],
+                    "tipsy": ["images/amanda/tavern/amanda_tipsy_new.png"],
                     "hall_cleaning": [
                         "images/amanda/tavern/cleaner.webp",
                         "images/amanda/tavern/cleaning1.jpg",
@@ -156,6 +158,7 @@ init python:
             self.night_bowl_request_day = -1
             self.fancy_night_bowl_received = False
             self.backyard_relief_preference = -1
+            self.backyard_relief_seen = False
             self.attic_window_breakfast_bj_day = -1
             self.attic_mock_response_day = -1
             self.attic_mock_stopped = False
@@ -224,6 +227,8 @@ init python:
         def update(self):
             super(AmandaInfo, self).update()
             self.data = AmandaStaticData
+            if not hasattr(self, "backyard_relief_seen"):
+                self.backyard_relief_seen = False
             self.ensure_story_defaults()
             return self
 

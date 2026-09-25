@@ -414,12 +414,12 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     $ Amanda.assign_tavern_service("", True)
     $ Amanda.set_job_value("jobWhoreAvail", 0)
     $ Amanda.set_job_value("jobGloryHoleAvail", 0)
-    $ external_calendar_set_fields(7, 1, 1100, 12, 29)
+    $ external_calendar_set_fields(7, 1, 1100, 10, 59)
     $ external_calendar_set_weekday(7)
     $ player.tavern_management.breakfast.sunday_dinner_last_day = -1
     assert eval (not tavern_sunday_dinner_available()) timeout 5.0
 
-    $ external_calendar_set_fields(7, 1, 1100, 12, 30)
+    $ external_calendar_set_fields(7, 1, 1100, 11, 0)
     assert eval (tavern_sunday_dinner_available()) timeout 5.0
     assert eval (not player.tavern_management.isTavernOpen and rooms.get("TavernMain").is_open()) timeout 5.0
     assert eval (all(str(people.location(npc_id) or "") == "TavernKitchen" for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
@@ -438,13 +438,13 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     $ Amanda.gifted_today = 0
     $ player.add_item("soap_001", 1)
     $ _sunday_soap_before = int(player.item_count("soap_001") or 0)
-    $ external_calendar_set_fields(7, 1, 1100, 13, 30)
+    $ external_calendar_set_fields(7, 1, 1100, 14, 30)
     assert eval (tavern_sunday_dinner_available() and tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
     run Jump("TavernKitchen")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == (12, 12, 12)) timeout 5.0
-    assert eval (int(calendar_v2.hour or 0) == 13 and int(calendar_v2.minute or 0) == 30) timeout 5.0
+    assert eval (int(calendar_v2.hour or 0) == 14 and int(calendar_v2.minute or 0) == 30) timeout 5.0
     assert eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) != current_game_day()) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Послушать воскресные шутки" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _sunday_church_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Послушать воскресные шутки")

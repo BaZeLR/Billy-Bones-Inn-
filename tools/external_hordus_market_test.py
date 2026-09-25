@@ -157,8 +157,8 @@ testcase external_hordus_sofa_prerequisites:
     python:
         external_hordus_prepare(True)
         threads["claraPaintingsPath"].completed = missing != "paintings"
-        player.tavern_management.client_room_hole = 0 if missing == "window" else 1
-        player.tavern_management.glory_hole = 1 if missing == "glory" else 2
+        tavern.renovations["peephole"].status = "available" if missing == "window" else "completed"
+        tavern.renovations["glory_hole"].status = "available" if missing == "glory" else "completed"
         threads["claraForestSofa"].num = 5 if missing == "forest" else 6
     run Call("IntHordusTalk")
     advance until eval ("Посмотреть товары" in external_hordus_choices()) timeout 20.0
@@ -173,8 +173,8 @@ testcase external_hordus_sofa_purchase_and_npc_presence:
     python:
         external_hordus_prepare(True)
         threads["claraPaintingsPath"].completed = True
-        player.tavern_management.client_room_hole = 1
-        player.tavern_management.glory_hole = 2
+        tavern.renovations["peephole"].status = "completed"
+        tavern.renovations["glory_hole"].status = "completed"
         Clara.rel = 5
         threads["claraBookletMarket"].advanceTo(threads["claraBookletMarket"].data.length, complete_at_end=True)
         threads["claraForestSofa"].advanceTo(6, force_active=True)
@@ -189,12 +189,12 @@ testcase external_hordus_sofa_purchase_and_npc_presence:
     click id (external_hordus_button("Старинный диван")) pos (0.5, 0.5) until eval (Sofa.installed) timeout 20.0
     assert eval (player.economy.money == 0 and player.item_count("cursed_sofa_001") == 0) timeout 5.0
     assert eval (not any(caption.startswith("Старинный диван") for caption in external_hordus_choices())) timeout 5.0
-    assert eval (people.get_info("sofa") is Sofa and Sofa.registry_group == "secondary" and people.ids_at("TavernMain").count("sofa") == 1) timeout 5.0
+    assert eval (people.get_info("sofa") is Sofa and Sofa.registry_group == "secondary" and people.ids_at("TavernEmptyRoom").count("sofa") == 1) timeout 5.0
     assert eval (not any(getattr(obj, "object_id", "") == "cursed_sofa_001" for obj in rooms.get("TavernMain").visible_objects())) timeout 5.0
     click id (external_hordus_button("Назад")) pos (0.5, 0.5) until eval ("Спросить о столице" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
-    run Jump("TavernMain")
-    advance until eval (rooms.current_code == "TavernMain" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_sofa") is not None) timeout 20.0
+    run Jump("TavernEmptyRoom")
+    advance until eval (rooms.current_code == "TavernEmptyRoom" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_sofa") is not None) timeout 20.0
     click id "main_ui_entity_button_npc_sofa" pos (0.5, 0.5)
     advance until eval ("Поговорить с диваном" in external_hordus_choices()) timeout 20.0
     assert eval (main_ui_runtime.mode == "talk" and main_ui_runtime.selected_char == "sofa") timeout 5.0

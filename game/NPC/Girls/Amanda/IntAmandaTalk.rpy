@@ -6,6 +6,8 @@ label IntAmandaTalk(girl_name="amanda"):
     $ main_ui_begin_talk_state("Разговор с Амандой", girl_name)
     if str(rooms.current_code or "") == "MarketPlace":
         $ main_ui_runtime.talk_picture = AmandaStaticData.image_path("market", "talk")
+    elif str(rooms.current_code or "") == "TavernMain":
+        $ main_ui_runtime.talk_picture = AmandaStaticData.image_path("tavern", "tipsy" if int(Amanda.drunk or 0) > 0 else "bar")
     $ main_ui_runtime.action_title = "Разговор с Амандой"
     $ main_ui_runtime.action_content = None
     if str(scene_runtime.text or "").strip() == "":

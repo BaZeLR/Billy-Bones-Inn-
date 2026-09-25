@@ -111,10 +111,9 @@ def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_r
     reward = BREAKFAST.split("def tavern_sunday_dinner_apply_social_bonus(present_ids=None):", 1)[1].split("\n    def ", 1)[0]
     dinner = BREAKFAST.split("label TavernKitchenSundayDinner(serve_spicy=0):", 1)[1]
 
-    assert 'people.schedule_state(npc_id).get("label", "")' in availability
-    assert 'people.schedule_state(npc_id).get("location", "")' in availability
-    assert 'for npc_id in ("sandra", "melissa", "amanda")' in availability
-    assert "current_minutes" not in availability
+    assert 'calendar_v2.week or 0' in availability
+    assert '11 * 60 <= minute_now <= 20 * 60 + 29' in availability
+    assert 'sunday_dinner_last_day' in availability
     assert 'kitchen_ids = set(people.ids_at("TavernKitchen") or [])' in attendance
     assert 'if npc_id not in kitchen_ids:' in attendance
     assert 'if "becky" in kitchen_ids:' in attendance
@@ -140,7 +139,7 @@ def test_sunday_dinner_is_a_mandatory_scheduled_entry_event():
     event = runtime.split('RThreadData(0, "tavern", "SundayDinner"', 1)[1].split('RThreadData(0, "tavern", "WorkRandomEvents"', 1)[0]
     entry_menu = BREAKFAST.split("label TavernKitchenSundayDinnerMenu:", 1)[1].split("label TavernKitchenSundayDinner(serve_spicy=0):", 1)[0]
 
-    assert '"TavernKitchenSundayDinnerMenu", 7, (12, 13)' in event
+    assert '"TavernKitchenSundayDinnerMenu", 7, (11, 20)' in event
     assert "tavern_sunday_dinner_available" in event
     assert '"TavernKitchen",\n            "enter"' in event
     assert '"Назад":' not in entry_menu

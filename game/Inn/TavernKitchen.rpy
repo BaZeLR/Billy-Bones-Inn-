@@ -456,6 +456,15 @@ label story_becky_sandra_kitchen_visit:
     $ scene_runtime.location_text = scene_runtime.text
     if _becky_sandra_visit_stage < 2:
         menu:
+            "Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:
+                $ scene_runtime.text = tavern_kitchen_spicy_tincture_apply(("sandra", "becky"))
+                $ get_girl_drunk("sandra")
+                $ get_girl_drunk("becky")
+                $ Sandra.add_arousal(5)
+                $ Becky.add_arousal(5)
+                $ scene_runtime.location_text = scene_runtime.text
+                call BeckySandraTipsyKitchenTalk
+                $ _becky_sandra_visit_thread.advance()
             "Не мешать разговору":
                 $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
                 $ scene_runtime.location_text = scene_runtime.text
@@ -478,14 +487,12 @@ label story_becky_sandra_kitchen_visit:
 
             "Подать горячую медовую настойку" if int(player.item_count("libido_tincture_001") or 0) > 0:
                 $ scene_runtime.text = tavern_kitchen_spicy_tincture_apply(("sandra", "becky"))
+                $ get_girl_drunk("sandra")
+                $ get_girl_drunk("becky")
                 $ Sandra.add_arousal(5)
                 $ Becky.add_arousal(5)
                 $ scene_runtime.location_text = scene_runtime.text
-                vscene "images/tavern/kitchen/becky_visit_1.png"
-                call stat
-                menu:
-                    "Продолжить разговор":
-                        pass
+                call BeckySandraTipsyKitchenTalk
                 $ scene_runtime.text = "Разогретый настойкой разговор быстро становится совсем откровенным.\n\n\"Давайте без намеков,\" говорите вы. \"Эдди давно смотрит на тебя как на женщину, а не только как на хозяйку. Он живет заботами твоего дома, помогает в лавке и явно хочет быть тебе ближе. Что ты сама к нему чувствуешь?\"\n\n\"Вот в том и беда, что он мне не чужой,\" отвечает Бекки. \"Я не понимаю, где заканчивается мой долг хозяйки и начинается мое собственное желание.\""
                 $ scene_runtime.location_text = scene_runtime.text
                 menu:
@@ -510,10 +517,32 @@ label story_becky_sandra_kitchen_visit:
             "Не мешать разговору":
                 $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
                 $ scene_runtime.location_text = scene_runtime.text
+    if procedural_randint(1, 2, "becky_kitchen_walk_home_%s" % current_game_day()) == 1:
+        "Собираясь уходить, Бекки задерживается у двери. «Стефан, проводишь меня до дома? После такого разговора одной идти не хочется»."
+        menu:
+            "Проводить Бекки домой":
+                vscene becky_homefront_withbecky_picture()
+                "Вы провожаете Бекки до ее двери. Она благодарит вас за компанию и, улыбнувшись на прощание, скрывается в доме. На сегодня вы расходитесь; приглашения войти не было."
+                $ main_ui_end_native_scene_state()
+                $ apply_movement_time(10, "StreetTavern")
+                jump StreetTavern
+            "Попрощаться у трактира":
+                "Бекки прощается с вами и отправляется к дому сама."
     menu:
         "Вернуться к своим делам":
             pass
     $ main_ui_end_native_scene_state()
+    return
+
+
+label BeckySandraTipsyKitchenTalk:
+    vscene "images/tavern/kitchen/becky_visit_1.png"
+    call stat
+    menu:
+        "Рассказать непристойный анекдот":
+            "Бекки вспоминает, как однажды покупатель попросил у нее свечу для долгой ночи, а утром вернулся за второй: первая, по его словам, догорела раньше, чем они с возлюбленной успели договориться, кто погасит свет. Сандра смеется и замечает, что таким хозяйствам нужна не свеча, а хороший запас терпения."
+        "Послушать, как у них складывается личная жизнь":
+            "Бекки с теплотой говорит, что Эдди всегда замечает, когда она устала, и берет заботы о лавке на себя. Сандра кивает: близость хороша тогда, когда рядом можно быть собой, а не играть хозяйку каждую минуту. Они обе поднимают кружки за тех, с кем дом становится теплее."
     return
 
 
@@ -656,7 +685,6 @@ label TavernKitchenAskSandraBreakfasts:
     $ Sandra.fun = min(100, int(Sandra.fun or 0) + 2)
     $ Melissa.rel = max(0, min(20, int(Melissa.rel or 0) + 1))
     $ Melissa.fun = max(0, min(100, int(Melissa.fun or 0) + 1))
-    $ Amanda.rel = max(0, min(20, int(Amanda.rel or 0) + 1))
     $ Amanda.fun = max(0, min(100, int(Amanda.fun or 0) + 1))
     $ player.change_stat("fun", 2)
     $ scene_runtime.text = "Вы просите Сандру почаще собирать домочадцев за общий утренний стол и не давать всем разбредаться без толку. Сандра выслушивает вас без лишних слов, потом переводит взгляд на оставленные припасы и кивает.\n\n\"Ладно. Если уж на кухне есть из чего готовить, я поговорю с девочками. Общий завтрак дому не повредит, а там и работа ровнее пойдет,\" решает она."

@@ -1421,6 +1421,7 @@ init -999 python:
             self.renovation_requests = {}
             self.wardrobe = GirlWardrobeState()
             self.temporary_fertility = {"item_id": "", "until_day": -1}
+            self.bathday_day = -1
 
         def update(self):
             super(Girl, self).update()
@@ -1429,6 +1430,7 @@ init -999 python:
             self.__dict__.setdefault("reaction_state", {})
             self.__dict__.setdefault("reaction_log", [])
             self.__dict__.setdefault("renovation_requests", {})
+            self.__dict__.setdefault("bathday_day", -1)
             base_clothing = getattr(getattr(self, "data", None), "base_clothing", {})
             self.wardrobe = GirlWardrobeState.from_saved(
                 getattr(self, "wardrobe", None),

@@ -17,7 +17,8 @@
     },
     {
       "label": "tavern_drawing",
-      "start": "09:00", "end": "11:59",
+      "weekdays": [1, 2, 3, 4, 6],
+      "start": "18:00", "end": "20:30",
       "location": "TavernMyRoom",
       "awake": true, "talkable": true, "working": true, "priority": 500,
       "condition": {"rule": "clara_drawing_work"}

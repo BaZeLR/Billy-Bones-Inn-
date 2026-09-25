@@ -32,6 +32,8 @@ init -45 python:
 
     def _pc_fire_object(where_id="", object_id=""):
         object_key = get_object_id(object_id)
+        if object_key == "shed_hot_water_stove" or str(where_id or "") == "Shed":
+            return ShedHotWaterStoveObject
         if object_key == "guest_room_stove_001" or str(where_id or "") == "TavernEmptyRoom":
             return TavernGuestRoomStoveObject
         if object_key in ("kitchen_hearth_001", "hearth_001", "cauldron_001") or str(where_id or "") == "TavernKitchen":
@@ -39,6 +41,8 @@ init -45 python:
         return TavernMainFireplaceObject
 
     def _pc_water_object(where_id="", object_id=""):
+        if get_object_id(object_id) == "shed_hot_water_stove" or str(where_id or "") == "Shed":
+            return ShedHotWaterStoveObject
         return TavernKitchenCauldronObject
 
     def _pc_room_by_code(where_id=""):

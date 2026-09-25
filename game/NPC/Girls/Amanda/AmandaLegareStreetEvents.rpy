@@ -2,7 +2,7 @@ label story_amanda_tavern_seduction_0:
     $ renpy.dynamic("_amanda_seduction_finish", "_amanda_seduction_profile", "_amanda_seduction_bedroom")
     $ main_ui_begin_native_scene_state("Флирт Аманды")
     show screen main_ui
-    call ShowImage("", "", AmandaStaticData.portrait)
+    vscene AmandaStaticData.image_path("tavern", "tipsy" if int(Amanda.drunk or 0) > 0 else "bar")
     $ scene_runtime.text = "В зале Аманда задержалась у стойки дольше обычного. Она будто ждала, пока вы заметите ее новое платье, поправила волосы и улыбнулась слишком невинно."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"

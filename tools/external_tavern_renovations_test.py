@@ -36,6 +36,8 @@ init python:
         TavernGuestRoomStoveObject.state["fire_until_minute"] = _pc_calendar_total_minutes() + 600
         TavernGuestRoomStoveObject.state["ash_dirty"] = 1
         renpy.session["guest_stove_load_expected"] = dict(TavernGuestRoomStoveObject.state)
+        ShedHotWaterStoveObject.state["hot_water_until_minute"] = _pc_calendar_total_minutes() + 600
+        renpy.session["shed_stove_load_expected"] = dict(ShedHotWaterStoveObject.state)
         tavern = TavernInfo.__new__(TavernInfo)
         tavern.renovation_due_days = {"shed": 34}
         player.tavern_management.slogan_state = 2
@@ -61,6 +63,8 @@ init python:
         assert rooms.get("TavernEmptyRoom").game_items == ["soap_001", "guest_room_stove_001"]
         assert TavernGuestRoomStoveObject.state == renpy.session.pop("guest_stove_load_expected")
         assert get_game_object("guest_room_stove_001") is TavernGuestRoomStoveObject
+        assert ShedHotWaterStoveObject.state == renpy.session.pop("shed_stove_load_expected")
+        assert get_game_object("shed_hot_water_stove") is ShedHotWaterStoveObject
         assert Sofa.installed and people.location("sofa") == "TavernEmptyRoom"
         assert Sandra.renovation_requests["shed"] is True
         assert Clara.renovation_requests["guest_room"] is False
@@ -85,6 +89,7 @@ init python:
             people.get_info(TAVERN_RENOVATIONS[code_key].quest_giver).renovation_requests[code_key] = False
         Sofa.installed = False
         TavernGuestRoomStoveObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
+        ShedHotWaterStoveObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0, "hot_water_until_minute": 0, "boiledWaterToday": 0}
         rooms.get("ShedWashroom").is_hidden = False
         player.set_money(5000)
         player.inventory.items["lumber_001"] = 5
@@ -300,13 +305,68 @@ testcase external_renovation_room_navigation_and_bathing:
     advance until eval (rooms.current_code == "ShedWashroom") timeout 20.0
     $ _bath_origin = main_ui_context_snapshot()
     run Call("ShedWashroomBath")
+    advance until eval ("Назад" in external_renovation_choices()) timeout 20.0
+    assert eval ("Вымыться — 15 минут" not in external_renovation_choices())
+    click id (external_renovation_button("Назад")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+    run Jump("Shed")
+    advance until eval (rooms.current_code == "Shed") timeout 20.0
+    assert eval (any(item.caption == "Печь и запас дров" for item in main_ui_runtime.action_items))
+    run Call("ShedHotWaterStove")
+    advance until eval ("Подготовить купальню" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Подготовить купальню")) pos (0.5, 0.5)
+    advance until eval (_pc_hot_water_is_ready(ShedHotWaterStoveObject)) timeout 20.0
+    assert eval (_pc_fire_is_active(ShedHotWaterStoveObject) and _object_state_int(ShedHotWaterStoveObject, "boiledWaterToday", 0) == 1)
+    assert eval (player.item_count("chopped_wood_001") == 3 and calendar_v2.hour == 10)
+    advance until eval ("Назад" in external_renovation_choices()) timeout 20.0
+    click id (external_renovation_button("Назад")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+    run Jump("ShedWashroom")
+    advance until eval (rooms.current_code == "ShedWashroom") timeout 20.0
+    $ _bath_origin = main_ui_context_snapshot()
+    run Call("ShedWashroomBath")
     advance until eval ("Вымыться — 15 минут" in external_renovation_choices()) timeout 20.0
     click id (external_renovation_button("Вымыться")) pos (0.5, 0.5)
     advance until eval ("Назад" in external_renovation_choices()) timeout 20.0
     click id (external_renovation_button("Назад")) pos (0.5, 0.5)
     advance until eval (not external_renovation_choices()) timeout 20.0
-    assert eval (calendar_v2.minute == 15 and rooms.current_code == "ShedWashroom")
+    assert eval (calendar_v2.hour == 10 and calendar_v2.minute == 15 and rooms.current_code == "ShedWashroom")
     assert eval (main_ui_context_snapshot() == _bath_origin)
+
+testcase external_shed_bathday_requires_hot_water_and_plays_three_pictures:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_renovation_prepare()
+    python:
+        threads["tavernBathDay"] = RThreadInfo(threadData["tavernBathDay"])
+        tavern.renovations["shed"].status = "completed"
+        calendar_v2.week = 3
+        calendar_v2.hour = 21
+        rooms.enter("ShedWashroom")
+    assert eval (not story_event_available("ShedWashroom", "enter"))
+    $ _set_object_state_int(ShedHotWaterStoveObject, "hot_water_until_minute", _pc_calendar_total_minutes() + 120)
+    assert eval (_pc_hot_water_is_ready(ShedHotWaterStoveObject))
+    assert eval (threads["tavernBathDay"].checkActive())
+    assert eval (all(row["ok"] for row in threadData["tavernBathDay"].triggers[0][0].auditChecks()))
+    assert eval (story_event_available("ShedWashroom", "enter"))
+    $ _bath_beauty_before = [girl.sex_stat("beauty", 0) for girl in (Sandra, Melissa, Amanda)]
+    run Call("checkTriggers", "ShedWashroom", "enter", 0)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    $ _bath_pictures_seen = [str(scene_runtime.picture)]
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    $ _bath_pictures_seen.append(str(scene_runtime.picture))
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    $ _bath_pictures_seen.append(str(scene_runtime.picture))
+    assert eval (len(set(_bath_pictures_seen)) == 3 and all("bathDay/" in path for path in _bath_pictures_seen))
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval ("Вернуться в купальню" in external_renovation_choices()) timeout 20.0
+    assert eval (all(girl.sex_stat("beauty", 0) == min(100, before + 10) and girl.bathday_day == current_game_day() for girl, before in zip((Sandra, Melissa, Amanda), _bath_beauty_before)))
+    assert eval (not _pc_hot_water_is_ready(ShedHotWaterStoveObject))
+    click id (external_renovation_button("Вернуться в купальню")) pos (0.5, 0.5)
+    advance until eval (not external_renovation_choices()) timeout 20.0
+    assert eval (not story_event_available("ShedWashroom", "enter"))
 
 testcase external_relocated_window_observes_existing_guest_scene:
     parameter girl = ["georgett", "liza"]
@@ -508,9 +568,14 @@ testcase external_guest_stove_fire_clean_and_back:
     click id ("choice_panel_button_%d" % [item.caption for item in main_ui_runtime.action_items].index("Каменная печь")) pos (0.5, 0.5)
     advance until screen "choice" timeout 20.0
     assert eval (_guest_stove_fire_caption == "Разжечь огонь")
+    click id (external_renovation_button("Сложить рядом дрова")) pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    assert eval (_object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 1 and player.item_count("chopped_wood_001") == 1)
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval (_guest_stove_fire_caption == "Разжечь огонь") timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
-    assert eval (_pc_fire_is_active(TavernGuestRoomStoveObject) and player.item_count("chopped_wood_001") == 1)
+    assert eval (_pc_fire_is_active(TavernGuestRoomStoveObject) and player.item_count("chopped_wood_001") == 1 and _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 0)
     assert eval (scene_runtime.picture.endswith("sofa_day_lit.png"))
     $ renpy.screenshot(config.basedir + "/guest-stove-lit.png")
     click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)

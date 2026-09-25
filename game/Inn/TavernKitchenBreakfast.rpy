@@ -26,12 +26,10 @@ init python:
         return int(calendar_v2.hour or 0) < 12 and not bool(player.tavern_management.breakfast.today)
 
     def tavern_sunday_dinner_available():
+        minute_now = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
         return (
-            all(
-                str(people.schedule_state(npc_id).get("label", "") or "") == "sunday_dinner"
-                and str(people.schedule_state(npc_id).get("location", "") or "") == "TavernKitchen"
-                for npc_id in ("sandra", "melissa", "amanda")
-            )
+            int(calendar_v2.week or 0) == 7
+            and 11 * 60 <= minute_now <= 20 * 60 + 29
             and int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) != current_game_day()
         )
 
@@ -159,6 +157,11 @@ init python:
 
         candidates = []
         for npc_id in present_ids:
+            if npc_id == "amanda":
+                desire = max(int(Amanda.arousal_value() or 0), int(float(Amanda.cycle_state().get("horny", 0.0) or 0.0) * 100))
+                if desire >= 15:
+                    candidates.append((2 if desire >= 35 else 1, desire, npc_id))
+                continue
             profile = npc_relationship_level(npc_id)
             friend_level = int(profile.get("friend_level", 0) or 0)
             corruption_level = int(profile.get("corruption_level", 0) or 0)
@@ -555,7 +558,12 @@ init python:
         for npc_id in rows:
             info = people.get_info(npc_id)
             if info is not None:
-                info.change_social(friend_delta=friend_delta, open_delta=open_delta, corruption_delta=corruption_delta)
+                if npc_id == "amanda":
+                    info.change_social(open_delta=open_delta)
+                    if corruption_delta:
+                        info.add_arousal(4)
+                else:
+                    info.change_social(friend_delta=friend_delta, open_delta=open_delta, corruption_delta=corruption_delta)
         if int(fun_delta or 0) != 0:
             player.change_stat("fun", int(fun_delta or 0))
         return rows
@@ -839,7 +847,11 @@ init python:
             if info is not None:
                 open_delta = 1 if npc_id in ("sandra", "melissa", "amanda", "becky") else 0
                 corruption_delta = 1 if npc_id in ("sandra", "melissa", "amanda") else 0
-                info.change_social(friend_delta=1, open_delta=open_delta, corruption_delta=corruption_delta)
+                if npc_id == "amanda":
+                    info.change_social(open_delta=open_delta)
+                    info.add_arousal(8)
+                else:
+                    info.change_social(friend_delta=1, open_delta=open_delta, corruption_delta=corruption_delta)
         player.change_stat("fun", 2)
         lines = [
             "Вы подаете к столу пряную настойку с медовой сладостью. По комнате сразу идет теплый, терпкий запах, и общий разговор делается заметно живее.",
@@ -1075,6 +1087,8 @@ init python:
     def tavern_breakfast_apply_social_bonus():
         changed_ids = []
         for npc_id in tavern_breakfast_present_ids():
+            if npc_id == "amanda":
+                continue
             info = people.get_info(npc_id)
             friend_cap = relationship_requirement_value(npc_id, "flirt", "friend")
             if info is not None and friend_cap > 0 and int(info.rel or 0) < friend_cap:
@@ -1141,13 +1155,14 @@ init python:
 
 
 label TavernKitchenBreakfast:
-    $ renpy.dynamic("_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
+    $ renpy.dynamic("_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index", "_bathday_request_now")
     if not tavern_breakfast_available():
         $ scene_runtime.text = "Сегодня вы уже завтракали."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
     $ player.tavern_management.breakfast.present_ids = list(household_breakfast_attendee_ids() or [])
+    $ _bathday_request_now = tavern_bathday_breakfast_request_ready()
     python hide:
         for _breakfast_girl_id in list(player.tavern_management.breakfast.present_ids or []):
             _breakfast_girl_info = people.get_info(_breakfast_girl_id)
@@ -1170,6 +1185,11 @@ label TavernKitchenBreakfast:
             "За столом собираются: " + (", ".join(tavern_breakfast_present_names()) if len(tavern_breakfast_present_names()) > 0 else "пока что только вы сами") + ".",
         ]
         _breakfast_lines.extend(tavern_breakfast_dialogue_lines())
+        if _bathday_request_now:
+            if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+                _breakfast_lines.append("Сандра напоминает: сегодня банный день. В баке уже есть горячая вода, и вечером купальня будет готова.")
+            else:
+                _breakfast_lines.append("Сандра напоминает: сегодня банный день. «Вечером понадобится купальня. Разожги печь в сарае и вскипяти воду в баке заранее», — просит она.")
         if (
             tavern_breakfast_can_listen()
             or tavern_breakfast_has_market_topic()
@@ -1377,7 +1397,7 @@ label TavernKitchenBreakfastAmandaAtticMock:
 label TavernKitchenBreakfastAmandaAtticExpose:
     $ Amanda.attic_mock_exposed = True
     $ Amanda.attic_mock_stopped = True
-    $ Amanda.change_social(open_delta=1, corruption_delta=1)
+    $ Amanda.trust = max(0, int(Amanda.trust or 0) - 1)
     $ scene_runtime.text = "Вы спокойно отвечаете, что если Аманда так любит шутить про чердак, можно сразу рассказать всем, откуда она сама высматривала тот же двор. За столом становится тише. Аманда краснеет, дергает плечом и больше к этой теме за завтраком не возвращается."
     $ scene_runtime.location_text = scene_runtime.text
     call stat
@@ -1478,7 +1498,8 @@ label TavernKitchenBreakfastTease(girl_name=""):
         $ scene_runtime.text = "{} незаметно приподнимает край юбки ровно настолько, чтобы вы успели заметить белье, а потом с невинным видом возвращается к завтраку.".format(people_display_name(_tease_girl))
     $ player_apply_arousal_trigger("breakfast_tease", 5 + _tease_tier)
     $ _tease_info.add_arousal(3 + _tease_tier)
-    $ _tease_info.change_social(corruption_delta=1)
+    if _tease_girl != "amanda":
+        $ _tease_info.change_social(corruption_delta=1)
     $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nУже тише {} предлагает после завтрака выбраться вдвоем: можно уединиться в трактире, прогуляться к лесному озеру или, если у вас есть лошадь, прокатиться за городом.".format(people_display_name(_tease_girl))
     $ scene_runtime.location_text = scene_runtime.text
     call stat
@@ -1616,6 +1637,8 @@ label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake", date_ori
     $ _outdoor_date_info.mark_asked()
     $ _outdoor_date_info.mark_talked()
     $ _outdoor_date_info.change_social(friend_delta=2, open_delta=1)
+    if _outdoor_date_girl == "amanda":
+        $ Amanda.trust = min(100, int(Amanda.trust or 0) + 1)
     $ _outdoor_date_info.add_arousal(5)
     $ player.change_stat("fun", 8)
     $ scene_runtime.text = "Прогулка заканчивается без спешки. {} благодарит вас за время вдвоем и дает понять, что охотно повторит такое свидание в другой день.".format(people_display_name(_outdoor_date_girl))
