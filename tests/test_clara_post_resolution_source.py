@@ -132,10 +132,10 @@ def test_education_keeps_gates_and_uses_market_discovery():
 
 def test_card_images_and_native_choices_follow_numeric_order():
     cards = label_block(source(CARDS), "story_clara_tavern_education_cards_0")
-    pictures = ['vscene "images/clara/education/cardplay%d.jpg"' % n for n in range(9)]
+    pictures = ['vscene "images/clara/education/cardplay%d.jpg"' % n for n in range(12)]
     assert [cards.index(picture) for picture in pictures] == sorted(cards.index(picture) for picture in pictures)
     assert cards.index('"Пойти проверить"') < cards.index('"Обойти лавку"') < cards.index('"Заглянуть в окно"') < cards.index(pictures[0])
-    assert cards.count('"Уйти":') == 8
+    assert cards.count('"Уйти":') == 11
     assert cards.count("active_thread.advance()") == 1
     assert cards.index('"Закончить наблюдение и вернуться на рынок"') < cards.index("active_thread.advance()")
     assert "change_social" not in cards
@@ -158,7 +158,7 @@ def test_hints_and_schedules_do_not_own_another_progress_state():
 
 
 def test_card_assets_exist():
-    for name in ["basement_window_night.png"] + ["cardplay%d.jpg" % n for n in range(9)]:
+    for name in ["basement_window_night.png"] + ["cardplay%d.jpg" % n for n in range(12)]:
         assert (ROOT / "game/images/clara/education" / name).is_file()
 
 

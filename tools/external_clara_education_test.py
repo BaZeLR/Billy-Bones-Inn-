@@ -177,7 +177,7 @@ testcase education_complete_market_route:
     click id "choice_panel_button_0" pos (0.5, 0.5)
 '''
 
-for index in range(9):
+for index in range(12):
     TEST_RPY += f'''
     advance until eval (scene_runtime.picture == "images/clara/education/cardplay{index}.jpg" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
@@ -200,12 +200,12 @@ TEST_RPY += r'''
     assert eval (not story_event_available("MarketPlace", "enter"))
 
 testcase education_leave_without_progress:
-    parameter stop = [0, 1, 2, 3, 7, 10]
+    parameter stop = [0, 1, 2, 3, 7, 10, 11, 12, 13]
     run Jump("MarketPlace")
     advance until eval ("Пойти проверить" in education_choices()) timeout 20.0
 '''
 
-for step in range(10):
+for step in range(13):
     TEST_RPY += f'''
     if eval (stop > {step}):
         $ education_old_picture = scene_runtime.picture
