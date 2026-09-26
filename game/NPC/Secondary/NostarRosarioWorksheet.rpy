@@ -7,7 +7,7 @@ screen nostar_rosario_worksheet():
     zorder 200
     key "game_menu" action ShowMenu("save")
 
-    default clue_page = 0
+    default clue_tab = "story"
     default picked_field = ""
     default picked_house = -1
 
@@ -23,6 +23,7 @@ screen nostar_rosario_worksheet():
     $ _cell_width = int((_inner_width - _heading_width - 20) / 5)
     $ _option_width = int((_inner_width - 20) / 3)
     $ _picked_row = next((row for row in NOSTAR_ROSARIO_FIELDS if row[0] == picked_field), None)
+    $ _clue_text = (NOSTAR_ROSARIO_STORY + "\n\n" + NOSTAR_ROSARIO_FACTS + "\n\n" + NOSTAR_ROSARIO_QUESTION) if clue_tab == "story" else (NOSTAR_ROSARIO_FACTS + "\n\n" + "\n\n".join(NOSTAR_ROSARIO_HINTS) + "\n\n" + NOSTAR_ROSARIO_QUESTION)
 
     add Transform("images/nostar/nobility_quarters.png", fit="cover")
     add Solid("#1d100bd0")
@@ -166,7 +167,7 @@ screen nostar_rosario_worksheet():
                 xfill True
                 spacing 14
                 text "Приметы улицы" font NOSTAR_ROSARIO_SCRIPT_FONT size 39 color "#6b2e25" xalign 0.5
-                text "Леди Ностар велела читать их по порядку, от первого дома к пятому." font NOSTAR_ROSARIO_BODY_FONT size 18 color "#624a36"
+                text "История леди Ностар и все приметы пяти домов." font NOSTAR_ROSARIO_BODY_FONT size 18 color "#624a36"
 
                 frame:
                     xfill True
@@ -175,18 +176,18 @@ screen nostar_rosario_worksheet():
 
                 hbox:
                     spacing 8
-                    for page, caption in ((0, "Лист I"), (1, "Лист II"), (2, "Лист III")):
+                    for tab, caption in (("story", "История"), ("hints", "Все 14 примет")):
                         textbutton caption:
-                            id ("nostar_rosario_clues_%d" % page)
-                            xsize int((_right_width - 60) / 3)
+                            id ("nostar_rosario_tab_%s" % tab)
+                            xsize int((_right_width - 52) / 2)
                             ysize 48
-                            background ("#874b37" if clue_page == page else "#c5a270")
+                            background ("#874b37" if clue_tab == tab else "#c5a270")
                             hover_background "#9a5e43"
                             text_font NOSTAR_ROSARIO_SCRIPT_FONT
                             text_size 24
-                            text_color ("#fff1d8" if clue_page == page else "#3e291d")
+                            text_color ("#fff1d8" if clue_tab == tab else "#3e291d")
                             text_xalign 0.5
-                            action SetScreenVariable("clue_page", page)
+                            action SetScreenVariable("clue_tab", tab)
 
                 frame:
                     xfill True
@@ -205,4 +206,4 @@ screen nostar_rosario_worksheet():
                         vscrollbar_xsize 10
                         vscrollbar_unscrollable "hide"
 
-                        text NOSTAR_ROSARIO_CLUE_PAGES[clue_page] font NOSTAR_ROSARIO_BODY_FONT size 19 color "#423020" line_spacing 7
+                        text _clue_text font NOSTAR_ROSARIO_BODY_FONT size 19 color "#423020" line_spacing 7

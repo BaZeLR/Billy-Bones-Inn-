@@ -183,6 +183,12 @@ testcase external_nostar_rosario_riddle_purchase_and_npc_presence:
     click id (external_hordus_button("Спросить о пропавшей Розарио")) pos (0.5, 0.5) until eval ("Попробовать разгадать загадку леди" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Попробовать разгадать загадку леди")) pos (0.5, 0.5) until screen "nostar_rosario_worksheet" timeout 20.0
     $ renpy.screenshot(config.basedir + "/nostar-worksheet.png")
+    assert eval (len(NOSTAR_ROSARIO_HINTS) == 14 and [int(hint.split(".", 1)[0]) for hint in NOSTAR_ROSARIO_HINTS] == list(range(1, 15))) timeout 5.0
+    click id "nostar_rosario_tab_hints" pos (0.5, 0.5) until eval (renpy.get_screen_variable("clue_tab", screen="nostar_rosario_worksheet") == "hints") timeout 20.0
+    assert eval (NOSTAR_ROSARIO_HINTS[-1] in renpy.get_screen_variable("_clue_text", screen="nostar_rosario_worksheet")) timeout 5.0
+    $ renpy.screenshot(config.basedir + "/nostar-worksheet-hints.png")
+    click id "nostar_rosario_tab_story" pos (0.5, 0.5) until eval (renpy.get_screen_variable("clue_tab", screen="nostar_rosario_worksheet") == "story") timeout 20.0
+    assert eval (NOSTAR_ROSARIO_STORY in renpy.get_screen_variable("_clue_text", screen="nostar_rosario_worksheet")) timeout 5.0
     assert eval (Nostar.rosario_count() == 0 and not Nostar.rosario_filled()) timeout 5.0
     click id "nostar_rosario_cell_resident_0" pos (0.5, 0.5) until eval (renpy.get_screen_variable("picked_field", screen="nostar_rosario_worksheet") == "resident") timeout 20.0
     $ renpy.screenshot(config.basedir + "/nostar-worksheet-choice.png")
