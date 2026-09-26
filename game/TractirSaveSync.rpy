@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 104
+define currentVersion = 105
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -829,6 +829,9 @@ init -100 python:
         if loaded_version < 104:
             updateSave_V103()
             loaded_version = 104
+        if loaded_version < 105:
+            updateSave_V104()
+            loaded_version = 105
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3306,6 +3309,14 @@ init -100 python:
         if artisans is not None and not any(exit.target == "NobilityQuarters" for exit in artisans.exits):
             artisans.exits.append(next(exit for exit in roomDefinitions["ArtisansQuarter"].exits if exit.target == "NobilityQuarters"))
         initThreads()
+
+    def updateSave_V104():
+        artisans = rooms.get("ArtisansQuarter")
+        if artisans is not None:
+            for room_exit in artisans.exits:
+                if room_exit.target == "NobilityQuarters":
+                    room_exit.condition = register_room_rule(artisans_quarter_sofa_asked)
+                    break
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

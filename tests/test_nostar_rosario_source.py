@@ -33,7 +33,8 @@ def test_nobility_route_and_nostar_schedule_are_visible_after_load():
     house = source("game/Town/NostarHouse.rpy")
     person = source("game/NPC/Secondary/InitNostar.rpy")
     migration = source("game/TractirSaveSync.rpy")
-    assert 'target="NobilityQuarters"' in artisans
+    assert 'target="NobilityQuarters", condition=artisans_quarter_sofa_asked' in artisans
+    assert 'threads.get("nostarRosarioSofa")' in artisans
     assert 'target="NostarHouse"' in quarter
     assert 'target="NobilityQuarters"' in house
     assert 'start="09:00"' in house and 'end="20:59"' in house
@@ -41,6 +42,7 @@ def test_nobility_route_and_nostar_schedule_are_visible_after_load():
     assert 'people.register(NostarStaticData, Nostar)' in migration
     assert 'artisans.exits.append(' in migration
     assert 'initThreads()' in migration.split('def updateSave_V103():', 1)[1]
+    assert 'room_exit.condition = register_room_rule(artisans_quarter_sofa_asked)' in migration
 
 
 def test_riddle_has_all_clues_and_right_answer_sells_for_1200():

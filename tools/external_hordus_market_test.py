@@ -156,6 +156,7 @@ testcase external_hordus_sofa_lead_is_not_a_shop_item:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 25.0
     $ external_hordus_prepare(True)
+    assert eval (not any(item.caption == "Идти в квартал знати" for item in artisans_quarter_action_items()))
     run Call("IntHordusTalk")
     advance until eval ("Спросить о мебели для гостевой" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Посмотреть товары")) pos (0.5, 0.5) until eval ("Назад" in external_hordus_choices()) timeout 20.0
@@ -164,6 +165,7 @@ testcase external_hordus_sofa_lead_is_not_a_shop_item:
     click id (external_hordus_button("Спросить о мебели для гостевой")) pos (0.5, 0.5) until eval ("Спросить, где искать леди" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Спросить, где искать леди")) pos (0.5, 0.5) until eval ("Поблагодарить Хорди" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Поблагодарить Хорди")) pos (0.5, 0.5) until eval (int(threads["nostarRosarioSofa"].num) == 1) timeout 20.0
+    assert eval (any(item.caption == "Идти в квартал знати" for item in artisans_quarter_action_items()))
     click id (external_hordus_button("Закончить разговор")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
 
 testcase external_nostar_rosario_riddle_purchase_and_npc_presence:

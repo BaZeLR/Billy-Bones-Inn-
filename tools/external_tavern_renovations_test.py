@@ -68,7 +68,7 @@ init python:
         assert Sofa.installed and people.location("sofa") == "TavernEmptyRoom"
         assert people.get_info("nostar") is Nostar
         assert rooms.get("NostarHouse") is not None and rooms.get("NobilityQuarters") is not None
-        assert any(exit.target == "NobilityQuarters" for exit in rooms.get("ArtisansQuarter").exits)
+        assert any(exit.target == "NobilityQuarters" and exit.condition is not None and exit.is_visible() == artisans_quarter_sofa_asked() for exit in rooms.get("ArtisansQuarter").exits)
         assert Sandra.renovation_requests["shed"] is True
         assert Clara.renovation_requests["guest_room"] is False
         print("RENOVATION_FULL_LOAD_PASSED", flush=True)

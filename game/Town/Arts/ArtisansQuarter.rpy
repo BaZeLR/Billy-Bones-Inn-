@@ -2,6 +2,9 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def artisans_quarter_sofa_asked():
+        return int(getattr(threads.get("nostarRosarioSofa"), "num", 0) or 0) >= 1
+
     def artisans_quarter_exit_minutes(target_room=""):
         if str(target_room or "").strip() == "StreetTavern":
             return navigation_group_travel_minutes()
@@ -29,7 +32,7 @@ init python:
             RoomExit(label="Идти в мастерскую столяра Драупнира", target="StolyarWorkshop", minutes_to_pass=10),
             RoomExit(label="Идти в лавку портнихи Фараго", target="DressShop", minutes_to_pass=10),
             RoomExit(label="Зайти в цирюльню Серджио Пета", target="BarberShop", minutes_to_pass=10),
-            RoomExit(label="Идти в квартал знати", target="NobilityQuarters", minutes_to_pass=10),
+            RoomExit(label="Идти в квартал знати", target="NobilityQuarters", condition=artisans_quarter_sofa_asked, minutes_to_pass=10),
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
         game_items=[
