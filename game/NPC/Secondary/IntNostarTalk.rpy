@@ -33,7 +33,7 @@ label IntNostarTalk:
 
 
 label story_nostar_rosario_riddle_1:
-    $ renpy.dynamic("_nostar_page", "_nostar_answer")
+    $ renpy.dynamic("_nostar_answer")
     $ main_ui_begin_native_scene_state("Пропажа Розарио")
     show screen main_ui
     vscene "images/nostar/lady_nostar.png"
@@ -42,49 +42,31 @@ label story_nostar_rosario_riddle_1:
         "Взять записи о пяти домах":
             pass
     vscene "images/nostar/nobility_quarters.png"
-    $ _nostar_page = 0
+    $ scene_runtime.text = "На пергаменте пять домов выстроены в ряд. Вы раскладываете приметы по столбцам, сверяясь с записями леди Ностар."
     while True:
-        $ scene_runtime.text = NOSTAR_ROSARIO_CLUE_PAGES[_nostar_page]
+        call screen nostar_rosario_worksheet
+        if _return != "submit":
+            $ main_ui_end_native_scene_state()
+            return False
+        $ _nostar_answer = Nostar.rosario_answer()
+        if _nostar_answer == NOSTAR_ROSARIO_ANSWER:
+            vscene "images/nostar/lady_nostar.png"
+            $ scene_runtime.text = "— Розарио у тифлинг-колдуньи, в зелёном доме, пятом слева, — отвечаете вы. — Гномья матрона живёт в первом доме, значит, лазурный — второй. Шафрановый с тавзой остаётся первым, а лошадь — во втором. Расставьте напитки, ленты и прочих питомцев: для колдуньи останется только ваша шиншилла.\n\nЛеди Ностар перестаёт улыбаться. Её палец ещё раз пробегает по пяти домам на листе. — Если вы правы, Стефан, сегодня я впервые обрадуюсь тому, что этот диван покинет мою гостиную."
+            menu:
+                "Выслушать леди Ностар":
+                    pass
+            $ scene_runtime.text = "Леди посылает слугу к зелёному дому. Тот возвращается не с оправданиями, а с переносной клеткой: Розарио сердито фыркает из-за решётки. Ностар прижимает шиншиллу к груди и наконец позволяет себе рассмеяться.\n\n— Слово держу, Стефан. Тысяча двести мараведи — и мои люди немедленно понесут диван в ваш трактир. Только не возвращайте его мне, если он заговорит по дороге."
+            menu:
+                "Вернуться к разговору о покупке":
+                    pass
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            return True
+        vscene "images/nostar/lady_nostar.png"
+        $ scene_runtime.text = "— Нет, — леди Ностар придерживает лист, прежде чем вы успеваете его свернуть. — Вы ищете Розарио не в том доме. Начните с гномьей матроны в первом и молока в третьем; мои соседи не умеют менять дома местами, даже если им очень хочется."
         menu:
-            "Следующая страница" if _nostar_page < 2:
-                $ _nostar_page += 1
-            "Предыдущая страница" if _nostar_page > 0:
-                $ _nostar_page -= 1
-            "Назвать соседку":
-                menu:
-                    "Гномья матрона":
-                        $ _nostar_answer = "dwarf"
-                    "Полуэльфийка":
-                        $ _nostar_answer = "halfelf"
-                    "Человеческая госпожа":
-                        $ _nostar_answer = "human"
-                    "Гоблинская королева":
-                        $ _nostar_answer = "goblin"
-                    "Тифлинг-колдунья":
-                        $ _nostar_answer = "tiefling"
-                    "Вернуться к приметам":
-                        $ _nostar_answer = ""
-                if _nostar_answer == NOSTAR_ROSARIO_ANSWER:
-                    vscene "images/nostar/lady_nostar.png"
-                    $ scene_runtime.text = "— Розарио у тифлинг-колдуньи, в зелёном доме, пятом слева, — отвечаете вы. — Гномья матрона живёт в первом доме, значит, лазурный — второй. Шафрановый с тавзой остаётся первым, а лошадь — во втором. Расставьте напитки, ленты и прочих питомцев: для колдуньи останется только ваша шиншилла.\n\nЛеди Ностар перестаёт улыбаться. Её палец ещё раз пробегает по пяти домам на листе. — Если вы правы, Стефан, сегодня я впервые обрадуюсь тому, что этот диван покинет мою гостиную."
-                    menu:
-                        "Выслушать леди Ностар":
-                            pass
-                    $ scene_runtime.text = "Леди посылает слугу к зелёному дому. Тот возвращается не с оправданиями, а с переносной клеткой: Розарио сердито фыркает из-за решётки. Ностар прижимает шиншиллу к груди и наконец позволяет себе рассмеяться.\n\n— Слово держу, Стефан. Тысяча двести мараведи — и мои люди немедленно понесут диван в ваш трактир. Только не возвращайте его мне, если он заговорит по дороге."
-                    menu:
-                        "Вернуться к разговору о покупке":
-                            pass
-                    $ event_runtime.active_thread.advance()
-                    $ main_ui_end_native_scene_state()
-                    return True
-                elif _nostar_answer != "":
-                    $ scene_runtime.text = "— Нет, — леди Ностар придерживает лист, прежде чем вы успеваете его свернуть. — Вы ищете Розарио не в том доме. Начните с гномьей матроны в первом и молока в третьем; мои соседи не умеют менять дома местами, даже если им очень хочется."
-                    menu:
-                        "Снова изучить записи":
-                            $ _nostar_page = 0
-                        "Вернуться позже":
-                            $ main_ui_end_native_scene_state()
-                            return False
+            "Снова изучить записи":
+                vscene "images/nostar/nobility_quarters.png"
             "Вернуться позже":
                 $ main_ui_end_native_scene_state()
                 return False

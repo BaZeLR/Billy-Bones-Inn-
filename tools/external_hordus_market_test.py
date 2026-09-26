@@ -181,9 +181,36 @@ testcase external_nostar_rosario_riddle_purchase_and_npc_presence:
     run Call("IntNostarTalk")
     advance until eval ("Спросить о пропавшей Розарио" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Спросить о пропавшей Розарио")) pos (0.5, 0.5) until eval ("Взять записи о пяти домах" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Взять записи о пяти домах")) pos (0.5, 0.5) until eval ("Назвать соседку" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Назвать соседку")) pos (0.5, 0.5) until eval ("Тифлинг-колдунья" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Тифлинг-колдунья")) pos (0.5, 0.5) until eval ("Выслушать леди Ностар" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Взять записи о пяти домах")) pos (0.5, 0.5) until screen "nostar_rosario_worksheet" timeout 20.0
+    $ renpy.screenshot(config.basedir + "/nostar-worksheet.png")
+    assert eval (Nostar.rosario_count() == 0 and not Nostar.rosario_filled()) timeout 5.0
+    click id "nostar_rosario_cell_resident_0" pos (0.5, 0.5) until eval (renpy.get_screen_variable("picked_field", screen="nostar_rosario_worksheet") == "resident") timeout 20.0
+    $ renpy.screenshot(config.basedir + "/nostar-worksheet-choice.png")
+    click id "nostar_rosario_choice_dwarf" pos (0.5, 0.5) until eval (Nostar.rosario_cell("resident", 0) == "dwarf") timeout 20.0
+    $ Nostar.set_rosario_cell("resident", 1, "dwarf")
+    assert eval (Nostar.rosario_cell("resident", 0) == "" and Nostar.rosario_cell("resident", 1) == "dwarf") timeout 5.0
+    python:
+        for field, values in (
+            ("color", ("saffron", "azure", "crimson", "ivory", "green")),
+            ("resident", ("dwarf", "halfelf", "human", "tiefling", "goblin")),
+            ("drink", ("water", "tea", "milk", "orange", "coffee")),
+            ("pet", ("fox", "horse", "snails", "hound", "chinchilla")),
+            ("implement", ("tawse", "ribbons", "cords", "collar", "gyves")),
+        ):
+            for house, value in enumerate(values):
+                Nostar.set_rosario_cell(field, house, value)
+        renpy.restart_interaction()
+    assert eval (Nostar.rosario_count() == 25 and Nostar.rosario_filled() and Nostar.rosario_answer() == "goblin") timeout 5.0
+    click id "nostar_rosario_submit" pos (0.5, 0.5) until eval ("Снова изучить записи" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Снова изучить записи")) pos (0.5, 0.5) until screen "nostar_rosario_worksheet" timeout 20.0
+    assert eval (Nostar.rosario_count() == 25 and Nostar.rosario_answer() == "goblin") timeout 5.0
+    python:
+        Nostar.set_rosario_cell("resident", 3, "goblin")
+        Nostar.set_rosario_cell("resident", 4, "tiefling")
+        renpy.restart_interaction()
+    assert eval (Nostar.rosario_count() == 25 and Nostar.rosario_answer() == "tiefling") timeout 5.0
+    $ renpy.screenshot(config.basedir + "/nostar-worksheet-filled.png")
+    click id "nostar_rosario_submit" pos (0.5, 0.5) until eval ("Выслушать леди Ностар" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Выслушать леди Ностар")) pos (0.5, 0.5) until eval ("Вернуться к разговору о покупке" in external_hordus_choices()) timeout 20.0
     click id (external_hordus_button("Вернуться к разговору о покупке")) pos (0.5, 0.5) until eval ("Спросить о диване" in external_hordus_choices()) timeout 20.0
     assert eval (int(threads["nostarRosarioSofa"].num) == 2 and not Sofa.installed) timeout 5.0
