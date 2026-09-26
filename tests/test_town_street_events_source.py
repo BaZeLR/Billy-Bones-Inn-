@@ -20,10 +20,27 @@ def test_town_street_thugs_shout_renders_result_as_native_menu():
     body = source.split("label TownStreetThugsShout:", 1)[1].split("label TownStreetPatrolEvent:", 1)[0]
 
     assert "Попробовать спугнуть их криком" not in body
-    assert '"[scene_runtime.text]"' in body
+    assert '"[scene_runtime.text]"' not in body
     assert '"Вернуться":' in body
     assert "main_ui_runtime.action_items" not in body
     assert "call screen main_ui" not in body
+
+
+def test_each_random_town_event_owns_the_ui_until_its_menu_finishes():
+    source = (PROJECT_ROOT / "game" / "Town" / "RandomTownEvents.rpy").read_text(encoding="utf-8-sig")
+    labels = (
+        ("TownRandomChronicleEvent", "TownStreetHelpEvent"),
+        ("TownStreetHelpEvent", "TownStreetHelpRecruit"),
+        ("TownStreetThugsEvent", "TownStreetThugsFight"),
+        ("TownStreetPatrolEvent", "TownStreetPatrolPass"),
+    )
+    for start, end in labels:
+        body = source.split(f"label {start}:", 1)[1].split(f"label {end}", 1)[0]
+        assert "main_ui_begin_native_scene_state(" in body
+        assert "main_ui_end_native_scene_state()" in body
+        assert "vscene scene_runtime.picture" in body
+        assert '"[scene_runtime.text]"' not in body
+        assert "main_ui_runtime.action_items" not in body
 
 
 def test_town_street_patrol_uses_its_dedicated_picture():

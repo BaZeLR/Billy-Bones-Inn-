@@ -204,6 +204,10 @@ def make_runtime_namespace():
         def var(self):
             return namespace.get("GuardCaptainVar", {})
 
+        @property
+        def street_patrol_pass(self):
+            return bool(namespace.get("ZimmerStreetPatrolPass", False))
+
     namespace["Zimmer"] = ZimmerProxy()
     namespace["RandomNameCode"] = lambda gender="male", nationality="": "Анна" if gender == "female" else "Иоганн"
     namespace["RandomStallionNameCode"] = lambda: "Буцефал"
@@ -523,6 +527,7 @@ def main() -> int:
             ("Спрятаться и уйти дворами", "Call", "TownStreetPatrolHide"),
             ("Бежать", "Call", "TownStreetPatrolRun"),
             ("Драться со стражей", "Call", "TownStreetPatrolFight"),
+            ("Идти дальше", "Function", "renpy.return_statement:True"),
         ],
     )
     assert_menu(
@@ -531,6 +536,7 @@ def main() -> int:
             ("Дать еды и предложить грязную работу при трактире", "Call", "TownStreetHelpRecruit"),
             ("Дать пару мараведи", "Call", "TownStreetHelpMoney"),
             ("Пройти мимо", "Function", "renpy.return_statement:True"),
+            ("Идти дальше", "Function", "renpy.return_statement:True"),
         ],
     )
     assert_menu(

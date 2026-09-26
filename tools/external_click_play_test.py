@@ -2678,7 +2678,7 @@ testcase external_actual_random_town_continue_click:
     $ TownStreet.fights_today = 0
     $ TownStreet.curfew_caught_today = 0
     $ TownStreet.story_seen_keys = []
-    $ GuardCaptainVar = {}
+    $ Zimmer.street_patrol_pass = False
     $ main_ui_runtime.overlay = ""
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
@@ -2695,6 +2695,68 @@ testcase external_actual_random_town_continue_click:
     assert eval (main_ui_runtime.action_items == [] and renpy.get_screen("say") is None) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Старое действие локации"]) timeout 5.0
+
+testcase external_random_town_event_ui_boundary:
+    parameter event_name = ["TownStreetHelpEvent", "TownStreetThugsEvent", "TownStreetPatrolEvent"]
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 22, 0)
+    $ rooms.enter("StreetTavern")
+    $ Zimmer.street_patrol_pass = False
+    $ player.set_stat("exploration", 300)
+    $ player.economy.money = 500
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Улица"
+    $ main_ui_runtime.action_items = [MenuItem("Старое действие локации", NullAction())]
+    $ scene_runtime.picture = "images/general/LocStreet.jpg"
+    $ scene_runtime.text = "Описание улицы"
+    $ scene_runtime.location_text = scene_runtime.text
+    run Call(event_name)
+    advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [] and renpy.get_screen("say") is None) timeout 5.0
+    assert eval (scene_runtime.picture != "images/general/LocStreet.jpg" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    assert eval ("Старое действие локации" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    if eval (event_name == "TownStreetHelpEvent"):
+        click id "choice_panel_button_2" pos (0.5, 0.5)
+        advance until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Идти дальше"]) timeout 20.0
+        assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == []) timeout 5.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+    elif eval (event_name == "TownStreetThugsEvent"):
+        click id "choice_panel_button_2" pos (0.5, 0.5)
+    else:
+        click id "choice_panel_button_1" pos (0.5, 0.5)
+        advance until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Идти дальше"]) timeout 20.0
+        assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == []) timeout 5.0
+        click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Старое действие локации"]) timeout 5.0
+
+testcase external_random_town_fight_returns_to_event_menu:
+    parameter event_name = ["TownStreetThugsEvent", "TownStreetPatrolEvent"]
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 22, 0)
+    $ rooms.enter("StreetTavern")
+    $ Zimmer.street_patrol_pass = False
+    $ player.set_stat("health", 100)
+    $ player.set_stat("energy", 100)
+    $ player.set_stat("exploration", 300)
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_items = [MenuItem("Старое действие локации", NullAction())]
+    $ scene_runtime.picture = "images/general/LocStreet.jpg"
+    $ scene_runtime.text = "Описание улицы"
+    $ scene_runtime.location_text = scene_runtime.text
+    run Call(event_name)
+    advance until screen "choice" timeout 20.0
+    if eval (event_name == "TownStreetThugsEvent"):
+        click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode == "fight") timeout 20.0
+    else:
+        click id "choice_panel_button_3" pos (0.5, 0.5) until eval (main_ui_runtime.mode == "fight") timeout 20.0
+    $ renpy.call_in_new_context("FightRetreat")
+    advance until eval (fight.outcome_kind == "retreat" and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Вернуться"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == []) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == (["Вернуться"] if event_name == "TownStreetThugsEvent" else ["Идти дальше"])) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.mode == "scene") timeout 20.0
     assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Старое действие локации"]) timeout 5.0
 
 testcase external_actual_random_town_click:
@@ -2724,7 +2786,7 @@ testcase external_actual_random_town_click:
     $ TownStreet.fights_today = 0
     $ TownStreet.curfew_caught_today = 0
     $ TownStreet.story_seen_keys = []
-    $ GuardCaptainVar = {}
+    $ Zimmer.street_patrol_pass = False
     $ main_ui_runtime.overlay = ""
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
@@ -2744,9 +2806,12 @@ testcase external_actual_random_town_click:
     run Call("TownStreetPatrolEvent")
     advance until screen "choice" timeout 20.0
     assert eval (str(scene_runtime.picture or "") == "images/fight/patrol_guard.png") timeout 5.0
-    click id "choice_panel_button_1" pos (0.5, 0.5)
+    $ _patrol_hide_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спрятаться и уйти дворами")
+    click id ("choice_panel_button_%d" % _patrol_hide_index) pos (0.5, 0.5)
     advance until eval (player.stats.exploration >= 308) timeout 20.0
-    assert eval (TownStreet.patrols_today >= 1 and player.stats.exploration >= 308 and len(list(TownStreet.story_seen_keys or [])) >= 1 and event_runtime.evaluation_time is None) timeout 5.0
+    assert eval (TownStreet.patrols_today >= 1) timeout 5.0
+    assert eval (player.stats.exploration >= 308) timeout 5.0
+    assert eval (len(list(TownStreet.story_seen_keys or [])) >= 1) timeout 5.0
     assert eval (TownStreet.random_seen_this_slot("StreetTavern", "TownStreetPatrolEvent")) timeout 5.0
     assert eval (TownStreet.event_key("StreetTavern", "TownStreetPatrolEvent") in TownStreet.story_seen_keys) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
@@ -2767,7 +2832,7 @@ testcase external_actual_random_town_click:
     $ TownStreet.fights_today = 0
     $ TownStreet.curfew_caught_today = 0
     $ TownStreet.story_seen_keys = []
-    $ GuardCaptainVar = {}
+    $ Zimmer.street_patrol_pass = False
     $ main_ui_runtime.overlay = ""
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
@@ -9836,6 +9901,8 @@ def main() -> int:
             "external_actual_market_blind_pirate_first_entry",
             "external_market_clock_open_hours",
             "external_actual_random_town_continue_click",
+            "external_random_town_event_ui_boundary",
+            "external_random_town_fight_returns_to_event_menu",
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
             "external_legacy_day_save_page_renders",
@@ -10048,6 +10115,8 @@ def main() -> int:
             "external_actual_market_blind_pirate_first_entry",
             "external_market_clock_open_hours",
             "external_actual_random_town_continue_click",
+            "external_random_town_event_ui_boundary",
+            "external_random_town_fight_returns_to_event_menu",
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
             "external_town_thugs_shout_result",

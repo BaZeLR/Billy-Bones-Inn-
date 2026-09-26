@@ -349,6 +349,8 @@ label TownRandomChronicleEvent:
     $ main_ui_begin_native_scene_state("Случайное событие")
     $ TownStreet.events_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownRandomChronicleEvent")
+    $ scene_runtime.picture = "images/general/harbor_street.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/general/LocMarketPlace1.jpg"
+    vscene scene_runtime.picture
     $ scene_runtime.text = TownStreet.random_chronicle(TownStreet.time_event_key())
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
@@ -361,22 +363,28 @@ label TownRandomChronicleEvent:
 
 label TownStreetHelpEvent:
     $ renpy.dynamic("_town_ctx")
+    $ main_ui_begin_native_scene_state("Просьба на улице")
     $ TownStreet.events_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownStreetHelpEvent")
     $ _town_ctx = TownStreet.make_help_context()
+    $ scene_runtime.picture = "images/general/harbor_street.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/general/LocMarketPlace1.jpg"
+    vscene scene_runtime.picture
     $ scene_runtime.text = "У стены сидит измученный человек. По виду это %s - %s. Он просит не денег, а куска еды и места, где можно переждать ночь. Рядом двое прохожих делают вид, что не слышат." % (_town_ctx.get("help_name", "бродяга"), _town_ctx.get("help_job", "без ремесла"))
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    "[scene_runtime.text]"
     menu:
         "Дать еды и предложить грязную работу при трактире":
             call TownStreetHelpRecruit(_town_ctx.get("help_name", "бродяга"))
-            "[scene_runtime.text]"
         "Дать пару мараведи":
             call TownStreetHelpMoney
-            "[scene_runtime.text]"
         "Пройти мимо":
+            $ scene_runtime.text = "Вы проходите мимо и оставляете человека у стены."
+            $ scene_runtime.location_text = scene_runtime.text
             pass
+    menu:
+        "Идти дальше":
+            pass
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -404,13 +412,15 @@ label TownStreetHelpMoney:
 
 
 label TownStreetThugsEvent:
+    $ main_ui_begin_native_scene_state("Громилы в переулке")
     $ TownStreet.events_today += 1
     $ TownStreet.fights_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownStreetThugsEvent")
+    $ scene_runtime.picture = "images/fight/thug.png"
+    vscene scene_runtime.picture
     $ scene_runtime.text = "Из бокового переулка вы слышите короткий вскрик. Двое крепких парней прижимают к стене растерянного горожанина и выворачивают ему руки. Увидев вас, один ухмыляется: «Проходи мимо, трактирщик. Не твое дело»."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    "[scene_runtime.text]"
     menu:
         "Вмешаться и драться":
             call TownStreetThugsFight
@@ -418,6 +428,7 @@ label TownStreetThugsEvent:
             call TownStreetThugsShout
         "Пройти мимо":
             pass
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -432,6 +443,7 @@ label TownStreetThugsFight:
     $ _thug_intro = "Вы встаете между жертвой и громилами. Один сплевывает на мостовую и перехватывает дубинку: теперь разговор закончится только дракой."
     $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
     call FightLoop
+    $ main_ui_begin_native_scene_state("Громилы в переулке")
     $ _thug_outcome = str(fight.last_result.get("outcome", "") or "")
     if _thug_outcome == "victory":
         $ player.set_stat("reputation", _thug_reputation_before + 3)
@@ -450,7 +462,6 @@ label TownStreetThugsFight:
         $ scene_runtime.location_text = scene_runtime.text
         $ renpy.notify("Репутация -1")
     if _thug_outcome in ("victory", "defeat", "retreat"):
-        "[scene_runtime.text]"
         menu:
             "Вернуться":
                 pass
@@ -472,7 +483,6 @@ label TownStreetThugsShout:
         $ player.change_stat("notoriety", 4)
         $ scene_runtime.text = "Вы громко зовете стражу и называете ближайшие дома так уверенно, будто уже знаете, куда побежите за подкреплением. Громилы переглядываются, ругаются и отступают в переулок. Прохожие запоминают, что вы не прошли мимо: репутация +2, дурная слава +4."
         $ scene_runtime.location_text = scene_runtime.text
-        "[scene_runtime.text]"
         menu:
             "Вернуться":
                 pass
@@ -482,6 +492,7 @@ label TownStreetThugsShout:
         $ _thug_intro = "Ваш крик только злит громил. Один толкает жертву в грязь, второй разворачивается к вам с дубинкой: теперь они хотят наказать именно вас."
         $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
         call FightLoop
+        $ main_ui_begin_native_scene_state("Громилы в переулке")
         $ _thug_outcome = str(fight.last_result.get("outcome", "") or "")
         if _thug_outcome == "victory":
             $ player.set_stat("reputation", _shout_reputation_before + 2)
@@ -495,7 +506,6 @@ label TownStreetThugsShout:
             $ scene_runtime.location_text = scene_runtime.text
             $ renpy.notify("Репутация -1")
         if _thug_outcome in ("victory", "defeat", "retreat"):
-            "[scene_runtime.text]"
             menu:
                 "Вернуться":
                     pass
@@ -506,6 +516,7 @@ label TownStreetPatrolEvent:
     $ renpy.dynamic("_fine")
     if not TownStreet.curfew_active():
         return False
+    $ main_ui_begin_native_scene_state("Ночной патруль")
     $ TownStreet.events_today += 1
     $ TownStreet.patrols_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownStreetPatrolEvent")
@@ -515,22 +526,21 @@ label TownStreetPatrolEvent:
     $ scene_runtime.location_text = scene_runtime.text
     $ _fine = TownStreet.fine_amount("fight")
     show screen main_ui
-    "[scene_runtime.text]"
     menu:
         "Показать пропуск" if TownStreet.patrol_pass_active():
             call TownStreetPatrolPass
-            "[scene_runtime.text]"
         "Заплатить штраф [_fine] мараведи":
             call TownStreetPatrolBribe
-            "[scene_runtime.text]"
         "Спрятаться и уйти дворами":
             call TownStreetPatrolHide
-            "[scene_runtime.text]"
         "Бежать":
             call TownStreetPatrolRun
-            "[scene_runtime.text]"
         "Драться со стражей":
             call TownStreetPatrolFight
+    menu:
+        "Идти дальше":
+            pass
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -596,6 +606,7 @@ label TownStreetPatrolFight:
     $ _patrol_intro = "Вы решаете не платить и не прятаться. Стражники переглядываются, опускают алебарды и берут вас в клещи. Теперь это настоящая драка с патрулем."
     $ fight_begin("patrol_guard", 2, _patrol_return_room, _patrol_picture, _patrol_intro)
     call FightLoop
+    $ main_ui_begin_native_scene_state("Ночной патруль")
     $ _patrol_outcome = str(fight.last_result.get("outcome", "") or "")
     if _patrol_outcome == "victory":
         $ player.change_stat("notoriety", 18)
@@ -610,24 +621,21 @@ label TownStreetPatrolFight:
         $ renpy.notify("Дурная слава +4")
     elif _patrol_outcome == "defeat":
         jump TownStreetPatrolStocks
-    if _patrol_outcome in ("victory", "retreat"):
-        "[scene_runtime.text]"
-        menu:
-            "Вернуться":
-                pass
     return True
 
 
 label TownStreetPatrolStocks:
+    $ main_ui_begin_native_scene_state("Колодки")
     $ TownStreet.curfew_caught_today = True
     $ TownStreet.patrols_today += 1
     $ player.economy.tavern_fame = int(player.economy.tavern_fame * 0.4)
     $ player.set_stat("notoriety", 0)
     $ scene_runtime.text = "Патруль тащит вас к колодкам. Ночь проходит унизительно: холод, смех поздних прохожих и тупая боль в плечах. К утру о вашем приключении уже знают слишком многие."
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+    show screen main_ui
     menu:
         "Дождаться утра":
+            $ main_ui_end_native_scene_state()
             call NextDay("StreetTavern", 1)
     return
 

@@ -519,7 +519,7 @@ init -20 python:
 
     def fight_action_items():
         if len(fight_active_enemy_rows()) <= 0:
-            return [MenuItem("Вернуться", Call("FightEnd"))]
+            return [MenuItem("Вернуться", [Call("FightEnd"), Return()])]
         target_row = fight_selected_target()
         target_name = str(target_row.name or "цель") if target_row is not None else "цель"
         items = [
@@ -1507,7 +1507,7 @@ label FightApplyActionResult(_fight_result):
         $ scene_runtime.location_text = scene_runtime.text
         $ fight.outcome_kind = "victory"
         $ main_ui_runtime.action_title = "Победа"
-        $ main_ui_runtime.action_items = [MenuItem("Забрать добычу и вернуться", Call("FightEnd"))]
+        $ main_ui_runtime.action_items = [MenuItem("Забрать добычу и вернуться", [Call("FightEnd"), Return()])]
         $ renpy.notify("Победа. Добыча: " + (fight_loot_text() or "нет"))
         return
     if str(_fight_result.get("done", "") or "") in ("defeat", "retreat"):
@@ -1517,7 +1517,7 @@ label FightApplyActionResult(_fight_result):
         $ scene_runtime.location_text = scene_runtime.text
         $ fight.outcome_kind = _fight_done
         $ main_ui_runtime.action_title = "Поражение" if _fight_done == "defeat" else "Отступление"
-        $ main_ui_runtime.action_items = [MenuItem("Вернуться", Call("FightEnd"))]
+        $ main_ui_runtime.action_items = [MenuItem("Вернуться", [Call("FightEnd"), Return()])]
         $ renpy.notify("Поражение в бою." if _fight_done == "defeat" else "Вы отступили из боя.")
         return
     call FightEnd
