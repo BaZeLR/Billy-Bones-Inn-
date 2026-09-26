@@ -22,11 +22,13 @@ def test_tavern_main_has_no_object_menu_mirror_or_boolean_protocol():
 
 def test_tavern_main_preserves_room_objects_exits_clients_and_story_events():
     for token in (
-        "rooms.get(\"TavernMain\").build_menu_sections()", 'Call("TavernProstClients", rooms.get(\"TavernMain\").state["client_room_girl"])',
+        "rooms.get(\"TavernMain\").build_menu_sections()", 'Call("TavernProstClients", client_girl)',
+        'client_girl in tavern_main_intimate_workers()', 'CheckIfSexEventExist(client_girl, calendar_v2.time_slot(), "Prostitution") > 0',
         'story_event_available("TavernMain", "overheard")',
         '"book_001"', '"fireplace_001"', '"bar_001"',
     ):
         assert token in SOURCE
 
+    assert "tavern.renovation_complete('peephole') and client_girl" not in SOURCE
     assert 'Call("checkTriggers", "TavernMain", "clara_tavern_visit", 0)' not in SOURCE
     assert 'story_event_available("TavernMain", "clara_paintings")' not in SOURCE

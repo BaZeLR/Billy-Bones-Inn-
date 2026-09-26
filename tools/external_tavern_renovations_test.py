@@ -423,16 +423,21 @@ testcase external_relocated_window_observes_existing_guest_scene:
         info = people.get_info(girl)
         info.set_hired(True)
         info.assign_tavern_service("intimate", False)
-        tavern.renovations["peephole"].status = "completed"
-        threads["tavernRenovations"].seen(list(TAVERN_RENOVATIONS).index("peephole"))
+        tavern.renovations["peephole"].status = "completed" if origin == "TavernMyRoom" else "unrequested"
+        if origin == "TavernMyRoom":
+            threads["tavernRenovations"].seen(list(TAVERN_RENOVATIONS).index("peephole"))
         SexEvents.delete_girl_today(girl)
         SexEvents.add_today(girl, calendar_v2.time_slot(), 2, "Prostitution")
         rooms.get("TavernMain").state["client_room_girl"] = girl
         threads["lizaTavernClientRoom"].reset()
     run Jump(origin)
     advance until eval (rooms.current_code == origin) timeout 20.0
-    assert eval (tavern_empty_room_peephole_has_client())
+    if eval (origin == "TavernMyRoom"):
+        assert eval (tavern_empty_room_peephole_has_client())
+    else:
+        assert eval (not tavern.renovation_complete("peephole") and any(item.caption == "Пойти проверить отдельную комнату" for item in main_ui_runtime.action_items))
     if eval (origin == "TavernMain"):
+        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"
         run (next(item.action for item in main_ui_runtime.action_items if item.caption == "Пойти проверить отдельную комнату"))
     else:
         run Call("TavernMyRoomObjectMenu", "tavern_empty_room_peephole")
@@ -443,14 +448,18 @@ testcase external_relocated_window_observes_existing_guest_scene:
     if eval (origin == "TavernMyRoom"):
         assert eval (scene_runtime.picture == "guest_room_peek" and "осторожно открываете" in scene_runtime.text)
     else:
-        assert eval ("Из своей комнаты" in scene_runtime.text)
+        assert eval (scene_runtime.picture == tavern_empty_room_picture("bedroom") and not scene_runtime.picture_overlay and "из зала" in scene_runtime.text)
     click id (external_renovation_button("Подсмотреть")) pos (0.5, 0.5)
     advance until eval (external_renovation_choices() == ["Вернуться"]) timeout 20.0
     assert eval (_media_asset_exists(scene_runtime.picture) and rooms.current_code == origin)
     assert eval (str(getattr(scene_runtime, "picture_overlay", "") or "") == ("images/tavern/guest_room/peephole_frame.png" if origin == "TavernMyRoom" else ""))
+    if eval (origin == "TavernMain"):
+        $ SexEvents.delete_girl_today(girl)
     click id (external_renovation_button("Вернуться")) pos (0.5, 0.5)
     advance until eval (not external_renovation_choices()) timeout 20.0
     assert eval (rooms.current_code == origin and main_ui_runtime.scene_origin is None and not getattr(scene_runtime, "picture_overlay", ""))
+    if eval (origin == "TavernMain"):
+        assert eval (not any(item.caption == "Пойти проверить отдельную комнату" for item in main_ui_runtime.action_items))
 
 testcase external_relocated_window_opens_empty_guest_room:
     run Jump("dev_after_report_checkpoint")

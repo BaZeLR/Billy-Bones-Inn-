@@ -224,8 +224,9 @@ init python:
         tavern_main_fireplace_wood_stock()
         sections = rooms.get("TavernMain").build_menu_sections()
         items = list(sections.get("movement", [])) + list(sections.get("actions", []))
-        if player.tavern_management.isTavernOpen and tavern.renovation_complete('peephole') and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "":
-            items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", rooms.get("TavernMain").state["client_room_girl"])))
+        client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+        if player.tavern_management.isTavernOpen and client_girl in tavern_main_intimate_workers() and CheckIfSexEventExist(client_girl, calendar_v2.time_slot(), "Prostitution") > 0:
+            items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", client_girl)))
         if tavern_main_closed_text() == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
             items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
         return items
