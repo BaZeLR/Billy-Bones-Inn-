@@ -213,6 +213,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("knownotvirgin", 1)
             if Amanda.sex_stat("virginity", True):
                 $ Amanda.set_var_int("glorydeflower", 1)
+                $ Amanda.record_first_partner("mc")
             call ShowImageSeq("amanda", "gloryfirst", "fuck", 6)
             jump AmandaAtGloryHole_menu
 

@@ -55,6 +55,11 @@
 - askzalettoday
 - MomDressComplaint
 
+## Current first-partner state
+- `Amanda.first_partner` is the single runtime owner: empty before first sex, `mc` or `legare` once known, `unknown` only for an ambiguous older save.
+- It is recorded once at the first encounter. The legacy `deflowerlegare` flag is consumed during save migration, not kept as parallel state.
+- No obedience, rebellion, or job-assignment rule reads this field yet; those decision criteria remain undecided.
+
 ## Primary Scenes/Dialogs/Features (TXT files)
 - InitAmanda.txt -> InitAmanda.rpy (rpy_exists)
 - IntAmandaTalk.txt -> IntAmandaTalk.rpy (rpy_exists)

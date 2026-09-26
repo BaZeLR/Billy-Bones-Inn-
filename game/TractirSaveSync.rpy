@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 105
+define currentVersion = 106
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -832,6 +832,9 @@ init -100 python:
         if loaded_version < 105:
             updateSave_V104()
             loaded_version = 105
+        if loaded_version < 106:
+            updateSave_V105()
+            loaded_version = 106
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3317,6 +3320,25 @@ init -100 python:
                 if room_exit.target == "NobilityQuarters":
                     room_exit.condition = register_room_rule(artisans_quarter_sofa_asked)
                     break
+
+    def updateSave_V105():
+        amanda_obj = globals().get("Amanda")
+        if amanda_obj is None:
+            return
+        if not hasattr(amanda_obj, "first_partner"):
+            legare_first = bool(getattr(amanda_obj, "lost_virginity_to_legare", False))
+            mc_first = bool(amanda_obj.var_int("beddeflower", 0) or amanda_obj.var_int("glorydeflower", 0))
+            if legare_first and mc_first:
+                amanda_obj.first_partner = "unknown"
+            elif legare_first:
+                amanda_obj.first_partner = "legare"
+            elif mc_first or (amanda_obj.var_int("fuckyou", 0) and not amanda_obj.sex_stat("virginity", True)):
+                amanda_obj.first_partner = "mc"
+            elif not amanda_obj.sex_stat("virginity", True):
+                amanda_obj.first_partner = "unknown"
+            else:
+                amanda_obj.first_partner = ""
+        amanda_obj.__dict__.pop("lost_virginity_to_legare", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

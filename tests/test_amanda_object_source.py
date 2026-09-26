@@ -141,7 +141,7 @@ def test_amanda_info_owns_runtime_state_and_story_defaults():
         "escaped_dance_unnoticed",
         "performed_oral_with_legare",
         "had_sex_with_legare",
-        "lost_virginity_to_legare",
+        "first_partner",
         "player_knows_legare_deflowered",
         "player_knows_legare_sex",
         "player_saw_legare_sex",
@@ -418,7 +418,7 @@ def test_amanda_legare_mechanic_is_direct_object_state_without_wrapper_plan():
         "escaped_dance_unnoticed",
         "performed_oral_with_legare",
         "had_sex_with_legare",
-        "lost_virginity_to_legare",
+        "first_partner",
         "player_knows_legare_deflowered",
         "player_knows_legare_sex",
         "player_saw_legare_sex",
@@ -466,6 +466,61 @@ def test_prohibiting_legare_sets_flag_before_obedient_exit():
     assert prohibit.index('if Amanda.legare_forbidden:') < prohibit.index('$ Amanda.legare_forbidden = True')
     assert prohibit.index('$ Amanda.legare_forbidden = True') < prohibit.index('if AmandaNesluh == 0:')
     assert prohibit.count('$ Amanda.legare_forbidden = True') == 1
+
+
+def test_amanda_first_partner_is_recorded_once_on_each_first_sex_path():
+    init = _source(AMANDA_INIT)
+    legare = _source(AMANDA_AFTER_LEGARE_SEX)
+    home = _source(AMANDA_AT_HOME)
+    glory = _source(AMANDA_AT_GLORY_HOLE)
+    sex = _source(PROJECT_ROOT / "game/NPC/Girls/Amanda/IntAmandaSex.rpy")
+    migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
+
+    assert 'self.first_partner = ""' in init
+    assert 'if not self.first_partner:' in init
+    assert 'self.record_first_partner("legare")' in init
+    assert '$ Amanda.record_first_partner("legare")' in legare
+    assert home.count('$ Amanda.record_first_partner("mc")') == 2
+    assert '$ Amanda.record_first_partner("mc")' in glory
+    assert '$ Amanda.record_first_partner("mc")' in sex
+    assert 'def updateSave_V105():' in migration
+    assert 'amanda_obj.__dict__.pop("lost_virginity_to_legare", None)' in migration
+    assert 'self.lost_virginity_to_legare' not in init
+    assert 'Amanda.lost_virginity_to_legare' not in legare
+
+
+def test_amanda_first_partner_save_migration_keeps_unknowns_unknown():
+    source = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
+    body = source.split("    def updateSave_V105():", 1)[1].split("    # Saved objects", 1)[0]
+    namespace = {}
+    exec("def updateSave_V105():" + body, namespace)
+
+    class OldAmanda:
+        def __init__(self, virginity, legare=False, **flags):
+            self.stats = {"virginity": virginity}
+            self.var = flags
+            self.lost_virginity_to_legare = legare
+
+        def var_int(self, key, default=0):
+            return self.var.get(key, default)
+
+        def sex_stat(self, key, default=None):
+            return self.stats.get(key, default)
+
+    cases = (
+        (OldAmanda(True), ""),
+        (OldAmanda(False, legare=True, fuckyou=1), "legare"),
+        (OldAmanda(False, beddeflower=1), "mc"),
+        (OldAmanda(False, glorydeflower=1), "mc"),
+        (OldAmanda(False, fuckyou=1), "mc"),
+        (OldAmanda(False), "unknown"),
+        (OldAmanda(False, legare=True, beddeflower=1), "unknown"),
+    )
+    for amanda, expected in cases:
+        namespace["Amanda"] = amanda
+        namespace["updateSave_V105"]()
+        assert amanda.first_partner == expected
+        assert not hasattr(amanda, "lost_virginity_to_legare")
 
 
 def test_amanda_v67_migration_consumes_complete_legare_state_once():

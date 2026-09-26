@@ -345,6 +345,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         $ _ias_text_parts.append("Кстати, вы легко и без препятствий вошли в Аманду. Похоже, она уже не девочка. Может стоит потом ее об этом расспросить.")
                         $ Amanda.set_var_int("knownotvirgin", 1)
                     if Amanda.sex_stat("virginity", True):
+                        $ Amanda.record_first_partner("mc")
                         $ Amanda.set_sex_stat("virginity", False)
                         $ Amanda.set_var_int("knownotvirgin", 1)
                     if GirlLocASDS == "street":

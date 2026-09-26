@@ -57,7 +57,7 @@ label IntAmandaTalk(girl_name="amanda"):
         "Сказать Аманде что она может иногда брать перерывы" if int(Amanda.talked_today or 0) < 3 and Amanda.warned_about_not_working:
             call IntAmandaAllowBreaks(girl_name)
             jump IntAmandaTalk
-        "Спросить где она потеряла девственность" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knownotvirgin", 0) > 0 and not Amanda.player_knows_legare_deflowered and Amanda.lost_virginity_to_legare:
+        "Спросить где она потеряла девственность" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knownotvirgin", 0) > 0 and not Amanda.player_knows_legare_deflowered and Amanda.first_partner == "legare":
             call IntAmandaAskVirginity(girl_name)
             jump IntAmandaTalk
         "[_legare_text]" if int(Amanda.talked_today or 0) < 3 and Amanda.player_knows_legare_sex and not Amanda.legare_forbidden:

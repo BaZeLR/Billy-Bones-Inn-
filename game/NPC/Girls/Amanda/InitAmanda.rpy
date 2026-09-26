@@ -179,7 +179,7 @@ init python:
             self.escaped_dance_unnoticed = False
             self.performed_oral_with_legare = False
             self.had_sex_with_legare = False
-            self.lost_virginity_to_legare = False
+            self.first_partner = ""
             self.player_knows_legare_deflowered = False
             self.player_knows_legare_sex = False
             self.player_saw_legare_sex = False
@@ -235,6 +235,10 @@ init python:
         def initialize_new_game_state(self):
             self.ensure_story_defaults()
             return self
+
+        def record_first_partner(self, partner):
+            if not self.first_partner:
+                self.first_partner = str(partner)
 
         def mana_profile(self):
             if self.mana_corrupted:
@@ -685,7 +689,7 @@ init python:
                 pregnancy_check("amanda", "mouth", 1, "legare")
             elif sex_type == 2:
                 self.had_sex_with_legare = True
-                self.lost_virginity_to_legare = True
+                self.record_first_partner("legare")
                 self.set_sex_stat("virginity", False)
                 self.legare_affection += 2
                 self.apply_social_chance(0, 0, 0, 50, 1, 4, "legare_dance_outcome")
@@ -734,7 +738,7 @@ init python:
                 bonus += 2
             if self.had_sex_with_legare:
                 bonus += 3
-            if self.lost_virginity_to_legare:
+            if self.first_partner == "legare":
                 bonus += 3
 
             bonus = min(14, max(1, bonus))

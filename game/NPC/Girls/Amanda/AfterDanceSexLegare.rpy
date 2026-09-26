@@ -146,7 +146,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
             "От ласк месье пошел дальше: он сноровисто стащил с Аманды платье, а затем принялся ласкать ее языком. Убедившись в том, что девочка созрела, он развернул ее, положив ее руки на бочку, и пристроился к ней сзади со своим стоящим колом членом. Писк Аманды, струйка крови, и вот негодяй уже внутри."
             $ Amanda.had_sex_with_legare = True
             $ Amanda.set_sex_stat("virginity", False)
-            $ Amanda.lost_virginity_to_legare = True
+            $ Amanda.record_first_partner("legare")
             $ Amanda.player_knows_legare_deflowered = True
             $ Amanda.set_var_int("knownotvirgin", 1)
             call ShowImage("amanda", "albersex", "fuckbarrelstart")

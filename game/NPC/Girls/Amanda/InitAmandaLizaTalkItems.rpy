@@ -66,7 +66,7 @@ init python:
         return Amanda.var_int("prohibitwithguys", 0)
 
     def amanda_liza_legare_deflower_condition():
-        return Amanda.sex_stat("sexacts", 0) < 20 and Amanda.lost_virginity_to_legare
+        return Amanda.sex_stat("sexacts", 0) < 20 and Amanda.first_partner == "legare"
 
     def amanda_liza_legare_oral_condition():
         return Amanda.performed_oral_with_legare and not Amanda.had_sex_with_legare

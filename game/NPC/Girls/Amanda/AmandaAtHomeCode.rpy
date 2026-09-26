@@ -207,6 +207,7 @@ label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
                 "Решив, что она и так готова, вы приставили свой торчащий колом член к влагалищу Аманды и посмотрели на нее. Она выглядела неуверенно, но все-таки слегка кивнула вам, и вы незамедлительно вошли в нее, прорвав ее плеву одним ударом, лишая ее девичества. Аманда слегка застонала от боли. Подождав немного, чтобы она привыкла к новым ощущениям, вы начали двигаться в ней, сначала медленно, а потом быстрее и быстрее. Однако было заметно, что она лишь терпит вас, не получая удовольствия. Впрочем, в конце концов ее боль улеглась и сменилась слабой улыбкой. Может, если бы вы чуть дольше продержались, Аманде бы и вовсе захорошело, но дольше вы не можете, вы готовы кончить."
                 $ Amanda.set_var_int("fuckyou", 1)
                 $ Amanda.set_var_int("knownotvirgin", 1)
+                $ Amanda.record_first_partner("mc")
                 $ Amanda.set_sex_stat("virginity", False)
                 $ Amanda.set_var_int("beddeflower", 1)
                 python:
@@ -221,6 +222,7 @@ label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
                 $ Amanda.record_orgasm_given()
                 $ Amanda.set_var_int("fuckyou", 1)
                 $ Amanda.set_var_int("knownotvirgin", 1)
+                $ Amanda.record_first_partner("mc")
                 $ Amanda.set_sex_stat("virginity", False)
                 $ Amanda.set_var_int("beddeflower", 1)
                 python:
