@@ -459,6 +459,15 @@ def test_repeated_legare_encounter_can_reveal_the_prior_sighting_only():
     assert "$ Amanda.knows_player_is_watching_legare_sex = True" not in prompt
 
 
+def test_prohibiting_legare_sets_flag_before_obedient_exit():
+    source = _source(AMANDA_AFTER_LEGARE)
+    prohibit = source.split('if arg == "Prohibit":', 1)[1].split('label AfterDanceLegare_Fight:', 1)[0]
+
+    assert prohibit.index('if Amanda.legare_forbidden:') < prohibit.index('$ Amanda.legare_forbidden = True')
+    assert prohibit.index('$ Amanda.legare_forbidden = True') < prohibit.index('if AmandaNesluh == 0:')
+    assert prohibit.count('$ Amanda.legare_forbidden = True') == 1
+
+
 def test_amanda_v67_migration_consumes_complete_legare_state_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V67():", 1)[1].split("label before_load:", 1)[0]

@@ -20,6 +20,7 @@ label AfterDanceLegare(arg=""):
         
         # Calculate Amanda's disobedience level
         $ AmandaNesluh = Amanda.nesluh_value()
+        $ Amanda.legare_forbidden = True
         
         if AmandaNesluh == 0:
             "Аманда расплакалась от вашей отповеди и убежала. Альбер хмуро посмотрел на вас и пошел восовояси. Что же, вы всего лишь сделали то, что были должны сделать, не правда ли?"
@@ -47,8 +48,6 @@ label AfterDanceLegare(arg=""):
             $ Amanda.legare_affection += 2
             $ Amanda.apply_social_chance(5, 1, -1, 30, 1, 3, "after_dance_legare_prohibit")
             
-        $ Amanda.legare_forbidden = True
-        
         if AmandaNesluh > 0:
             menu:
                 "Дать им уйти":
