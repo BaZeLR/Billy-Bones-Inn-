@@ -604,7 +604,7 @@ testcase external_guest_stove_fire_clean_and_back:
     $ Sofa.installed = True
     $ player.condition.fun = 100
     $ player.condition.energy = 100
-    $ player.inventory.items["chopped_wood_001"] = 2
+    $ player.inventory.items["chopped_wood_001"] = 3
     $ _hall_fire_before = dict(TavernMainFireplaceObject.state)
     $ _kitchen_fire_before = dict(TavernKitchenHearthObject.state)
     run Jump("TavernEmptyRoom")
@@ -614,12 +614,18 @@ testcase external_guest_stove_fire_clean_and_back:
     assert eval (_guest_stove_fire_caption == "Разжечь огонь")
     click id (external_renovation_button("Сложить рядом дрова")) pos (0.5, 0.5)
     advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
-    assert eval (_object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 1 and player.item_count("chopped_wood_001") == 1)
+    assert eval (_object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 1 and player.item_count("chopped_wood_001") == 2)
+    click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
+    advance until eval (_guest_stove_fire_caption == "Разжечь огонь") timeout 20.0
+    assert eval ("Сложить все дрова" in external_renovation_choices())
+    click id (external_renovation_button("Сложить все дрова")) pos (0.5, 0.5)
+    advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
+    assert eval (_object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 3 and player.item_count("chopped_wood_001") == 0)
     click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
     advance until eval (_guest_stove_fire_caption == "Разжечь огонь") timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval ("Продолжить" in external_renovation_choices()) timeout 20.0
-    assert eval (_pc_fire_is_active(TavernGuestRoomStoveObject) and player.item_count("chopped_wood_001") == 1 and _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 0)
+    assert eval (_pc_fire_is_active(TavernGuestRoomStoveObject) and player.item_count("chopped_wood_001") == 0 and _object_state_int(TavernGuestRoomStoveObject, "chopped_wood_stock", 0) == 2)
     assert eval (scene_runtime.picture.endswith("sofa_day_lit.png"))
     $ renpy.screenshot(config.basedir + "/guest-stove-lit.png")
     click id (external_renovation_button("Продолжить")) pos (0.5, 0.5)
