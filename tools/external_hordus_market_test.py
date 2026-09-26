@@ -180,8 +180,8 @@ testcase external_nostar_rosario_riddle_purchase_and_npc_presence:
     advance until eval (rooms.current_code == "NostarHouse") timeout 20.0
     run Call("IntNostarTalk")
     advance until eval ("Спросить о пропавшей Розарио" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Спросить о пропавшей Розарио")) pos (0.5, 0.5) until eval ("Взять записи о пяти домах" in external_hordus_choices()) timeout 20.0
-    click id (external_hordus_button("Взять записи о пяти домах")) pos (0.5, 0.5) until screen "nostar_rosario_worksheet" timeout 20.0
+    click id (external_hordus_button("Спросить о пропавшей Розарио")) pos (0.5, 0.5) until eval ("Попробовать разгадать загадку леди" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Попробовать разгадать загадку леди")) pos (0.5, 0.5) until screen "nostar_rosario_worksheet" timeout 20.0
     $ renpy.screenshot(config.basedir + "/nostar-worksheet.png")
     assert eval (Nostar.rosario_count() == 0 and not Nostar.rosario_filled()) timeout 5.0
     click id "nostar_rosario_cell_resident_0" pos (0.5, 0.5) until eval (renpy.get_screen_variable("picked_field", screen="nostar_rosario_worksheet") == "resident") timeout 20.0

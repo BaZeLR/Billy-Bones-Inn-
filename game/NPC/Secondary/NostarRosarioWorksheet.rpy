@@ -114,7 +114,7 @@ screen nostar_rosario_worksheet():
                 null height 5
                 hbox:
                     spacing 18
-                    textbutton "Назвать хозяйку Розарио":
+                    textbutton "Назвать похитительницу Розарио":
                         id "nostar_rosario_submit"
                         xsize int(_inner_width * 0.60)
                         ysize 54
