@@ -263,6 +263,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
             return
 
         "Прервать это непотребство" if CurSexStep < MaxStep - 1 and not Amanda.knows_player_is_watching_legare_sex:
+            $ Amanda.set_var_int("legare_confrontations", Amanda.var_int("legare_confrontations", 0) + 1)
             $ Amanda.legare_forbidden = True
             $ Amanda.knows_player_saw_legare_sex = True
             $ Amanda.knows_player_is_watching_legare_sex = True

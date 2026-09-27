@@ -62,6 +62,12 @@ label CodeAmandaSorryChoices:
             "Не обращать внимание на ее слова и поцеловать покрепче":
                 call CodeAmandaKickFromRoom("afterdeny")
 
+            "Потребовать, чтобы Аманда выбрала между трактиром и Легаре" if Amanda.legare_forbidden and Amanda.legare_affection >= 5 and Amanda.var_int("legare_confrontations", 0) >= 2 and not Amanda.sex_stat("virginity", True) and Amanda.var_int("legare_choice_start_day", -1) < 0 and not Amanda.var_value("legare_choice_outcome", ""):
+                "Вы сказали Аманде, что больше не станете прикрывать ее тайные встречи с Легаре. Если она хочет остаться в трактире, ей придется решить, что для нее важнее. Аманда попросила три дня, чтобы подумать."
+                $ Amanda.set_var_int("legare_choice_start_day", int(current_game_day() or 0))
+                $ Amanda.room_entry_blocked_today = True
+                jump TavernMain
+
             "Взять назад слова про Лизетту" if Amanda.var_int("prohibitliza", 0):
                 "\"Даже не знаю, что на меня нашло,\" — удивленно сказали вы. \"Ну подумаешь, Аманда с портовой шлюхой подружилась и та ее жизни учит. Что здесь такого? Даже не знаю, чего это я так рассердился. Все ж нормально.\""
                 $ _amanda_confirm_msg = Amanda.happy_confirm_text()

@@ -180,6 +180,7 @@ label story_amanda_legare_tavern_visit_0:
             return True
         "Прямо запретить":
             "Вы велели Аманде не крутиться у стола Легаре. Виноторговец вежливо поднял руки, будто ни при чем, а Аманда побледнела от злости и стыда."
+            $ Amanda.set_var_int("legare_confrontations", Amanda.var_int("legare_confrontations", 0) + 1)
             $ Amanda.legare_forbidden = True
             $ Amanda.legare_affection = max(0, Amanda.legare_affection - 2)
             $ Amanda.change_mana(-2, "forbid_legare_tavern_visit")

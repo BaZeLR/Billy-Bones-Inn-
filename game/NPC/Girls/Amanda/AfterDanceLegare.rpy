@@ -20,6 +20,7 @@ label AfterDanceLegare(arg=""):
         
         # Calculate Amanda's disobedience level
         $ AmandaNesluh = Amanda.nesluh_value()
+        $ Amanda.set_var_int("legare_confrontations", Amanda.var_int("legare_confrontations", 0) + 1)
         $ Amanda.legare_forbidden = True
         
         if AmandaNesluh == 0:

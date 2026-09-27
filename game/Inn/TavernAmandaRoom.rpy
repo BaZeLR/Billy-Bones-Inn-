@@ -406,6 +406,10 @@ label TavernAmandaRoomWindowLook:
 
 label story_amanda_room_grope_0:
     $ renpy.dynamic("tmpSexType", "_amanda_sleep_dress", "_amanda_wake_picture", "_grope_sleep_dress", "tmpGropeReact", "tmpRand")
+    if Amanda.var_int("legare_choice_start_day", -1) >= 0 and not Amanda.var_value("legare_choice_outcome", ""):
+        "Аманда отворачивается. Она еще не готова ответить и просит оставить ее одну."
+        $ Amanda.room_entry_blocked_today = True
+        jump TavernMain
     $ _grope_sleep_dress = tavern_amanda_room_sleep_dress()
     $ _amanda_sleep_dress = _grope_sleep_dress
     $ Amanda.wear_night_clothes(_grope_sleep_dress)

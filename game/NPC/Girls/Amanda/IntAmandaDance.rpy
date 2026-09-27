@@ -283,6 +283,7 @@ label IntAmandaDance():
                 "\"Хорошо,\" только и сказала Аманда. Но вам показалось что под внешней покорностью девчонка затаила обиду."
                 $ Amanda.legare_affection -= 1
                 $ Amanda.apply_social_chance(3, 1, -2, 15, 1, -4, "friday_dance_intervene")
+            $ Amanda.set_var_int("legare_confrontations", Amanda.var_int("legare_confrontations", 0) + 1)
             $ Amanda.legare_forbidden = True
             $ Amanda.left_friday_dance = True
             $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step + 2

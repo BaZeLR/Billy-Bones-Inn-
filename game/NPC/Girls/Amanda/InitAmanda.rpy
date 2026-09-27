@@ -103,6 +103,9 @@ init python:
             "beddeflower": 0,
             "sawwithguys": 0,
             "prohibitwithguys": 0,
+            "legare_confrontations": 0,
+            "legare_choice_start_day": -1,
+            "legare_choice_outcome": "",
         }
 
         def __init__(self):
@@ -229,6 +232,8 @@ init python:
             self.data = AmandaStaticData
             if not hasattr(self, "backyard_relief_seen"):
                 self.backyard_relief_seen = False
+            if "legare_confrontations" not in self.var:
+                self.var["legare_confrontations"] = 1 if self.legare_forbidden else 0
             self.ensure_story_defaults()
             return self
 
@@ -342,7 +347,8 @@ init python:
 
         def legare_intro_ready(self):
             return (
-                self.legare_affection <= 0
+                self.var_value("legare_choice_outcome", "") != "tavern"
+                and self.legare_affection <= 0
                 and not self.legare_forbidden
                 and people_to_int(Alber.rel, 0) >= 0
             )
@@ -515,6 +521,8 @@ init python:
 
         def dance_event_conditions_met(self, event_obj):
             partner = str(getattr(event_obj, "partner", "") or "")
+            if partner in ("legare_intro", "legare") and self.var_value("legare_choice_outcome", "") == "tavern":
+                return False
             if partner == "legare_intro":
                 return (
                     self.is_at("FridayDance")
@@ -571,6 +579,12 @@ init python:
             )
 
         def sex_offer_reaction(self):
+            if (self.legare_forbidden and self.legare_affection >= 5
+                    and self.var_int("legare_confrontations", 0) >= 2
+                    and not self.sex_stat("virginity", True)
+                    and self.var_int("legare_choice_start_day", -1) < 0
+                    and not self.var_value("legare_choice_outcome", "")):
+                return 3
             reaction = 0
             rel = people_to_int(self.rel, 0)
             corr = people_to_int(self.corruption, 0)

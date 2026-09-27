@@ -373,6 +373,8 @@ init -34 python:
                 "amanda_fuckyou": girl_decision_int(Amanda.var_int("fuckyou", 0), 0),
                 "amanda_knowsexactive": girl_decision_int(Amanda.var_int("knowsexactive", 0), 0),
                 "amanda_alberfriends": girl_decision_int(Amanda.legare_affection, 0),
+                "amanda_trust": girl_decision_int(Amanda.trust, 0),
+                "amanda_first_partner": str(Amanda.first_partner or ""),
                 "amanda_lizafriends": girl_decision_int(Amanda.var_int("lizafriends", 0), 0),
                 "amanda_alberprohibit": girl_decision_int(Amanda.legare_forbidden, 0),
                 "amanda_prohibitwithguys": girl_decision_int(Amanda.var_int("prohibitwithguys", 0), 0),
@@ -395,6 +397,23 @@ init -34 python:
     def girl_decision_probabilities(girl_name="", action_name="", profile=None):
         data = dict(profile or build_girl_decision_profile(girl_name))
         action_key = str(action_name or "favor").strip().lower()
+        if action_key == "amanda_legare_choice" and str(data.get("girl", "") or "") == "amanda":
+            # Her current household ties compete with Legare. First-partner history only tips the balance.
+            tavern_bond = (
+                girl_decision_ratio(data.get("mana_value", 0), 100)
+                + girl_decision_ratio(data.get("amanda_trust", 0), 100)
+                + girl_decision_ratio(data.get("friend_value", 0), 20)
+            ) / 3.0
+            legare_bond = girl_decision_ratio(data.get("amanda_alberfriends", 0), 20)
+            first_partner = str(data.get("amanda_first_partner", "") or "").lower()
+            first_bias = 0.15 if first_partner == "mc" else (-0.15 if first_partner == "legare" else 0.0)
+            good_score = 7.0 * (tavern_bond - legare_bond + first_bias)
+            p_good = girl_decision_clamp(girl_decision_sigmoid(good_score), 0.05, 0.95)
+            return {
+                "good": p_good, "neutral": 0.0, "bad": 1.0 - p_good,
+                "capricious_good_is_bad": 0.0, "capricious_bad_is_good": 0.0,
+                "caprice": 0.0, "good_score": good_score, "bad_score": -good_score,
+            }
         good_score = girl_decision_score(data, action_key, "good") - 1.15
         bad_score = girl_decision_score(data, action_key, "bad") - 1.05
         p_good = girl_decision_clamp(girl_decision_sigmoid(good_score))

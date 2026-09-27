@@ -13,6 +13,14 @@ label IntAmandaTalk(girl_name="amanda"):
     if str(scene_runtime.text or "").strip() == "":
         $ scene_runtime.text = "Аманда смотрит на вас с привычным любопытством, ожидая продолжения разговора."
         $ scene_runtime.location_text = scene_runtime.text
+    if Amanda.var_int("legare_choice_start_day", -1) >= 0 and not Amanda.var_value("legare_choice_outcome", ""):
+        $ scene_runtime.text = "Аманда пока не хочет обсуждать ваш разговор о Легаре. Она обещала ответить через три дня."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Оставить ее в покое":
+                pass
+        $ main_ui_end_talk_state()
+        return
     $ _legare_text = "Запретить ей %s с месье Легаре" % ("гулять" if Amanda.sex_stat("virginity", True) else "трахаться")
     $ _can_dress_change = Amanda.dress_change_has_options()
     $ _dad_phrase = DaddyAskBuildPhrase(girl_name) if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and int(Amanda.rel or 0) >= 8 and Amanda.pregnancy_days() >= 120 else ""
@@ -42,7 +50,7 @@ label IntAmandaTalk(girl_name="amanda"):
         "Извиниться перед Амандой" if Amanda.can_apologize():
             call IntAmandaReconcile(girl_name)
             jump IntAmandaTalk
-        "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden:
+        "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden and not Amanda.var_value("legare_choice_outcome", ""):
             call IntAmandaAllowAlber(girl_name)
             jump IntAmandaTalk
         "Разрешить Аманде болтать с Лизеттой" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("prohibitliza", 0) > 0:
@@ -192,6 +200,7 @@ label IntAmandaBanAlber(girl_name="amanda"):
     $ scene_runtime.text += "\n\nогорошили вы Аманду. И, не давая ей опомнится, вы продолжили: \"Ты вообще думала, когда с ним путалась? Он старше тебе даже не вдвое, а наверное втрое и женат! Так вот, я не желаю чтобы это повторялось, понятно!\"\nАманда попыталась было вам что-то возразить, но вы и слушать не стали ее лепет, лишь повторили: \"Понятно?!\" и, не дожидаясь ответа ушли. "
     $ Amanda.apply_social_chance(4, 1, -2, 0, 0, 0, "talk_ban_alber")
     $ Amanda.mark_talked()
+    $ Amanda.set_var_int("legare_confrontations", Amanda.var_int("legare_confrontations", 0) + 1)
     $ Amanda.legare_forbidden = True
     $ scene_runtime.location_text = scene_runtime.text
     return

@@ -235,6 +235,7 @@ init -24 python:
                 and str(people.location("alber") or "") == "TavernMain"
                 and Amanda.legare_affection >= 5
                 and not Amanda.legare_forbidden
+                and Amanda.var_value("legare_choice_outcome", "") != "tavern"
             )
 
 
@@ -256,6 +257,7 @@ init -24 python:
             return (
                 str(rooms.current_code or "") in ("StreetTavern", "MarketPlace")
                 and CheckIfSexEventExist("amanda", calendar_v2.time_slot(), "legarerun") > 0
+                and Amanda.var_value("legare_choice_outcome", "") != "tavern"
             )
 
 

@@ -60,6 +60,17 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "MorningWood", "#False", [
         AmandaMorningWood,
     ], highlight=True, threaded=True),
+    LThreadData(0, "amanda", "LegareChoice", "#Amanda.var_int('legare_choice_start_day', -1) >= 0", [
+        (
+            "story_amanda_legare_choice_0",
+            None, None, None,
+            1, None, [
+                "#current_game_day() >= Amanda.var_int('legare_choice_start_day', -1) + 3",
+                "#not bool(Amanda.var_value('legare_choice_outcome', ''))",
+            ], None,
+            "TavernMyRoom", "bedtime", -5,
+        ),
+    ], highlight=True, threaded=True),
     LThreadData(0, "amanda", "KitchenWindowFavor", None, [
         AmandaKitchenWindowFavor,
     ], highlight=False, threaded=False),

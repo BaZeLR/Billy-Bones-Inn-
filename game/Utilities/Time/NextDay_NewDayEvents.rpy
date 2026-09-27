@@ -106,7 +106,7 @@ label NextDay_NewDayEvents(retlocname=""):
                     GloryChanceDecrease += 5
                 if procedural_randint(1, max(3, 4 + GloryChanceDecrease), key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:162:9") == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
-        if Amanda.had_sex_with_legare and Amanda.legare_affection >= 10 and Amanda.corruption >= 35 and week_value != 5:
+        if Amanda.had_sex_with_legare and Amanda.legare_affection >= 10 and Amanda.corruption >= 35 and week_value != 5 and Amanda.var_value("legare_choice_outcome", "") != "tavern":
             ChanceVar = 6
             if Amanda.legare_affection >= 15:
                 ChanceVar -= 1
