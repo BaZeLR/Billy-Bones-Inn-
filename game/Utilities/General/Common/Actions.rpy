@@ -1263,6 +1263,7 @@ label Sleep(return_location="TavernMain", timepassed=1, fallback_text="", where_
         $ scene_runtime.location_text = scene_runtime.text
     if story_event_available(_sleep_where, "bedtime"):
         call checkTriggers(_sleep_where, "bedtime", 0)
+    $ player.change_stat("health", 25 * _sleep_days)
     call NextDay(_sleep_target, _sleep_days)
     if renpy.has_label(_sleep_target):
         jump expression _sleep_target
