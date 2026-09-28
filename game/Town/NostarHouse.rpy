@@ -5,6 +5,10 @@ init python:
     def nostar_house_sofa_gone():
         return bool(Sofa.installed)
 
+    def nostar_house_cage_stealth_too_low():
+        favor = threads.get("nostarRosarioFavor")
+        return bool(Sofa.installed and favor is not None and int(favor.num or 0) == 1 and int(player.stats.exploration or 0) < 1300)
+
     def nostar_house_picture():
         return "images/nostar/drawing_room_without_sofa.png" if Sofa.installed else "images/nostar/drawing_room.png"
 
@@ -14,6 +18,11 @@ init python:
         display_name="Дом леди Ностар Линк",
         bg_picture="images/nostar/drawing_room.png",
         descriptions=[
+            RoomDescription(
+                text="В гостиной леди Ностар ещё заметно пустое место от дивана. Розарио копошится в золочёной клетке, а на чистом поддоне лежат те самые шарики. Пока вы не сумеете подойти незаметно: для этого нужно больше 12 уровней исследования, то есть 1300 очков.",
+                condition=nostar_house_cage_stealth_too_low,
+                priority=120,
+            ),
             RoomDescription(
                 text="Большая гостиная леди Ностар отделана с изысканной небрежностью. Между окнами и камином стоит старинный бордовый диван с резными лапами. На боковом столике пустует золочёная клетка Розарио; хозяйка то и дело бросает на неё взгляд.",
                 condition=nostar_house_has_sofa,

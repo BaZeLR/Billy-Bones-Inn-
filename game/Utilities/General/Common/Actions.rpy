@@ -814,6 +814,8 @@ init -46 python:
                     crafting.soap_requests[key] = 1
             if info is not None and str(getattr(info, "registry_group", "") or "") == "girl":
                 shared_effect_applied = info.apply_shared_item_effect(item_key, current_game_day())
+                if int(custom_props.get("shared_arousal_bonus", 0) or 0) > 0:
+                    info.add_arousal(int(custom_props.get("shared_arousal_bonus", 0) or 0))
 
         effect_lines = []
         if fun_bonus > 0:

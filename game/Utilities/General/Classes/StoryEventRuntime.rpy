@@ -2070,6 +2070,33 @@ define cityThreadList = [
             None, "TavernMain", "enter", -300, True,
         ),
     ], highlight=True, threaded=True),
+    LThreadData(0, "nostar", "RosarioFavor", [
+        "#threads['nostarRosarioSofa'].completed",
+    ], [
+        (
+            "story_nostar_favor_letter_0", None, None, None, 1, None,
+            ["#Sofa.rosario_recipe_taught",
+             "#current_game_day() > int(Sofa.rosario_recipe_taught_day)"],
+            None, "TavernMain", "enter", 25,
+        ),
+        (
+            "story_nostar_cage_1", None, (9, 20), None, 1, None,
+            ["#rooms.get('NostarHouse').is_open()",
+             "#str(people.location('nostar') or '') == 'NostarHouse'",
+             "#int(player.stats.exploration or 0) >= 1300"],
+            None, "NostarHouse", "enter", 25, True,
+        ),
+        (
+            "story_nostar_tiefling_negotiation_2", None, (9, 20), None, 1, None,
+            None, None, "NobilityQuarters", "enter", 25, True,
+        ),
+        (
+            "story_nostar_favor_reward_3", None, (9, 20), None, 1, None,
+            ["#rooms.get('NostarHouse').is_open()",
+             "#str(people.location('nostar') or '') == 'NostarHouse'"],
+            None, "talk_nostar", "favor_reward", 40, True,
+        ),
+    ], highlight=True, threaded=True),
     LThreadData(0, "city", "BlindPirateFall", None, [
         (
             "story_city_blind_pirate_fall_0",

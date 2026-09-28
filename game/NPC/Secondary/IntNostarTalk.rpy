@@ -37,6 +37,8 @@ label IntNostarTalk:
             "Спросить о диване" if story_event_available("talk_nostar", "sofa_sale"):
                 call checkTriggers("talk_nostar", "sofa_sale", 0)
                 vscene nostar_house_picture()
+            "Рассказать о разговоре с тифлингшей" if story_event_available("talk_nostar", "favor_reward"):
+                call checkTriggers("talk_nostar", "favor_reward", 0)
             "Узнать, что случилось с Розарио" if int(threads["nostarRosarioSofa"].num or 0) == 1 and not story_event_available("talk_nostar", "rosario_riddle"):
                 $ scene_runtime.text = "— Десятник Циммерман пока не ручается за вашу проницательность, — говорит леди, прикрывая ладонью пустую клетку. — Разберитесь в деле жениха Клариссы Легаре. Когда сумеете отличить улику от удобной сплетни, возвращайтесь: тогда я доверю вам поиски Розарио."
             "Поговорить о квартале":
@@ -142,3 +144,82 @@ label story_nostar_sofa_delivery_3:
     $ event_runtime.active_thread.complete()
     $ main_ui_end_native_scene_state()
     return True
+
+
+label story_nostar_favor_letter_0:
+    $ main_ui_begin_native_scene_state("Письмо леди Ностар")
+    show screen main_ui
+    vscene tavern_main_picture()
+    $ scene_runtime.text = "Посыльный кладёт на стойку конверт с печатью леди Ностар. Внутри — короткое письмо: «Стефан, Розарио вернулся, но моя соседка из зелёного дома продолжает кружить возле его клетки. Её собственная шиншилла погибла от дурного корма; она украла моего зверька ради помёта для настоек. Я хочу уладить дело без стражи. Загляните ко мне и поговорите с ней как разумный человек. Моя дверь открыта днём»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Сложить письмо и запомнить приглашение":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_nostar_cage_1:
+    $ main_ui_begin_native_scene_state("Клетка Розарио")
+    show screen main_ui
+    vscene "images/nostar/drawing_room_without_sofa.png"
+    $ scene_runtime.text = "Леди Ностар отвлеклась на посетителя, а Розарио деловито перебирает лапками в золочёной клетке. На чистом поддоне вы замечаете ровно то, о чём скрипел диван. Вашего опыта путешествий хватает, чтобы подойти так тихо, что даже привратник за спиной не оборачивается."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Незаметно взять десять шариков из поддона":
+            $ scene_runtime.text = "Вы прикрываете ладонью край клетки, отсчитываете десять крошечных шариков и прячете их в бумажный свёрток. Розарио наблюдает за вами с видом сурового казначея: по его мнению, за такое полагалась бы хотя бы морковка. Ностар продолжает беседу, ничего не заметив. Пять шариков стоит сохранить для сделки с соседкой из зелёного дома; остальные можно пустить на настойку."
+            $ scene_runtime.location_text = scene_runtime.text
+            $ player.add_item("chinchilla_droppings_001", 10)
+            menu:
+                "Отойти от клетки":
+                    pass
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            return True
+        "Не трогать клетку":
+            $ main_ui_end_native_scene_state()
+            return False
+
+
+label story_nostar_tiefling_negotiation_2:
+    $ main_ui_begin_native_scene_state("Зелёный дом")
+    show screen main_ui
+    vscene "images/nostar/nobility_quarters.png"
+    $ scene_runtime.text = "У зелёного дома вам открывает краснокожая тифлингша. При слове «Розарио» она дёргает хвостом и пытается захлопнуть дверь, но вы успеваете спросить о её собственной шиншилле.\n\n— Корм мне продали испорченный, — сердито говорит она. — Пока я поняла, зверёк уже умер. Ностар со своими вечерами знала, зачем я держала его. Я решила, что Розарио побудет у меня пару дней. Да, это была кража. Нет, гордиться тут нечем."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Предложить пять шариков за три серебряные монеты" if int(player.item_count("chinchilla_droppings_001") or 0) >= 5:
+            $ scene_runtime.text = "— Розарио остаётся у Ностар, — говорите вы. — Вы признаете, что взяли его без спроса, и извинитесь. А вот пять шариков для вашей настойки я могу продать сейчас. Три серебряные монеты — и больше никаких клеток, лазеек и ночных визитов.\n\nТифлингша разглядывает свёрток, потом смеётся: — Торгуетесь как Папирус, только товар куда честнее. Согласна. Передайте Ностар: я приду днём и извинюсь сама. А вам спасибо, что не притащили сюда стражу."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Обменять пять шариков на три монеты":
+                    $ player.remove_item("chinchilla_droppings_001", 5)
+                    $ player.add_item("silver_coin_001", 3)
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            return True
+        "Показать пустые руки" if int(player.item_count("chinchilla_droppings_001") or 0) < 5:
+            $ scene_runtime.text = "— Пять шариков за три серебряные монеты, — говорит тифлингша. — Без товара это пока просто красивая речь."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Вернуться с товаром":
+                    pass
+            $ main_ui_end_native_scene_state()
+            return False
+        "Вернуться к разговору позже":
+            $ main_ui_end_native_scene_state()
+            return False
+
+
+label story_nostar_favor_reward_3:
+    $ main_ui_begin_native_scene_state("Соседский мир")
+    show screen main_ui
+    vscene "images/nostar/lady_nostar_after_sale.png"
+    $ scene_runtime.text = "Ностар выслушивает вас, потом негромко зовёт слугу: — Передайте в зелёный дом, что дверь для извинений открыта днём. Без краж, ночных визитов и кричащих родственников.\n\nРозарио выглядывает из клетки, словно тоже ждёт отчёта. Вы оставляете при себе подробности сделки с тифлингшей. Ностар облегчённо выдыхает: — Вы избавили меня от ещё одной недели сплетен, Стефан. Для квартала знати это порой ценнее серебра."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Попрощаться с леди Ностар":
+            $ event_runtime.active_thread.complete()
+            $ main_ui_end_native_scene_state()
+            return True
