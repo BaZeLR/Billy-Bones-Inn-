@@ -85,6 +85,10 @@ label CursedSofaRitualRequirements:
         $ scene_runtime.text = "Диван требует сначала просверлить потайное окошко в стене гостевой комнаты. Без этого обзорного отверстия Кларисса не считает условленное улучшение трактира законченным."
     elif not tavern.renovation_complete('glory_hole'):
         $ scene_runtime.text = "Диван ворчит, что трактиру все еще не хватает построенного глорихола: именно он должен отвести лишние взгляды от гостевой комнаты во время ритуала."
+    elif not tavern.renovation_complete('guest_room'):
+        $ scene_runtime.text = "Гостевая комната пока не приведена в порядок, как просила Кларисса. Сначала нужно закончить ее ремонт."
+    elif not threads["melissaAnalSolution"].completed:
+        $ scene_runtime.text = "Мелисса еще не прошла свой отдельный путь доверия и не решила, какой близости хочет сама. Условие дивана нельзя выполнить за нее."
     elif not Clara.sex_stat("virginity", True) or not Melissa.sex_stat("virginity", True):
         $ scene_runtime.text = "Диван долго сопит обивкой и признает, что условие проклятия уже нельзя выполнить этой парой: обе девушки должны сохранить невинность до ритуала."
     elif str(people.location("clara") or "") != "TavernMain" or str(people.location("melissa") or "") != "TavernMain":

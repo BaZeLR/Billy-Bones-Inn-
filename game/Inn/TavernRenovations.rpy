@@ -162,6 +162,7 @@ init 5 python:
         picture="images/tavern/backyard/shed/ruined_stove_chamber.png",
         condition={"rule": "tavern_renovation", "code": "shed", "completed": False},
         actions=[ObjectAction(action_id="inspect_ruined_stove", label="Осмотреть каморку и печь", hook="call", target="ShedRuinedStove")],
+        custom_properties={"object_menu_label": "ShedRuinedStove"},
     )
     ShedWashTubObject = GameObject(
         object_id="shed_wash_tub", name="Купель",
@@ -308,7 +309,7 @@ label story_tavern_renovation_complete:
     $ main_ui_end_native_scene_state()
     return True
 
-label ShedRuinedStove:
+label ShedRuinedStove(object_id="shed_ruined_stove"):
     $ main_ui_begin_native_scene_state(ShedRuinedStoveObject.name)
     if 6 <= int(calendar_v2.hour) < 20:
         vscene "images/tavern/backyard/shed/ruined_stove_chamber.png"

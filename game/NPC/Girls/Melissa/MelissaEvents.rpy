@@ -615,6 +615,7 @@ label story_melissa_bat_problem_6:
             pass
     $ calendar_v2.advance_minutes(45)
     $ event_runtime.active_thread.advance()
+    $ event_runtime.active_thread.setDay()
     $ Melissa.complete_bats_problem()
     $ Melissa.change_social(friend_delta=3, open_delta=2)
     $ event_runtime.evaluation_time = None
@@ -651,13 +652,32 @@ label story_melissa_courtship_amanda_talk_0:
     return True
 
 
+label story_melissa_courtship_moon_opening_0:
+    $ main_ui_begin_native_scene_state("Ночной разговор с Мелиссой")
+    show screen main_ui
+    vscene MelissaStaticData.image_path("courtship", "storm_arrival")
+    $ scene_runtime.text = "Мелисса задерживается у вашей двери перед сном. Уже почти месяц прошел после ремонта крыши, а в лунные ночи непонятный стук возвращается. Она признается, что ей спокойнее говорить об этом с вами, и спрашивает, не будет ли вам неприятно, если однажды она попросится переночевать здесь."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Сказать, что она может попросить":
+            $ Melissa.change_social(friend_delta=1)
+            $ calendar_v2.advance_minutes(10)
+            $ event_runtime.active_thread.advance()
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
+        "Пока не обещать":
+            pass
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label story_melissa_courtship_storm_1:
     $ renpy.dynamic("_melissa_storm_accept")
     $ _melissa_storm_accept = False
     $ main_ui_begin_native_scene_state("Ночная просьба Мелиссы")
     show screen main_ui
     vscene MelissaStaticData.image_path("courtship", "storm_arrival")
-    $ scene_runtime.text = "За окнами грохочет гроза. Когда вы уже собираетесь лечь, в дверь осторожно стучат. На пороге стоит Мелисса с подушкой и свернутым одеялом. Она признается, что от раскатов и скрипа крыши ей не по себе, и просит разрешить переночевать в вашей комнате."
+    $ scene_runtime.text = "В полнолуние над жилыми комнатами снова раздается странный стук. Когда вы уже собираетесь лечь, в дверь осторожно стучат. На пороге стоит Мелисса с подушкой и свернутым одеялом. После всех проверок крыши она по-прежнему слышит этот шум и просит разрешить переночевать в вашей комнате."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Разрешить Мелиссе остаться":
@@ -666,7 +686,7 @@ label story_melissa_courtship_storm_1:
             $ Melissa.change_social(friend_delta=-1)
     if _melissa_storm_accept:
         vscene MelissaStaticData.cycle_image("courtship", "sleep", 0)
-        $ scene_runtime.text = "Вы уступаете Мелиссе край кровати и гасите свет. Некоторое время она лежит тихо, прислушиваясь к грому, а затем ее дыхание становится неровным."
+        $ scene_runtime.text = "Вы уступаете Мелиссе край кровати и гасите свет. Некоторое время она лежит тихо, прислушиваясь к стуку над комнатами, а затем ее дыхание становится неровным."
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Притвориться спящим":
@@ -685,7 +705,7 @@ label story_melissa_courtship_storm_1:
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
     else:
-        $ scene_runtime.text = "Мелисса поджимает губы, молча забирает свои вещи и возвращается к себе. Возможно, в другую грозовую ночь она решится попросить снова."
+        $ scene_runtime.text = "Мелисса поджимает губы, молча забирает свои вещи и возвращается к себе. Возможно, в другую лунную ночь она решится попросить снова."
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Лечь спать":

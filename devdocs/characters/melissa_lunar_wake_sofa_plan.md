@@ -1,6 +1,6 @@
 # Melissa, Clarissa, the lunar noise, and the sofa — event/thread plan
 
-Status: **design only; not implemented**. This records the requested story order and the live-code gaps. It does not replace authored TXT/QSP dialogue or authorize changes to adjacent, working scenes. In particular, do not silently rewrite existing Russian dialogue to make a gate fit.
+Status: **implemented through the ordered investigation, wake-up, ointment and solution milestones; the weregoat continuation remains unwritten** (2026-09-28). This records the requested story order and the remaining live-code gaps. It does not replace authored TXT/QSP dialogue or authorize changes to adjacent, working scenes.
 
 ## Source of truth and scope
 
@@ -15,9 +15,7 @@ Status: **design only; not implemented**. This records the requested story order
 flowchart TD
     B[Bat problem completed; roof and booklet resolved] --> D[Record completion day on existing bat thread]
     D --> M[28 in-game days pass]
-    M --> O{Shed renovated?}
-    O -- No --> OR[Melissa's ointment request route]
-    O -- Yes --> OS[Alternate request route: decision still needed]
+    M --> OR[Melissa's ointment request, regardless of shed renovation]
     B --> L[Lunar noise; virgin listener only]
     L --> BF[Breakfast complaint; roof/attic checked again]
     BF --> SF[Sandra's account and old-stove lead]
@@ -49,7 +47,7 @@ This is an **ordering diagram**, not a claim that all nodes exist in live code. 
 | L2 — recheck | Attic/roof investigation after L1 | MC checks the repaired roof/attic again and finds no bats; the supernatural question remains open. | This must not reopen or rewind `melissaBatProblem`, destroy the roof renovation, or claim a new bat infestation. |
 | L3 — Sandra account | A subsequent breakfast after L2 | Sandra tells the village account about the weregoat, the priest's abuse of authority in her past, and the belief involving the old stove. Amanda's response depends on what she can hear/knows. Preserve the requested rough, comic tone when dialogue is authored; do not fabricate a milder replacement in this document. | One-time story event. Its conclusion enables the later shed/weregoat pursuit; it does not resolve the noise. |
 | L4 — old-stove lead | Old shed stove, full moon, after L3 | The ruined-stove chamber becomes the next place to investigate, leading into the weregoat/satyr story. | The proposed hidden-MC/spirit-impersonation encounter is recorded as a separate, **unwritten** branch. Agency/consent for an intimate scene there is unresolved; no code, payoff or automatic progression is specified here. |
-| O0 — delayed request | At least 28 absolute game days after B0; shed not renovated | Melissa asks for the special ointment as a response to discomfort and growing curiosity. Existing Amanda/Liza ointment gossip may remain an alternate introduction, but must not be the sole prerequisite. | Both introductions feed the **same** `melissaOintmentIntimacy` progression. Do not require `amandaStreetDiscipline` or completed Melissa courtship for this delayed route. A refusal leaves the request available later. |
+| O0 — delayed request | At least 28 absolute game days after B0; shed renovation does not matter | Melissa asks for the special ointment for its healing and skin-care qualities, and because she wants MC's attention. Existing Amanda/Liza ointment gossip remains an alternate introduction, but is not the sole prerequisite. | Both introductions feed the **same** `melissaOintmentIntimacy` progression. The delayed route does not require `amandaStreetDiscipline` or completed Melissa courtship. A refusal leaves the request available later. |
 | N0 — first sleepover | Full-moon phase, bedtime in MC's room, after the bat/booklet safety gate and delayed-story readiness | Melissa asks to stay. The existing first-night masturbation observation remains intact. The original storm may supply scene atmosphere, but weather is not a substitute for the lunar gate. | Declining does not advance; accepting advances exactly once. Schedule uses actual hours and moon month, never a generic “night” text slot. |
 | N1–N3 — further nights | Later eligible nights, minimum one day between stages | Preserve the current `melissaCourtship` gradual progression: mutual observation, her request to touch, and the later taste stage. Use its authored labels and illustrations unless an explicitly requested revision changes them. | Each stage advances only after its chosen interaction. No same-night cascade or repeat stat farming. |
 | W0–W5 — morning wake-ups | Melissa remains in her room in an eligible morning before breakfast | See detailed wake-up table below. This is an incremental opportunity, not a one-click shortcut to the final action. | One stage per wake opportunity; same-day replay blocked. Declining leaves the current stage available for another morning. |
@@ -80,10 +78,10 @@ If Melissa is **sick**, she remains in her room and the thread does not reset or
 - Clarissa must be resident/present for her complaint and joint scenes. If she is away, detained or absent, Melissa's own complaint still plays; there is no phantom Clara dialogue.
 - Do not force illness, lust, friendship or a gifted item to equal consent or a completed story stage. “Not now” keeps the correct stage, consumes only the explicitly authored time, and does not secretly set a success flag.
 - The special cream remains a real inventory item. Request, possessing the recipe, possessing cream, using cream, and succeeding at the later solution are distinct facts. The current `melissaOintmentIntimacy` completion means the existing attempt **stopped**, not that S1 succeeded.
-- A completed shed before the 28-day threshold is an **open branch decision**: the request must not become unreachable forever merely because renovation was efficient, but the exact alternate scene is not specified. Keep this as a visible design gap, not a guessed hidden fallback.
+- A completed shed before the 28-day threshold does **not** cancel Melissa's ointment request. This was explicitly decided during implementation; the request is about her own skin and attention, not the state of the bathroom.
 - The existing sofa first-talk and ritual are two different stages in `claraForestSofa`. The future ritual gate needs the completed guest-room request/renovation and the actual solution milestone in addition to any unchanged prerequisites. Do not add a second `sofa_active` or `sofa_ready` boolean.
 
-## Verified live-code discrepancies (do not mark as done)
+## Baseline discrepancies recorded before implementation
 
 1. `game/Inn/HouseholdRuntimeEvents.rpy::HouseholdWakeSleepyGirl` currently gives the tickle, look and conditional handjob in one visit; no ordered W0–W5 thread exists. Sick Melissa only receives care actions.
 2. `game/NPC/Girls/Melissa/MelissaEvents.rpy` already contains five `melissaCourtship` stages, but its first sleepover is a probabilistic storm event; subsequent nights are not locked to full-moon days.
@@ -102,4 +100,13 @@ If Melissa is **sick**, she remains in her room and the thread does not reset or
 6. Add the shared solution event only after its condition and text are specified. Then change the sofa ritual gate without changing the sofa's object ownership, purchase flow, or first story.
 7. Validate with focused source/runtime tests, Ren'Py 8.5.2 compile/lint, an old-save load, a week crossing the moon-month boundary, and manual UI checks for no leaked room navigation, correct images, no repeated stat awards and no early sofa payoff.
 
-Open authoring decisions: (a) exact alternate ointment entry if the shed is already renovated; (b) the precise event/outcome that constitutes the later “anal solution”; (c) the old-stove encounter's agency/consent and resulting weregoat event. None of these is silently decided by this plan.
+## Implementation checkpoint — 2026-09-28
+
+- The ruined-stove chamber is a real hidden room. Inspecting the shed reveals its exit; the old stove object lives inside. A save migration adds the room/exit and moves the object from old Shed saves. Renovation removes access to the demolished chamber.
+- `melissaMoonNoise` owns the five ordered discovery events; `melissaMoonNoiseRepeat` owns later eligible nightly recurrence. The moon window uses `calendar_v2.day`, the virginity check uses the live NPC objects, and the breakfast/attic/stove scenes use native event labels. If renovation has already removed the old stove, the last step records that lead as lost rather than presenting an impossible room.
+- Bat completion stamps the existing thread day. The 28-day ointment route is an alternative to the unchanged Amanda/Lizette gossip entry into the same thread. The lunar courtship opener is likewise an alternative to the existing Amanda talk, so that talk is no longer an accidental hard prerequisite.
+- `melissaMorningWake` has six one-time ordered stages, available in her room while sleepy or sick; illness is not cleared by these stages. The old single-visit handjob shortcut is held until the new sequence completes. Its dedicated handjob image is in Melissa's manifest.
+- `melissaAnalSolution` records Clarissa's direct advice and a later private decision by Melissa. The second event consumes a real cream item only on acceptance, records one encounter, and leaves both virginity states unchanged. The sofa's later ritual now requires this thread and the guest-room renovation in addition to its previous conditions.
+- Ren'Py 8.5.2 compile and lint exited successfully. Five focused source-test modules passed (36 tests). A broader source-test batch reported 64 passes, 4 failures and 31 fixture errors; most failures are stale assertions against unrelated prior architecture, while the old wake-tickle string assertion specifically conflicts with the new ordered gate. The native Ren'Py label-entry smoke tests passed for 19 Melissa labels (plus two thread-instantiation cases), after updating the test harness to the current NPC/UI owners. These tests stop at the first native choice; they do **not** prove every branch outcome. No manual click-through or old-save load has yet been claimed.
+
+Still unwritten: the later weregoat/satyr branch and any intimate old-stove encounter. The present L4 scene investigates the stove only. That future branch requires its own conditions and authored scene, not an automatic event from entering a hidden room.

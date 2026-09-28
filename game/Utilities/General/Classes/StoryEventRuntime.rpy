@@ -111,6 +111,22 @@ define melissaCourtshipBaseConditions = [
     "#Melissa.intimacy_story_ready()",
 ]
 
+define melissaCourtshipNightConditions = melissaCourtshipBaseConditions + [
+    "#threads['melissaBatProblem'].completed",
+    "#int(threads['melissaMoonNoise'].num or 0) >= 1",
+    "#bool(Melissa.sex_stat('virginity', True))",
+    "#current_game_day() >= int(threads['melissaBatProblem'].day or 0) + 28",
+    "#17 <= int(calendar_v2.day or 0) <= 20",
+]
+
+define melissaCourtshipMoonOpeningConditions = melissaCourtshipBaseConditions + [
+    "#threads['melissaBatProblem'].completed",
+    "#int(threads['melissaMoonNoise'].num or 0) >= 1",
+    "#bool(Melissa.sex_stat('virginity', True))",
+    "#current_game_day() >= int(threads['melissaBatProblem'].day or 0) + 28",
+    "#14 <= int(calendar_v2.day or 0) <= 20",
+]
+
 define melissaCourtshipOpeningConditions = melissaCourtshipBaseConditions + [
     "#Melissa.relationship_stage() >= 2",
     "#Liza.can_work_tavern()",
@@ -138,7 +154,7 @@ define melissaThreadList = [
         ),
     ]], highlight=False, threaded=True),
     LThreadData(0, "melissa", "Courtship", None, [
-        (
+        [(
             "story_melissa_courtship_amanda_talk_0",
             (1, 6), (12, 18), None,
             0.25, None,
@@ -151,27 +167,33 @@ define melissaThreadList = [
             TAVERN_AMANDA_LIZA_TALK_ROOMS, "enter", 15,
         ),
         (
+            "story_melissa_courtship_moon_opening_0",
+            None, (20, 23), None,
+            1, None, melissaCourtshipMoonOpeningConditions, None,
+            "TavernMyRoom", "bedtime", 0,
+        )],
+        (
             "story_melissa_courtship_storm_1",
             None, (20, 23), 1,
-            0.25, None, melissaCourtshipBaseConditions, None,
+            0.25, None, melissaCourtshipNightConditions, None,
             "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_mutual_2",
             None, (20, 23), 1,
-            1, None, melissaCourtshipBaseConditions, None,
+            1, None, melissaCourtshipNightConditions, None,
             "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_touch_him_3",
             None, (20, 23), 1,
-            1, None, melissaCourtshipBaseConditions, None,
+            1, None, melissaCourtshipNightConditions, None,
             "TavernMyRoom", "bedtime", 0,
         ),
         (
             "story_melissa_courtship_taste_4",
             None, (20, 23), 1,
-            1, None, melissaCourtshipBaseConditions, None,
+            1, None, melissaCourtshipNightConditions, None,
             "TavernMyRoom", "bedtime", 0,
         ),
     ], highlight=False, threaded=True),
@@ -442,12 +464,106 @@ define melissaThreadList = [
             11,
         ),
     ], highlight=False, threaded=True),
-    LThreadData(0, "melissa", "OintmentIntimacy", [
-        "#threads['melissaCourtship'].completed",
-        "#int(threads['amandaStreetDiscipline'].num or 0) >= 1",
-        "#not bool(threads['amandaStreetDiscipline'].aborted)",
+    LThreadData(0, "melissa", "MoonNoise", [
+        "#threads['melissaBatProblem'].completed",
+        "#tavern.renovation_complete('roof')",
     ], [
         (
+            "story_melissa_moon_noise_0",
+            None, (21, 23), None,
+            1, None,
+            ["#14 <= int(calendar_v2.day or 0) <= 23",
+             "#bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+            None, "TavernUpstairs", "enter", 22,
+        ),
+        (
+            "story_melissa_moon_breakfast_1",
+            None, (6, 11), 1,
+            1, None,
+            ["#('melissa' in tavern_breakfast_present_ids() and bool(Melissa.sex_stat('virginity', True))) or ('clara' in tavern_breakfast_present_ids() and Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+            None, "TavernKitchen", "breakfast", 25,
+        ),
+        (
+            "story_melissa_moon_roof_check_2",
+            None, (6, 23), None,
+            1, None, None,
+            None, "TavernAtic", "enter", 20,
+        ),
+        (
+            "story_melissa_moon_sandra_story_3",
+            None, (6, 11), 1,
+            1, None, ["#'sandra' in tavern_breakfast_present_ids()"],
+            None, "TavernKitchen", "breakfast", 25,
+        ),
+        (
+            "story_melissa_moon_old_stove_4",
+            None, (20, 23), None,
+            1, None,
+            ["#17 <= int(calendar_v2.day or 0) <= 20",
+             "#not tavern.renovation_complete('shed')",
+             "#not rooms.get('ShedRuinedChamber').is_hidden"],
+            None, "ShedRuinedChamber", "enter", 25,
+        ),
+        (
+            "story_melissa_moon_stove_gone_4",
+            None, (20, 23), None,
+            1, None,
+            ["#17 <= int(calendar_v2.day or 0) <= 20",
+             "#tavern.renovation_complete('shed')"],
+            None, "Shed", "enter", 25,
+        ),
+    ], highlight=True, threaded=True),
+    LThreadData(0, "melissa", "MoonNoiseRepeat", [
+        "#threads['melissaMoonNoise'].completed",
+    ], [
+        (
+            "story_melissa_moon_noise_repeat",
+            None, (21, 23), None,
+            1, None,
+            ["#14 <= int(calendar_v2.day or 0) <= 23",
+             "#bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+            None, "TavernUpstairs", "enter", 22,
+        ),
+    ], highlight=False, threaded=False),
+    LThreadData(0, "melissa", "MorningWake", [
+        "#Melissa.intimacy_story_ready()",
+    ], [
+        (
+            "story_melissa_morning_wake_0", None, (6, 11), None, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+        (
+            "story_melissa_morning_wake_1", None, (6, 11), 1, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+        (
+            "story_melissa_morning_wake_2", None, (6, 11), 1, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+        (
+            "story_melissa_morning_wake_3", None, (6, 11), 1, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+        (
+            "story_melissa_morning_wake_4", None, (6, 11), 1, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')",
+             "#Melissa.handjob_story_ready()", "#Melissa.can_have_sex_today()",
+             "#not Melissa.sex_busy()", "#player.intimacy.can_cum()"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+        (
+            "story_melissa_morning_wake_5", None, (6, 11), 1, 1, None,
+            ["#household_morning_issue_type('melissa') in ('sleepy', 'sick')",
+             "#Melissa.can_have_sex_today()", "#not Melissa.sex_busy()"],
+            None, "TavernMelissaRoom", "wake", 0,
+        ),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "OintmentIntimacy", None, [
+        [(
             "story_melissa_ointment_talk_0",
             (1, 6), (12, 18), None,
             1, None,
@@ -463,10 +579,22 @@ define melissaThreadList = [
                 "#not Amanda.tavern_service_busy_now()",
                 "#not Melissa.tavern_service_busy_now()",
                 "#not Liza.tavern_service_busy_now()",
+                "#threads['melissaCourtship'].completed",
+                "#int(threads['amandaStreetDiscipline'].num or 0) >= 1",
+                "#not bool(threads['amandaStreetDiscipline'].aborted)",
             ],
             None,
             TAVERN_AMANDA_LIZA_TALK_ROOMS, "enter", 14,
         ),
+        (
+            "story_melissa_ointment_after_bats_0",
+            None, (12, 18), None,
+            1, None,
+            ["#threads['melissaBatProblem'].completed",
+             "#current_game_day() >= int(threads['melissaBatProblem'].day or 0) + 28",
+             "#str(people.location('melissa') or '') == str(rooms.current_code or '')"],
+            None, "TavernMain", "enter", 14,
+        )],
         (
             "story_melissa_ointment_request_1",
             None, (20, 22), 1,
@@ -492,6 +620,28 @@ define melissaThreadList = [
             ],
             "special_cream_001",
             "TavernMyRoom", "bedtime", 0,
+        ),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "AnalSolution", [
+        "#threads['melissaOintmentIntimacy'].completed",
+        "#threads['melissaMorningWake'].completed or threads['melissaCourtship'].completed",
+        "#Clara.tavern_resident()",
+        "#not Clara.mongol_case_detained()",
+    ], [
+        (
+            "story_melissa_clara_solution_talk_0", None, (18, 23), None,
+            1, None,
+            ["#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+             "#str(people.location('melissa') or '') == 'TavernMelissaRoom'"],
+            None, "TavernMelissaRoom", "solution_talk", 2,
+        ),
+        (
+            "story_melissa_clara_solution_1", None, (20, 23), 1,
+            1, None,
+            ["#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+             "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
+             "#Melissa.can_have_sex_today()", "#player.intimacy.can_cum()"],
+            "special_cream_001", "TavernMelissaRoom", "solution", 2,
         ),
     ], highlight=False, threaded=True),
     LThreadData(0, "melissa", "UpstairsBedroomRelief", None, [
@@ -1161,6 +1311,7 @@ define claraThreadList = [
             None,
             [
                 "#Sofa.installed",
+                "#tavern.renovation_complete('guest_room')",
             ],
             None,
             "CursedSofa",
@@ -1180,6 +1331,8 @@ define claraThreadList = [
                 "#bool(Melissa.sex_stat('virginity', True))",
                 "#tavern.renovation_complete('peephole')",
                 "#tavern.renovation_complete('glory_hole')",
+                "#tavern.renovation_complete('guest_room')",
+                "#threads['melissaAnalSolution'].completed",
                 "#str(people.location('clara') or '') == 'TavernMain'",
                 "#str(people.location('melissa') or '') == 'TavernMain'",
             ],

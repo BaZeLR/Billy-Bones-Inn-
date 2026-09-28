@@ -1715,6 +1715,8 @@ label TavernKitchenBreakfastMorningIssue:
         "Разбудить [_breakfast_issue_name]" if _breakfast_issue_code == "sleepy":
             if _breakfast_issue_girl == "amanda" and threads["amandaMorningWindowEpisode"].getAvailableEvents():
                 jump TavernAmandaRoom
+            elif _breakfast_issue_girl == "melissa" and story_event_available("TavernMelissaRoom", "wake"):
+                call checkTriggers("TavernMelissaRoom", "wake", 0)
             else:
                 call HouseholdWakeSleepyGirl(_breakfast_issue_girl)
 

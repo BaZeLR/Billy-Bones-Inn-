@@ -150,7 +150,7 @@ testcase event_{safe_name}:
         player.stats.exploration = max(int(player.stats.exploration or 0), 250)
         player.set_money(max(int(player.economy.money or 0), 500))
         for _girl in ("amanda", "sandra", "melissa", "clara", "georgett", "liza", "becky"):
-            _girl_info = getPersonInfo(_girl)
+            _girl_info = people.get_info(_girl)
             _girl_info.rel = max(int(_girl_info.rel or 0), 20)
             _girl_info.corruption = max(int(_girl_info.corruption or 0), 20)
             _girl_info.openness = max(int(_girl_info.openness or 0), 20)
@@ -185,7 +185,7 @@ testcase event_{safe_name}:
     run Call("{label_name}")
     pause 0.1
     python:
-        print("EVENT_LABEL_DONE", "{label_name}", "items", len(list(current_action_items or [])))
+        print("EVENT_LABEL_DONE", "{label_name}", "items", len(list(main_ui_runtime.action_items or [])))
 
 '''
 
@@ -208,7 +208,7 @@ testcase event_{safe_name}_branch_{branch_index}:
         player.stats.exploration = max(int(player.stats.exploration or 0), 250)
         player.set_money(max(int(player.economy.money or 0), 500))
         for _girl in ("amanda", "sandra", "melissa", "clara", "georgett", "liza", "becky"):
-            _girl_info = getPersonInfo(_girl)
+            _girl_info = people.get_info(_girl)
             _girl_info.rel = max(int(_girl_info.rel or 0), 20)
             _girl_info.corruption = max(int(_girl_info.corruption or 0), 20)
             _girl_info.openness = max(int(_girl_info.openness or 0), 20)
@@ -242,10 +242,10 @@ testcase event_{safe_name}_branch_{branch_index}:
     run Call("{label_name}")
     pause 0.1
     python:
-        _external_branch_count = len(list(current_action_items or []))
+        _external_branch_count = len(list(main_ui_runtime.action_items or []))
         _external_branch_safe = False
         if _external_branch_count > {branch_index}:
-            _external_branch_action_text = str(current_action_items[{branch_index}].action)
+            _external_branch_action_text = str(main_ui_runtime.action_items[{branch_index}].action)
             for _token in (
                 "story_",
                 "TownStreet",
@@ -264,10 +264,10 @@ testcase event_{safe_name}_branch_{branch_index}:
                     break
         print("EVENT_BRANCH_READY", "{label_name}", {branch_index}, "items", _external_branch_count, "safe", _external_branch_safe)
     if eval (_external_branch_count > {branch_index} and _external_branch_safe):
-        run current_action_items[{branch_index}].action
+        run main_ui_runtime.action_items[{branch_index}].action
         pause 0.1
         python:
-            print("EVENT_BRANCH_DONE", "{label_name}", {branch_index}, str(CurLoc or ""), len(list(current_action_items or [])))
+            print("EVENT_BRANCH_DONE", "{label_name}", {branch_index}, str(CurLoc or ""), len(list(main_ui_runtime.action_items or [])))
 
 '''
 

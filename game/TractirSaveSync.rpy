@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 106
+define currentVersion = 107
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -835,6 +835,9 @@ init -100 python:
         if loaded_version < 106:
             updateSave_V105()
             loaded_version = 106
+        if loaded_version < 107:
+            updateSave_V106()
+            loaded_version = 107
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3339,6 +3342,25 @@ init -100 python:
             else:
                 amanda_obj.first_partner = ""
         amanda_obj.__dict__.pop("lost_virginity_to_legare", None)
+
+    def updateSave_V106():
+        rooms.repair()
+        shed = rooms.get("Shed")
+        chamber = rooms.get("ShedRuinedChamber")
+        if shed is not None and chamber is not None:
+            if not any(room_exit.target == "ShedRuinedChamber" for room_exit in shed.exits):
+                shed.exits.insert(0, next(room_exit for room_exit in ShedRoomDefinition.exits if room_exit.target == "ShedRuinedChamber"))
+            if _room_has_item_by_id(shed, "shed_ruined_stove"):
+                _room_remove_item_by_id(shed, "shed_ruined_stove")
+            if not _room_has_item_by_id(chamber, "shed_ruined_stove"):
+                _room_add_item_by_id(chamber, "shed_ruined_stove")
+        bat_thread = threads.get("melissaBatProblem")
+        courtship_thread = threads.get("melissaCourtship")
+        if bat_thread is not None and bat_thread.completed:
+            if courtship_thread is not None and int(courtship_thread.num or 0) > 1:
+                bat_thread.day = int(current_game_day() or 0) - 28
+            else:
+                bat_thread.day = int(current_game_day() or 0)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

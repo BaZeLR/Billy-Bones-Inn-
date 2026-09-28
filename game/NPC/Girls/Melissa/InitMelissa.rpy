@@ -143,6 +143,7 @@ init python:
                     ],
                 },
                 "sexy_times": {
+                    "handjob": ["images/melissa/sexyTimes/handjob_melissa.jpg"],
                     "blowjob": [
                         "images/melissa/sexyTimes/blowjob0.png",
                         "images/melissa/sexyTimes/blowjob1.jpg",

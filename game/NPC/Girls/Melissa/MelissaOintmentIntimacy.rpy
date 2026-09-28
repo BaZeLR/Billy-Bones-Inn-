@@ -2,6 +2,28 @@
 # Availability and progress are owned only by melissaOintmentIntimacy.
 
 
+label story_melissa_ointment_after_bats_0:
+    $ main_ui_begin_native_scene_state("Просьба Мелиссы")
+    show screen main_ui
+    vscene MelissaStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "Мелисса ловит вас наедине после дневных хлопот. Она слышала, как лечебная мазь помогла Клариссе, и теперь прямо спрашивает, можно ли приготовить такую же для нее: кожа после нее становится мягче, а ласковое прикосновение перестает причинять неудобство. «Аманда и Сандра умеют забрать все твое внимание, — добавляет она. — Я тоже хочу, чтобы ты смотрел на меня. И мазь я хочу попробовать сама, не ради них»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Пообещать поговорить об этом позже":
+            $ calendar_v2.advance_minutes(10)
+            $ event_runtime.active_thread.advance()
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
+        "Не давать обещания":
+            $ scene_runtime.text = "Мелисса принимает ответ без спора. Если вы передумаете, она сможет вернуться к разговору в другой день."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Вернуться к делам":
+                    pass
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label story_melissa_ointment_talk_0:
     $ main_ui_begin_native_scene_state("Разговор Аманды и Лизетты")
     show screen main_ui
@@ -37,7 +59,7 @@ label story_melissa_ointment_request_1:
     $ main_ui_begin_native_scene_state("Ночная просьба Мелиссы")
     show screen main_ui
     vscene MelissaStaticData.image_path("courtship", "storm_arrival")
-    $ scene_runtime.text = "Поздно вечером в вашу дверь тихо стучит Мелисса. Она мнется на пороге, а затем признается, что слышала разговор Аманды с Лизеттой о дорогой лечебной мази. Ей хочется попробовать ее на чувствительной коже, но попросить об этом кого-нибудь другого она не решается."
+    $ scene_runtime.text = "Поздно вечером в вашу дверь тихо стучит Мелисса. Она мнется на пороге, а затем возвращается к разговору о дорогой лечебной мази. Ей хочется попробовать ее на чувствительной коже, но попросить об этом кого-нибудь другого она не решается."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Пообещать помочь, когда мазь будет готова":

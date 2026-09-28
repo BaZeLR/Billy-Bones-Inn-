@@ -56,6 +56,10 @@ init 6 python:
         items = []
         for issue_action in list(household_room_issue_action_specs("melissa") or []):
             items.append(MenuItem(str(issue_action.get("label", "") or ""), Call(str(issue_action.get("target", "") or ""), *tuple(issue_action.get("args", ()) or ()))))
+        if story_event_available("TavernMelissaRoom", "solution_talk"):
+            items.append(MenuItem("Выслушать совет Клариссы", Call("checkTriggers", "TavernMelissaRoom", "solution_talk", 0)))
+        if story_event_available("TavernMelissaRoom", "solution") and event_runtime.available["TavernMelissaRoom"]["solution"].checkItem():
+            items.append(MenuItem("Поговорить с Мелиссой наедине", Call("checkTriggers", "TavernMelissaRoom", "solution", 0)))
         ointment_index = len(items)
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))

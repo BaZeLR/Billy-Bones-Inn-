@@ -287,6 +287,14 @@ init python:
         rows = []
         if girl == "":
             return rows
+        if girl == "melissa" and issue_code in ("sick", "sleepy") and story_event_available("TavernMelissaRoom", "wake"):
+            rows.append({
+                "label": "Проведать Мелиссу утром",
+                "target": "checkTriggers",
+                "args": ("TavernMelissaRoom", "wake", 0),
+            })
+            if issue_code == "sleepy":
+                return rows
         if issue_code == "sick":
             if girl == "amanda":
                 rows.append({
@@ -897,7 +905,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
                     "Оставить Мелиссу собираться":
                         pass
 
-            "Пощекотать ее под грудью":
+            "Пощекотать ее под грудью" if not Melissa.intimacy_story_ready() or threads["melissaMorningWake"].completed:
                 $ Melissa.remove_clothing_layer("panties")
                 vscene MelissaStaticData.cycle_image("tavern", "sleep", 4)
                 $ scene_runtime.text = "Вместо второго окрика вы проводите пальцами под ее грудью. Мелисса взвизгивает, пытается перехватить вашу руку и, не удержавшись, валится обратно на кровать. Еще миг она сердито смотрит на вас, а потом не выдерживает и смеется, подтянув ноги к животу."
@@ -927,7 +935,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
                             "Оставить Мелиссу собираться":
                                 pass
 
-                    "Предложить помочь рукой" if Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():
+                    "Предложить помочь рукой" if threads["melissaMorningWake"].completed and Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():
                         vscene MelissaStaticData.image_path("outfit_reward", "handjob")
                         $ scene_runtime.text = "Вы напоминаете, сколько всего уже осталось позади: крысы больше не хозяйничают в кладовой, летучие мыши изгнаны, а история с рисунками Клариссы доведена до конца. Мелисса долго смотрит на выпуклость под вашими штанами, потом решительно расстегивает их и осторожно обхватывает твердый член ладонью."
                         $ scene_runtime.location_text = scene_runtime.text

@@ -2,6 +2,9 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
+    def shed_ruined_chamber_accessible():
+        return not tavern.renovation_complete("shed")
+
     ShedRoomDefinition = Room(
         code_name="Shed",
         group_name=ROOM_GROUP_TAVERN,
@@ -19,13 +22,13 @@ init 6 python:
             ),
         ],
         exits=[
+            RoomExit(label="Пройти за старую перегородку", target="ShedRuinedChamber", minutes_to_pass=1, condition=shed_ruined_chamber_accessible),
             RoomExit(label="Войти в прачечную и купальню", target="ShedWashroom", minutes_to_pass=1, condition={"rule": "tavern_renovation", "code": "shed"}),
             RoomExit(label="Вернуться на задний двор", target="Backyard"),
         ],
         game_items=[
             "old_axe_001",
             "lumber_001",
-            "shed_ruined_stove",
             "shed_hot_water_stove",
         ],
         custom_properties={},
@@ -61,7 +64,8 @@ init 6 python:
                 text_parts.append("Сарай отремонтирован. Здесь стоят печь с баком горячей воды, бревна и отдельная поленница колотых дров. За плотно закрывающейся дверью находится другая комната — прачечная с купальней.")
             else:
                 text_parts.append(intro_value)
-                text_parts.append("За старой перегородкой есть каморка с наполовину развалившейся печью. Ее просторное нутро давно остыло.")
+                if not rooms.get("ShedRuinedChamber").is_hidden:
+                    text_parts.append("За старой перегородкой вы уже нашли каморку со старой печью.")
         if tavern.renovation_days_left("shed"):
             text_parts.append("Драупнир ремонтирует сарай. До окончания: %s дн." % tavern.renovation_days_left("shed"))
 
@@ -236,12 +240,15 @@ label ShedTakeChoppedWood(quantity=1):
 
 
 label ShedExamine:
+    if not tavern.renovation_complete("shed") and rooms.get("ShedRuinedChamber").is_hidden:
+        $ rooms.get("ShedRuinedChamber").is_hidden = False
+        $ scene_runtime.text = "Осматривая дальнюю стену сарая, вы замечаете щель за покосившейся перегородкой. Там скрыта отдельная каморка со старой печью. Теперь туда можно пройти."
+    else:
+        $ scene_runtime.text = build_shed_description(False, "Вы внимательно осматриваете сарай.")
     if not bool(rooms.get("Shed").state["bucket_found"]) and player.item_count("bucket_001") <= 0:
         $ rooms.get("Shed").state["bucket_found"] = True
         $ player.add_item("bucket_001", 1)
-        $ scene_runtime.text = "Вы внимательно осматриваете сарай и, пошарив под старыми досками и тряпьем, находите крепкое хозяйственное ведро."
-    else:
-        $ scene_runtime.text = build_shed_description(False, "Вы внимательно осматриваете сарай.")
+        $ scene_runtime.text += " Пошарив под досками и тряпьем, вы также находите крепкое хозяйственное ведро."
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_items = build_shed_action_items()
     return
