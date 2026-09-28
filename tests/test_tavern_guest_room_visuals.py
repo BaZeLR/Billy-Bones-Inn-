@@ -88,10 +88,11 @@ def test_closed_peephole_shutter_blocks_the_opening():
         assert image.convert("RGBA").getpixel((768, 512))[3] == 255
 
 
-def test_client_action_images_keep_open_shutter_only_from_mc_room():
+def test_client_action_images_keep_open_shutter_from_hall_and_mc_room():
     scene = (GAME / "Inn/TavernProstClients.rpy").read_text(encoding="utf-8-sig")
     screen = (GAME / "Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
-    assert 'if return_room == "TavernMyRoom":\n        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"' in scene
+    assert '    $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"' in scene
+    assert 'if return_room == "TavernMyRoom":\n        $ scene_runtime.picture_overlay =' not in scene
     assert scene.index('scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"') < scene.index('if girl_name == "liza":') < scene.index('elif girl_name == "georgett":')
     assert 'elif SexEventType == 99:\n            $ scene_runtime.picture = tavern_empty_room_picture("bedroom")' in scene
     assert '$ scene_runtime.picture_overlay = ""\n    return' in scene

@@ -35,8 +35,9 @@ def test_relocated_peephole_keeps_existing_client_event_flow():
     assert '"myroom_guest_peephole"' not in bedroom
 
 
-def test_occupied_peek_opens_existing_overlay_before_observation():
+def test_hall_and_room_peeks_open_same_overlay_before_observation():
     source = (ROOT / "game/Inn/TavernProstClients.rpy").read_text(encoding="utf-8-sig")
     intro = source.split("label TavernProstClients(", 1)[1].split("label TavernProstClientsWatch", 1)[0]
-    assert 'if return_room == "TavernMyRoom":\n        vscene "guest_room_peek"' in intro
+    assert '$ scene_runtime.picture_overlay = ""\n    vscene "guest_room_peek"' in intro
+    assert 'if return_room != "TavernMyRoom":\n        $ scene_runtime.picture = tavern_empty_room_picture("bedroom")' not in intro
     assert intro.index('vscene "guest_room_peek"') < intro.index('call TavernProstClientsWatch(')

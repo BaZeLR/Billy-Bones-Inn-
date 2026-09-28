@@ -10,11 +10,9 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
         return
     if client_time is None:
         $ client_time = calendar_v2.time_slot()
-    if return_room != "TavernMyRoom":
-        $ scene_runtime.picture_overlay = ""
     $ main_ui_begin_native_scene_state("Потайное окошко" if return_room == "TavernMyRoom" else "Отдельная комната")
-    if return_room != "TavernMyRoom":
-        $ scene_runtime.picture = tavern_empty_room_picture("bedroom")
+    $ scene_runtime.picture_overlay = ""
+    vscene "guest_room_peek"
     if str(girl_name or "") == "":
         $ scene_runtime.text = "В отдельной комнате сейчас никого нет."
         $ scene_runtime.location_text = scene_runtime.text
@@ -28,10 +26,9 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
         return
 
     if return_room == "TavernMyRoom":
-        vscene "guest_room_peek"
         $ scene_runtime.text = "Вы осторожно открываете потайное окошко, медленно сдвигая деревянную заслонку. Отсюда хорошо видно происходящее в гостевой."
     else:
-        $ scene_runtime.text = "Вы проходите из зала к отдельной комнате. За дверью слышны голоса: похоже, там принимают клиента."
+        $ scene_runtime.text = "Из зала вы поднимаетесь к потайному окошку в своей комнате и осторожно сдвигаете заслонку. За ней слышны голоса: похоже, в гостевой принимают клиента."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
@@ -71,8 +68,7 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
             "Вернуться":
                 return
 
-    if return_room == "TavernMyRoom":
-        $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"
+    $ scene_runtime.picture_overlay = "images/tavern/guest_room/peephole_frame.png"
 
     if girl_name == "liza":
         $ Liza.portstreet_clients_seen_today = True
