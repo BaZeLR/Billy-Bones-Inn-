@@ -76,7 +76,7 @@ def test_revenge_is_an_ordered_three_event_story_and_fight_retries():
     assert "threads['claraAmandaWarning'].completed" in thread
     assert "Liza.can_work_tavern()" in thread
     assert "ROOM_GROUP_TAVERN" in thread
-    assert '"WineStore"' in thread
+    assert '"talk_liza"' in thread
     assert '"enter"' in thread
 
     fight = label_block(post, "story_clara_legare_revenge_fight_2")

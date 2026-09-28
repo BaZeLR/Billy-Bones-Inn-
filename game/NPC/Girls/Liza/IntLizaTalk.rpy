@@ -38,6 +38,8 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
                 call IntLizaTalkAskWork(girl_name_ilt, girl_loc_ilt)
             "Спросить о таинственном 'Холглоре' в 'Пьяном Пирате'" if Liza.can_ask_topic("holglor"):
                 call IntLizaTalkAskHolglor(girl_name_ilt, girl_loc_ilt)
+            "Лизка, ты же с Легаре «дружишь»? Он тебя потрахивает ведь, ты у него любимая киска ещё с порта" if story_event_available("talk_liza", "legare_revenge"):
+                call checkTriggers("talk_liza", "legare_revenge", 0)
             "Снять" if (player.economy.money >= 8 or (player.economy.money >= 4 and girl_loc_ilt == "tavern")) and player.intimacy.can_cum() and Liza.can_have_sex_today():
                 call IntLizaTalkHire(girl_name_ilt, girl_loc_ilt)
             "Лапать":

@@ -27,21 +27,22 @@ label story_clara_legare_revenge_amanda_tells_liza_0:
 
 
 label story_clara_legare_revenge_request_1:
-    $ main_ui_begin_native_scene_state("Просьба Аманды и Лизетты")
+    $ main_ui_begin_native_scene_state("Поручение Лизетте")
     show screen main_ui
-    vscene "images/amanda/liazaamandatalk.webp"
-    $ scene_runtime.text = "Аманда и Лизетта подходят к вам вместе. После разговора с Клариссой обе уверены: Легаре снова попытается запугать её, если решит, что она осталась без защиты. Девушки не просят расправы исподтишка — они хотят, чтобы вы встали рядом с Клариссой, когда тот явится, и не позволили ему снова диктовать ей свою волю."
+    vscene LizaStaticData.image_path("tavern", "wench_happy")
+    $ scene_runtime.text = "«Да он ко мне ещё в „Пирате“ подкатывал, — смеётся Лизетта. — А так чё? Клиент да клиент и жарит неплохо», — отвечает она, кокетливо улыбаясь. «А что?»"
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Выслушать их":
+        "Ответить Лизетте":
             pass
 
-    $ scene_runtime.text = "«Он привык, что все отступают, стоит ему повысить голос», — говорит Лизетта. Аманда упрямо добавляет: «Так пусть на этот раз увидит, что Кларисса не одна». Вы обещаете разобраться с Легаре открыто, если он вновь тронет её."
+    $ scene_runtime.text = "«Хочу дать тебе ответственное поручение как члену нашего хозяйства», — доверительно шепчете вы."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Пообещать защитить Клариссу":
+        "Вернуться к разговору":
             pass
 
+    # Pauline's assignment is a later step; the old WineStore fight is gated.
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ main_ui_end_native_scene_state()
