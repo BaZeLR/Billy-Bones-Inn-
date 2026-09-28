@@ -1,4 +1,8 @@
 init python:
+    def nostar_tiefling_house_known():
+        favor = threads.get("nostarRosarioFavor")
+        return bool(favor is not None and int(favor.num or 0) >= 2)
+
     NobilityQuartersRoomDefinition = Room(
         code_name="NobilityQuarters",
         group_name=ROOM_GROUP_CITY,
@@ -10,6 +14,7 @@ init python:
         )],
         exits=[
             RoomExit(label="К дому леди Ностар Линк", target="NostarHouse", minutes_to_pass=5),
+            RoomExit(label="К зелёному дому тифлингши", target="TieflingHouse", condition=nostar_tiefling_house_known, minutes_to_pass=5),
             RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter", minutes_to_pass=10),
         ],
     )

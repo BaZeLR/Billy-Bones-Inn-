@@ -79,19 +79,54 @@ def test_sofa_former_owner_story_is_the_recipe_reveal():
     assert "$ Sofa.rosario_recipe_taught = True" in story
 
 
+def test_nostar_letter_follows_the_sofa_recipe_on_a_later_tavern_entry():
+    runtime = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    favor = runtime.split('LThreadData(0, "nostar", "RosarioFavor"', 1)[1].split(
+        'LThreadData(0, "city", "BlindPirateFall"', 1
+    )[0]
+    sofa = (ROOT / "game/Inn/TavernCursedSofa.rpy").read_text(encoding="utf-8-sig")
+
+    assert "#threads['nostarRosarioSofa'].completed" in favor
+    assert "#Sofa.rosario_recipe_taught" in favor
+    assert "#current_game_day() > int(Sofa.rosario_recipe_taught_day)" in favor
+    assert '"TavernMain", "enter", 25' in favor
+    assert '"Послушать новую историю" if Sofa.installed and (' in sofa
+
+
 def test_nostar_favor_counts_exploration_pellets_and_silver_once():
     events = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
     favor = events.split('LThreadData(0, "nostar", "RosarioFavor"', 1)[1].split('LThreadData(0, "city", "BlindPirateFall"', 1)[0]
     story = (ROOT / "game/NPC/Secondary/IntNostarTalk.rpy").read_text(encoding="utf-8-sig")
-    assert "#int(player.stats.exploration or 0) >= 1300" in favor
+    assert "#int(player.stats.exploration or 0) >= 1300" not in favor
+    assert '"TieflingHouse", "enter", 25' in favor
     for label in ("story_nostar_favor_letter_0", "story_nostar_cage_1", "story_nostar_tiefling_negotiation_2", "story_nostar_favor_reward_3"):
         assert label in favor and "label %s:" % label in story
     cage = story.split("label story_nostar_cage_1:", 1)[1].split("label story_nostar_tiefling_negotiation_2:", 1)[0]
     trade = story.split("label story_nostar_tiefling_negotiation_2:", 1)[1].split("label story_nostar_favor_reward_3:", 1)[0]
     assert 'player.add_item("chinchilla_droppings_001", 10)' in cage
+    assert 'max(0, 100 - 10 * _nostar_cage_level)' in cage
+    assert 'procedural_randint(1, 100, "nostar_cage_' in cage
+    assert cage.index('return False') < cage.index('player.add_item("chinchilla_droppings_001", 10)')
     assert 'player.remove_item("chinchilla_droppings_001", 5)' in trade
     assert 'player.add_item("silver_coin_001", 3)' in trade
     assert "getattr(" not in favor
     room = (ROOT / "game/Town/NostarHouse.rpy").read_text(encoding="utf-8-sig")
-    assert "nostar_house_cage_stealth_too_low" in room
-    assert "1300 очков" in room
+    assert "nostar_house_cage_stealth_too_low" not in room
+    quarters = (ROOT / "game/Town/NobilityQuarters.rpy").read_text(encoding="utf-8-sig")
+    tiefling = (ROOT / "game/Town/TieflingHouse.rpy").read_text(encoding="utf-8-sig")
+    migration = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    assert 'target="TieflingHouse", condition=nostar_tiefling_house_known' in quarters
+    assert 'code_name="TieflingHouse"' in tiefling
+    assert 'call RoomEnterEventGate(rooms.current_code, False)' in tiefling
+    assert 'def updateSave_V107():' in migration
+    assert 'quarters.exits.append(' in migration
+    assert 'initThreads()' in migration.split('def updateSave_V107():', 1)[1]
+
+
+def test_nostar_favor_letter_uses_script_font_and_requests_peace():
+    story = (ROOT / "game/NPC/Secondary/IntNostarTalk.rpy").read_text(encoding="utf-8-sig")
+    letter = story.split("label story_nostar_favor_letter_0:", 1)[1].split("label story_nostar_cage_1:", 1)[0]
+    assert "NOSTAR_ROSARIO_SCRIPT_FONT" in letter
+    assert "остротой Вашего ума" in letter
+    assert "тифлингша" in letter and "Розарио" in letter
+    assert "леди Ностар Линк" in letter

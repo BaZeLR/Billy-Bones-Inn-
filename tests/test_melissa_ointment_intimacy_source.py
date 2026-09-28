@@ -15,7 +15,7 @@ def read(path):
 def test_ointment_story_is_one_melissa_owned_linear_thread():
     runtime = read(STORY_RUNTIME)
     block = runtime.split('LThreadData(0, "melissa", "OintmentIntimacy"', 1)[1].split(
-        'LThreadData(0, "melissa", "UpstairsBedroomRelief"', 1
+        'LThreadData(0, "melissa", "AnalSolution"', 1
     )[0]
 
     assert "#threads['melissaCourtship'].completed" in block
@@ -58,11 +58,20 @@ def test_ointment_labels_own_their_native_scene_flow_and_inventory_cost():
     treatment = labels.split("label story_melissa_ointment_try_2:", 1)[1].split("\n\nlabel ", 1)[0]
     assert treatment.count('player.remove_item("special_cream_001", 1)') == 1
     assert treatment.count("event_runtime.active_thread.advance()") == 1
-    assert "Melissa.change_social(" not in labels
-    assert "Melissa.add_arousal(" not in labels
+    assert 'Melissa.set_sex_stat("beauty"' in treatment
+    assert "Melissa.add_arousal(8)" in treatment
+    assert "анальный секс" not in treatment
+    items = read(ROOT / "game/Items/Crafting/SoapCraftAndAtticItems.rpy")
+    gifts = read(ROOT / "game/Utilities/General/Common/Actions.rpy")
+    assert "делает ее шелковистой" in items
+    assert '"special_cream_001": {' in gifts
+    assert '"beauty_bonus": 2' in gifts.split('"special_cream_001": {', 1)[1].split("},", 1)[0]
+    clara = read(ROOT / "game/NPC/Girls/Clara/ClaraPaintingsThread.rpy")
+    assert 'Clara.set_sex_stat("beauty"' in clara
+    assert "Clara.add_arousal(8)" in clara
 
 
-def test_melissa_anal_action_uses_thread_completion_as_its_only_new_gate():
+def test_melissa_anal_action_waits_for_the_shared_moon_event():
     engine = read(MELISSA_SEX)
     melissa = read(MELISSA_INIT)
     melissa_class = melissa.split("class MelissaInfo(Girl):", 1)[1].split(
@@ -72,7 +81,7 @@ def test_melissa_anal_action_uses_thread_completion_as_its_only_new_gate():
 
     assert '_hse_info.intimacy_action_allowed("anal")' in action
     assert 'def intimacy_action_allowed(self, action_code=""):' in melissa_class
-    assert 'return bool(threads["melissaOintmentIntimacy"].completed)' in melissa_class
+    assert 'return bool(threads["melissaAnalSolution"].completed)' in melissa_class
     assert 'if action_key == "vaginal":' in melissa_class
     assert 'return not bool(self.sex_stat("virginity", True))' in melissa_class
     assert 'threads["melissaOintmentIntimacy"]' not in engine
@@ -89,5 +98,36 @@ def test_applying_ointment_has_one_completion_path_and_one_item_cost():
     assert treatment.count("event_runtime.active_thread.advance()") == 1
     assert '"Не торопить Мелиссу":' not in treatment
     assert treatment.index('"Отложить просьбу":') > treatment.index(
-        '"Осторожно помочь Мелиссе":'
+        '"Помочь Мелиссе нанести крем":'
     )
+
+
+def test_clarissa_melissa_talk_is_an_entry_event_and_shared_visit_is_lunar():
+    runtime = read(STORY_RUNTIME)
+    block = runtime.split('LThreadData(0, "melissa", "AnalSolution"', 1)[1].split(
+        'LThreadData(0, "melissa", "UpstairsBedroomRelief"', 1
+    )[0]
+    room = read(ROOT / "game/Inn/TavernMelissaRoom.rpy")
+    scenes = read(ROOT / "game/NPC/Girls/Melissa/MelissaAnalSolution.rpy")
+
+    assert '"TavernMelissaRoom", "enter", 2' in block
+    assert '"TavernMyRoom", "bedtime", 0' in block
+    assert "#calendar_v2.moon_phase_name_en() == 'Full Moon'" in block
+    assert "#bool(Melissa.sex_stat('virginity', True))" in block
+    assert "#bool(Clara.sex_stat('virginity', True))" in block
+    assert '"solution_talk"' not in room
+    assert '"solution"' not in room
+    assert 'Clara.record_sex_history("You", "TavernMyRoom", "outside")' in scenes
+    assert 'Melissa.record_sex_history("You", "TavernMyRoom", "outside")' in scenes
+    assert 'set_sex_stat("virginity", False)' not in scenes
+
+
+def test_morning_wake_refreshes_room_actions_after_restoring_scene_context():
+    wake = read(ROOT / "game/NPC/Girls/Melissa/MelissaMorningWake.rpy")
+    for step in range(6):
+        block = wake.split("label story_melissa_morning_wake_%d:" % step, 1)[1].split(
+            "\n\nlabel ", 1
+        )[0]
+        assert block.index("main_ui_end_native_scene_state()") < block.index(
+            "main_ui_runtime.action_items = tavern_melissa_room_action_items()"
+        )

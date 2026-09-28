@@ -36,6 +36,11 @@ init -46 python:
             },
             "common_text": "{} сразу заметно оживляется: роскошное мыло действует и на самолюбие, и на настроение.",
         },
+        "special_cream_001": {
+            "targets": ("sandra", "melissa", "amanda", "clara", "liza", "georgett"),
+            "beauty_bonus": 2,
+            "common_text": "{} радуется дорогому крему: он смягчает кожу и делает уход за собой настоящим удовольствием.",
+        },
         "boar_meat_001": {
             "targets": ("sandra",),
             "friend_bonus": 1,

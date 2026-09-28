@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 107
+define currentVersion = 108
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -838,6 +838,9 @@ init -100 python:
         if loaded_version < 107:
             updateSave_V106()
             loaded_version = 107
+        if loaded_version < 108:
+            updateSave_V107()
+            loaded_version = 108
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3361,6 +3364,13 @@ init -100 python:
                 bat_thread.day = int(current_game_day() or 0) - 28
             else:
                 bat_thread.day = int(current_game_day() or 0)
+
+    def updateSave_V107():
+        rooms.repair()
+        quarters = rooms.get("NobilityQuarters")
+        if quarters is not None and not any(room_exit.target == "TieflingHouse" for room_exit in quarters.exits):
+            quarters.exits.append(next(room_exit for room_exit in roomDefinitions["NobilityQuarters"].exits if room_exit.target == "TieflingHouse"))
+        initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

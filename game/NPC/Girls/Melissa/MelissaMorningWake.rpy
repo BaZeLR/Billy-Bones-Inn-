@@ -20,9 +20,9 @@ label story_melissa_morning_wake_0:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -49,9 +49,9 @@ label story_melissa_morning_wake_1:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -78,9 +78,9 @@ label story_melissa_morning_wake_2:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -107,9 +107,9 @@ label story_melissa_morning_wake_3:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -138,9 +138,9 @@ label story_melissa_morning_wake_4:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -167,7 +167,7 @@ label story_melissa_morning_wake_5:
             pass
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     if rooms.current_code == "TavernMelissaRoom":
         $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
-    $ main_ui_end_native_scene_state()
     return True

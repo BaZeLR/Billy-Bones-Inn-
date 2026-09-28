@@ -624,24 +624,29 @@ define melissaThreadList = [
     ], highlight=False, threaded=True),
     LThreadData(0, "melissa", "AnalSolution", [
         "#threads['melissaOintmentIntimacy'].completed",
-        "#threads['melissaMorningWake'].completed or threads['melissaCourtship'].completed",
+        "#int(threads['melissaMoonNoise'].num or 0) >= 1",
         "#Clara.tavern_resident()",
         "#not Clara.mongol_case_detained()",
+        "#bool(Melissa.sex_stat('virginity', True))",
+        "#bool(Clara.sex_stat('virginity', True))",
     ], [
         (
             "story_melissa_clara_solution_talk_0", None, (18, 23), None,
             1, None,
             ["#str(people.location('clara') or '') == 'TavernMelissaRoom'",
              "#str(people.location('melissa') or '') == 'TavernMelissaRoom'"],
-            None, "TavernMelissaRoom", "solution_talk", 2,
+            None, "TavernMelissaRoom", "enter", 2,
         ),
         (
             "story_melissa_clara_solution_1", None, (20, 23), 1,
             1, None,
-            ["#str(people.location('clara') or '') == 'TavernMelissaRoom'",
-             "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
-             "#Melissa.can_have_sex_today()", "#player.intimacy.can_cum()"],
-            "special_cream_001", "TavernMelissaRoom", "solution", 2,
+            ["#calendar_v2.moon_phase_name_en() == 'Full Moon'",
+             "#room_in_group(str(people.location('clara') or ''), ROOM_GROUP_TAVERN)",
+             "#room_in_group(str(people.location('melissa') or ''), ROOM_GROUP_TAVERN)",
+             "#Melissa.can_have_sex_today()", "#Clara.can_have_sex_today()",
+             "#not Melissa.sex_busy()", "#not Clara.sex_busy()",
+             "#player.intimacy.can_cum()"],
+            None, "TavernMyRoom", "bedtime", 0,
         ),
     ], highlight=False, threaded=True),
     LThreadData(0, "melissa", "UpstairsBedroomRelief", None, [
@@ -2082,13 +2087,12 @@ define cityThreadList = [
         (
             "story_nostar_cage_1", None, (9, 20), None, 1, None,
             ["#rooms.get('NostarHouse').is_open()",
-             "#str(people.location('nostar') or '') == 'NostarHouse'",
-             "#int(player.stats.exploration or 0) >= 1300"],
+             "#str(people.location('nostar') or '') == 'NostarHouse'"],
             None, "NostarHouse", "enter", 25, True,
         ),
         (
             "story_nostar_tiefling_negotiation_2", None, (9, 20), None, 1, None,
-            None, None, "NobilityQuarters", "enter", 25, True,
+            None, None, "TieflingHouse", "enter", 25, True,
         ),
         (
             "story_nostar_favor_reward_3", None, (9, 20), None, 1, None,

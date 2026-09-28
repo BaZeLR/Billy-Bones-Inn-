@@ -364,7 +364,7 @@ init python:
         def intimacy_action_allowed(self, action_code=""):
             action_key = str(action_code or "").strip().lower()
             if action_key == "anal":
-                return bool(threads["melissaOintmentIntimacy"].completed)
+                return bool(threads["melissaAnalSolution"].completed)
             if action_key == "vaginal":
                 return not bool(self.sex_stat("virginity", True))
             return True
