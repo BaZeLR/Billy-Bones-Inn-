@@ -1656,6 +1656,20 @@ define beckyThreadList = [
             20,
         ),
     ], highlight=False, threaded=True),
+    RThreadData(0, "becky", "SandraKitchenVisitRepeat", [
+        "#threads['beckySandraKitchenVisit'].completed",
+    ], [1, [
+        (
+            "story_becky_sandra_kitchen_visit_repeat", None, (18, 20), None,
+            1, None,
+            [
+                "#str(people.location('becky') or '') == 'TavernKitchen'",
+                "#str(people.location('sandra') or '') == 'TavernKitchen'",
+                "#int(current_game_day() or 0) > int(threads['beckySandraKitchenVisit'].day or 0)",
+            ],
+            None, "TavernKitchen", "enter", 20,
+        ),
+    ]], highlight=False, threaded=False),
     # The Becky home route has two procedure-owned milestones followed by one
     # authored talk event.  Empty cells deliberately avoid registering a
     # second action for scenes already owned by BeckyHomeFront/IntBeckySex.

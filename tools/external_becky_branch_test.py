@@ -712,6 +712,30 @@ testcase becky_clothes_offer_schedules_one_appointment:
     screenshot "becky_tailor_appointment.png"
     run Hide("dress_shop_catalog_page")
 
+testcase becky_completed_kitchen_visits_show_both_women:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.daysInGame = 45
+        calendar_v2.week = 2
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        threads["beckySandraKitchenVisit"].advanceTo(3, complete_at_end=True)
+        threads["beckySandraKitchenVisit"].day = 40
+        event_runtime.fired_keys_today = []
+        event_runtime.evaluation_time = None
+        rooms.enter("TavernKitchen")
+        initStoryEventRuntime(True)
+    assert eval (people.location("becky") == "TavernKitchen" and people.location("sandra") == "TavernKitchen")
+    run Call("checkTriggers", "TavernKitchen", "enter", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("Бекки" in scene_runtime.text and "Сандра" in scene_runtime.text)
+    assert eval (str(scene_runtime.picture).endswith("becky_visit_0.png"))
+    $ _join_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Подсесть к подругам")
+    click id ("choice_panel_button_%d" % _join_index) pos (0.5, 0.5) until eval (str(scene_runtime.picture).endswith("becky_visit_1.png")) timeout 10.0
+    assert eval ("Бекки" in scene_runtime.text and "Сандра" in scene_runtime.text)
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+
 testcase becky_kitchen_visits_distinguish_tea_from_hot_honey:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
