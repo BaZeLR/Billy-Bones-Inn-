@@ -41,6 +41,8 @@ def test_rosario_recipe_registers_distinct_items_and_unlocks_after_sofa_clue():
     recipe = catalog["rosario_arousal_tincture_recipe"]
     assert set(items) == {"chinchilla_droppings_001", "rosario_arousal_tincture_001", "silver_coin_001"}
     assert recipe.item_result == "rosario_arousal_tincture_001"
+    assert recipe.image == "images/recipe_book/rosario_tincture_recipe.png"
+    assert (ROOT / "game" / recipe.image).is_file()
     assert {key: value["quantity"] for key, value in recipe.ingredients.items()} == {
         "chinchilla_droppings_001": 1,
         "honey_comb_001": 1,
@@ -58,6 +60,8 @@ def test_rosario_recipe_registers_distinct_items_and_unlocks_after_sofa_clue():
     assert recipe.unlock_condition()
 
     drink = items["rosario_arousal_tincture_001"]
+    assert drink.picture == "images/recipe_book/rosario_tincture_bottle.png"
+    assert (ROOT / "game" / drink.picture).is_file()
     assert drink.custom_properties["player_libido_days"] == 2
     assert drink.custom_properties["shared_arousal_bonus"] == 15
     assert drink.custom_properties["shared_conception_permille"] == 550

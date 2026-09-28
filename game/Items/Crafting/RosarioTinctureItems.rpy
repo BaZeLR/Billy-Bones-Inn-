@@ -39,6 +39,7 @@ init 5 python:
         object_id="rosario_arousal_tincture_001",
         name="настойка Розарио",
         description="Редкая медово-грибная настойка по рецепту говорящего дивана. Состав звучит как шутка, но бутылка обещает два дня необычайного жара.",
+        picture="images/recipe_book/rosario_tincture_bottle.png",
         carriable=True,
         stackable=True,
         usable=True,
@@ -73,7 +74,7 @@ init 5 python:
     RosarioTinctureRecipePage = RecipePage(
         recipe_id="rosario_arousal_tincture_recipe",
         title="Настойка Розарио",
-        image="images/recipe_book/libido_recipe.png",
+        image="images/recipe_book/rosario_tincture_recipe.png",
         item_result="rosario_arousal_tincture_001",
         ingredients={
             "chinchilla_droppings_001": {"quantity": 1, "unit": "шарик"},
