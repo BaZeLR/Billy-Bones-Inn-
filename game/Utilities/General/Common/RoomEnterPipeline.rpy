@@ -5,13 +5,6 @@ label RoomEnterEventGate(room_code="", include_daily=True):
     $ renpy.dynamic("_room_enter_code", "_room_enter_daily_ids", "_room_enter_daily_npc", "_household_seen_before", "_room_enter_sick_girl")
     $ _room_enter_code = str(room_code or rooms.current_code or "").strip()
 
-    if _room_enter_code == "GroceryStore":
-        $ _room_enter_sick_girl = grocery_pregnancy_sickness_girl(_room_enter_code)
-        if _room_enter_sick_girl:
-            call check_daily_event(_room_enter_sick_girl, "GroceryPregnancySickness", _room_enter_code, calendar_v2.time_slot())
-            if _return:
-                return True
-
     $ _room_enter_sick_girl = tavern_morning_sickness_girl(_room_enter_code)
     while _room_enter_sick_girl:
         call check_daily_event(_room_enter_sick_girl, "MorningSickness", _room_enter_code, calendar_v2.time_slot())

@@ -1615,6 +1615,12 @@ define claraThreadList = [
     ], highlight=False, threaded=True),
 ]
 define beckyThreadList = [
+    RThreadData(0, "becky", "GroceryPregnancySickness", None, [1, [
+        ("GroceryPregnancySickness", (1, 6), (6, 17), None, 1.0 / 7.0, None, [
+            "#str(people.location('becky') or '') == 'GroceryStore'",
+            "#0 < Becky.pregnancy_days() < 80",
+        ], None, "GroceryStore", "enter", 40, False, "becky:grocery_pregnancy_sickness"),
+    ]], highlight=False, threaded=True),
     LThreadData(0, "becky", "FridayDanceMC", None, [
         (
             "story_becky_friday_dance_mc_0",
@@ -1920,6 +1926,12 @@ define beckyThreadList = [
     ], highlight=False, threaded=True),
 ]
 define ingaThreadList = [
+    RThreadData(0, "inga", "GroceryPregnancySickness", None, [1, [
+        ("GroceryPregnancySickness", (1, 6), (6, 17), None, 1.0 / 7.0, None, [
+            "#str(people.location('inga') or '') == 'GroceryStore'",
+            "#0 < Inga.pregnancy_days() < 80",
+        ], None, "GroceryStore", "enter", 40, False, "inga:grocery_pregnancy_sickness"),
+    ]], highlight=False, threaded=True),
     LThreadData(0, "inga", "SherwoodGratitude", [
         "#bool(threads['robinEddieRecovery'].completed)",
     ], [

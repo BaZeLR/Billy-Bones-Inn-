@@ -20,6 +20,7 @@ init -25 python:
             self.action = evt[9]
             self.priority = evt[10]
             self.repeatable = bool(evt[11]) if len(evt) > 11 else False
+            self.daily_key = str(evt[12] or "") if len(evt) > 12 else ""
             self.thread_name = thread_name
             self.threaded = threaded
             self.conds = []

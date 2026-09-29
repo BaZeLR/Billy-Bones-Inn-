@@ -1,21 +1,7 @@
-init python:
-    def grocery_pregnancy_sickness_girl(room_code=""):
-        current_room = str(room_code or rooms.current_code or "").strip()
-        if current_room != "GroceryStore" or not rooms.get("GroceryStore").is_open():
-            return ""
-        current_slot = calendar_v2.time_slot()
-        for girl_key in ("becky", "inga"):
-            girl_info = people.get_info(girl_key)
-            if (girl_info is not None
-                    and str(people.location(girl_key) or "") == current_room
-                    and 0 < girl_info.pregnancy_days() < 80
-                    and daily_events.exists(girl_key, "GroceryPregnancySickness", current_room, current_slot)):
-                return girl_key
-        return ""
-
-
-label GroceryPregnancySickness(girl_name):
+label GroceryPregnancySickness(girl_name=""):
     $ renpy.dynamic("_grocery_sick_name", "_grocery_sick_picture")
+    if not girl_name and event_runtime.active_thread is not None:
+        $ girl_name = event_runtime.active_thread.data.person
     $ _grocery_sick_name = people_display_name(girl_name)
     $ _grocery_sick_picture = grocery_store_grocer_picture(girl_name)
     $ main_ui_begin_native_scene_state("Недомогание в лавке")
