@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 WASHROOM = (ROOT / "game/Inn/ShedWashroom.rpy").read_text(encoding="utf-8-sig")
 THREADS = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
 BREAKFAST = (ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+RENOVATIONS = (ROOT / "game/Inn/TavernRenovations.rpy").read_text(encoding="utf-8-sig")
+SHED = (ROOT / "game/Inn/Shed.rpy").read_text(encoding="utf-8-sig")
 
 
 def load_function(source, name, namespace):
@@ -69,3 +71,25 @@ def test_bathday_is_room_entry_event_not_a_competing_breakfast_trigger():
     assert '"TavernKitchen", "breakfast"' not in bath_thread
     assert "_bathday_request_now = tavern_bathday_breakfast_request_ready()" in BREAKFAST
     assert bath_thread.count("tavern_bathday_ready") == 2
+
+
+def test_shed_has_one_direct_bath_preparation_action():
+    stove = RENOVATIONS.split("label ShedHotWaterStove:", 1)[1].split("\nlabel ", 1)[0]
+    assert 'action_id="prepare_shed_bath", label="Подготовить купальню", hook="call", target="ShedHotWaterStove"' in RENOVATIONS
+    assert stove.count('call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")') == 1
+    assert stove.count('call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")') == 1
+    assert stove.count("menu:") == 1
+    assert '"Разжечь огонь или подложить дрова"' not in stove
+    assert '"Вскипятить воду"' not in stove
+    assert '"Вычистить золу"' not in stove
+    assert '"Вернуться в сарай"' in stove
+
+
+def test_shed_keeps_one_log_splitting_route_and_existing_fuel_check():
+    lumber = (ROOT / "game/Items/Resources/LumberItem.rpy").read_text(encoding="utf-8-sig")
+    chores = (ROOT / "game/Inn/PlayerChoresSystem.rpy").read_text(encoding="utf-8-sig")
+    assert '"chop_lumber_with_old_axe"' in SHED.split("def build_shed_action_items():", 1)[1].split("\nlabel Shed:", 1)[0]
+    assert 'action_id="chop_lumber"' in lumber
+    assert 'target="Chop"' in lumber
+    assert 'if key == "make_fire" and not _pc_fire_fuel_available(where_id, object_id):' in chores
+    assert '"Сначала нужно наколоть бревна на дрова."' in chores

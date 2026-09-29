@@ -206,7 +206,7 @@ default ShedHotWaterStoveObject = GameObject(
     description="Новая печь греет большой металлический бак. Бревна и колотые дрова сложены отдельно, на безопасном расстоянии от топки; запас топлива по-прежнему общий для хозяйства.",
     picture="images/tavern/backyard/shed/renovated.png",
     condition={"rule": "tavern_renovation", "code": "shed"},
-    actions=[ObjectAction(action_id="inspect_shed_stove", label="Печь и запас дров", hook="call", target="ShedHotWaterStove")],
+    actions=[ObjectAction(action_id="prepare_shed_bath", label="Подготовить купальню", hook="call", target="ShedHotWaterStove")],
     state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0, "hot_water_until_minute": 0, "boiledWaterToday": 0},
 )
 
@@ -379,39 +379,24 @@ label ShedWashroomBath(object_id="shed_wash_tub"):
 label ShedHotWaterStove:
     $ main_ui_begin_native_scene_state(ShedHotWaterStoveObject.name)
     show screen main_ui
-    while True:
-        vscene shed_picture()
-        $ scene_runtime.text = "Печь с водяным баком стоит отдельно от прачечной и купальни. Дрова лежат в сарае, вдали от топки."
-        if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
-            $ scene_runtime.text += " В баке есть горячая вода."
-        elif _pc_fire_is_active(ShedHotWaterStoveObject):
-            $ scene_runtime.text += " Огонь горит; воду можно вскипятить."
-        else:
-            $ scene_runtime.text += " Печь остыла, горячей воды нет."
-        $ scene_runtime.location_text = scene_runtime.text
-        menu:
-            "Подготовить купальню" if not _pc_hot_water_is_ready(ShedHotWaterStoveObject):
-                if not _pc_fire_is_active(ShedHotWaterStoveObject):
-                    call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")
-                    if _pc_fire_is_active(ShedHotWaterStoveObject):
-                        "Вы кладете колотые дрова в топку и разжигаете печь под медным баком."
-                    else:
-                        "[scene_runtime.text]"
-                if _pc_fire_is_active(ShedHotWaterStoveObject) and not _pc_hot_water_is_ready(ShedHotWaterStoveObject):
-                    call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")
-                    if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
-                        "Пока вода закипает, вы приводите купальню в порядок. Затем наполняете купель горячей водой и раскладываете чистые полотенца. Теперь купальня готова."
-                    else:
-                        "[scene_runtime.text]"
-            "Разжечь огонь или подложить дрова":
-                call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")
+    vscene shed_picture()
+    if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+        "В баке уже есть горячая вода. Купальня готова."
+    else:
+        if not _pc_fire_is_active(ShedHotWaterStoveObject):
+            call MakeFire("chopped_wood_001", "Shed", "", "shed_hot_water_stove")
+            if _pc_fire_is_active(ShedHotWaterStoveObject):
+                "Вы кладете колотые дрова в топку и разжигаете печь под медным баком."
+            else:
                 "[scene_runtime.text]"
-            "Вскипятить воду" if _pc_fire_is_active(ShedHotWaterStoveObject):
-                call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")
+        if _pc_fire_is_active(ShedHotWaterStoveObject) and not _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+            call BoilWater("shed_hot_water_stove", "Shed", "", "shed_hot_water_stove")
+            if _pc_hot_water_is_ready(ShedHotWaterStoveObject):
+                "Пока вода закипает, вы приводите купальню в порядок. Затем наполняете купель горячей водой и раскладываете чистые полотенца. Теперь купальня готова."
+            else:
                 "[scene_runtime.text]"
-            "Вычистить золу" if _object_state_int(ShedHotWaterStoveObject, "ash_dirty", 0) > 0:
-                call Clean("ashes", "Shed", "", "shed_hot_water_stove")
-                "[scene_runtime.text]"
-            "Назад":
-                $ main_ui_end_native_scene_state()
-                return
+    menu:
+        "Вернуться в сарай":
+            $ main_ui_end_native_scene_state()
+            $ main_ui_runtime.action_items = build_shed_action_items()
+            return

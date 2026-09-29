@@ -115,7 +115,7 @@ init 6 python:
         room_obj = rooms.current if rooms.current is not None else rooms.get("Shed")
         items = [MenuItem("Осмотреть сарай", Call("ShedExamine"))]
         seen_object_ids = set()
-        hidden_action_ids = {"examine_lumber", "examine_chopped_wood", "take_chopped_wood"}
+        hidden_action_ids = {"examine_lumber", "examine_chopped_wood", "take_chopped_wood", "chop_lumber_with_old_axe"}
 
         for row in list(getattr(room_obj, "game_items", []) or []):
             object_id = get_object_id(row)
