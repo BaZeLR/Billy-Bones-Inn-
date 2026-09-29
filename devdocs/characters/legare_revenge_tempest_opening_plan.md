@@ -86,7 +86,13 @@ The Sofa/witch supply line is a distinct ordered quest, not hidden state in the 
 
 The **new-game-only** prologue begins with Stephan waking at the Market in unfamiliar Coitus-town surroundings, in a medical robe, safety glasses and rubber gloves, carrying a vibranium ring/communications unit. This is the immediate aftermath of a Tempest conflict that the player cannot yet remember. The Blind Pirate workers witness their employer being sent to slavery nearby. Sandra finds Stephan and says he has been missing **three weeks**; she asks about his clothes on their way home and describes the ruined tavern, rats, bats and dirt. In his room, the communication unit barely reaches Dr Evil, who promises to find a way out and says something went wrong in the Tempest fight; Penny is introduced in this opening arc. On the table is Duchess Conchitta's letter explaining Stephan's inheritance. At the tavern Amanda and Melissa object to his absence; reading the letter returns fragments of a memory that is *not his own*, including his uncle expelling him and his sailor years. This hands off to normal tavern play.
 
-Opening art prepared: `game/images/general/intro_market_stephan_medical.png` shows Stephan waking at the Market in the medical robe, safety glasses and rubber gloves, examining the communication ring. It is an illustration for the replacement prologue, **not yet wired into the current `Intro` label**. Preserve the existing text-bearing opening until the complete new sequence is authored and validated.
+Opening art sequence prepared (all staged, **not yet wired into the current `Intro` label**):
+
+1. `game/images/general/intro_market_stephan_medical_v2.png` — Stephan wakes at the Market wearing the buttoned chef-like medical robe, huge black insulated rubber gloves and steampunk safety goggles, and examines the communication ring. The earlier `intro_market_stephan_medical.png` remains as the first version; do not overwrite it.
+2. `game/images/general/intro_market_guard_nearmiss_wide.png` — a mounted city guard almost rides into him; wide view of the horse stopping and Stephan recoiling in fright.
+3. `game/images/general/intro_market_guard_nearmiss_stephan_close.png` — close-up of Stephan's startled face from the same instant.
+
+These pictures do not replace the text-bearing opening by themselves. Author and validate the full new-game scene sequence before changing `Intro`.
 
 The late Franchesca/mirror arc reveals **why** those opening images and the memory gap occurred. It must not jump back to `Intro` or reset the calendar, inventory, relationships, completed threads, or saves. The live `Intro.rpy` still contains the old inheritance opening and jumps into tavern play; replacing it is **not implemented** by this plan. The exact identity/memory mechanism, Penny's first scene, and whether the three missing weeks count in the game's day counter remain design decisions. Do not invent them while coding the opener.
 
