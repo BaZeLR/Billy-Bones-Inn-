@@ -16,4 +16,7 @@ label AdvanceTimeOnly(minutes_to_add=60):
     $ _advance_minutes = advance_time_runtime(minutes_to_add)
     if int(_advance_minutes or 0) > 0:
         call stat
+        # A scheduled visitor can arrive while MC remains in the kitchen.
+        if str(rooms.current_code or "") == "TavernKitchen" and main_ui_runtime.mode == "scene" and story_event_available("TavernKitchen", "enter"):
+            call checkTriggers("TavernKitchen", "enter", 0)
     return _advance_minutes

@@ -736,6 +736,49 @@ testcase becky_completed_kitchen_visits_show_both_women:
     assert eval ("Бекки" in scene_runtime.text and "Сандра" in scene_runtime.text)
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
 
+testcase becky_kitchen_visit_starts_when_she_arrives_while_mc_waits:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.daysInGame = 45
+        calendar_v2.week = 2
+        calendar_v2.hour = 17
+        calendar_v2.minute = 30
+        threads["beckySandraKitchenVisit"].reset()
+        threads["beckySandraKitchenVisit"].forceEnable()
+        event_runtime.fired_keys_today = []
+        event_runtime.evaluation_time = None
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.scene_origin = None
+    run Jump("TavernKitchen")
+    advance until eval (rooms.current_code == "TavernKitchen" and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval (people.location("becky") != "TavernKitchen") timeout 5.0
+    run Call("AdvanceTimeOnly", 30)
+    advance until eval (main_ui_runtime.mode == "event" and str(scene_runtime.picture).endswith("becky_visit_0.png")) timeout 20.0
+    assert eval (people.location("becky") == "TavernKitchen" and people.location("sandra") == "TavernKitchen") timeout 5.0
+    assert eval ("Бекки" in scene_runtime.text and "Сандра" in scene_runtime.text) timeout 5.0
+
+testcase becky_repeat_kitchen_visit_starts_when_she_arrives:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.daysInGame = 45
+        calendar_v2.week = 2
+        calendar_v2.hour = 17
+        calendar_v2.minute = 30
+        threads["beckySandraKitchenVisit"].advanceTo(3, complete_at_end=True)
+        threads["beckySandraKitchenVisit"].day = 40
+        event_runtime.fired_keys_today = []
+        event_runtime.evaluation_time = None
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.scene_origin = None
+    run Jump("TavernKitchen")
+    advance until eval (rooms.current_code == "TavernKitchen" and main_ui_runtime.mode == "scene") timeout 20.0
+    run Call("AdvanceTimeOnly", 30)
+    advance until eval (main_ui_runtime.mode == "event" and str(scene_runtime.picture).endswith("becky_visit_0.png")) timeout 20.0
+    assert eval ("Бекки" in scene_runtime.text and "Сандра" in scene_runtime.text) timeout 5.0
+    assert eval ("Подсесть к подругам" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
 testcase becky_kitchen_visits_distinguish_tea_from_hot_honey:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
