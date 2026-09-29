@@ -15,6 +15,8 @@ Affluent townspeople send adult virgin servants and protégées to the gathering
 
 Gerhardt is connected to the weregoat that hunts virgin energy. Franchesca, Ellona's highest priestess, is his rival for that energy. She seeks births for a force of superhumans in another, modern world, using a time-loop mechanism. The late reveal identifies her as Tempest and connects her to Steven Wolf being trapped in Coitus. This is also the explanation sought for the opening's displaced identity: **the man called Stephan is not simply the Stephan everyone assumes**. Keep the precise identity/memory mechanism a mystery until its authored reveal; do not overwrite the current player state with a second identity object.
 
+The cave relic and the route to it are tracked in `legare_revenge_tempest_opening_plan.md`: after Becky's trade road is genuinely cleared of bandits, the Cunidail elves can reveal the hiding place of **Дилдон Ебунец**. That discovery is a later aid against Franchesca and toward escape, not a consequence of merely watching a Sabbat.
+
 ## Clue and reveal order
 
 | Beat | What the player learns | Gate / presentation still needed |
