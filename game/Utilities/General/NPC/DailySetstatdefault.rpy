@@ -20,7 +20,11 @@ label DailySetstatdefault(girl_name):
     if _dssd_suspects_count == 0 and _dssd_pregnancy_days >= 50:
         $ ZaletGetSuspectList(girl_name)
 
-    if daily_events.exists(girl_name, "MorningSickness") == 0:
+    if girl_name in ("becky", "inga"):
+        if daily_events.exists(girl_name, "GroceryPregnancySickness") == 0 and 0 < _dssd_pregnancy_days < 80:
+            if procedural_randint(1, 7, "grocery_pregnancy_sickness_%s_%s" % (girl_name, int(current_game_day()))) == 1:
+                $ daily_events.add(girl_name, "GroceryStore", 5, "<", 1, -1, "GroceryPregnancySickness", "GroceryPregnancySickness", "girl")
+    elif daily_events.exists(girl_name, "MorningSickness") == 0:
         if ((_dssd_pregnancy_days > 0 and _dssd_pregnancy_days < 80 and procedural_randint(1, 7, "morning_sickness_%s_%s" % (girl_name, int(current_game_day()))) == 1)
                 or (_dssd_pregnancy_days == 0 and procedural_randint(1, 60, "false_morning_sickness_%s_%s" % (girl_name, int(current_game_day()))) == 32)):
             $ daily_events.add(girl_name, "alllocs", 2, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
