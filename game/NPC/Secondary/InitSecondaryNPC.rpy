@@ -127,6 +127,13 @@ init python:
             super().__init__(name, **kwargs)
             self.var = dict(kwargs.get("var", {}) or {})
 
+        def confession_points(self):
+            points = int(bool(Georgett.story_value("georgettadmit", 0) or Georgett.story_value("churchgeorgettadmit", 0)))
+            points += int(bool(Georgett.story_value("churchlizaadmit", 0)))
+            points += 2 * int(bool(self.var_value("becky_church_reported", False)))
+            points += int(all(player.economy.church_repairs_donated))
+            return points
+
         def interaction_visible(self, room_code=""):
             if str(room_code or "").strip() == "Church":
                 return church_confession_action_visible()

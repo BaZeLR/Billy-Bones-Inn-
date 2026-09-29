@@ -49,6 +49,19 @@ def test_each_distinct_pledge_rewards_attendance_and_temporary_fame_once():
     assert donate.index("player.tavern_management.visitors += 5") < donate.index("player.change_tavern_fame(1)")
 
 
+def test_gerhardt_confession_points_and_later_topics_use_witnessed_sources():
+    secondary = source("game/NPC/Secondary/InitSecondaryNPC.rpy")
+    confession = source("game/Town/Church/ChurchIspoved.rpy")
+
+    assert 'Georgett.story_value("georgettadmit", 0) or Georgett.story_value("churchgeorgettadmit", 0)' in secondary
+    assert 'Georgett.story_value("churchlizaadmit", 0)' in secondary
+    assert 'self.var_value("becky_church_reported", False)' in secondary
+    assert 'int(all(player.economy.church_repairs_donated))' in secondary
+    assert 'any(threads["beckyGerhardAdvice"].done)' in confession
+    assert 'Gerhard.confession_points() >= 5' in confession
+    assert 'Gerhard.set_var("becky_church_reported", True)' in confession
+
+
 def test_ellona_blessing_and_curse_state_is_owned_by_player_intimacy():
     player = source("game/Utilities/General/Player/Player.rpy")
     prayer = source("game/Town/Temple/EllonaBirthPrayMenu.rpy")
