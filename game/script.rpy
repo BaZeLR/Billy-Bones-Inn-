@@ -11,13 +11,6 @@ init python:
     style.warning_button_text.color = "#000000"  # Default text color (overridden in buttons)
     style.warning_button_text.outlines = [(2, "#000000", 0, 0)]  # Black outline
 
-    # Default intro sequence data as fallback
-    default_intro_sequence = [
-        ("images/general/intro1.png", "Welcome to Tractir!"),
-        ("images/general/intro2.png", "A game of adventure and intrigue..."),
-        ("images/general/intro3.png", "Your journey begins now!")
-    ]
-
     # Gameplay buttons are text-only; no filled fallback rectangles.
     style.button.background = None
     style.button.hover_background = None
@@ -53,38 +46,6 @@ init python:
 # Calendar defaults. calendar_v2 is the single initialized Calendar instance.
 default calendar_v2 = Calendar(minute=0, hour=8, day=1, week=1, period=1, cycle=CALENDAR_START_CYCLE, daysInGame=0)
 init python:
-    def load_intro_sequence():
-        try:
-            import json
-            import os
-
-            # First try to load from game/json directory
-            try:
-                path = renpy.loader.transfn("json/intro_sequence.json")
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                return [(item['image'], item['text']) for item in data]
-            except Exception:
-                # If that fails, try to create the directory and file with default data
-                try:
-                    json_dir = os.path.join(renpy.config.gamedir, "json")
-                    if not os.path.exists(json_dir):
-                        os.makedirs(json_dir)
-
-                    json_path = os.path.join(json_dir, "intro_sequence.json")
-                    default_data = [{"image": img, "text": txt} for img, txt in default_intro_sequence]
-
-                    with open(json_path, "w", encoding="utf-8") as f:
-                        json.dump(default_data, f, indent=2, ensure_ascii=False)
-
-                    return default_intro_sequence
-                except Exception:
-                    # If creating the file fails too, just return the defaults
-                    return default_intro_sequence
-        except Exception as e:
-            renpy.notify(f"Error loading intro sequence: {e}")
-            return default_intro_sequence
-
     def procedural_seed(key=""):
         key_text = str(key or "")
         key_total = 0
@@ -504,79 +465,6 @@ screen splash_screen():
             hover_foreground "#FF0000"
             text_style "warning_button_text"  # Apply text style with outlines
 
-transform fade:
-    alpha 0.0
-    linear 1.0 alpha 1.0
-
-transform fade_in:
-    alpha 0.0
-    linear 1.0 alpha 1.0
-
-transform fade_out:
-    alpha 1.0
-    linear 1.0 alpha 0.0
-
-screen cinematic_intro(images_texts):
-    tag menu
-    modal True
-    default idx = 0
-
-    if not images_texts:
-        timer 0.01 action Return()
-    else:
-        $ _img = images_texts[idx][0]
-        $ _txt = images_texts[idx][1]
-
-        if renpy.loadable(_img):
-            add _img at fade_in
-        else:
-            add Solid("#000")
-
-        window:
-            background "#00000080"
-            xalign 0.5
-            yalign 0.5
-            xsize 1000
-            ysize None
-            padding (20, 20)
-
-            text _txt:
-                xalign 0.5
-                color "#FFFFFF"
-                text_align 0.5
-                size 24
-                layout "subtitle"
-                min_width 960
-
-        hbox:
-            xalign 0.5
-            yalign 0.92
-            spacing 24
-
-            textbutton "Continue" action If(
-                idx < len(images_texts) - 1,
-                SetScreenVariable("idx", idx + 1),
-                Return()
-            )
-
-            textbutton "Skip" action Return()
-
-        key "mouseup_1" action If(
-            idx < len(images_texts) - 1,
-            SetScreenVariable("idx", idx + 1),
-            Return()
-        )
-        key "K_SPACE" action If(
-            idx < len(images_texts) - 1,
-            SetScreenVariable("idx", idx + 1),
-            Return()
-        )
-        key "K_RETURN" action If(
-            idx < len(images_texts) - 1,
-            SetScreenVariable("idx", idx + 1),
-            Return()
-        )
-
 label splashscreen:
     call screen splash_screen
     return
@@ -584,16 +472,8 @@ label splashscreen:
 label start:
     jump Intro
 
-#label intro:
-#    jump Intro
-
 label introduction:
-    $ renpy.dynamic("intro_data")
-    $ intro_data = load_intro_sequence()
-    if intro_data:
-        call screen cinematic_intro(intro_data) with dissolve
-    else:
-        "Introduction sequence is not available yet."
+    call OpeningCinematic
     return
 
 label tutorial:
@@ -602,13 +482,4 @@ label tutorial:
 
 label about_game:
     "About the game is a placeholder for now."
-    return
-
-label cinematic_intro:
-    $ renpy.dynamic("intro_data")
-    $ intro_data = load_intro_sequence()
-    if intro_data:
-        call screen cinematic_intro(intro_data) with dissolve
-    else:
-        "Introduction sequence is not available yet."
     return

@@ -181,13 +181,15 @@ init -998 python:
         def __init__(self):
             self.weapon = ""
             self.armor = ""
+            self.wrist = ""
+            self.finger = ""
 
         def equip(self, item_id, slot=""):
             item_key = player_normalize_item_id(item_id)
             if not item_key:
                 return False
             slot_key = str(slot or "").strip().lower()
-            if slot_key not in ("weapon", "armor"):
+            if slot_key not in ("weapon", "armor", "wrist", "finger"):
                 try:
                     item_obj = get_game_item(item_key)
                     item_type = str(getattr(item_obj, "item_type", "") or getattr(item_obj, "category", "") or "").lower()
@@ -199,7 +201,7 @@ init -998 python:
 
         def unequip(self, slot=""):
             slot_key = str(slot or "").strip().lower()
-            if slot_key not in ("weapon", "armor"):
+            if slot_key not in ("weapon", "armor", "wrist", "finger"):
                 return False
             setattr(self, slot_key, "")
             return True
@@ -766,8 +768,10 @@ init -998 python:
             self.stats = PlayerStats()
             self.skills = {}
             self.economy = PlayerEconomy()
-            self.inventory = PlayerInventory()
+            self.inventory = PlayerInventory({"comm_unit_001": 1, "vibranium_ring_001": 1})
             self.equipment = PlayerEquipment()
+            self.equipment.wrist = "comm_unit_001"
+            self.equipment.finger = "vibranium_ring_001"
             self.appearance = PlayerAppearance()
             self.intimacy = PlayerIntimacy()
             self.chores = PlayerChores()

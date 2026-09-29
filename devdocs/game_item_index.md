@@ -3,7 +3,7 @@
 Source of truth:
 
 - `GameItem` class: `game/Items/Core/GameItem.rpy`
-- Registered item list: `game/Items/Core/GameItems.rpy`
+- Registered item catalog: `game_item_registry` in `game/Items/Core/GameItem.rpy` (items self-register)
 - Runtime item lookup: `get_game_item(...)` in `game/Utilities/General/Classes/GameObjectTemplate.rpy`
 
 Every real item should have:
@@ -15,7 +15,7 @@ Every real item should have:
 5. An explicit `picture` value when it has item art, or an intentional empty picture.
 6. An `actions=[...]` list when the item has direct item actions.
 7. Each `ObjectAction` must lead to a real direct label or text action.
-8. The item object must be listed in `_all_game_item_objects()` unless it is deliberately not part of gameplay.
+8. The item object must self-register under its stable `object_id`.
 
 Do not add wrapper dispatchers to make item menus work. Fix the item definition, room item list, or direct action label.
 
@@ -51,6 +51,8 @@ Fixed:
 | `WineBarrelItem` | `game/Items/Resources/WineBarrelItem.rpy` |
 | `TavernHelpBookItem` | `game/Items/Resources/TavernHelpBookItem.rpy` |
 | `MelissaBookletItem` | `game/Items/Resources/MelissaBookletItem.rpy` |
+| `CommUnitItem` | `game/Items/Resources/OpeningDeviceItems.rpy` |
+| `VibraniumRingItem` | `game/Items/Resources/OpeningDeviceItems.rpy` |
 
 ### `game/Items/Crafting/SoapCraftAndAtticItems.rpy`
 

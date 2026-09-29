@@ -20,7 +20,7 @@ init 5 python:
         description="Старый ларь, в котором хранится ваша одежда.",
         picture="images/player_room/player_room.png",
         container=True,
-        state={"open": 0, "visible": 1, "locked": 0},
+        state={"open": 0, "visible": 1, "locked": 0, "stored_devices": []},
         actions=[
             ObjectAction(
                 action_id="open_chest",

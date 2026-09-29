@@ -1,6 +1,6 @@
 # Legare revenge, Tempest reveal, and replacement opening
 
-Design plan from the 2026-09-28 03:45 user outline and subsequent clarifications. **This is a plan, not a claim that the sequence is playable.** Preserve existing QSP/TXT dialogue where it applies; new Russian scenes need their own authored text and illustrations. All participants in intimate scenes are adults. The event label owns its picture, text, choices, and completion; a room owns only entry, navigation, and objects.
+Design plan from the 2026-09-28 03:45 user outline and subsequent clarifications. **The replacement opening is playable; the later revenge/Tempest branches remain planned unless marked live below.** Preserve existing QSP/TXT dialogue where it applies. All participants in intimate scenes are adults. The event label owns its picture, text, choices, and completion; a room owns only entry, navigation, and objects.
 
 ## Confirmed decisions and live baseline
 
@@ -84,31 +84,25 @@ The Sofa/witch supply line is a distinct ordered quest, not hidden state in the 
 
 ## Replacement opening: playable order and memory reveal
 
-The **new-game-only** prologue begins with Stephan waking at the Market in unfamiliar Coitus-town surroundings, in a medical robe, safety glasses and rubber gloves, carrying a vibranium ring/communications unit. This is the immediate aftermath of a Tempest conflict that the player cannot yet remember. The Blind Pirate workers witness their employer being sent to slavery nearby. Sandra finds Stephan and says he has been missing **three weeks**; she asks about his clothes on their way home and describes the ruined tavern, rats, bats and dirt. In his room, the communication unit barely reaches Dr Evil, who promises to find a way out and says something went wrong in the Tempest fight; Penny is introduced in this opening arc. On the table is Duchess Conchitta's letter explaining Stephan's inheritance. At the tavern Amanda and Melissa object to his absence; reading the letter returns fragments of a memory that is *not his own*, including his uncle expelling him and his sailor years. This hands off to normal tavern play.
+The playable prologue now starts at the Market, three weeks after Steven/Tempest vanish, and follows the guard, Blind Pirate news, Sandra's reunion, tavern-team confrontation, Duchess Conchitta's letter, Stephan's childhood/sailor memory flashes, and the damaged comm-unit call. Steven remembers the time-field attack before play begins. `Intro` calls the returnable `OpeningCinematic` label and then enters the normal tavern checkpoint; the main-menu `Introduction` entry calls the same label and returns to the menu. The sequence uses native Ren'Py dialogue over full-screen art with a bottom text window; it does not use the room HUD or the obsolete JSON slideshow. The original two memory pictures remain untouched.
 
-Opening art sequence prepared (all staged, **not yet wired into the current `Intro` label**):
+All playable art is numbered in `game/images/intro/`:
 
-1. `game/images/general/intro_market_stephan_medical_v2.png` — Stephan wakes at the Market wearing the buttoned chef-like medical robe, huge black insulated rubber gloves and steampunk safety goggles, and examines the communication ring. The earlier `intro_market_stephan_medical.png` remains as the first version; do not overwrite it.
-2. `game/images/general/intro_market_guard_nearmiss_wide.png` — a mounted city guard almost rides into him; wide view of the horse stopping and Stephan recoiling in fright.
-3. `game/images/general/intro_market_guard_nearmiss_stephan_close.png` — close-up of Stephan's startled face from the same instant.
-4. `game/images/general/intro_market_peasant_blind_pirate_story.png` — an unnamed peasant tells Stephan of the Blind Pirate proprietor's ruin and points to the receding cage wagon; Stephan's face shows awe and shock. This shot follows the cage reveal, but remains staged until the replacement prologue owns its dialogue and image sequence.
-5. `game/images/general/intro_market_sandra_reunion_close.png` — close-up of Sandra's amazed, happy relief on recognizing Stephan alive at the Market after his three-week absence.
-6. `game/images/general/intro_butchery_street_sandra_leads_stephan.png` — Sandra takes Stephan's gloved hand and leads him along Butchery Street toward the Wild Stallion, its horse sign visible ahead. Her established dark hair, green eyes, cream blouse and burgundy bodice carry across both shots.
-7. `game/images/general/intro_kitchen_meeting_team_robe.png` — Sandra, Melissa and Amanda confront Stephan in the Wild Stallion kitchen, annoyed about his absence; he still wears the buttoned robe, goggles and rubber gloves. This is a new sibling to the user's `meetingTeam.png`, which remains untouched.
-8. `game/images/general/intro_kitchen_amanda_checks_breath.png` — side close-up as Amanda checks Stephan's breath for ale, then realizes he is sober. Her planned line is verbatim: “He's sober! this is getting more weird”.
-9. `game/images/general/intro_player_room_read_letter_v2.png` — alone in his shabby room, Stephan opens and reads the inheritance letter. His face follows the default player-card portrait; the table is against the room's right wall, with the bed on the left. He still wears the robe and rubber gloves, with his goggles lifted to reveal his face. The earlier `intro_player_room_read_letter.png` and `intro_letter_scene.png` remain untouched.
-10. `game/images/general/intro_player_room_mirror_shock.png` — Stephan touches his cheek and stares at his own face in an ordinary room mirror, horrified. His planned line is verbatim: “This is me!? How come!?” The room mirror is not Hordus's later quest item.
-11. `game/images/general/intro_memory_uncle_confrontation.png` — first memory flash: young-adult Stephan faces his angry uncle at the door of the uncle's rural home.
-12. `game/images/general/intro_memory_evicted_from_home.png` — the uncle sends Stephan away; Stephan looks back from the rain-soaked road with his travel sack.
-13. `game/images/general/intro_memory_sailor_on_deck.png` — a later flash shows the same young-adult Stephan working rigging on a merchant ship's deck.
+| Frame | Scene |
+| --- | --- |
+| `intro_1`–`intro_4` | Market awakening, near collision (wide/close), peasant and Blind Pirate wagon. |
+| `intro_5`–`intro_6` | Sandra reunion and walk home through Butchery Street. |
+| `intro_7`–`intro_8` | Kitchen confrontation and Amanda checking whether Stephan is sober. |
+| `intro_9`–`intro_10` | Inheritance letter and Steven's mirror shock. |
+| `intro_11`–`intro_12` | Corrected memory: uncle expels young Stephan from Wild Stallion before Sandra/young Melissa/young Amanda; later Stephan as sailor. |
+| `intro_13` | Steven on his bed, gloves off, checking the wrist unit; reused when the call dies. |
+| `intro_14` | Dr Evil on the comm screen through heavy time-space interference. |
+| `intro_15` | Static-covered screen and Penny's brief voice: **portrait placeholder** until her reference is supplied. |
+| `intro_16` | Flashback to Steven and Tempest colliding inside the time-field. |
 
-These three new flashback images follow Stephan's player-card identity and the current opening's realistic style. The older `memory_uncle_throws_stephan.png` and `memory_ship_deck.png` remain untouched. The flashbacks are prepared art, not yet connected to the live `Intro` label; their dialogue and timing must be preserved or settled when that playable sequence is authored.
+The two separate `GameItem`s, `comm_unit_001` (wrist) and `vibranium_ring_001` (finger), use `game/images/general/comm_unit_item.png` and `game/images/general/vibranium_ring_item.png`. Fresh Player state begins with both worn. The player card can remove/replace them, and the bedroom chest can store/retrieve them without a second inventory authority. Existing saves do not receive them automatically; no retroactive grant is planned without a migration decision.
 
-The existing `cityBlindPirateFall` Market-entry event now uses `game/images/market/blindPirate_liza_georgette.png`: the former proprietor remains inside the cage, while Georgette and Lizette are recognizable and visibly crying outside it. Its original image remains on disk. This event is already playable on an eligible Market entry; connecting it to the replacement new-game prologue is still future work.
-
-These pictures do not replace the text-bearing opening by themselves. Author and validate the full new-game scene sequence before changing `Intro`.
-
-The late Franchesca/mirror arc reveals **why** those opening images and the memory gap occurred. It must not jump back to `Intro` or reset the calendar, inventory, relationships, completed threads, or saves. The live `Intro.rpy` still contains the old inheritance opening and jumps into tavern play; replacing it is **not implemented** by this plan. The exact identity/memory mechanism, Penny's first scene, and whether the three missing weeks count in the game's day counter remain design decisions. Do not invent them while coding the opener.
+The peasant's opening account is narrative only: it does **not** mark the independent `cityBlindPirateFall` Market-entry event completed. The three missing weeks also do not advance the live calendar. Penny's image and fuller dialogue remain pending her reference; `intro_15.png` deliberately shows only the interrupted feed. The later Franchesca/mirror arc explains this opening but must never jump back to it or reset game state.
 
 ## Implementation boundaries and acceptance checks
 

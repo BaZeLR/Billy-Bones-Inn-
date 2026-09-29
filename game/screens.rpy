@@ -100,7 +100,22 @@ screen say(who, what):
     $ _say_panel_w = int((config.screen_width - 36) * 0.72)
     $ _say_inner_w = _say_panel_w - 48
 
-    if renpy.get_screen("main_ui") is not None and what:
+    if intro_cinematic_active:
+        window:
+            id "window"
+            xpos 0
+            xsize config.screen_width
+            yalign 1.0
+            ysize 244
+            background Solid("#08080ad9")
+            padding (64, 24, 64, 28)
+            vbox:
+                xfill True
+                spacing 9
+                if who is not None:
+                    text who id "who" color "#e7c484" size 30
+                text what id "what" color "#ffffff" size 30 xsize (config.screen_width - 128)
+    elif renpy.get_screen("main_ui") is not None and what:
         $ _room = rooms.current
         $ _room_name = _room.display_name if _room is not None else str(rooms.current_code or "")
         vbox:
@@ -138,7 +153,7 @@ screen say(who, what):
 
     ## If there's a side image, display it above the text. Do not display on the
     ## phone variant - there's no room.
-    if not renpy.variant("small"):
+    if not intro_cinematic_active and not renpy.variant("small"):
         add SideImage() xalign 0.0 yalign 1.0
 
 

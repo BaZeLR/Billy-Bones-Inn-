@@ -271,7 +271,7 @@ label TavernMyRoomTakeFloorItem(item_id=""):
 
 
 label TavernMyRoomOpenChest(preserve_text=False):
-    $ renpy.dynamic("_room_object", "_all_dresses", "_appearance", "_current_dress", "_dress", "_dress_key", "_short")
+    $ renpy.dynamic("_room_object", "_all_dresses", "_appearance", "_current_dress", "_dress", "_dress_key", "_short", "_device_id", "_device_name", "_stored_devices")
     $ _room_object = tavern_my_room_get_object("chest_001")
     $ player_ensure_nightwear_in_chest()
     if _room_object is not None:
@@ -306,6 +306,13 @@ label TavernMyRoomOpenChest(preserve_text=False):
                     main_ui_runtime.action_items.append(MenuItem("Снять " + _short, Call("TavernMyRoomRemoveDress", _dress)))
         if not player_is_naked():
             main_ui_runtime.action_items.append(MenuItem("Раздеться для сна", Call("TavernMyRoomSetSleepLayer", "nothing")))
+        _stored_devices = list(_room_object.state.get("stored_devices", []) or []) if _room_object is not None else []
+        for _device_id in ("comm_unit_001", "vibranium_ring_001"):
+            _device_name = str(runtime_item_display_name(_device_id) or _device_id)
+            if _device_id in _stored_devices:
+                main_ui_runtime.action_items.append(MenuItem("Взять из ларя: " + _device_name, Call("TavernMyRoomTakeDeviceFromChest", _device_id)))
+            elif player.item_count(_device_id) > 0:
+                main_ui_runtime.action_items.append(MenuItem("Положить в ларь: " + _device_name, Call("TavernMyRoomStoreDeviceInChest", _device_id)))
     $ main_ui_runtime.action_items.append(MenuItem("Закрыть ларь", Call("TavernMyRoomCloseChest")))
     $ renpy.restart_interaction()
     return
@@ -326,6 +333,47 @@ label TavernMyRoomCloseChest:
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_my_room_action_items()
     $ renpy.restart_interaction()
+    return
+
+
+label TavernMyRoomStoreDeviceInChest(item_id=""):
+    $ renpy.dynamic("_device_id", "_chest", "_stored", "_slot")
+    $ _device_id = str(item_id or "").strip()
+    $ _chest = tavern_my_room_get_object("chest_001")
+    if str(rooms.current_code or "") != "TavernMyRoom" or _chest is None or _device_id not in ("comm_unit_001", "vibranium_ring_001"):
+        return
+    $ _stored = list(_chest.state.get("stored_devices", []) or [])
+    if player.item_count(_device_id) > 0 and _device_id not in _stored:
+        $ _slot = str(get_game_item(_device_id).custom_properties.get("wear_slot", "") or "")
+        if _slot in ("wrist", "finger") and str(getattr(player.equipment, _slot, "") or "") == _device_id:
+            $ player.unequip(_slot)
+        $ player.remove_item(_device_id, 1)
+        $ _stored.append(_device_id)
+        $ _chest.state["stored_devices"] = _stored
+        $ scene_runtime.text = "Вы сняли и положили в ларь " + str(runtime_item_display_name(_device_id) or _device_id) + "."
+    else:
+        $ scene_runtime.text = "Этой вещи сейчас нет у вас при себе."
+    $ scene_runtime.location_text = scene_runtime.text
+    call TavernMyRoomOpenChest(True)
+    return
+
+
+label TavernMyRoomTakeDeviceFromChest(item_id=""):
+    $ renpy.dynamic("_device_id", "_chest", "_stored")
+    $ _device_id = str(item_id or "").strip()
+    $ _chest = tavern_my_room_get_object("chest_001")
+    if str(rooms.current_code or "") != "TavernMyRoom" or _chest is None or _device_id not in ("comm_unit_001", "vibranium_ring_001"):
+        return
+    $ _stored = list(_chest.state.get("stored_devices", []) or [])
+    if _device_id in _stored and player.item_count(_device_id) == 0:
+        $ _stored.remove(_device_id)
+        $ _chest.state["stored_devices"] = _stored
+        $ player.add_item(_device_id, 1)
+        $ scene_runtime.text = "Вы достали из ларя " + str(runtime_item_display_name(_device_id) or _device_id) + "."
+    else:
+        $ scene_runtime.text = "Этой вещи сейчас нет в ларе."
+    $ scene_runtime.location_text = scene_runtime.text
+    call TavernMyRoomOpenChest(True)
     return
 
 

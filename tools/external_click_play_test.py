@@ -7279,8 +7279,10 @@ testcase external_player_save_payload_parity:
     $ player.stats.exploration = 14
     $ player.skills["tracking"] = 6
     $ player.economy.money = 4321
-    $ player.inventory.items = {"soap_001": 2}
+    $ player.inventory.items = {"soap_001": 2, "comm_unit_001": 1, "vibranium_ring_001": 1}
     $ player.equipment.weapon = "rusty_hunter_rifle_001"
+    $ player.equipment.wrist = "comm_unit_001"
+    $ player.equipment.finger = "vibranium_ring_001"
     $ player.appearance.days_since_wash = 2
     $ player.appearance.days_since_haircut = 19
     $ player.intimacy.arousal = 37
@@ -7298,8 +7300,8 @@ testcase external_player_save_payload_parity:
     assert eval (isinstance(_saved_player.condition, PlayerCondition) and int(_saved_player.condition.health or 0) == 83) timeout 5.0
     assert eval (isinstance(_saved_player.stats, PlayerStats) and int(_saved_player.stats.exploration or 0) == 14 and int(_saved_player.skills.get("tracking", 0) or 0) == 6) timeout 5.0
     assert eval (isinstance(_saved_player.economy, PlayerEconomy) and int(_saved_player.economy.money or 0) == 4321) timeout 5.0
-    assert eval (isinstance(_saved_player.inventory, PlayerInventory) and int(_saved_player.inventory.count("soap_001") or 0) == 2) timeout 5.0
-    assert eval (isinstance(_saved_player.equipment, PlayerEquipment) and str(_saved_player.equipment.weapon or "") == "rusty_hunter_rifle_001") timeout 5.0
+    assert eval (isinstance(_saved_player.inventory, PlayerInventory) and int(_saved_player.inventory.count("soap_001") or 0) == 2 and int(_saved_player.inventory.count("comm_unit_001") or 0) == 1 and int(_saved_player.inventory.count("vibranium_ring_001") or 0) == 1) timeout 5.0
+    assert eval (isinstance(_saved_player.equipment, PlayerEquipment) and str(_saved_player.equipment.weapon or "") == "rusty_hunter_rifle_001" and str(_saved_player.equipment.wrist or "") == "comm_unit_001" and str(_saved_player.equipment.finger or "") == "vibranium_ring_001") timeout 5.0
     assert eval (isinstance(_saved_player.appearance, PlayerAppearance) and int(_saved_player.appearance.days_since_wash or 0) == 2 and int(_saved_player.appearance.days_since_haircut or 0) == 19) timeout 5.0
     assert eval (isinstance(_saved_player.intimacy, PlayerIntimacy) and int(_saved_player.intimacy.arousal or 0) == 37) timeout 5.0
     assert eval (isinstance(_saved_player.chores, PlayerChores) and int(_saved_player.chores.weekly.get("bring_woods", 0) or 0) == 3) timeout 5.0
@@ -7458,6 +7460,49 @@ testcase external_player_appearance_v47_migration:
     assert eval (int(player.appearance.days_since_haircut or 0) == 20) timeout 5.0
     assert eval (not hasattr(player.appearance, "washDays") and not hasattr(player.appearance, "hairCutdays") and not hasattr(player.appearance, "haircut_day")) timeout 5.0
 '''
+
+
+OPENING_DEVICE_CHECKS = r'''
+testcase external_opening_cinematic_new_game:
+    assert eval (all(renpy.loadable("images/intro/intro_%d.png" % index) for index in range(1, 17))) timeout 5.0
+    run Jump("Intro")
+    advance until eval (renpy.get_screen("say") is not None and "Сначала вернулся звук" in str(renpy.get_screen("say").scope.get("what", ""))) timeout 90.0
+    assert eval (intro_cinematic_active and renpy.get_screen("main_ui") is None) timeout 5.0
+    screenshot "external_opening_first_frame.png"
+    advance until screen "choice" timeout 90.0
+    assert eval (not intro_cinematic_active and str(rooms.current_code or "") == "Intro") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and renpy.get_screen("main_ui") is not None) timeout 30.0
+
+testcase external_opening_cinematic_main_menu_replay:
+    run Jump("introduction")
+    advance until screen "main_menu" timeout 90.0
+    assert eval (not intro_cinematic_active) timeout 5.0
+
+testcase external_opening_devices_wear_and_chest:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (get_game_item("comm_unit_001") is not None and get_game_item("vibranium_ring_001") is not None) timeout 5.0
+    assert eval (player.item_count("comm_unit_001") == 1 and player.item_count("vibranium_ring_001") == 1) timeout 5.0
+    assert eval (str(player.equipment.wrist or "") == "comm_unit_001" and str(player.equipment.finger or "") == "vibranium_ring_001") timeout 5.0
+    $ rooms.enter("TavernMyRoom")
+    run Call("TavernMyRoomOpenChest")
+    assert eval (any("Положить в ларь: наручный коммуникатор" == str(item.caption or "") for item in main_ui_runtime.action_items)) timeout 5.0
+    run Call("TavernMyRoomStoreDeviceInChest", "comm_unit_001")
+    assert eval (str(rooms.current_code or "") == "TavernMyRoom") timeout 5.0
+    assert eval (player.item_count("comm_unit_001") == 0) timeout 5.0
+    assert eval (str(getattr(player.equipment, "wrist", "") or "") == "") timeout 5.0
+    assert eval ("comm_unit_001" in TavernMyRoomChestObject.state.get("stored_devices", [])) timeout 5.0
+    run Call("TavernMyRoomStoreDeviceInChest", "vibranium_ring_001")
+    assert eval (player.item_count("vibranium_ring_001") == 0 and str(getattr(player.equipment, "finger", "") or "") == "" and "vibranium_ring_001" in TavernMyRoomChestObject.state.get("stored_devices", [])) timeout 5.0
+    run Call("TavernMyRoomTakeDeviceFromChest", "comm_unit_001")
+    run Call("TavernMyRoomTakeDeviceFromChest", "vibranium_ring_001")
+    assert eval (player.item_count("comm_unit_001") == 1 and player.item_count("vibranium_ring_001") == 1 and not TavernMyRoomChestObject.state.get("stored_devices", [])) timeout 5.0
+    run Call("PlayerCardEquipItem", "comm_unit_001")
+    run Call("PlayerCardEquipItem", "vibranium_ring_001")
+    assert eval (str(player.equipment.wrist or "") == "comm_unit_001" and str(player.equipment.finger or "") == "vibranium_ring_001") timeout 5.0
+'''
+
+PLAYER_SAVE_PARITY_CHECKS += "\n\n" + OPENING_DEVICE_CHECKS
 
 
 TAVERN_HELP_FLOW_CHECKS = r'''
@@ -9825,6 +9870,9 @@ def main() -> int:
             "external_daily_setstatdefault_body_maps_exist",
             "external_room_registry_pickle_round_trip",
             "external_player_save_payload_parity",
+            "external_opening_cinematic_new_game",
+            "external_opening_cinematic_main_menu_replay",
+            "external_opening_devices_wear_and_chest",
             "external_player_actual_load_parity",
             "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
@@ -10041,6 +10089,9 @@ def main() -> int:
             "external_daily_setstatdefault_body_maps_exist",
             "external_room_registry_pickle_round_trip",
             "external_player_save_payload_parity",
+            "external_opening_cinematic_new_game",
+            "external_opening_cinematic_main_menu_replay",
+            "external_opening_devices_wear_and_chest",
             "external_player_actual_load_parity",
             "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
