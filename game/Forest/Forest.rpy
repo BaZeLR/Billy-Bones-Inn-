@@ -253,8 +253,14 @@ init python:
 
     def forest_action_items():
         if forest_after_dusk():
-            return [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+            items = []
+            if bool(getattr(Mongol, "tavern_servant", False)) and "mongol" in player.combat.party:
+                items.append(MenuItem("Поговорить с Монголом", Call("MongolTavernTalk")))
+            items.append(MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk")))
+            return items
         items = []
+        if bool(getattr(Mongol, "tavern_servant", False)) and "mongol" in player.combat.party:
+            items.append(MenuItem("Поговорить с Монголом", Call("MongolTavernTalk")))
         if werecat_can_search("Forest"):
             items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
         if fight_can_hunt_here("Forest"):

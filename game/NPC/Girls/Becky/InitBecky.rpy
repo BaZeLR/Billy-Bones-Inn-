@@ -260,6 +260,18 @@ init python:
         def store_lover_modest_reaction(self):
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
 
+        def sherwood_store_private_available(self):
+            return (
+                str(rooms.current_code or "") == "GroceryStore"
+                and rooms.get("GroceryStore").is_open()
+                and str(people.location("becky") or "") == "GroceryStore"
+                and int(self.rel or 0) >= 10
+                and int(self.corruption or 0) >= 40
+                and player.intimacy.can_cum()
+                and self.can_have_sex_today()
+                and not self.sex_busy()
+            )
+
         def has_bra(self):
             return self.clothing_layer("bra") != ""
 

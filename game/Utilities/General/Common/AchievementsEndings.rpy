@@ -4,6 +4,7 @@
 define tractir_achievement_order = [
     "shit_with_comfort",
     "melissa_full_storeroom",
+    "mongol_household",
     "first_month_survived",
     "sandra_secured_future",
     "notoriety_25",
@@ -19,6 +20,10 @@ define tractir_achievements = {
     "melissa_full_storeroom": (
         "Полная кладовая",
         "При подсчете запасов на кухне Мелисса обнаружила больше ста порций провизии и не меньше пятидесяти бочонков вина.",
+    ),
+    "mongol_household": (
+        "Верный конюший",
+        "Через три дня после освобождения Шервудской дороги Монгол прибыл с конём и каретой и поступил на службу в трактир.",
     ),
     "first_month_survived": (
         "Первый месяц",

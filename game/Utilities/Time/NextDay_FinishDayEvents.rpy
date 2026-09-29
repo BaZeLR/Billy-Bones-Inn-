@@ -124,7 +124,8 @@ label NextDay_FinishDayEvents:
     $ renpy.dynamic("_ndf_all_girl_names", "_ndf_all_girl_index")
     python:
         next_day_finish_day_events()
-        _ndf_all_girl_names = [info.name for info in people.girl_values()]
+        # Pregnancy belongs to Girl instances, including secondary NPCs such as Inga.
+        _ndf_all_girl_names = [info.name for info in people.values() if isinstance(info, Girl)]
         _ndf_all_girl_index = 0
 
     while _ndf_all_girl_index < len(_ndf_all_girl_names):

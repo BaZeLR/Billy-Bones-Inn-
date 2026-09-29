@@ -9,6 +9,7 @@ label NextDay_TavernDaily():
     $ renpy.dynamic("_dog_theft_result", "_kitchen_effect_lines", "_kitchen_stock_used", "_rat_food_loss_due_day", "_tavern_worker")
     call SetTavernServiceLevels
     python:
+        ExtraEvents += Mongol.perform_tavern_service()
         # Daily visitors and happiness
         CurDay['happy'] = 0
         CurDay['visitors'] = player.tavern_management.visitors + procedural_randint(-4, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:13:1")
@@ -55,7 +56,7 @@ label NextDay_TavernDaily():
             CurDay['rat_food_loss'] = min(30, int(player.tavern_management.productnum or 0))
             player.tavern_management.productnum = max(0, int(player.tavern_management.productnum or 0) - CurDay['rat_food_loss'])
             werecat_state()['rat_food_loss_next_day'] = int(current_game_day()) + 7
-        CurDay['fixedcost'] = household.member_count() * 1 + 10
+        CurDay['fixedcost'] = (household.member_count() - int(bool(getattr(Mongol, 'tavern_servant', False)))) * 1 + 10
         # Service level effects
         if CurDay['happy'] >= 0:
             if player.tavern_management.service.waitress_score < 10 or player.tavern_management.service.cleanliness_score < 10 or player.tavern_management.service.kitchen_score < 10:
@@ -92,8 +93,7 @@ label NextDay_TavernDaily():
         TotalDay['loyalty'] += CurDay['loyalty']
         if int(calendar_v2.week or 0) == 7:
             TotalDay['KidsMoney'] += player.economy.weekly_child_support_money()
-        if player.horse.owns_horse():
-            TotalDay['HorseFood'] += 3
+        TotalDay['HorseFood'] += 3 * (int(player.horse.owns_horse()) + len(list(getattr(player.horse, 'stable_horses', []) or [])))
         if daily_events.exists("", "StableHorseTheft") > 0:
             if player.horse.owns_horse():
                 player.horse.theft_attempted = True

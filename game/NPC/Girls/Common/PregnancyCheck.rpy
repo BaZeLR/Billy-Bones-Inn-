@@ -11,7 +11,7 @@ init python:
     def pregnancy_conception_chance(girl_name="", dad_name="", is_dude_random=0):
         girl = str(girl_name or "").strip().lower()
         girl_info = people.get_info(girl)
-        if girl_info is None or str(getattr(girl_info, "registry_group", "") or "") != "girl":
+        if not isinstance(girl_info, Girl):
             return 0
 
         chance = max(0.0, float(girl_info.sex_stat("ConceptionChance", 0) or 0))

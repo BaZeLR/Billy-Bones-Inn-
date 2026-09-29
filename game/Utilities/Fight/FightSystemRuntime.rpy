@@ -401,7 +401,7 @@ init -20 python:
     def fight_player_attack_preview_text():
         level = fight_player_level()
         dog_state = fight_dog_support_state()
-        attack_min = 5 + level * 5 + fight_weapon_attack_points() + int(dog_state.get("attack", 0) or 0)
+        attack_min = 5 + level * 5 + fight_weapon_attack_points() + int(dog_state.get("attack", 0) or 0) + fight_mongol_hunt_attack_bonus()
         attack_max = attack_min + level * 3
         if int(player.condition.energy or 0) < 20:
             attack_min -= 4
@@ -417,7 +417,7 @@ init -20 python:
     def fight_player_defence_preview_text():
         level = fight_player_level()
         dog_state = fight_dog_support_state()
-        defence_min = 5 + level * 4 + fight_armor_defence_points() + int(dog_state.get("defence", 0) or 0)
+        defence_min = 5 + level * 4 + fight_armor_defence_points() + int(dog_state.get("defence", 0) or 0) + fight_mongol_hunt_defence_bonus()
         defence_max = defence_min + level * 2
         if int(player.condition.energy or 0) < 15:
             defence_min -= 3
@@ -441,12 +441,18 @@ init -20 python:
             "moves": moves,
         }
 
+    def fight_mongol_hunt_attack_bonus():
+        return 2 if bool(getattr(Mongol, "tavern_servant", False)) and "mongol" in player.combat.party and room_in_group(fight.return_room_code, ROOM_GROUP_FOREST) else 0
+
+    def fight_mongol_hunt_defence_bonus():
+        return 1 if fight_mongol_hunt_attack_bonus() else 0
+
     def fight_player_attack_roll():
         level = fight_player_level()
         dog_state = fight_dog_support_state()
         base_attack = 5 + level * 5
         random_attack = procedural_randint(0, level * 3, fight_rng_key("player_attack"))
-        attack_total = int(base_attack + fight_weapon_attack_points() + random_attack + int(dog_state.get("attack", 0) or 0))
+        attack_total = int(base_attack + fight_weapon_attack_points() + random_attack + int(dog_state.get("attack", 0) or 0) + fight_mongol_hunt_attack_bonus())
         if int(player.condition.energy or 0) < 20:
             attack_total -= 4
         if int(fight.status_state.get("locked_turns", 0) or 0) > 0:
@@ -460,7 +466,7 @@ init -20 python:
         dog_state = fight_dog_support_state()
         base_defence = 5 + level * 4
         random_defence = procedural_randint(0, level * 2, fight_rng_key("player_defence"))
-        defence_total = int(base_defence + fight_armor_defence_points() + random_defence + int(dog_state.get("defence", 0) or 0))
+        defence_total = int(base_defence + fight_armor_defence_points() + random_defence + int(dog_state.get("defence", 0) or 0) + fight_mongol_hunt_defence_bonus())
         if int(player.condition.energy or 0) < 15:
             defence_total -= 3
         if int(fight.status_state.get("stagger_turns", 0) or 0) > 0:

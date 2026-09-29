@@ -157,6 +157,8 @@ init python:
         if not closed_text:
             if str(people.location("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
+            if str(people.location("inga") or "") == "TavernMain" and str(Inga.schedule_state().get("label", "") or "") == "inga_lucas_tavern_guests":
+                desc_parts.append("Инга и Лукас сидят за столиком у окна. С открытием дороги в Куниделл у них опять полно дел, но субботний вечер они решили провести в вашем трактире.")
             service_workers = tavern_main_intimate_workers()
             liza_work = "liza" in service_workers
             georgett_work = "georgett" in service_workers

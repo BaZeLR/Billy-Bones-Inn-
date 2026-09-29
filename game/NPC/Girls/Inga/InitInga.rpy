@@ -13,6 +13,9 @@ init python:
             return False
         return str(people.get_data("eddie").getLocation(week_now, calendar_v2.hour) or "") != "GroceryStore"
 
+    def inga_tavern_guest_available():
+        return bool(threads["robinEddieRecovery"].completed) and int(Inga.acquaintance_stage or 0) >= 2
+
     class IngaData(PeopleData):
         code_name = "inga"
 
@@ -30,6 +33,17 @@ init python:
                 gift_preferences=["wild_rose_001", "soap_001", "lavender_001"],
                 base_clothing={"day_dress": "openworkdress", "bra": "simplebra", "panties": "simplepanties", "legs": "redstockings", "shoes": "simpleshoes"},
                 schedule_entries=[
+                    NPCScheduleEntry(
+                        location="TavernMain",
+                        weekdays=[6],
+                        start_hour=18,
+                        end_hour=22,
+                        awake=True,
+                        talkable=True,
+                        condition=inga_tavern_guest_available,
+                        priority=240,
+                        label="inga_lucas_tavern_guests",
+                    ),
                     NPCScheduleEntry(
                         location="GroceryStore",
                         weekdays=[1, 2, 3, 4, 5, 6],
@@ -121,6 +135,18 @@ init python:
             super(IngaInfo, self).update()
             self.data = IngaStaticData
             return self
+
+        def sherwood_private_time_available(self):
+            room_code = str(rooms.current_code or "")
+            return (
+                self.acquaintance_stage >= 2
+                and npc_friend_level("inga") >= 2
+                and room_code in ("GroceryStore", "BeckyHome", "TavernMain")
+                and str(people.location("inga") or "") == room_code
+                and player.intimacy.can_cum()
+                and self.can_have_sex_today()
+                and not self.sex_busy()
+            )
 
         def interaction_visible(self, room_code=""):
             if str(room_code or "").strip() == "BeckyHome":

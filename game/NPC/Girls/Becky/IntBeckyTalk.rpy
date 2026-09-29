@@ -79,6 +79,12 @@ label IntBeckyTalk(girl_name="becky"):
                 call story_becky_talk_eddie_after_sex_0(_becky_name)
             "Спросить, знает ли она от кого затяжелела" if Becky.talk_count() < 2 and Becky.rel >= 8 and int(Becky.stats.get("pregnancy", 0) or 0) >= 120 and str(DaddyAskBuildPhrase(_becky_name) or "") != "":
                 call story_becky_talk_pregnancy_0(_becky_name)
+            "Вспомнить о свободной дороге" if story_event_available("talk_becky", "sherwood_store"):
+                call checkTriggers("talk_becky", "sherwood_store", 0)
+                vscene grocery_store_grocer_picture("becky")
+            "Побыть с Бекки наедине" if threads["beckySherwoodStore"].completed and Becky.sherwood_store_private_available():
+                call BeckySherwoodStorePrivateTime
+                vscene grocery_store_grocer_picture("becky")
             "Насчет твоего предложения, в чем там все-таки дело?" if story_event_available("talk_becky", "becky_sherwood_offer_retry"):
                 call checkTriggers("talk_becky", "becky_sherwood_offer_retry", 0)
             "А чего ты сама с эльфами не торгуешь?" if Becky.talk_count() < 2 and int(threads["beckySherwoodTrade"].num or 0) >= 2 and not Becky.asked_about_elf_trade:

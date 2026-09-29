@@ -40,6 +40,14 @@ label IntIngaTalk(show_menu=True):
                 if str(rooms.current_code or "") == "GroceryStore":
                     $ scene_runtime.picture = "images/inga/newInga/inga_store_closeup_unlaced_clean.png"
                     vscene scene_runtime.picture
+            "Поговорить о спасённой дороге" if story_event_available("talk_inga", "sherwood_gratitude"):
+                call checkTriggers("talk_inga", "sherwood_gratitude", 0)
+                if str(rooms.current_code or "") == "GroceryStore":
+                    vscene "images/inga/newInga/inga_store_closeup_unlaced_clean.png"
+            "Провести время с Ингой" if threads["ingaSherwoodGratitude"].completed and Inga.sherwood_private_time_available():
+                call IngaSherwoodPrivateTime
+                if str(rooms.current_code or "") == "GroceryStore":
+                    vscene "images/inga/newInga/inga_store_closeup_unlaced_clean.png"
             "Попросить Ингу позаботиться и о вас" if str(rooms.current_code or "") == "GroceryStore" and npc_friend_level("inga") >= 2 and player.intimacy.can_cum() and Inga.can_have_sex_today():
                 $ scene_runtime.picture = "images/inga/StreetSex/minet1.jpg"
                 vscene scene_runtime.picture

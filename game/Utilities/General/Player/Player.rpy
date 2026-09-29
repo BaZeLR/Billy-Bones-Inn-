@@ -702,6 +702,16 @@ init -998 python:
             self.stolen_purchase_price = 0
             self.stolen_days = 0
             self.theft_attempted = False
+            self.stable_horses = []
+            self.carriage_ready = False
+
+        def add_stable_horse(self, name):
+            horses = list(getattr(self, "stable_horses", []) or [])
+            horse_name = str(name or "").strip()
+            if horse_name and horse_name not in horses:
+                horses.append(horse_name)
+            self.stable_horses = horses
+            return horse_name
 
         def owns_horse(self):
             return bool(str(self.name or "").strip())

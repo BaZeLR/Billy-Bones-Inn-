@@ -16,6 +16,14 @@ This document captures the scope explicitly requested in the current session (af
 
 ## Remaining Work (explicitly deferred — "this is all for now... we need todo on it")
 
+### Post-camp recovery now playable (2026-09-29)
+- After a camp victory, a separate one-time `robinCampLoot` event offers an optional search on the next Blackwood Road entry. Its four finds are registered inventory items and the chest pays 2,000 maravedi; declining leaves the search available.
+- After the camp report closes Zimmer's case, `robinEddieRecovery` plays on entry to Becky's open grocery store while Becky is present. MC returns Eddie's horse and the stolen purse to Becky; she thanks him. The purse has no established QSP amount, so it is not added to player money.
+- These new threads initialize for existing saves that have already won the fight and reported to Zimmer. Neither depends on replaying those completed events.
+- The Becky return awards +20 to the tavern visitor baseline and +3 fame once. It schedules Mongol's arrival three game days later. His event grants a horse (a spare if MC already owns one) and carriage, then adds him to the tavern household. Daily service splits a shed log into wood, clears ashes, prepares bath water when the shed is renovated and fuel is available, and reports on the horses and carriage. As a household member he consumes 0.1 sack of provisions daily; both horses incur feed cost. A forest-party option gives his hunting bonus. The full-moon Saturday guide is a separate one-time event using Clarissa's established moon/forest prerequisites.
+- Becky has a relationship/corruption-gated store invitation after the return; its completion and later repeat visits use her shared pregnancy check. Inga's gratitude and visits (alone or with Lucas after her existing shared-encounter thread) likewise use the shared conception path. Inga now participates in the daily pregnancy/birth lifecycle despite her secondary-NPC registry grouping. Inga and Lucas are Saturday evening tavern guests once the road is reopened and Inga is known.
+- Still pending: the two servant girls and their no-player-chore coverage, a playable carriage ride, Mongol's renovation proposal, the crafted fire-bottle assault gate, the peaceful branch, and full Cunidale trade. The current code must not be treated as completion of those parts.
+
 ### 1. Cunidale (Kunidell / Elven Village) — Full Content
 - Proper location for the elven village (trade with Becky's vegetables).
 - Dialog with elves (Lady Minetuel mentioned in old BeckyQuestInit).
@@ -32,13 +40,13 @@ This document captures the scope explicitly requested in the current session (af
   - MC must carry and use one existing crafted fire bottle
     (`fire_bomb_001`) during the assault. The camp event consumes that item;
     do not create a second quest-only fire-bottle item or mirror its quantity.
-  - Unique post-camp reward package, granted exactly once:
-    - recover Becky's stolen horse;
-    - receive exactly 2,000 maravedi;
-    - Mongol joins the tavern household as stableman and servant;
-    - one additional horse joins the tavern stable;
+  - Unique post-camp reward package (items marked above are now granted by separate one-time events):
+    - resolve any additional horse reward beyond Eddie's recovered horse;
+    - receive exactly 2,000 maravedi from the optional camp chest;
+    - Mongol joins the tavern household as stableman and servant three days after Becky receives Eddie's property;
+    - one additional horse joins the tavern stable with him;
     - Mongol's two servant girls join the household;
-    - a carriage becomes available for rides with tavern ladies.
+    - a carriage is delivered; rides with tavern ladies remain to be implemented.
   - The two servant girls take responsibility for cleaning, tending the fires,
     and maintaining the wood stock so MC no longer performs those routine
     duties while the servants are active and able to work.

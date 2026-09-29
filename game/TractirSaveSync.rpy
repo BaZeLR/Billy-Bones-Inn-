@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 108
+define currentVersion = 109
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -841,6 +841,9 @@ init -100 python:
         if loaded_version < 108:
             updateSave_V107()
             loaded_version = 108
+        if loaded_version < 109:
+            updateSave_V108()
+            loaded_version = 109
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3370,6 +3373,23 @@ init -100 python:
         quarters = rooms.get("NobilityQuarters")
         if quarters is not None and not any(room_exit.target == "TieflingHouse" for room_exit in quarters.exits):
             quarters.exits.append(next(room_exit for room_exit in roomDefinitions["NobilityQuarters"].exits if room_exit.target == "TieflingHouse"))
+        initThreads()
+
+    def updateSave_V108():
+        # Preserve NPC state while replacing saved schedules and room objects
+        # with the live Inga guest / Mongol stable / carriage definitions.
+        people.register(IngaStaticData, Inga)
+        MongolStaticData.set_schedule(mongol_schedule_entries())
+        for name, value in (
+            ("arrival_due_day", -1), ("tavern_servant", False),
+            ("arrival_day", -1), ("last_service_day", -1),
+            ("last_service_report", ""),
+        ):
+            Mongol.__dict__.setdefault(name, value)
+        people.register(MongolStaticData, Mongol)
+        player.horse.__dict__.setdefault("stable_horses", [])
+        player.horse.__dict__.setdefault("carriage_ready", False)
+        rooms.repair()
         initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded

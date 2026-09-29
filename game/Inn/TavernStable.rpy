@@ -6,7 +6,10 @@ init python:
         return player.horse.owns_horse()
 
     def tavern_stable_no_horse(_obj=None):
-        return not player.horse.owns_horse()
+        return not player.horse.owns_horse() and not list(getattr(player.horse, "stable_horses", []) or [])
+
+    def tavern_stable_carriage_present(_obj=None):
+        return bool(getattr(player.horse, "carriage_ready", False))
 
     def tavern_stable_can_saddle(_obj=None):
         return player.horse.owns_horse() and not player.horse.saddled
@@ -33,7 +36,7 @@ init python:
                 routine_pictures = person_data.image_sequence("tavern", "stable_grooming") if person_data is not None else []
                 if routine_pictures:
                     return procedural_choice(routine_pictures, "tavern_stable_%s_grooming_routine" % person)
-        if player.horse.owns_horse():
+        if player.horse.owns_horse() or list(getattr(player.horse, "stable_horses", []) or []):
             if is_day:
                 return "images/tavern/backyard/stables/horse-day.png"
             return "images/tavern/backyard/stables/stablehorse_night.png"
@@ -87,6 +90,13 @@ init python:
                 condition=tavern_stable_no_horse,
             ),
             GameObject(
+                object_id="carriage",
+                name="Карета",
+                description="Привезённая Монголом карета стоит под навесом; сбруя и дорожные принадлежности сложены рядом.",
+                actions=[ObjectAction(action_id="examine_carriage", label="Осмотреть карету", hook="text", target="Монгол держит карету наготове для поездок, проверяя колёса и ремни каждое утро.")],
+                condition=tavern_stable_carriage_present,
+            ),
+            GameObject(
                 object_id="tack",
                 name="Конская сбруя",
                 description="На стенах висят ремни, уздечки и прочая сбруя.",
@@ -130,6 +140,8 @@ init python:
         items = []
         for room_object in rooms.get("TavernStable").visible_game_items():
             items.append(MenuItem(room_object.name, Call("tavern_stable_object_menu", room_object.object_id)))
+        if bool(getattr(Mongol, "tavern_servant", False)) and str(people.location("mongol") or "") == "TavernStable":
+            items.append(MenuItem("Поговорить с Монголом", Call("MongolTavernTalk")))
         if tavern_stable_can_ride_to_kunidell():
             items.append(MenuItem("Купить провизию для эльфов у Бекки и отправится в Куниделл верхом", Call("TavernStableRideToKunidell")))
         if tavern_stable_can_walk_to_kunidell():
@@ -152,17 +164,25 @@ init python:
                     morning_grooms.append(people_display_name(person))
 
         if player.horse.owns_horse():
-            desc_parts.append("Сейчас в конюшне есть только один конь - %s. Хоть и не дикий, но все-таки жеребец." % str(player.horse.name))
+            desc_parts.append("В конюшне стоит ваш жеребец %s." % str(player.horse.name))
             if player.horse.saddled:
                 desc_parts.append("Конь уже оседлан и сбруя подогнана.")
             else:
                 desc_parts.append("Седло и сбруя висят рядом, коня можно оседлать перед дорогой.")
         else:
-            desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл в конюшне нет.")
+            if not list(getattr(player.horse, "stable_horses", []) or []):
+                desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл в конюшне нет.")
+
+        if list(getattr(player.horse, "stable_horses", []) or []):
+            desc_parts.append("В других денниках стоят лошади хозяйства: %s." % ", ".join(list(player.horse.stable_horses)))
+        if tavern_stable_carriage_present():
+            desc_parts.append("Под навесом ждёт привезённая Монголом карета.")
+        if bool(getattr(Mongol, "tavern_servant", False)) and str(people.location("mongol") or "") == "TavernStable":
+            desc_parts.append("Монгол проверяет сбрую и занимается лошадьми.")
 
         if morning_grooms:
             desc_parts.append("%s с утра приводит в порядок стойла и конскую сбрую." % ", ".join(morning_grooms))
-        elif not player.horse.owns_horse():
+        elif tavern_stable_no_horse() and str(people.location("mongol") or "") != "TavernStable":
             desc_parts.append("Здесь вообще никого, кроме вас, нет.")
 
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])

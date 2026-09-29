@@ -201,6 +201,9 @@ label MarketPlaceApproachMongol(mode_code=""):
 
 
 label MarketPlaceTalkMongol:
+    if str(rooms.current_code or "") in ("TavernStable", "Forest") and bool(getattr(Mongol, "tavern_servant", False)):
+        call MongolTavernTalk
+        return
     if not Mongol.known:
         call MarketPlaceApproachMongol("first")
     else:

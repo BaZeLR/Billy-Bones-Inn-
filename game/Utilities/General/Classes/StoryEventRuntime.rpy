@@ -1906,8 +1906,35 @@ define beckyThreadList = [
             130,
         ),
     ], highlight=False, threaded=False),
+    LThreadData(0, "becky", "SherwoodStore", [
+        "#bool(threads['robinEddieRecovery'].completed)",
+    ], [
+        (
+            "story_becky_sherwood_store_0",
+            None, None, None,
+            1, None,
+            ["#Becky.sherwood_store_private_available()"],
+            None,
+            "talk_becky", "sherwood_store", 95,
+        ),
+    ], highlight=False, threaded=True),
 ]
 define ingaThreadList = [
+    LThreadData(0, "inga", "SherwoodGratitude", [
+        "#bool(threads['robinEddieRecovery'].completed)",
+    ], [
+        (
+            "story_inga_sherwood_gratitude_0",
+            None, None, None,
+            1,
+            None,
+            ["#Inga.sherwood_private_time_available()"],
+            None,
+            "talk_inga",
+            "sherwood_gratitude",
+            75,
+        ),
+    ], highlight=True, threaded=True),
     # Becky unlocks this later Inga encounter in her post-visit conversation.
     # Its cursor belongs to Inga and cannot advance Becky's HomeFront thread.
     LThreadData(0, "inga", "GroceryMorning", "ingaGroceryMorningEnabled", [
@@ -1945,7 +1972,43 @@ define ingaThreadList = [
 define eddieThreadList = []
 define irmaThreadList = []
 define churchThreadList = []
-define mongolThreadList = []
+define mongolThreadList = [
+    LThreadData(0, "mongol", "TavernArrival", [
+        "#bool(threads['robinEddieRecovery'].completed)",
+        "#int(getattr(Mongol, 'arrival_due_day', -1) or -1) >= 0",
+    ], [
+        (
+            "story_mongol_tavern_arrival_0",
+            None, None, None,
+            1,
+            None,
+            ["#current_game_day() >= int(Mongol.arrival_due_day or 0)"],
+            None,
+            "TavernMain",
+            "enter",
+            -80,
+        ),
+    ], highlight=True, threaded=True),
+    LThreadData(0, "mongol", "MoonSabbathGuide", [
+        "#bool(threads['mongolTavernArrival'].completed)",
+    ], [
+        (
+            "story_mongol_moon_sabbath_guide_0",
+            6, (19, 22), 1,
+            1, None,
+            [
+                "#not Clara.mongol_case_detained()",
+                "#calendar_v2.moon_phase_name_en() == 'Full Moon'",
+                "#int(player.stats.exploration or 0) >= 100",
+                "#int(threads['claraForestSofa'].num or 0) >= 3",
+                "#not threads['claraForestSofa'].aborted",
+                "#Clara.wardrobe.owns('thiefdress')",
+            ],
+            None,
+            "talk_mongol", "moon_sabbath_guide", 40,
+        ),
+    ], highlight=False, threaded=True),
+]
 define cityGuardThreadList = []
 define robinThreadList = [
     LThreadData(0, "robin", "CampDestruction", [
@@ -1973,6 +2036,38 @@ define robinThreadList = [
             "talk_zimmer",
             "robin_camp_report",
             100,
+        ),
+    ], highlight=True, threaded=True),
+    LThreadData(0, "robin", "CampLoot", [
+        "#int(threads['robinCampDestruction'].num or 0) >= 1",
+    ], [
+        (
+            "story_robin_blackwood_camp_loot_0",
+            None, None, None,
+            1,
+            None,
+            ["#str(rooms.current_code or '') == 'BlackwoodRoad'"],
+            None,
+            "BlackwoodRoad",
+            "enter",
+            -90,
+        ),
+    ], highlight=True, threaded=True),
+    LThreadData(0, "robin", "EddieRecovery", [
+        "#int(threads['robinCampDestruction'].num or 0) >= 2",
+        "#int(Zimmer.robin_complaint_stage or 0) >= 4",
+        "#int(Eddie.fingal_talk_stage or 0) >= 2 or int(Becky.eddie_robbed_day or 0) > 0",
+    ], [
+        (
+            "story_robin_blackwood_eddie_recovery_0",
+            None, None, None,
+            1,
+            None,
+            ["#grocery_store_active_grocer_id() == 'becky'"],
+            None,
+            "GroceryStore",
+            "enter",
+            -90,
         ),
     ], highlight=True, threaded=True),
     LThreadData(0, "robin", "BlackwoodRoadAmbush", None, [

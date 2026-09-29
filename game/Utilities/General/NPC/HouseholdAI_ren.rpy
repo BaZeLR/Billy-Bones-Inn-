@@ -256,6 +256,8 @@ init 5 python:
                     residents.append(npc_id)
             if Clara.tavern_resident():
                 residents.append("clara")
+            if bool(getattr(Mongol, "tavern_servant", False)):
+                residents.append("mongol")
             return residents
 
         def member_count(self):
