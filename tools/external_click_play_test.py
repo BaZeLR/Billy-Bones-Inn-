@@ -7464,13 +7464,20 @@ testcase external_player_appearance_v47_migration:
 
 OPENING_DEVICE_CHECKS = r'''
 testcase external_opening_cinematic_new_game:
-    assert eval (all(renpy.loadable("images/intro/intro_%d.png" % index) for index in range(1, 17))) timeout 5.0
+    assert eval (all(renpy.loadable("images/intro/intro_%d.png" % index) for index in range(1, 23)) and renpy.loadable("images/intro/penny_ass.png")) timeout 5.0
     run Jump("Intro")
     advance until eval (renpy.get_screen("say") is not None and "Сначала вернулся звук" in str(renpy.get_screen("say").scope.get("what", ""))) timeout 90.0
-    assert eval (intro_cinematic_active and renpy.get_screen("main_ui") is None) timeout 5.0
+    assert eval (intro_cinematic_active and renpy.get_screen("main_ui") is None and renpy.get_screen("intro_letterbox") is not None) timeout 5.0
     screenshot "external_opening_first_frame.png"
+    advance until eval (renpy.get_screen("say") is not None and "Ты дрался с Темпест" in str(renpy.get_screen("say").scope.get("what", ""))) timeout 90.0
+    screenshot "external_opening_evil_explains_fight.png"
+    advance until eval (renpy.get_screen("say") is not None and "pickle cock" in str(renpy.get_screen("say").scope.get("what", ""))) timeout 90.0
+    screenshot "external_opening_penny_wrong_picture.png"
+    advance until eval (renpy.get_screen("say") is not None and "Wrong picture" in str(renpy.get_screen("say").scope.get("what", ""))) timeout 90.0
+    screenshot "external_opening_evil_wrong_picture_line.png"
+    advance until eval (renpy.get_screen("say") is not None and str(renpy.get_screen("say").scope.get("what", "")) == "М-ха-ха!") timeout 90.0
     advance until screen "choice" timeout 90.0
-    assert eval (not intro_cinematic_active and str(rooms.current_code or "") == "Intro") timeout 5.0
+    assert eval (not intro_cinematic_active and renpy.get_screen("intro_letterbox") is None and str(rooms.current_code or "") == "Intro") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and renpy.get_screen("main_ui") is not None) timeout 30.0
 
 testcase external_opening_cinematic_main_menu_replay:

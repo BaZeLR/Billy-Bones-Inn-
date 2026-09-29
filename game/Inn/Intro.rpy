@@ -7,6 +7,12 @@ define intro_evil = Character("Доктор Ивил")
 define intro_penny = Character("Пенни")
 
 
+screen intro_letterbox():
+    zorder -1
+    add Solid("#000000") xpos 0 ypos 0 xysize (config.screen_width, 90)
+    add Solid("#000000") xpos 0 yalign 1.0 xysize (config.screen_width, 244)
+
+
 label Intro:
     scene black
     hide screen status
@@ -30,6 +36,7 @@ label Intro:
 
 label OpeningCinematic:
     $ intro_cinematic_active = True
+    show screen intro_letterbox
 
     scene expression Transform("images/intro/intro_1.png", xysize=(config.screen_width, config.screen_height), fit="cover") with Fade(0.2, 0.1, 0.4)
     "Сначала вернулся звук: тележные колёса, крики торговцев, звон подков по булыжнику. Потом — чужой город и собственные руки в нелепых чёрных перчатках."
@@ -79,26 +86,47 @@ label OpeningCinematic:
     "Вы сели на кровать, сняли огромные перчатки и раскрыли экран коммуникатора на предплечье. Зелёная полоска связи едва дрожала."
     intro_steven "Доктор? Вы меня слышите?"
 
-    scene expression Transform("images/intro/intro_14.png", xysize=(config.screen_width, config.screen_height), fit="cover") with dissolve
-    "Экран зашипел. Сквозь плотные полосы помех проступило знакомое лысое лицо."
+    scene expression Transform("images/intro/intro_22.png", xysize=(config.screen_width, config.screen_height), fit="cover") with dissolve
+    "Экран зашипел. Коммуникатор плотно охватывал ваше голое предплечье; за ним вы видели собственную ладонь. Сквозь плотные полосы помех проступило знакомое лысое лицо."
+    scene black
+    show expression Transform("images/intro/intro_17.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
     intro_evil "Стивен! Живой! Чёрт побери, мы так волновались. Даже Пенни!"
-    intro_evil "Ты дрался с той богиней — Темпест. Потом вы исчезли вместе. Наши учёные едва поймали твой сигнал: пространство и время там перекручены."
+    scene black
+    show expression Transform("images/intro/intro_20.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    intro_evil "Ты дрался с Темпест — сверхчеловеком по прозвищу «Богиня». Она остановила тебя среди колонн, а потом бросилась в атаку."
+    scene black
+    show expression Transform("images/intro/intro_21.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    intro_evil "Её удар расколол камень. Вокруг вас замкнулось сияющее поле — мы видели это на записи."
+    scene expression Transform("images/intro/intro_16.png", xysize=(config.screen_width, config.screen_height), fit="cover") with vpunch
+    intro_evil "Потом вы исчезли вместе. Наши учёные едва поймали твой сигнал: пространство и время там перекручены."
+    "Вспышка памяти: белый халат, защитные очки, огромные чёрные перчатки. Вы пытались удержать удар Темпест — и оба провалились в ослепительный разлом."
+    scene expression Transform("images/intro/intro_22.png", xysize=(config.screen_width, config.screen_height), fit="cover") with dissolve
     intro_steven "Я в каком-то трактире. Меня зовут Стефаном. В зеркале — чужое лицо."
-    intro_evil "Я вижу. Выглядишь... иначе. Но это сейчас не главное. Не привлекай внимания. Мы разберёмся, куда тебя забросило и как вернуть."
+    scene black
+    show expression Transform("images/intro/intro_18.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    intro_evil "Я вижу. Выглядишь... иначе. Но это сейчас не главное. Держись и не привлекай внимания, Стивен. Мы разберёмся, куда тебя забросило и как вернуть."
+    scene black
+    show expression Transform("images/intro/intro_19.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
     intro_evil "Пенни здесь, она хочет поздороваться. Только не пугай её своим новым видом. М-ха-ха!"
 
+    scene black
+    show expression Transform("images/intro/penny_ass.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    "Вместо лица Пенни на экране неожиданно появился её снимок. Из динамика сквозь помехи донёсся её голос."
+    intro_penny "Stevie! hello pickle cock... you basta... pshhhh!"
     scene expression Transform("images/intro/intro_15.png", xysize=(config.screen_width, config.screen_height), fit="cover") with dissolve
-    "Вместо изображения Пенни по экрану побежал густой снег. Её голос пробился сквозь треск на одно мгновение."
-    intro_penny "Стивен! Ну наконец-то! Я уже хотела сама вытащить тебя за шиворот! Ты меня видишь?.."
-    "Экран мигнул чужим, неверным кадром. Наступила тишина."
+    intro_evil "Упс. Wrong picture..."
+    scene black
+    show expression Transform("images/intro/intro_19.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    intro_evil "М-ха-ха!"
+    scene black
+    show expression Transform("images/intro/intro_18.png", xysize=(config.screen_height, config.screen_height), fit="contain", xalign=0.5, yalign=0.5) with dissolve
+    intro_evil "Тише. Не высовывайся и береги себя. Дождись нашей связи."
 
-    scene expression Transform("images/intro/intro_16.png", xysize=(config.screen_width, config.screen_height), fit="cover") with Fade(0.2, 0.1, 0.4)
-    "Вспышка памяти: белый халат, защитные очки, огромные чёрные перчатки. Темпест бросается на вас среди рушащихся колонн; вокруг её руки замыкаются сияющие кольца времени."
-    "Вы пытаетесь удержать удар — и оба проваливаетесь в ослепительный разлом."
+    scene expression Transform("images/intro/intro_13.png", xysize=(config.screen_width, config.screen_height), fit="cover") with Fade(0.2, 0.1, 0.4)
     intro_steven "Теперь ясно. Она использовала ловушку времени... и я попал сюда вместе с ней."
 
-    scene expression Transform("images/intro/intro_13.png", xysize=(config.screen_width, config.screen_height), fit="cover") with dissolve
     "Связь оборвалась. За дверью слышались голоса Сандры, Мелиссы и Аманды. Этот трактир был домом Стефана; пока вы не найдёте дорогу назад, он станет и вашим."
+    hide screen intro_letterbox
     $ intro_cinematic_active = False
     return
 

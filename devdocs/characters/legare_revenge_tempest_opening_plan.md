@@ -84,9 +84,9 @@ The Sofa/witch supply line is a distinct ordered quest, not hidden state in the 
 
 ## Replacement opening: playable order and memory reveal
 
-The playable prologue now starts at the Market, three weeks after Steven/Tempest vanish, and follows the guard, Blind Pirate news, Sandra's reunion, tavern-team confrontation, Duchess Conchitta's letter, Stephan's childhood/sailor memory flashes, and the damaged comm-unit call. Steven remembers the time-field attack before play begins. `Intro` calls the returnable `OpeningCinematic` label and then enters the normal tavern checkpoint; the main-menu `Introduction` entry calls the same label and returns to the menu. The sequence uses native Ren'Py dialogue over full-screen art with a bottom text window; it does not use the room HUD or the obsolete JSON slideshow. The original two memory pictures remain untouched.
+The playable prologue now starts at the Market, three weeks after Steven/Tempest vanish, and follows the guard, Blind Pirate news, Sandra's reunion, tavern-team confrontation, Duchess Conchitta's letter, Stephan's childhood/sailor memory flashes, and the damaged comm-unit call. Steven remembers the time-field attack before play begins. `Intro` calls the returnable `OpeningCinematic` label and then enters the normal tavern checkpoint; the main-menu `Introduction` entry calls the same label and returns to the menu. The sequence uses native Ren'Py dialogue over full-screen art with black cinematic bars above and below, and the bottom text window; it does not use the room HUD or the obsolete JSON slideshow. The original two memory pictures remain untouched.
 
-All playable art is numbered in `game/images/intro/`:
+The numbered shots and the supplied Penny picture live in `game/images/intro/`:
 
 | Frame | Scene |
 | --- | --- |
@@ -96,13 +96,16 @@ All playable art is numbered in `game/images/intro/`:
 | `intro_9`–`intro_10` | Inheritance letter and Steven's mirror shock. |
 | `intro_11`–`intro_12` | Corrected memory: uncle expels young Stephan from Wild Stallion before Sandra/young Melissa/young Amanda; later Stephan as sailor. |
 | `intro_13` | Steven on his bed, gloves off, checking the wrist unit; reused when the call dies. |
-| `intro_14` | Dr Evil on the comm screen through heavy time-space interference. |
-| `intro_15` | Static-covered screen and Penny's brief voice: **portrait placeholder** until her reference is supplied. |
-| `intro_16` | Flashback to Steven and Tempest colliding inside the time-field. |
+| `intro_14`–`intro_15` | Earlier wrist-screen art retained as source/reference; `intro_15` supplies the brief static interruption. |
+| `intro_16` | Steven and Tempest colliding inside the time-field, shown **during** Dr Evil's explanation. |
+| `intro_17`–`intro_19` | The three supplied Dr Evil reactions: startled, finger to lips, and laughing; all appear in the call. |
+| `intro_20`–`intro_21` | The two supplied Tempest images, intercut with Dr Evil's explanation before the collision shot. |
+| `intro_22` | Corrected communicator close-up: human forearm, wrist, open palm and fingers all visible. |
+| `penny_ass` | User-supplied mistaken picture appears in Penny's interrupted feed. Dr Evil says “Wrong picture” over static immediately before his laugh; the words are not baked into the art. |
 
 The two separate `GameItem`s, `comm_unit_001` (wrist) and `vibranium_ring_001` (finger), use `game/images/general/comm_unit_item.png` and `game/images/general/vibranium_ring_item.png`. Fresh Player state begins with both worn. The player card can remove/replace them, and the bedroom chest can store/retrieve them without a second inventory authority. Existing saves do not receive them automatically; no retroactive grant is planned without a migration decision.
 
-The peasant's opening account is narrative only: it does **not** mark the independent `cityBlindPirateFall` Market-entry event completed. The three missing weeks also do not advance the live calendar. Penny's image and fuller dialogue remain pending her reference; `intro_15.png` deliberately shows only the interrupted feed. The later Franchesca/mirror arc explains this opening but must never jump back to it or reset game state.
+The peasant's opening account is narrative only: it does **not** mark the independent `cityBlindPirateFall` Market-entry event completed. The three missing weeks also do not advance the live calendar. The supplied Penny image is the deliberate mistaken feed; a separate live-call portrait is not needed for this joke. “Goddess” is Tempest's superhero nickname, not a deity classification. The later Franchesca/mirror arc explains this opening but must never jump back to it or reset game state.
 
 ## Implementation boundaries and acceptance checks
 
