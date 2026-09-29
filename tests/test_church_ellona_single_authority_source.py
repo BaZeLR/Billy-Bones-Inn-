@@ -40,6 +40,15 @@ def test_completed_church_repairs_use_renpy_strikethrough_tags():
     assert 'entry = "[s]{}[/s]".format(entry)' not in church
 
 
+def test_each_distinct_pledge_rewards_attendance_and_temporary_fame_once():
+    church = source("game/Town/Church/ShowChurchDraupnirList.rpy")
+    donate = church.split("label ChurchDonate(donation_idx=0):", 1)[1]
+
+    assert donate.index("church_repair_is_donated(idx)") < donate.index("record_church_donation(idx, cost)")
+    assert donate.index("record_church_donation(idx, cost)") < donate.index("player.tavern_management.visitors += 5")
+    assert donate.index("player.tavern_management.visitors += 5") < donate.index("player.change_tavern_fame(1)")
+
+
 def test_ellona_blessing_and_curse_state_is_owned_by_player_intimacy():
     player = source("game/Utilities/General/Player/Player.rpy")
     prayer = source("game/Town/Temple/EllonaBirthPrayMenu.rpy")

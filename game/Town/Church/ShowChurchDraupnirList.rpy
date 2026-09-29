@@ -35,8 +35,12 @@ label ChurchDonate(donation_idx=0):
     $ renpy.dynamic("idx", "cost")
     $ idx = int(donation_idx or 0)
     $ cost = CHURCH_REPAIR_COSTS[idx]
+    if player.economy.church_repair_is_donated(idx) or player.economy.church_donated_today > 0 or player.economy.money <= cost:
+        return
     $ player.spend_money(cost)
     $ player.economy.record_church_donation(idx, cost)
+    $ player.tavern_management.visitors += 5
+    $ player.change_tavern_fame(1)
     $ player.set_stat("notoriety", 0)
 
     $ scene_runtime.text = "Решив, что грех будет не помочь святому отцу, вы полезли в кошелек и с радостным сердцем отсчитали {} мараведи.\n\n\"Вот, святой отец,\" сказали вы, \"жертвую на {}\"".format(cost, CHURCH_REPAIR_DONATION_TARGETS[idx])
