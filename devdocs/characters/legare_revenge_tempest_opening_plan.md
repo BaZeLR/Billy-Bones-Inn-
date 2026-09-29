@@ -91,6 +91,7 @@ Opening art sequence prepared (all staged, **not yet wired into the current `Int
 1. `game/images/general/intro_market_stephan_medical_v2.png` — Stephan wakes at the Market wearing the buttoned chef-like medical robe, huge black insulated rubber gloves and steampunk safety goggles, and examines the communication ring. The earlier `intro_market_stephan_medical.png` remains as the first version; do not overwrite it.
 2. `game/images/general/intro_market_guard_nearmiss_wide.png` — a mounted city guard almost rides into him; wide view of the horse stopping and Stephan recoiling in fright.
 3. `game/images/general/intro_market_guard_nearmiss_stephan_close.png` — close-up of Stephan's startled face from the same instant.
+4. `game/images/general/intro_market_peasant_blind_pirate_story.png` — an unnamed peasant tells Stephan of the Blind Pirate proprietor's ruin and points to the receding cage wagon; Stephan's face shows awe and shock. This shot follows the cage reveal, but remains staged until the replacement prologue owns its dialogue and image sequence.
 
 The existing `cityBlindPirateFall` Market-entry event now uses `game/images/market/blindPirate_liza_georgette.png`: the former proprietor remains inside the cage, while Georgette and Lizette are recognizable and visibly crying outside it. Its original image remains on disk. This event is already playable on an eligible Market entry; connecting it to the replacement new-game prologue is still future work.
 
