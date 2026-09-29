@@ -29,7 +29,8 @@ def test_blind_pirate_uses_event_engine_and_authored_label():
     assert market.index(trigger) < market.rindex(picture_seed) < market.index(description)
     assert "label MarketPlaceBlindPirateEvent:" not in market
     assert "town_street" not in market
-    assert "vscene " in event
+    assert 'vscene "images/market/blindPirate_liza_georgette.png"' in event
+    assert (ROOT / "game/images/market/blindPirate_liza_georgette.png").is_file()
     assert event.count('$ scene_runtime.text = ') == 4
     assert event.count('"[scene_runtime.text]"') == 4
     assert "_market_room.descriptions" not in event

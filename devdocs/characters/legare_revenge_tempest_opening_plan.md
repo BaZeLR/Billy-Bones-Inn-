@@ -92,6 +92,8 @@ Opening art sequence prepared (all staged, **not yet wired into the current `Int
 2. `game/images/general/intro_market_guard_nearmiss_wide.png` — a mounted city guard almost rides into him; wide view of the horse stopping and Stephan recoiling in fright.
 3. `game/images/general/intro_market_guard_nearmiss_stephan_close.png` — close-up of Stephan's startled face from the same instant.
 
+The existing `cityBlindPirateFall` Market-entry event now uses `game/images/market/blindPirate_liza_georgette.png`: the former proprietor remains inside the cage, while Georgette and Lizette are recognizable and visibly crying outside it. Its original image remains on disk. This event is already playable on an eligible Market entry; connecting it to the replacement new-game prologue is still future work.
+
 These pictures do not replace the text-bearing opening by themselves. Author and validate the full new-game scene sequence before changing `Intro`.
 
 The late Franchesca/mirror arc reveals **why** those opening images and the memory gap occurred. It must not jump back to `Intro` or reset the calendar, inventory, relationships, completed threads, or saves. The live `Intro.rpy` still contains the old inheritance opening and jumps into tavern play; replacing it is **not implemented** by this plan. The exact identity/memory mechanism, Penny's first scene, and whether the three missing weeks count in the game's day counter remain design decisions. Do not invent them while coding the opener.
