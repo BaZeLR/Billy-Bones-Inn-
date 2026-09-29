@@ -98,6 +98,11 @@ Opening art sequence prepared (all staged, **not yet wired into the current `Int
 8. `game/images/general/intro_kitchen_amanda_checks_breath.png` — side close-up as Amanda checks Stephan's breath for ale, then realizes he is sober. Her planned line is verbatim: “He's sober! this is getting more weird”.
 9. `game/images/general/intro_player_room_read_letter_v2.png` — alone in his shabby room, Stephan opens and reads the inheritance letter. His face follows the default player-card portrait; the table is against the room's right wall, with the bed on the left. He still wears the robe and rubber gloves, with his goggles lifted to reveal his face. The earlier `intro_player_room_read_letter.png` and `intro_letter_scene.png` remain untouched.
 10. `game/images/general/intro_player_room_mirror_shock.png` — Stephan touches his cheek and stares at his own face in an ordinary room mirror, horrified. His planned line is verbatim: “This is me!? How come!?” The room mirror is not Hordus's later quest item.
+11. `game/images/general/intro_memory_uncle_confrontation.png` — first memory flash: young-adult Stephan faces his angry uncle at the door of the uncle's rural home.
+12. `game/images/general/intro_memory_evicted_from_home.png` — the uncle sends Stephan away; Stephan looks back from the rain-soaked road with his travel sack.
+13. `game/images/general/intro_memory_sailor_on_deck.png` — a later flash shows the same young-adult Stephan working rigging on a merchant ship's deck.
+
+These three new flashback images follow Stephan's player-card identity and the current opening's realistic style. The older `memory_uncle_throws_stephan.png` and `memory_ship_deck.png` remain untouched. The flashbacks are prepared art, not yet connected to the live `Intro` label; their dialogue and timing must be preserved or settled when that playable sequence is authored.
 
 The existing `cityBlindPirateFall` Market-entry event now uses `game/images/market/blindPirate_liza_georgette.png`: the former proprietor remains inside the cage, while Georgette and Lizette are recognizable and visibly crying outside it. Its original image remains on disk. This event is already playable on an eligible Market entry; connecting it to the replacement new-game prologue is still future work.
 
