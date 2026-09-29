@@ -19,7 +19,7 @@ def test_ledger_owns_the_native_weekly_premium_decision():
     assert '"Продолжить":' in scene
     assert "main_ui_end_native_scene_state()" in scene
     assert "for girl_id, info in people.girl_items()" in scene
-    assert "if info.is_tavern_worker()" in scene
+    assert "if tavern.is_team_member(girl_id)" in scene
     assert "_tavern_team_keys" not in scene
     assert "while _premium_index" not in scene
     assert "Рассмотреть следующую кандидатуру" not in scene

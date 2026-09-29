@@ -37,6 +37,8 @@ init -20 python:
 
         def can_play(self, room_code=""):
             room_key = str(room_code or "")
+            if self.event_type == "harrass" and tavern.client_touch_policy == "hands_off":
+                return False
             if room_key not in self.locations:
                 return False
             if self.requires_open and not player.tavern_management.isTavernOpen:
@@ -123,6 +125,24 @@ init -20 python:
         )
 
 
+    def tavern_work_client_referral_ready():
+        return bool(
+            (tavern_work_job_candidates("jobwaitress") or tavern_work_job_candidates("jobcleaning"))
+            and (tavern_work_job_candidates("jobwhore") or tavern_work_job_candidates("jobgloryhole"))
+        )
+
+
+    def tavern_work_client_referral_playable(room_code=""):
+        if str(room_code or "") != "TavernMain":
+            return False
+        guides = set(tavern_work_job_candidates("jobwaitress", "TavernMain") + tavern_work_job_candidates("jobcleaning", "TavernMain"))
+        return bool(
+            tavern_work_client_referral_ready()
+            and people.available_tavern_service_workers()
+            and any(people.get_info(key).tavern_service_target(False) == "" for key in guides)
+        )
+
+
     def tavern_work_roll(chance, key):
         chance_value = max(0, min(100, tavern_work_int(chance, 0)))
         if chance_value <= 0:
@@ -183,6 +203,8 @@ init -20 python:
         period_value = tavern_work_int(period, 0)
         codes = []
         for row in list(event_runtime.tavern_work_events or []):
+            if str(row.get("type", "") or "") == "harrass" and tavern.client_touch_policy == "hands_off":
+                continue
             mandatory = bool(row.get("mandatory", False))
             if mandatory:
                 if include_mandatory and period_value == 10:
@@ -223,6 +245,8 @@ init -20 python:
         )
         harassment_events_per_job = 1 if intimate_workers.intersection(("georgett", "liza")) else 2
         for event_type in tavern_work_random_type_order:
+            if event_type == "harrass" and tavern.client_touch_policy == "hands_off":
+                continue
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:
                 continue
@@ -314,6 +338,8 @@ init -20 python:
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             if bool(row.get("mandatory", False)):
                 continue
+            if str(row.get("type", "") or "") == "harrass" and tavern.client_touch_policy == "hands_off":
+                continue
             event_def = tavern_work_definition(str(row.get("code", "") or ""))
             if event_def is not None:
                 if not event_def.period_matches(row.get("period", 0), tp, require_room_match):
@@ -386,6 +412,7 @@ define tavern_work_events_by_type = {
     "tavern_story": [
         TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=15, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50, locations=TAVERN_AMANDA_LIZA_TALK_ROOMS, requires_open=False, after_breakfast=True, rolls=3),
         TavernWorkEventDefinition("LizaWenchStory", "tavern_story", "EventLizaWenchStory", periods=(2, 3, 4, 5), chance=25, required_job="jobwaitress", condition=tavern_work_liza_wench_scheduled, play_condition=tavern_work_liza_wench_playable, priority=55),
+        TavernWorkEventDefinition("ClientReferral", "tavern_story", "event_tavern_client_referral", periods=(2, 3, 4), chance=40, condition=tavern_work_client_referral_ready, play_condition=tavern_work_client_referral_playable, priority=60),
     ],
     "theft": [],
     "big_fight": [],
@@ -404,3 +431,30 @@ label TavernWorkEventTrigger:
         $ scene_runtime.location_text = scene_runtime.text
         return True
     return True
+
+
+label event_tavern_client_referral(eyewitness=0):
+    $ renpy.dynamic("_referral_guides", "_referral_source", "_referral_target", "_referral_info", "_referral_place", "_referral_text")
+    if not eyewitness:
+        return "Работницы объясняли посетителям, к кому обратиться, и направляли желающих к свободным девушкам на их рабочих местах."
+    $ _referral_guides = [key for key in sorted(set(tavern_work_job_candidates("jobwaitress", "TavernMain") + tavern_work_job_candidates("jobcleaning", "TavernMain"))) if people.get_info(key).tavern_service_target(False) == ""]
+    $ _referral_source = procedural_choice(_referral_guides, "client_referral_guide_%s_%s" % (current_game_day(), calendar_v2.time_slot())) if _referral_guides else ""
+    $ _referral_target = procedural_choice(people.available_tavern_service_workers(), "client_referral_worker_%s_%s" % (current_game_day(), calendar_v2.time_slot()))
+    $ _referral_info = people.get_info(_referral_target)
+    if not _referral_source or _referral_info is None:
+        return ""
+    $ _referral_place = _referral_info.tavern_service_target(False)
+    $ _referral_text = "%s объясняет посетителю, к кому обратиться: %s %s. Посетитель благодарит ее и идет куда направили." % (people_display_name(_referral_source), people_display_name(_referral_target), "принимает гостей за ширмой глорихола" if _referral_place == "gloryhole" else "свободна в гостевой комнате")
+    if tavern.client_touch_policy == "hands_off":
+        $ _referral_text = "%s напоминает посетителю, что других работниц трогать нельзя. " % people_display_name(_referral_source) + _referral_text
+    $ main_ui_begin_native_scene_state("Гость в трактире")
+    show screen main_ui
+    vscene tavern_main_picture()
+    $ scene_runtime.text = _referral_text
+    $ scene_runtime.location_text = _referral_text
+    menu:
+        "Продолжить":
+            pass
+    $ _referral_info.accept_tavern_client(1)
+    $ main_ui_end_native_scene_state()
+    return ""

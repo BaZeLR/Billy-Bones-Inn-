@@ -106,6 +106,9 @@ init python:
             "legare_confrontations": 0,
             "legare_choice_start_day": -1,
             "legare_choice_outcome": "",
+            "legare_service_decision_day": -1,
+            "legare_service_savings": 0,
+            "legare_service_reconciled": False,
         }
 
         def __init__(self):
@@ -240,6 +243,21 @@ init python:
         def initialize_new_game_state(self):
             self.ensure_story_defaults()
             return self
+
+        def social_action_allowed(self, action="", item_id=""):
+            if (str(action or "").strip().lower() == "talk"
+                    and self.var_value("legare_choice_outcome", "") == "service"
+                    and not bool(self.var_value("legare_service_reconciled", False))
+                    and current_game_day() < self.var_int("legare_service_decision_day", -1) + 14):
+                return False
+            return super(AmandaInfo, self).social_action_allowed(action, item_id)
+
+        def tavern_job_available(self, job_key):
+            if (self.var_value("legare_choice_outcome", "") == "service"
+                    and not bool(self.var_value("legare_service_reconciled", False))
+                    and str(job_key or "") in ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow")):
+                return False
+            return super(AmandaInfo, self).tavern_job_available(job_key)
 
         def record_first_partner(self, partner):
             if not self.first_partner:

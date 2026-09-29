@@ -102,8 +102,15 @@ label NextDay(retlocname, timepassed):
 
     # Calculate revenues
     python:
-        TotalDay['whorerevenue'] = sum(TotalWhoreClients.values()) * 3
-        TotalDay['gloryholerevenue'] = sum(TotalGloryHoleClients.values()) * 2
+        TotalDay['whorerevenue'] = sum(tavern.service_house_revenue(girl, "intimate", count) for girl, count in TotalWhoreClients.items())
+        TotalDay['gloryholerevenue'] = sum(tavern.service_house_revenue(girl, "gloryhole", count) for girl, count in TotalGloryHoleClients.items())
+        Amanda.add_var_int("legare_service_savings", tavern.service_worker_revenue("amanda", "intimate", TotalWhoreClients.get("amanda", 0)) + tavern.service_worker_revenue("amanda", "gloryhole", TotalGloryHoleClients.get("amanda", 0)))
+        if (Amanda.var_value("legare_choice_outcome", "") == "service"
+                and not Amanda.var_value("legare_service_reconciled", False)
+                and Amanda.var_int("legare_service_savings", 0) >= barber_shop_haircut_price("female")
+                and not household.barber_appointments.get("amanda", 0)
+                and current_game_day() - int(household.barber_visit_last_day.get("amanda", -14) or -14) >= 14):
+            household.barber_appointments["amanda"] = 1
         
         player.economy.tavern_fame += TotalDay['loyalty']
         _nextday_money_delta = (TotalDay['revenue'] - TotalDay['dineout'] - TotalDay['fixedcost'] +
@@ -119,13 +126,18 @@ label NextDay(retlocname, timepassed):
                 dress_name = ShortDressName.get(dress_shop.produced, dress_shop.produced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
                 player.appearance.replace_dress(dress_shop.produced, int(current_game_day()))
+            elif dress_shop.buyer == 'amanda':
+                Amanda.wardrobe.add_owned(dress_shop.produced)
+                Amanda.wardrobe.set_day_dress(dress_shop.produced)
+                NewDressCame = 'Ирма прислала Аманде заказанное ею платье. За обновку она расплатилась из своих денег.'
                 
-            if player.economy.money >= 50:
-                NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
-                player.spend_money(5)
-            else:
-                NewDressCame += f' Вы забрали заказ, проигнорировав протянутую ладошку мальчишки и не дав ему ничего на чай. А обновку вы положили в ларь.'
-                Irma.change_social(friend_delta=-1)
+            if dress_shop.buyer != 'amanda':
+                if player.economy.money >= 50:
+                    NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
+                    player.spend_money(5)
+                else:
+                    NewDressCame += f' Вы забрали заказ, проигнорировав протянутую ладошку мальчишки и не дав ему ничего на чай. А обновку вы положили в ларь.'
+                    Irma.change_social(friend_delta=-1)
                 
         dress_shop.produced = ''
         dress_shop.buyer = ''

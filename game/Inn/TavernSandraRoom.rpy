@@ -296,7 +296,7 @@ label TavernSandraLedgerScene:
         _premium_workers = [
             (girl_id, info)
             for girl_id, info in people.girl_items()
-            if info.is_tavern_worker()
+            if tavern.is_team_member(girl_id)
         ]
         _premium_worker_ids = set([girl_id for girl_id, info in _premium_workers])
         _premium_worker_count = len(_premium_workers)

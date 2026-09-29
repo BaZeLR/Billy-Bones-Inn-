@@ -303,7 +303,7 @@ init python:
 
     def tavern_breakfast_soap_request_girl():
         for npc_id in list(tavern_breakfast_present_ids() or []):
-            if npc_id in ("sandra", "melissa", "amanda") and household_soap_request_ready(npc_id):
+            if npc_id in ("sandra", "melissa", "amanda") and people.get_info(npc_id).social_action_allowed("talk") and household_soap_request_ready(npc_id):
                 return npc_id
         return ""
 
@@ -313,7 +313,7 @@ init python:
             return "sandra"
         if "melissa" in present_ids and story_event_available("TavernKitchen", "melissa_dress_request"):
             return "melissa"
-        if "amanda" in present_ids and story_event_available("TavernKitchen", "amanda_dress_request"):
+        if "amanda" in present_ids and Amanda.social_action_allowed("talk") and story_event_available("TavernKitchen", "amanda_dress_request"):
             return "amanda"
         return ""
 
@@ -325,7 +325,7 @@ init python:
             if npc_id not in ("sandra", "amanda", "melissa"):
                 continue
             info = people.get_info(npc_id)
-            if info is None or not info.date_intimacy_available():
+            if info is None or not info.social_action_allowed("talk") or not info.date_intimacy_available():
                 continue
             last_tease_day = people_to_int(getattr(info, "breakfast_tease_day", -1), -1)
             if last_tease_day == current_game_day():
@@ -451,7 +451,7 @@ init python:
         rows = []
         for npc_id in list(tavern_breakfast_present_ids() or []):
             key = str(npc_id or "").strip().lower()
-            if key in ("sandra", "melissa", "amanda"):
+            if key in ("sandra", "melissa", "amanda") and people.get_info(key).social_action_allowed("talk"):
                 rows.append(key)
         return rows
 
@@ -955,7 +955,7 @@ init python:
         candidates = []
         for npc_id in list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids()):
             info = people.get_info(npc_id)
-            if not isinstance(info, Girl) or not info.is_tavern_worker():
+            if not isinstance(info, Girl) or not tavern.is_team_member(npc_id):
                 continue
             if int(info.rel or 0) < 5 or not people.is_awake(npc_id):
                 continue
@@ -1783,7 +1783,7 @@ label TavernKitchenBreakfastLookAtGirl(girl_name=""):
     if _breakfast_look_girl not in list(tavern_breakfast_present_ids() or []):
         return
     $ _breakfast_look_info = people.get_info(_breakfast_look_girl)
-    if _breakfast_look_info is None:
+    if _breakfast_look_info is None or not _breakfast_look_info.social_action_allowed("talk"):
         return
     $ _breakfast_look_origin_picture = str(scene_runtime.picture or "")
     $ _breakfast_look_origin_text = str(scene_runtime.text or "")

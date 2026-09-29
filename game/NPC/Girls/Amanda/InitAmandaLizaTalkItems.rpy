@@ -53,11 +53,14 @@ init python:
     def amanda_liza_room_rejection_condition():
         return Amanda.var_int("fuckyou", 0) == 0 and not Amanda.room_rescue_called and Amanda.room_entry_blocked_today
 
+    def amanda_liza_legare_warning_known():
+        return threads["claraAmandaWarning"].completed or threads["amandaStreetDiscipline"].completed
+
     def amanda_liza_legare_forbidden_naive_condition():
-        return Amanda.corruption < 25 and Amanda.legare_forbidden
+        return Amanda.corruption < 25 and Amanda.legare_forbidden and not amanda_liza_legare_warning_known()
 
     def amanda_liza_legare_forbidden_defiant_condition():
-        return Amanda.corruption >= 25 and Amanda.legare_forbidden
+        return Amanda.corruption >= 25 and Amanda.legare_forbidden and not amanda_liza_legare_warning_known()
 
     def amanda_liza_prohibit_liza_condition():
         return Amanda.var_int("prohibitliza", 0)
@@ -66,13 +69,13 @@ init python:
         return Amanda.var_int("prohibitwithguys", 0)
 
     def amanda_liza_legare_deflower_condition():
-        return Amanda.sex_stat("sexacts", 0) < 20 and Amanda.first_partner == "legare"
+        return Amanda.sex_stat("sexacts", 0) < 20 and Amanda.first_partner == "legare" and not amanda_liza_legare_warning_known()
 
     def amanda_liza_legare_oral_condition():
-        return Amanda.performed_oral_with_legare and not Amanda.had_sex_with_legare
+        return Amanda.performed_oral_with_legare and not Amanda.had_sex_with_legare and not amanda_liza_legare_warning_known()
 
     def amanda_liza_legare_affection_condition():
-        return Amanda.legare_affection > 10 and not Amanda.performed_oral_with_legare and not Amanda.had_sex_with_legare
+        return Amanda.legare_affection > 10 and not Amanda.performed_oral_with_legare and not Amanda.had_sex_with_legare and not amanda_liza_legare_warning_known()
 
     def amanda_liza_amanda_pregnant_condition():
         return Amanda.pregnancy_days() > 120 and Liza.pregnancy_days() <= 120
@@ -96,7 +99,7 @@ init python:
         return Amanda.var_int("fuckyou", 0)
 
     def amanda_liza_had_sex_with_legare_condition():
-        return Amanda.had_sex_with_legare
+        return Amanda.had_sex_with_legare and not amanda_liza_legare_warning_known()
 
     def get_random_amanda_liza_talk_row():
         matched_rows = []

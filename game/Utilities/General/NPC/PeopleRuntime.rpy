@@ -927,7 +927,7 @@ init -999 python:
             breakfast = player.tavern_management.breakfast
             if room_key == "TavernKitchen" and bool(breakfast.event_active):
                 present_ids = [people_normalize_id(row) for row in list(breakfast.present_ids or [])]
-                return self.name in present_ids
+                return self.name in present_ids and bool(self.social_action_allowed("talk"))
             return (
                 bool(people.can_talk(self.name))
                 and str(self.getLocation() or "") == room_key
@@ -1535,6 +1535,7 @@ init -999 python:
                 entry is not None
                 and bool(getattr(entry, "working", False))
                 and str(entry.selected_location() or "") == expected_location
+                and str(self.getLocation() or "") == expected_location
                 and not self.tavern_service_busy_now()
             )
 

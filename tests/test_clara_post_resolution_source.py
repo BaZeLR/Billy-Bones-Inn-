@@ -7,6 +7,7 @@ VISITS = ROOT / "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy"
 POST = ROOT / "game/NPC/Girls/Clara/ClaraPostResolutionThreads.rpy"
 CARDS = ROOT / "game/NPC/Girls/Clara/ClaraEducationCards.rpy"
 WINE_STORE = ROOT / "game/Town/WineStore.rpy"
+AMANDA_LIZA_TALK = ROOT / "game/NPC/Girls/Amanda/InitAmandaLizaTalkItems.rpy"
 
 
 def source(path):
@@ -90,6 +91,44 @@ def test_revenge_is_an_ordered_three_event_story_and_fight_retries():
     assert "event_runtime.active_thread.advance()" not in retry
     assert "amanda_conflict_stage" not in fight
     assert "legare_departure_code" not in fight
+
+
+def test_liza_rebukes_only_when_amanda_keeps_legare_after_warning():
+    scene = label_block(source(POST), "story_clara_legare_revenge_amanda_tells_liza_0")
+    talk = source(AMANDA_LIZA_TALK)
+    condition = next(line.strip()[3:-1] for line in scene.splitlines()
+                     if line.strip().startswith('if Amanda.var_value("legare_choice_outcome"'))
+
+    class AmandaState:
+        def __init__(self, outcome, start_day):
+            self.outcome = outcome
+            self.start_day = start_day
+
+        def var_value(self, name, default):
+            return self.outcome if name == "legare_choice_outcome" else default
+
+        def var_int(self, name, default):
+            return self.start_day if name == "legare_choice_start_day" else default
+
+    for outcome, start_day, expected in (
+        ("service", 5, True),
+        ("", 5, True),
+        ("tavern", 5, False),
+        ("", -1, False),
+    ):
+        assert bool(eval(condition, {"Amanda": AmandaState(outcome, start_day)})) is expected
+
+    assert "пиздой думаешь" in scene
+    assert "пизда твоя" in scene
+    assert "предать настоящих друзей ради него" in scene
+    assert 'threads["claraAmandaWarning"].completed' in talk
+    assert 'threads["amandaStreetDiscipline"].completed' in talk
+    for name in (
+        "legare_forbidden_naive", "legare_forbidden_defiant", "legare_deflower",
+        "legare_oral", "legare_affection", "had_sex_with_legare",
+    ):
+        block = talk.split("def amanda_liza_%s_condition():" % name, 1)[1].split("\n    def ", 1)[0]
+        assert "not amanda_liza_legare_warning_known()" in block
 
 
 def test_education_keeps_gates_and_uses_market_discovery():

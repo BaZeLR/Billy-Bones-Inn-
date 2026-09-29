@@ -72,7 +72,7 @@ def _runtime(day=30, money=10000, logs=40):
         spent.append(amount)
         return True
     player.spend_money = spend_money
-    team = [(key, SimpleNamespace(renovation_requests={}, is_tavern_worker=lambda: True, reward_need_fulfilled=lambda amount, reason, key=key: rewards.append((key, amount, reason)))) for key in ("amanda", "melissa", "sandra", "clara", "liza", "georgett")]
+    team = [(key, SimpleNamespace(renovation_requests={}, is_tavern_worker=lambda: True, var_value=lambda name, default=None: default, reward_need_fulfilled=lambda amount, reason, key=key: rewards.append((key, amount, reason)))) for key in ("amanda", "melissa", "sandra", "clara", "liza", "georgett")]
     team.append(("becky", SimpleNamespace(is_tavern_worker=lambda: False)))
     namespace = {
         "calendar_v2": calendar, "player": player,

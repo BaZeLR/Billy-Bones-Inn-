@@ -71,6 +71,29 @@ define amandaThreadList = [
             "TavernMyRoom", "bedtime", -5,
         ),
     ], highlight=True, threaded=True),
+    LThreadData(0, "amanda", "LegareService", "#Amanda.var_value('legare_choice_outcome', '') == 'service'", [
+        (
+            "story_amanda_legare_service_breakfast",
+            None, (6, 11), None,
+            1, None, [
+                "#current_game_day() > Amanda.var_int('legare_service_decision_day', -1)",
+            ], None,
+            "TavernKitchen", "breakfast", -40,
+        ),
+    ], highlight=True, threaded=True),
+    LThreadData(0, "amanda", "ServiceDress", "#Amanda.var_value('legare_choice_outcome', '') == 'service'", [
+        (
+            "story_amanda_service_dress_order",
+            None, (9, 11), None,
+            1, None, [
+                "#not Amanda.wardrobe.owns('slutdress')",
+                "#Amanda.var_int('legare_service_savings', 0) >= _gds_dress_cost('slutdress')",
+                "#not bool(dress_shop.produced)",
+                "#rooms.get('DressShop').is_open()",
+            ], None,
+            "DressShop", "enter", -25,
+        ),
+    ], highlight=False, threaded=True),
     LThreadData(0, "amanda", "KitchenWindowFavor", None, [
         AmandaKitchenWindowFavor,
     ], highlight=False, threaded=False),

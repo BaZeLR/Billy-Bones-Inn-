@@ -78,8 +78,8 @@ def test_all_service_workers_share_one_npc_job_and_client_pipeline():
     assert "for _tavern_worker in people.girl_values():" in rollover
     assert "_tavern_worker.apply_tavern_job_plan()" in rollover
     assert "[girl for girl in people.girl_values() if girl.tavern_client_generation_enabled()]" in clients
-    assert "sum(TotalWhoreClients.values()) * 3" in report
-    assert "sum(TotalGloryHoleClients.values()) * 2" in report
+    assert 'tavern.service_house_revenue(girl, "intimate", count) for girl, count in TotalWhoreClients.items()' in report
+    assert 'tavern.service_house_revenue(girl, "gloryhole", count) for girl, count in TotalGloryHoleClients.items()' in report
     assert '"Спросить, кто хочет дополнительно заработать"' in dinner
     assert '_service_offer_info.enable_tavern_service("intimate")' in dinner
     assert '_service_offer_info.enable_tavern_service("gloryhole")' in dinner

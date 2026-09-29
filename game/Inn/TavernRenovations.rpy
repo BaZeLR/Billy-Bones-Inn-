@@ -49,8 +49,37 @@ init -30 python:
                 self.status = "accepted"
 
     class TavernInfo(object):
+        client_touch_policy = "standard"
+
         def __init__(self):
             self.renovations = {code: TavernRenovation(code) for code in TAVERN_RENOVATIONS}
+
+        def service_terms(self, girl_name="", service=""):
+            if str(girl_name or "").strip().lower() == "amanda":
+                info = people.get_info("amanda")
+                if (info is not None
+                        and info.var_value("legare_choice_outcome", "") == "service"
+                        and not bool(info.var_value("legare_service_reconciled", False))):
+                    return {"price": 20 if service == "gloryhole" else 300, "house_percent": 60}
+            return None
+
+        def is_team_member(self, girl_name=""):
+            info = people.get_info(girl_name)
+            return bool(info is not None and info.is_tavern_worker() and self.service_terms(girl_name, "intimate") is None)
+
+        def service_house_revenue(self, girl_name="", service="", clients=0):
+            count = max(0, int(clients or 0))
+            terms = self.service_terms(girl_name, service)
+            if terms is not None:
+                return count * int(terms["price"]) * int(terms["house_percent"]) // 100
+            return count * (2 if service == "gloryhole" else 3)
+
+        def service_worker_revenue(self, girl_name="", service="", clients=0):
+            terms = self.service_terms(girl_name, service)
+            if terms is None:
+                return 0
+            count = max(0, int(clients or 0))
+            return count * int(terms["price"]) - self.service_house_revenue(girl_name, service, count)
 
         def renovation_complete(self, code):
             return self.renovations[code].status == "completed"
@@ -116,7 +145,7 @@ init -30 python:
                 if job.code in ("backyard", "shed", "guest_room"):
                     people.get_info(job.requester).renovation_requests[job.code] = False
                 for girl_id, info in people.girl_items():
-                    if info.is_tavern_worker():
+                    if self.is_team_member(girl_id):
                         info.reward_need_fulfilled(1, "renovation_" + job.code)
                 if job.requester != "player":
                     people.get_info(job.requester).reward_need_fulfilled(2, "renovation_" + job.code)

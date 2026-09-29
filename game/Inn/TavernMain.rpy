@@ -148,6 +148,11 @@ init python:
             desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
             desc_parts.append(str(routine_visual.get("text", "") or ""))
             desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
+            available_workers = people.available_tavern_service_workers()
+            if available_workers and (NamesList("jobwaitress", "TavernMain") or NamesList("jobcleaning", "TavernMain")):
+                if tavern.client_touch_policy == "hands_off":
+                    desc_parts.append("Работницы объясняют посетителям правило дома: остальных девушек трогать нельзя.")
+                desc_parts.append("За услугами посетителей направляют к свободным девушкам на их рабочих местах: " + _tavern_join_names(available_workers) + ".")
 
         if not closed_text:
             if str(people.location("becky") or "") == "TavernMain":

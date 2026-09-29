@@ -283,7 +283,7 @@ label BarberShopSellLuxurySoap:
 
 
 label BarberShopServePendingGuest:
-    $ renpy.dynamic("_barber_guest", "_barber_guest_name", "_barber_guest_price", "_barber_guest_info")
+    $ renpy.dynamic("_barber_guest", "_barber_guest_name", "_barber_guest_price", "_barber_guest_info", "_barber_self_paid")
     $ _barber_guest = barber_shop_pending_npc_id()
     if str(_barber_guest or "") == "":
         $ scene_runtime.text = "Сейчас никто из ваших знакомых не ждет визита к Серджио."
@@ -292,12 +292,16 @@ label BarberShopServePendingGuest:
         return
     $ _barber_guest_name = people_display_name(_barber_guest)
     $ _barber_guest_price = int(barber_shop_haircut_price("female") or 0)
-    if int(player.economy.money or 0) < _barber_guest_price:
+    $ _barber_self_paid = _barber_guest == "amanda" and Amanda.var_value("legare_choice_outcome", "") == "service" and not Amanda.var_value("legare_service_reconciled", False)
+    if (Amanda.var_int("legare_service_savings", 0) if _barber_self_paid else int(player.economy.money or 0)) < _barber_guest_price:
         $ scene_runtime.text = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" " % (_barber_guest_name, _barber_guest_price)
         $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
         return
-    $ player.spend_money(_barber_guest_price)
+    if _barber_self_paid:
+        $ Amanda.add_var_int("legare_service_savings", -_barber_guest_price)
+    else:
+        $ player.spend_money(_barber_guest_price)
     $ calendar_v2.advance_minutes(45)
     $ household.barber_visit_last_day[_barber_guest] = current_game_day()
     $ household.barber_appointments.pop(_barber_guest, None)
@@ -316,7 +320,10 @@ label BarberShopServePendingGuest:
         elif _barber_guest == "amanda":
             $ _barber_guest_info.change_skill("waitress", 2)
     $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 1
-    $ scene_runtime.text = "Вы приводите %s к Серджио и оплачиваете визит. Цирюльник долго возится с волосами, душистой водой и острыми ножницами, при этом без остановки болтая о женщинах, тканях, нижнем белье и о том, как ухоженный вид меняет весь дом. Когда все заканчивается, %s выглядит заметно ухоженнее и явно уходит от Серджио с новыми мыслями о себе." % (_barber_guest_name, _barber_guest_name)
+    if _barber_self_paid:
+        $ scene_runtime.text = "%s сама отсчитывает Серджио %d мараведи из своего заработка. Цирюльник приводит ее волосы в порядок, и она уходит, не попросив у вас ни монеты." % (_barber_guest_name, _barber_guest_price)
+    else:
+        $ scene_runtime.text = "Вы приводите %s к Серджио и оплачиваете визит. Цирюльник долго возится с волосами, душистой водой и острыми ножницами, при этом без остановки болтая о женщинах, тканях, нижнем белье и о том, как ухоженный вид меняет весь дом. Когда все заканчивается, %s выглядит заметно ухоженнее и явно уходит от Серджио с новыми мыслями о себе." % (_barber_guest_name, _barber_guest_name)
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     call ShowImage("", "", barber_shop_picture_path())
