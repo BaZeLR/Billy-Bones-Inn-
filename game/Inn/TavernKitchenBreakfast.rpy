@@ -276,6 +276,7 @@ init python:
     def tavern_breakfast_amanda_attic_mock_ready():
         return (
             Amanda.attic_busted()
+            and int(threads["amandaMorningWindowEpisode"].num or 0) >= 1
             and "amanda" in list(tavern_breakfast_present_ids() or [])
             and not Amanda.attic_mock_stopped
             and not Amanda.attic_mock_exposed
@@ -1052,7 +1053,7 @@ init python:
                     lines.append("Мелисса мрачно говорит, что под потолком шуршало до рассвета. \"Если это мыши, пусть подавятся. Если летучие мыши, пусть провалятся в ад.\"")
                 if "sandra" in present_ids:
                     lines.append("Сандра коротко отвечает, что с чердаком надо кончать: сначала выгнать крылатую дрянь, потом заделать щели, а не чесать языком за кашей.")
-            if threads["melissaBatProblem"].num >= 6 and "amanda" in present_ids:
+            if threads["melissaBatProblem"].num >= 6 and "amanda" in present_ids and int(threads["amandaMorningWindowEpisode"].num or 0) >= 1:
                 lines.append("Стоит за столом всплыть слову \"чердак\", как Аманда многозначительно тянет: \"Главное, Стефан, теперь не падать сверху в чужие комнаты без стука.\" Мелисса тут же фыркает, но уголки ее губ все равно дрожат.")
         if "amanda" in present_ids:
             lines.append("Аманда ест быстро, но все равно успевает строить рожи и цеплять всех подряд, будто завтрак без подколок ей в горло не лезет.")
@@ -2194,6 +2195,25 @@ label TavernKitchenSundayDinnerServiceOffer(girl_name=""):
     if not isinstance(_service_offer_info, Girl) or not tavern_sunday_dinner_can_offer_service(girl_name):
         return
     $ _service_offer_name = str(people_display_name(girl_name) or girl_name)
+    if tavern.is_team_member(girl_name) and int(_service_offer_info.corruption or 0) < 40 and not _service_offer_info.tavern_service_available("intimate"):
+        $ _service_offer_info.set_harass_instruction("notallow")
+        $ scene_runtime.text = "Вы смотрите, как " + _service_offer_name + " реагирует на разговоры о посетителях, и решаете не предлагать ей интимную работу: она к этому не готова. Вместо этого вы говорите, что подумаете о найме уличных девок для желающих гостей. Домашних работниц клиентам трогать нельзя; чаевых за такие вольности больше не будет, зато они смогут направлять охочих посетителей к отдельным услугам."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Выслушать ответ":
+                pass
+        if girl_name == "sandra":
+            $ scene_runtime.text = "Сандра поджимает губы: «Девок с улицы сперва проверь. Но своих я больше на растерзание пьяному залу не отдам. Пусть гости платят тем, кто сам выбрал такую работу»."
+        elif girl_name == "melissa":
+            $ scene_runtime.text = "Мелисса заметно расслабляется: «Без чаевых проживу. Если кому-то нужно больше эля, я подам эль. Если нужно другое — покажу, к кому идти, и руки от меня пусть уберёт»."
+        elif girl_name == "amanda":
+            $ scene_runtime.text = "Аманда фыркает: «Чаевые жалко, конечно. Но если они перестанут хватать меня за юбку, я сама покажу им дорогу к тем, кто берёт за это деньги»."
+        else:
+            $ scene_runtime.text = _service_offer_name + " соглашается объяснять настойчивым гостям, где искать отдельные услуги, но не обещает терпеть их руки ради чаевых."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Вернуться к обеду":
+                return
     $ _service_offer_decision = _service_offer_info.decide("tavern_service")
     if _service_offer_decision["reaction"] not in ("good", "capricious_bad_is_good"):
         if _service_offer_decision["reaction"] == "neutral":

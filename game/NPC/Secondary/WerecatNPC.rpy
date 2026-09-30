@@ -272,6 +272,16 @@ init 2 python:
         default_intervals=[],
         random_intervals=[
             npc_daily_schedule_random_interval(
+                0, 6,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="late_night_nest",
+                choices=[
+                    npc_daily_schedule_choice("TavernStorage", 2, True, True, "rat_watch", condition=werecat_is_living_with_household),
+                    npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "melissa_room_nest", condition=werecat_is_living_with_household),
+                    npc_daily_schedule_choice("TavernKitchen", 1, True, True, "hearth_nest", condition=werecat_is_living_with_household),
+                ],
+            ),
+            npc_daily_schedule_random_interval(
                 6, 8,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="morning_roam",
@@ -326,6 +336,16 @@ init 2 python:
                     npc_daily_schedule_choice("TavernSandraRoom", 1, True, True, "sandra_room_nest", condition=werecat_is_living_with_household),
                     npc_daily_schedule_choice("TavernStorage", 2, True, True, "night_storage", condition=werecat_is_living_with_household),
                     npc_daily_schedule_choice("Backyard", 1, True, True, "night_yard", condition=werecat_is_living_with_household),
+                ],
+            ),
+            npc_daily_schedule_random_interval(
+                18, 24,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="late_evening_roam",
+                choices=[
+                    npc_daily_schedule_choice("TavernMain", 2, True, True, "warm_fire", condition=werecat_is_living_with_household),
+                    npc_daily_schedule_choice("TavernStorage", 2, True, True, "rat_watch", condition=werecat_is_living_with_household),
+                    npc_daily_schedule_choice("TavernKitchen", 2, True, True, "kitchen_hearth", condition=werecat_is_living_with_household),
                 ],
             ),
         ],

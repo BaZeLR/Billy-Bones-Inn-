@@ -267,6 +267,7 @@ label WerecatCheckTrap(room_code=""):
                 $ _werecat_pet_state["trust"] = max(6, int(_werecat_pet_state.get("trust", 0) or 0))
                 $ _werecat_pet_state["comfort"] = max(8, int(_werecat_pet_state.get("comfort", 0) or 0))
                 $ WerecatStaticData.invalidate_daily_schedule()
+                $ tractir_activate_achievement("werecat_home")
                 $ scene_runtime.text = "Вы не тянете поводок, не орете и не делаете резких движений. Просто тихо уводите странную лесную кошку с собой, будто она сама уже наполовину решила вам довериться. Дом быстро принимает ее как новую, немного диковатую, но полезную тварь. В кладовых с этого дня становится спокойнее: теперь у крыс появился настоящий враг."
                 $ scene_runtime.location_text = scene_runtime.text
                 call stat

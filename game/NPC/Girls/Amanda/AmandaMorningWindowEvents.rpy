@@ -4,8 +4,8 @@
 label AmandaMorningWindowArrival(picture, opening):
     $ main_ui_begin_native_scene_state("Аманда у окна")
     show screen main_ui
-    vscene "images/tavern/secondfloor/girls_room_day.png"
-    $ scene_runtime.text = "Amanda is not at breakfast. You go to check her: you hear weird slurping noises and quiet moaning."
+    vscene "images/tavern/secondfloor/second_floor.png"
+    $ scene_runtime.text = "Аманды нет за завтраком. Вы поднимаетесь наверх проверить, не заболела ли она. В коридоре слышатся странные влажные звуки и приглушённые стоны. Дверь её комнаты чуть приоткрыта."
     menu:
         "Войти":
             pass
@@ -15,7 +15,7 @@ label AmandaMorningWindowArrival(picture, opening):
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "You hear noises at the window."
+    $ scene_runtime.text = "Со стороны окна доносится ещё один звук. Аманда на миг косится туда и снова смотрит на вас."
     menu:
         "Посмотреть в окно":
             pass
@@ -27,12 +27,12 @@ label AmandaMorningWindowArrival(picture, opening):
 
 
 label story_amanda_room_morning_window_0:
-    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_004.jpeg", "Amanda is on her bed, covered badly.\n\nAmanda: Oy, mister you should knock.")
-    $ scene_runtime.text = "Amanda says she is sorry for not coming for breakfast, while looking at the bulge under your pants."
+    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_004.jpeg", "Аманда лежит на кровати, кое-как прикрывшись одеялом. Увидев вас, она резко прижимает его к груди.\n\n«Ой, мессир! Стучаться надо!»")
+    $ scene_runtime.text = "«Прости, что не вышла к завтраку», — говорит Аманда. Но взгляд её уже скользнул ниже вашего пояса."
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "You decided to leave."
+    $ scene_runtime.text = "Вы оставляете её одну и возвращаетесь на кухню."
     menu:
         "Вернуться на кухню":
             pass
@@ -45,12 +45,12 @@ label story_amanda_room_morning_window_0:
 
 
 label story_amanda_room_morning_window_1:
-    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_003.jpeg", "Amanda does not even bother to cover herself properly and is sucking her finger.")
-    $ scene_runtime.text = "Master, you did not disclose me to Sandra, so can we keep this little secret?\n\nShe winks. Between us???"
+    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_003.jpeg", "На этот раз Аманда почти не пытается прикрыться. Она медленно облизывает палец и наблюдает за вашей реакцией.")
+    $ scene_runtime.text = "«Мессир, вы ведь не рассказали Сандре, чем я тут занимаюсь. Оставим это между нами?» — спрашивает она и подмигивает."
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "You decided to leave her again with a huge erection!!!!"
+    $ scene_runtime.text = "Вы снова уходите. Штаны заметно теснее, чем были по дороге сюда."
     menu:
         "Вернуться на кухню":
             pass
@@ -66,16 +66,16 @@ label story_amanda_room_morning_window_1:
 
 
 label story_amanda_room_morning_window_2:
-    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_002.jpeg", "This time she decided to tease you with a smile and puts on a show of her titties.")
-    $ scene_runtime.text = "Melissa said my puppies are too small. Do you like my puppies, Stephan? Do I make you hard???"
+    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_002.jpeg", "Сегодня Аманда встречает вас улыбкой и нарочно откидывает одеяло с груди.")
+    $ scene_runtime.text = "«Мелисса говорит, что мои сиськи слишком маленькие. А тебе нравятся, Стефан? У тебя от них встаёт?»"
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "She laughs. Okay, okay, I know, I know, I am a bad girl and late to breakfast again. But it is so much fun here, isn't it? Did you see how he is pumping his wife!!!! Happy couple. I am almost jealous, and your little bro down there thinks so too."
+    $ scene_runtime.text = "Аманда хохочет. «Ладно, ладно, знаю: я плохая девчонка и опять опоздала к завтраку. Но тут куда веселее! Видел, как сосед свою жену трахает? Счастливая парочка. Я почти завидую. Судя по твоим штанам, ты тоже»."
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "Amanda laughs, and you leave... again. Damn, Ilmater almighty, she is a little cute devil, the horny one..."
+    $ scene_runtime.text = "Она снова смеётся, а вы уходите. Ильматер всемогущий, до чего же она бесстыжая маленькая чертовка."
     menu:
         "Вернуться на кухню":
             pass
@@ -92,33 +92,33 @@ label story_amanda_room_morning_window_2:
 
 
 label story_amanda_room_morning_window_3:
-    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_001.jpeg", "This time Amanda is lying on the bed naked, waiting for you.\n\nHello, master, do not be so shy. Let's do it together! Show me your glory!")
-    $ scene_runtime.text = "Show or not show?"
+    call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_001.jpeg", "На этот раз Аманда лежит на кровати голой и словно ждёт вас.\n\n«Привет, мессир. Не стесняйся. Давай вместе! Покажи, что прячешь в штанах!»")
+    $ scene_runtime.text = "Показать ей или отказаться?"
     menu:
         "Показать":
-            $ scene_runtime.text = "Wow, you are one poor horny bastard! Amanda laughs aloud."
+            $ scene_runtime.text = "«Ого, да ты совсем извёлся!» — Аманда громко смеётся."
         "Не показывать":
-            $ scene_runtime.text = "You are as prude as Melissa. Too bad she likes girls."
+            $ scene_runtime.text = "«Ты такой же стеснительный, как Мелисса. Только ей нравятся девчонки», — дразнит вас Аманда."
     menu:
         "Продолжить":
             pass
-    $ scene_runtime.text = "You say: Do it together? Is this why you are locking the door?\n\nNo, says Amanda, to keep perverts like you outside!!!! She giggles. Girls have many secrets!"
+    $ scene_runtime.text = "«Вместе, значит? Поэтому ты заперла дверь?» — спрашиваете вы.\n\n«Нет, чтобы такие извращенцы, как ты, не лезли!» — хихикает Аманда. «У девочек полно секретов»."
     menu:
         "Продолжить":
             pass
     if Melissa.drawings_found:
-        $ scene_runtime.text = "You tell her about the booklet you found at Melissa's. She shuts up.\n\nBut this is our secret too. We will discuss the booklet later, right???"
+        $ scene_runtime.text = "Вы напоминаете ей о найденной у Мелиссы книжице. Аманда мигом замолкает.\n\n«Но это ведь тоже наш секрет? Про книжицу поговорим потом, да?»"
         menu:
             "Продолжить":
                 pass
     if (Amanda.harass_instruction() == "notallow" and Amanda.corruption < 45) or (Amanda.harass_instruction() == "" and Amanda.corruption < 30):
-        $ scene_runtime.text = "You tell her: This is hypocrisy. Why not enjoy that and help the tavern as well?\n\nAmanda is pissed off, and you leave. An apology will be needed."
+        $ scene_runtime.text = "«И что за лицемерие? Почему бы тебе не получать удовольствие и заодно не помогать трактиру?» — спрашиваете вы.\n\nАманда сердито отворачивается. Вы уходите, понимая, что без извинения она это не забудет."
         $ Amanda.change_anger(1, "morning_window_clients_argument")
         menu:
             "Продолжить":
                 pass
     vscene "images/amanda/Room/Masturbation/amanda_bedroomAPI.webp"
-    $ scene_runtime.text = "You decided to leave her again."
+    $ scene_runtime.text = "Вы снова оставляете её одну."
     menu:
         "Вернуться на кухню":
             pass
@@ -136,7 +136,7 @@ label story_amanda_morning_wood_0:
     $ main_ui_begin_native_scene_state("Аманда: ранний визит")
     show screen main_ui
     vscene player_room_image_path("wake_up")
-    $ scene_runtime.text = "Amanda came in early morning to catch up your erection."
+    $ scene_runtime.text = "Ранним утром Аманда тихо пробралась к вам в комнату. Она задерживает взгляд на вашем теле, пытаясь понять, проснулись ли вы."
     menu:
         "Продолжить утро":
             pass

@@ -159,18 +159,18 @@ TEST_RPY += r'''
     advance until eval (external_amanda_flirt_choices() == ["Показать", "Не показывать"]) timeout 20.0
     click id (external_amanda_flirt_button("Показать" if show else "Не показывать")) pos (0.5, 0.5)
     advance until eval (external_amanda_flirt_choices() == ["Продолжить"]) timeout 20.0
-    assert eval (("poor horny bastard" if show else "prude as Melissa") in scene_runtime.text)
+    assert eval (("совсем извёлся" if show else "стеснительный, как Мелисса") in scene_runtime.text)
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (external_amanda_flirt_choices() == ["Продолжить"]) timeout 20.0
-    assert eval ("Girls have many secrets!" in scene_runtime.text)
+    assert eval ("У девочек полно секретов" in scene_runtime.text)
     click id "choice_panel_button_0" pos (0.5, 0.5)
     if eval (booklet):
         advance until eval (external_amanda_flirt_choices() == ["Продолжить"]) timeout 20.0
-        assert eval ("booklet you found" in scene_runtime.text)
+        assert eval ("найденной у Мелиссы книжице" in scene_runtime.text)
         click id "choice_panel_button_0" pos (0.5, 0.5)
     if eval (argument):
         advance until eval (external_amanda_flirt_choices() == ["Продолжить"]) timeout 20.0
-        assert eval ("hypocrisy" in scene_runtime.text and Amanda.can_apologize())
+        assert eval ("лицемерие" in scene_runtime.text and Amanda.can_apologize())
         click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (external_amanda_flirt_choices() == ["Вернуться на кухню"]) timeout 20.0
     assert eval (scene_runtime.picture == "images/amanda/Room/Masturbation/amanda_bedroomAPI.webp" and renpy.loadable(scene_runtime.picture))
@@ -178,7 +178,7 @@ TEST_RPY += r'''
 TEST_RPY += LEAVE.replace("STAGE", "3").replace("NEXT", "4")
 TEST_RPY += r'''
     assert eval (threads["amandaMorningWindowEpisode"].completed)
-    assert eval (Amanda.corruption == _window_corruption + 1 and Amanda.rebellion == _window_rebellion + _window_delta)
+    assert eval (Amanda.corruption == _window_corruption and Amanda.rebellion == _window_rebellion + _window_delta)
     assert eval (Amanda.can_apologize() == argument and Amanda.rel == 10)
 
 testcase external_window_gates_delay_and_save:

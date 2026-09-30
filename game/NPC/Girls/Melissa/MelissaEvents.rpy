@@ -118,6 +118,15 @@ label story_melissa_werecat_home_0:
     elif relationship_anger("melissa") > 0:
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nМелисса сегодня не дает Аманде разгуляться. На каждую шутку отвечает сухо, и Сандра быстро переводит разговор обратно к кладовой."
     $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Погладить новую охотницу":
+            pass
+    vscene "images/melissa/thanks1.png"
+    $ scene_runtime.text = "Мелисса дожидается, пока Сандра отвернётся к очагу, подходит к вам и быстро целует в щёку. «Спасибо, что привёл её домой, Стефан. Я уж думала, мы этих крыс никогда не одолеем». Она краснеет и поспешно возвращается к столу."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться к завтраку":
+            pass
     $ player.change_stat("fun", 3)
     $ Sandra.change_social(friend_delta=1)
     $ Melissa.change_social(friend_delta=1)

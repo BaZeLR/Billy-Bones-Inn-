@@ -25,14 +25,14 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
                 $ _girl_info.change_social(friend_delta=1)
                 $ _girl_info.change_mana(1, "harass_player_help")
                 $ _girl_info.change_rebellion(-1, "harass_player_help")
-        elif _girl_slut >= 60:
+        elif _girl_slut >= 60 and _harass_instruction != 'notallow':
             $ result += f'\nНо {_girl_name} вдруг неожиданно оборвала вас, сказав: "Стефан, душка, зачем же ты ругаешь такого приятного господина? Я совсем не в обиде!" - с этими словами ветреная {_girl_name} страстно, с язычком, поцеловала своего мнимого обидчика и пошла дальше по своим делам, призывно виляя бедрами. Вы остались стоять в оторопении.'
             $ girl_run_away = 2
             $ result += f'\nПохоже, что ваша реакция не очень-то понравилась {_girl_name3}.'
             $ _girl_info.record_negative_reaction("harass_blocked_wanted_attention")
             $ _girl_info.change_mana(-1, "harass_blocked_wanted_attention")
             $ _girl_info.change_rebellion(1, "harass_blocked_wanted_attention")
-        elif _girl_slut >= 30:
+        elif _girl_slut >= 30 and _harass_instruction != 'notallow':
             $ result += f'\nНо у вас осталось чувство, что {_girl_name} была вовсе не против, чтобы к ней приставали, и что ваше вмешательство было лишним.'
         else:
             $ result += f'\nВо время всей этой лекции {_girl_name} стояла за вашей спиной и обиженно смотрела на незадачливого любителя распустить руки.'
@@ -43,7 +43,7 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
                 $ _girl_info.change_rebellion(-1, "harass_player_help")
         call HarassShowImage(GirlNamePEGHR, "tits", 0, EyewitnessPEGHR, JobTypePEGHR)
     elif your_reaction1 == 2:
-        if (_harass_instruction == 'notallow' and _girl_slut < 30) or (_harass_instruction == '' and _girl_slut < 18):
+        if _harass_instruction == 'notallow' or (_harass_instruction == '' and _girl_slut < 18):
             $ result += f'{_girl_name} с трудом вырвалась из цепких объятий'
             $ girl_run_away = 1
             if _girl_slut <= 10:
@@ -51,7 +51,7 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
                 $ girl_slapped = 1
             else:
                 $ result += ' и вернулась к работе.'
-        elif (_harass_instruction == 'notallow' and _girl_slut < 45) or (_harass_instruction == '' and _girl_slut < 30):
+        elif _harass_instruction == '' and _girl_slut < 30:
             $ result += f'{_girl_name} сделала слабую попытку вырваться, оглянулась, увидела что вы на нее с интересом смотрите, и решила что будь что будет.'
         elif strcomp(_harass_instruction, '^allow'):
             if _girl_slut < 18 and procedural_randint(1, 1 + max((15 - _girl_slut) // 6, 1), key="procedural:NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy:procedural_randint:60:4") == 1:
@@ -69,7 +69,7 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
             else:
                 $ result += f'{_girl_name} сначала дернулась от неожиданности, но в целом реагировала спокойно. Работа уборщицей в вашем трактире приучила ее мириться с такими вещами.'
     else:
-        if (_harass_instruction == 'notallow' and _girl_slut < 45) or (_harass_instruction == '' and _girl_slut < 30):
+        if _harass_instruction == 'notallow' or (_harass_instruction == '' and _girl_slut < 30):
             $ result += f'{_girl_name} с трудом вырвалась из цепких объятий'
             $ girl_run_away = 1
             if _girl_slut <= 10:

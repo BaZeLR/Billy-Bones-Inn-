@@ -3,6 +3,7 @@
 # ================================================================================
 define tractir_achievement_order = [
     "shit_with_comfort",
+    "werecat_home",
     "melissa_full_storeroom",
     "mongol_household",
     "first_month_survived",
@@ -13,6 +14,10 @@ define tractir_achievement_order = [
 ]
 
 define tractir_achievements = {
+    "werecat_home": (
+        "Новая охотница",
+        "Поймали лесную кошку и привели её в трактир, где она взялась охранять припасы от крыс.",
+    ),
     "shit_with_comfort": (
         "Shit with comfort",
         "Впервые воспользовались отремонтированным дворовым нужником и пережили насмешки Мелиссы.",
@@ -107,6 +112,9 @@ init -20 python:
     def tractir_check_achievements_apply():
         day_count = _tractir_progress_int(calendar_v2.daysInGame, 0)
         notoriety_value = _tractir_progress_int(player.stats.notoriety, 0)
+
+        if int(werecat_state().get("adopted", 0) or 0) == 1:
+            tractir_activate_achievement("werecat_home")
 
         if day_count >= 28:
             tractir_activate_achievement("first_month_survived")

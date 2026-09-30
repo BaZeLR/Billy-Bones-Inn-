@@ -23,6 +23,9 @@ label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass
         "Сказать, что вы обдумаете проблему" if _girl_unhappy:
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 6)
 
+        "Предложить нанять отдельных работниц для охочих гостей" if _girl_unhappy:
+            call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 8)
+
         "Выгнать наглого клиента" if _girl_unhappy:
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 7)
 
@@ -123,6 +126,16 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _girl_info.change_rebellion(-1, "harass_customer_ejected")
             $ _girl_info.change_anger(-1, "harass_customer_ejected")
         $ player.change_tavern_fame(-1)
+    elif choice_code == 8:
+        $ _discussion_text = "Вы обещаете {}, что подумаете о найме уличных девок для посетителей, которым мало эля. Домашних работниц трогать нельзя: чаевых за такую вольность не будет, зато они смогут направлять охочих гостей к отдельным услугам. Пока никого нового вы не наняли, но правило для зала объявляете уже сейчас.".format(people_name(GirlNameMHD, 'dative'))
+        if _girl_info is not None:
+            $ _girl_info.set_harass_instruction("notallow")
+            if _girl_corruption < 40:
+                $ _discussion_text += "\n\n{} с облегчением соглашается объяснять гостям, куда обращаться, если им нужно другое обслуживание: чужие руки ей самой больше терпеть не придётся.".format(people_display_name(GirlNameMHD))
+                $ _girl_info.change_mana(1, "harass_separate_workers")
+            else:
+                $ _discussion_text += "\n\n{} усмехается: чаевых жаль, но она предпочитает сама выбирать, кому позволять вольности, а гостям обещает показывать дорогу к отдельным работницам.".format(people_display_name(GirlNameMHD))
+        call HarassDiscussImage(GirlNameMHD, 2)
     else:
         $ _discussion_text = "Вы решили ничего не говорить {}, а пойти лучше дальше по своим делам.".format(people_name(GirlNameMHD, 'dative'))
 
