@@ -195,16 +195,18 @@ screen dress_shop_catalog_page(rack_type="male", girl_name=""):
                                         action Call("DressShopBuyMaleItem", _dress_code)
                             else:
                                 $ _girl_has_dress = bool(_girl_name) and _gds_has_dress_for_girl(_girl_name, _dress_code)
-                                $ _female_can_offer = bool(_girl_name) and not _girl_has_dress and str(dress_shop.produced or "") == "" and int(dress_shop.girl_dress_block or 0) == 0 and _dress_price <= int(player.economy.money or 0)
+                                $ _dress_objection = _gds_dress_objection(_girl_name, _dress_code) if _girl_name else "unavailable"
+                                $ _female_can_offer = bool(_girl_name) and not _dress_objection and str(dress_shop.produced or "") == "" and int(dress_shop.girl_dress_block or 0) == 0 and _dress_price <= int(player.economy.money or 0)
 
-                                textbutton "Выбрать":
-                                    id "dress_shop_catalog_offer_" + _dress_code
-                                    alt "dress_shop_catalog_offer_" + _dress_code
-                                    style "dress_shop_catalog_button"
-                                    text_style "dress_shop_catalog_button_text"
-                                    xalign 0.5
-                                    sensitive _female_can_offer
-                                    action ([Hide("dress_shop_catalog_page"), Call("GirlDressSuggest", _girl_name, _dress_code)] if _girl_name else NullAction())
+                                if _girl_name and not _dress_objection:
+                                    textbutton "Выбрать":
+                                        id "dress_shop_catalog_offer_" + _dress_code
+                                        alt "dress_shop_catalog_offer_" + _dress_code
+                                        style "dress_shop_catalog_button"
+                                        text_style "dress_shop_catalog_button_text"
+                                        xalign 0.5
+                                        sensitive _female_can_offer
+                                        action ([Hide("dress_shop_catalog_page"), Call("GirlDressSuggest", _girl_name, _dress_code)] if _girl_name else NullAction())
 
                                 if not _girl_name:
                                     text "Выбор доступен при совместном визите" size 15 color "#5a3a24" xalign 0.5 text_align 0.5
@@ -216,6 +218,8 @@ screen dress_shop_catalog_page(rack_type="male", girl_name=""):
                                     text "Выбор закрыт" size 15 color "#5a3a24" xalign 0.5
                                 elif _dress_price > int(player.economy.money or 0):
                                     text "Не хватает денег" size 15 color "#5a3a24" xalign 0.5
+                                elif _dress_objection:
+                                    text "Она пока не хочет такой наряд" size 15 color "#5a3a24" xalign 0.5 text_align 0.5
 
             null yfill True
 

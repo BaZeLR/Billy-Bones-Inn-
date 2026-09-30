@@ -78,7 +78,7 @@ label IntMelissaTalk(girl_name="melissa"):
             if _apology_accepted:
                 call ReconciliationFavorMenu(girl_name)
             jump IntMelissaTalk
-        "Предложить купить Мелиссе обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists(girl_name, "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
+        "Предложить купить Мелиссе обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists(girl_name, "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6 and _gds_has_new_acceptable_dress(girl_name):
             call IntMelissaDressChange(girl_name)
             jump IntMelissaTalk
         "Спросить, что для нее сейчас важнее всего" if int(Melissa.asked_today or 0) == 0 and int(Melissa.rel or 0) >= 15:

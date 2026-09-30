@@ -1508,6 +1508,7 @@ init -999 python:
                     self.name not in household.outfit_requests
                     and not daily_events.exists(self.name, "BuyDressTom", "")
                     and not daily_events.exists(self.name, "BuyDress", "")
+                    and _gds_has_new_acceptable_dress(self.name)
                 )
             if favor == "barber":
                 day = current_game_day()

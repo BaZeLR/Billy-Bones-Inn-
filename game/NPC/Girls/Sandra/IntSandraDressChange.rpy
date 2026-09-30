@@ -11,6 +11,7 @@ init python:
             and daily_events.exists(girl_key, "BuyDress", "") == 0
             and int(Sandra.talked_today or 0) < 2
             and int(calendar_v2.week or 0) != 6
+            and _gds_has_new_acceptable_dress(girl_key)
         )
 
 

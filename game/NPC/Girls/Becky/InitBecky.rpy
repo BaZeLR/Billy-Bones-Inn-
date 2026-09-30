@@ -224,6 +224,7 @@ init python:
                 and daily_events.exists(girl_key, "BuyDress", "") == 0
                 and self.talk_count() < 2
                 and int(calendar_v2.week or 0) != 6
+                and _gds_has_new_acceptable_dress(girl_key)
             )
             return {
                 "can_offer_bra_off": bool(can_offer_bra_off),

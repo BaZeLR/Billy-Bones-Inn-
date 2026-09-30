@@ -59,6 +59,88 @@ init python:
         bottom_slut = int(DressPartSlut.get(bottom_name, 0) or 0)
         return top_slut, bottom_slut
 
+    def _gds_peer_owns_dress(girl_name, dress_code):
+        girl = str(girl_name or "").strip().lower()
+        if not tavern.is_team_member(girl):
+            return False
+        for peer_name, peer in people.girl_items():
+            if peer_name == girl or not tavern.is_team_member(peer_name) or not peer.wardrobe.owns(dress_code):
+                continue
+            base = dict(getattr(getattr(peer, "data", None), "base_clothing", {}) or {})
+            initial_dresses = set([base.get("day_dress", "")] + list(base.get("owned", []) or []))
+            if dress_code not in initial_dresses:
+                return True
+        return False
+
+    def _gds_interested_in_dress(girl_name):
+        girl = str(girl_name or "").strip().lower()
+        info = people.get_info(girl)
+        if info is None:
+            return False
+        if girl in household.outfit_requests:
+            return True
+        thread_name = {
+            "sandra": "sandraRevealingDressInitiative",
+            "melissa": "melissaRevealingDressRequest",
+            "amanda": "amandaRevealingDressRequest",
+        }.get(girl, "")
+        thread = threads.get(thread_name) if thread_name else None
+        return bool(thread is not None and thread.completed and not str(info.revealing_dress_code or "").strip())
+
+    def _gds_dress_objection(girl_name, dress_code):
+        girl = str(girl_name or "").strip().lower()
+        dress = str(dress_code or "").strip().lower()
+        info = people.get_info(girl)
+        if info is None or dress not in FemaleDressCodes:
+            return "unavailable"
+        if info.wardrobe.owns(dress):
+            return "owned"
+        if dress in ("simplebra", "simplepanties"):
+            return "unwanted"
+        if dress.endswith("stockings"):
+            return "stockings" if int(info.corruption or 0) < 15 else ""
+        if dress not in DressTopPart or dress not in DressBottomPart:
+            return "unavailable"
+        if _gds_peer_owns_dress(girl, dress):
+            return ""
+
+        corruption = int(info.corruption or 0)
+        top, bottom = _gds_dress_top_bottom_slut(dress)
+        if ((corruption >= 35 and top < 2) or (corruption >= 55 and top < 3)
+                or (corruption >= 70 and top < 6) or (corruption >= 45 and bottom < 2)
+                or (corruption >= 60 and bottom < 3) or (corruption >= 75 and bottom < 6)):
+            return "too_plain"
+
+        if _gds_interested_in_dress(girl):
+            owned_exposure = max([
+                max(_gds_dress_top_bottom_slut(owned))
+                for owned in info.wardrobe.owned_items
+                if owned in DressTopPart and owned in DressBottomPart and owned != "nightshirt"
+            ] or [0])
+            if max(top, bottom) <= owned_exposure + 2:
+                return ""
+
+        if corruption < 40 and top >= 5:
+            return "top_extreme"
+        if corruption < 20 and top >= 3:
+            return "top_open"
+        if corruption < 10 and top >= 2:
+            return "top_bold"
+        if corruption < 55 and bottom >= 5:
+            return "bottom_extreme"
+        if corruption < 35 and bottom >= 3:
+            return "bottom_short"
+        if corruption < 20 and bottom >= 2:
+            return "bottom_bold"
+        return ""
+
+    def _gds_has_new_acceptable_dress(girl_name):
+        return any(
+            not _gds_dress_objection(girl_name, dress_code)
+            for dress_code in FemaleDressCodes
+            if dress_code in DressTopPart and dress_code in DressBottomPart
+        )
+
     def _gds_apply_purchase(girl_name, dress_code, set_legsdef=False, set_legs=False, set_produced=False):
         g = str(girl_name or "")
         d = str(dress_code or "")
@@ -100,7 +182,7 @@ init python:
 
 
 label GirlDressSuggest(GirlName="", DressToBuy=""):
-    $ renpy.dynamic("DressBuyIsRelative", "ShowOffLevel", "_rn", "_short_name", "_gds_dress_id", "_is_bra", "_is_panties", "_is_stockings", "_girl_info", "_slut", "_legs_now", "_panties_now")
+    $ renpy.dynamic("DressBuyIsRelative", "ShowOffLevel", "_rn", "_short_name", "_gds_dress_id", "_is_bra", "_is_panties", "_is_stockings", "_dress_objection", "_legs_now", "_panties_now")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
@@ -110,6 +192,12 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
 
     $ DressBuyIsRelative = _gds_relative_type(GirlName)
     $ ShowOffLevel = _gds_showoff_level(GirlName)
+    $ _dress_objection = _gds_dress_objection(GirlName, DressToBuy)
+
+    if _dress_objection in ("owned", "unavailable"):
+        $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
+        return
 
 
     $ _rn = people_display_name(GirlName)
@@ -122,8 +210,6 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         _is_bra = "bra" in _gds_dress_id
         _is_panties = "panties" in _gds_dress_id
         _is_stockings = "stockings" in _gds_dress_id
-        _girl_info = people.get_info(GirlName)
-        _slut = int(_girl_info.corruption or 0) if _girl_info is not None else 0
 
     if _is_bra:
         if GirlName == "georgett":
@@ -146,7 +232,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         return
 
     if _is_stockings:
-        if _slut < 15:
+        if _dress_objection == "stockings":
             '"Ой, чулочки! Ну не знаю, нужны ли они мне?" скромно заметила [_rn]. "Наверное нет, я же никому свои ножки показывать не собираюсь. Давай лучше еще что-то посмотрим."'
             $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
             show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
@@ -193,45 +279,43 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    $ _top_slut, _bottom_slut = _gds_dress_top_bottom_slut(DressToBuy)
-
-    if _slut < 40 and _top_slut >= 5:
+    if _dress_objection == "top_extreme":
         '"Не, ну ты чего?" удивилась вашему выбору [_rn]. "Тут же сиськи практически наружу. Да если и не поворачиваться - все равно все будет видно. Я такое не то, что одевать, в комнате своей не хочу хранить."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if _slut < 20 and _top_slut >= 3:
+    if _dress_objection == "top_open":
         '"Стефан, ты видел эту блузку? В ней же все открыто. Она на грани приличия, вернее уже за гранью," попеняла вам [_rn]. "А я девушка приличная и мне нужны приличные платья."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if _slut < 10 and _top_slut >= 2:
+    if _dress_objection == "top_bold":
         '"Стефан, это платье конечно милое, но какое-то черезчур смелое. Не думаю, что я смогу такое, с вырезом, носить," засмущалась [_rn]. "Давай пока посмотрим другие платья, поскромнее."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if _slut < 55 and _bottom_slut >= 5:
+    if _dress_objection == "bottom_extreme":
         '"Ну ты и выбрал! Наверное членом думал," прокоментировала ваш выбор [_rn]. "С такой юбочкой наклонишься и все видно. Сам такое носи."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if _slut < 35 and _bottom_slut >= 3:
+    if _dress_objection == "bottom_short":
         '"Долго думал? Я такую юбочку не то что на люди, в комнате своей не одену," не одобрила ваш выбор [_rn]. "Если хочешь мне подарок сделать, то давай что-то другое купим."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if _slut < 20 and _bottom_slut >= 2:
+    if _dress_objection == "bottom_bold":
         '"Ну все таки такое платье слишком смелое," зарделась [_rn]. "Давай посмотрим другие, такие чтоб подол до пола был."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
-    if ((_slut >= 35 and _top_slut < 2) or (_slut >= 55 and _top_slut < 3) or (_slut >= 70 and _top_slut < 6) or (_slut >= 45 and _bottom_slut < 2) or (_slut >= 60 and _bottom_slut < 3) or (_slut >= 75 and _bottom_slut < 6)):
+    if _dress_objection == "too_plain":
         '"Стефан, я по твоему кто? Грымза какая или серая мышка? Зачем ты мне суешь это платье, которое слишком скромно и для сорокалетней девственницы? Давай другие посмотрим, понаряднее и попривлекательней."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)

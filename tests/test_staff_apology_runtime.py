@@ -90,6 +90,8 @@ def runtime():
         "renpy": SimpleNamespace(random=SimpleNamespace(randint=rng)),
         "DressTopPart": {},
         "DressBottomPart": {},
+        # Dress willingness is covered by the tailor-specific runtime tests.
+        "_gds_has_new_acceptable_dress": lambda _girl_name: True,
     }
     load_definitions(
         PEOPLE,

@@ -11,6 +11,7 @@ label IntGeorgettDressChange(GirlNameIGT="georgett"):
             and daily_events.exists(GirlNameIGT, "BuyDress", "") == 0
             and Georgett.talk_count() < 2
             and int(calendar_v2.week or 0) != 6
+            and _gds_has_new_acceptable_dress(GirlNameIGT)
         )
 
     if not (_can_shame or _can_buy):

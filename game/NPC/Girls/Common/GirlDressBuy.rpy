@@ -51,7 +51,7 @@ label GirlDressBuyLeave(GirlName=""):
     hide screen dress_shop_catalog_page
     $ _rn = people_display_name(GirlName)
     if int(player.appearance.girl_dresses_bought or 0) <= 0:
-        $ _dress_prices = [int(getattr(item, "price", 0) or 0) for item in dress_shop_catalog_items("female") if not _gds_has_dress_for_girl(GirlName, dress_shop_item_code(item)) and int(getattr(item, "price", 0) or 0) > 0]
+        $ _dress_prices = [int(getattr(item, "price", 0) or 0) for item in dress_shop_catalog_items("female") if not _gds_dress_objection(GirlName, dress_shop_item_code(item)) and int(getattr(item, "price", 0) or 0) > 0]
         if GirlName in household.outfit_requests and _dress_prices and int(player.economy.money or 0) < min(_dress_prices):
             $ people.get_info(GirlName).record_broken_care_promise()
             $ household_cancel_outfit_request(GirlName)
