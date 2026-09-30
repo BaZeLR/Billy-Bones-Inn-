@@ -34,7 +34,7 @@ init -42 python:
         },
         "clara": {
             "private_talk": {"score": 10, "friend": 3, "open": 2, "slut": 0},
-            "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
+            "gift": {"score": 0, "friend": 7, "open": 0, "slut": 0},
             "share": {"score": 7, "friend": 3, "open": 0, "slut": 0},
             "flirt": {"score": 0, "friend": 5, "open": 0, "slut": 0},
         },

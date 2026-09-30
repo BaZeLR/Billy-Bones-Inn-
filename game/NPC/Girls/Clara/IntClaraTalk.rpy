@@ -27,7 +27,15 @@ label IntClaraTalk(girl_name="clara"):
                 call ShowGirlCard(girl_name)
                 $ _clara_repeat_menu = True
 
-            "Поговорить" if social_has_visible_topics(girl_name, "talk"):
+            "Поболтать с Клариссой" if int(Clara.rel or 0) < 3 and Clara.can_talk_today():
+                call IntClaraSmalltalk
+                $ _clara_repeat_menu = True
+
+            "Поговорить с Клариссой о личном" if 3 <= int(Clara.rel or 0) < 6 and Clara.can_talk_today():
+                call IntClaraPersonalTalk
+                $ _clara_repeat_menu = True
+
+            "Поговорить" if int(Clara.rel or 0) >= 6 and social_has_visible_topics(girl_name, "talk"):
                 call SocialTalkTopicMenu(girl_name, "talk")
                 $ _clara_repeat_menu = True
 
@@ -49,16 +57,12 @@ label IntClaraTalk(girl_name="clara"):
                         $ Clara.flirt_count = max(0, int(Clara.flirt_count or 0)) + 1
                 $ _clara_repeat_menu = True
 
-            "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift") and Clara.has_giftable_entries():
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
                 call IntClaraGiftMenu(girl_name)
                 $ _clara_repeat_menu = True
 
             "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
                 call OldPointKinoAttempt(girl_name)
-                $ _clara_repeat_menu = True
-
-            "Извиниться перед Клариссой" if Clara.can_apologize():
-                call OldPointApology(girl_name)
                 $ _clara_repeat_menu = True
 
             "Проследить за Клариссой по рынку" if str(rooms.current_code or "") == "MarketPlace" and int(player.stats.exploration or 0) >= 100 and int(Clara.asked_today or 0) == 0:
@@ -166,6 +170,40 @@ label IntClaraTalk(girl_name="clara"):
             "Назад":
                 $ main_ui_end_talk_state()
                 return
+    return
+
+
+label IntClaraSmalltalk:
+    $ renpy.dynamic("_clara_busy_text")
+    $ _clara_busy_text = Clara.interrupt_work()
+    if _clara_busy_text:
+        $ scene_runtime.text = _clara_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ scene_runtime.text = "Кларисса встречает вас прищуром: «Ну, мейстер Стефан, что нового за пределами нашей лавки?» Вы обмениваетесь городскими слухами; она слушает внимательно и то и дело задает вопрос точнее вашего ответа."
+    if procedural_randint(1, 2, "clara_smalltalk_%s_%s" % (Clara.talk_count(), current_game_day())) == 1:
+        $ Clara.add_relation(1, 3)
+        $ scene_runtime.text += "\n\nНа прощание Кларисса придерживает вас еще на миг: кажется, ей понравилось разговаривать с вами просто так."
+    $ Clara.finish_talk()
+    $ scene_runtime.location_text = scene_runtime.text
+    return
+
+
+label IntClaraPersonalTalk:
+    $ renpy.dynamic("_clara_busy_text")
+    $ _clara_busy_text = Clara.interrupt_work()
+    if _clara_busy_text:
+        $ scene_runtime.text = _clara_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ scene_runtime.text = "Вы спрашиваете Клариссу не о ценах на вино и не о приличиях дома Легаре. Она сперва отшучивается, а потом признается: «Иногда мне хочется, чтобы меня спрашивали, чего хочу я сама. Представляешь, какая опасная мысль?»"
+    if procedural_randint(1, 2, "clara_personal_%s_%s" % (Clara.talk_count(), current_game_day())) == 1:
+        $ Clara.add_relation(1, 6)
+        $ Clara.change_social(open_delta=1)
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+        $ scene_runtime.text += "\n\nНа этот раз ее улыбка не похожа на ту, которой встречают покупателей."
+    $ Clara.finish_talk()
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 

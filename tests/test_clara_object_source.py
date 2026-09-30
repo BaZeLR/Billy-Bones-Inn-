@@ -153,6 +153,12 @@ def test_clara_social_and_gift_logic_belongs_to_clara_instance():
     assert "Clara.remove_gift_entry(_selected)" in talk_source
     assert 'SocialTalkTopicMenu(girl_name, "talk")' in talk_source
     assert 'SocialTalkTopicMenu(girl_name, "flirt")' in talk_source
+    assert 'call IntClaraSmalltalk' in talk_source
+    assert 'call IntClaraPersonalTalk' in talk_source
+    assert 'label IntClaraSmalltalk:' in talk_source
+    assert 'label IntClaraPersonalTalk:' in talk_source
+    assert 'social_interaction_allowed_for_npc(girl_name, "gift")' in talk_source
+    assert '"Извиниться перед Клариссой"' not in talk_source
     assert "label IntClaraTalkMenu:" not in talk_source
     assert "jump IntClaraTalkMenu" not in talk_source
     assert "while True:" not in talk_source
@@ -166,8 +172,11 @@ def test_clara_social_and_gift_logic_belongs_to_clara_instance():
     assert "def npc_gift_action_available" not in people_runtime
     assert "Clara.has_giftable_entries()" not in people_runtime
     assert "Clara.has_caught_cat_gift()" in social_topics
+    clara_gift_gate = social_topics.split('if key == "clara":\n            if action_key == "flirt":', 1)[1].split('if action_key == "share":', 1)[0]
+    assert 'social_flirted_today_value(key)' not in clara_gift_gate
     clara_requirements = relationship.split('"clara": {', 1)[1].split('"becky": {', 1)[0]
     assert '"flirt": {"score": 0, "friend": 5, "open": 0, "slut": 0}' in clara_requirements
+    assert '"gift": {"score": 0, "friend": 7, "open": 0, "slut": 0}' in clara_requirements
 
     assert "label IntClaraTalkApply" not in talk_source
     assert "choice_code" not in talk_source

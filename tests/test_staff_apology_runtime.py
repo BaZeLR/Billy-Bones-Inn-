@@ -14,6 +14,27 @@ ROOT = Path(__file__).resolve().parents[1]
 PEOPLE = ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy"
 RELATIONSHIPS = ROOT / "game/Utilities/General/NPC/RelationshipDynamics.rpy"
 NPC_IDS = ("amanda", "melissa", "sandra", "liza", "georgett", "clara", "becky", "future_worker")
+TEAM_IDS = ("amanda", "melissa", "sandra")
+NON_TEAM_IDS = ("liza", "georgett", "clara", "becky", "future_worker")
+
+
+@pytest.mark.parametrize("path", (
+    "Becky/IntBeckyTalk.rpy",
+    "Clara/IntClaraTalk.rpy",
+    "Liza/IntLizaTalk.rpy",
+    "Georgett/IntGeorgettTalk.rpy",
+))
+def test_outside_npc_talk_menus_have_no_household_apology(path):
+    source = (ROOT / "game/NPC/Girls" / path).read_text(encoding="utf-8")
+    assert "OldPointApology" not in source
+    assert "Извиниться перед" not in source
+
+
+def test_becky_keeps_her_authored_talk_progression():
+    source = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalk.rpy").read_text(encoding="utf-8")
+    assert "call _int_becky_talk_smalltalk(_becky_name)" in source
+    assert "call _int_becky_talk_personal(_becky_name)" in source
+    assert "call PlayerCardGiftToFixedTargetMenu(_becky_name)" in source
 
 
 def load_definitions(path, marker, names, namespace):
@@ -113,12 +134,12 @@ def test_negative_reaction_costs_five_clamped_at_zero(runtime, name, before, aft
     assert npc.anger_with_player == 1
     assert npc.reaction_state["last_anger_reason"] == "harass_player_watched"
     assert (npc.openness, npc.corruption, npc.talked_today) == (7, 12, 0)
-    assert npc.can_apologize()
+    assert npc.can_apologize() is (name in TEAM_IDS)
     assert snapshot(other) == unchanged
     assert runtime.rng.calls == []
 
 
-@pytest.mark.parametrize("name", NPC_IDS)
+@pytest.mark.parametrize("name", TEAM_IDS)
 @pytest.mark.parametrize("gain", range(1, 6))
 def test_accepted_apology_draws_half_chance_then_one_to_five(runtime, name, gain):
     npc = runtime.make_npc(name, anger=4)
@@ -141,7 +162,7 @@ def test_accepted_apology_draws_half_chance_then_one_to_five(runtime, name, gain
     assert snapshot(other) == unchanged
 
 
-@pytest.mark.parametrize("name", NPC_IDS)
+@pytest.mark.parametrize("name", TEAM_IDS)
 def test_refused_apology_changes_only_talk_count(runtime, name):
     npc = runtime.make_npc(name, anger=3)
     runtime.namespace["relationship_set_anger"](name, 2, 1, "harass_player_ignored")
@@ -164,7 +185,7 @@ def test_apology_reports_actual_gain_at_npc_relationship_cap(runtime, cap, start
     assert npc.anger_with_player == 0
 
 
-@pytest.mark.parametrize("name", NPC_IDS)
+@pytest.mark.parametrize("name", TEAM_IDS)
 def test_successful_apology_cannot_award_a_duplicate_gain(runtime, name):
     npc = runtime.make_npc(name, anger=1)
     runtime.rng.values.extend((1, 3))
@@ -177,7 +198,7 @@ def test_successful_apology_cannot_award_a_duplicate_gain(runtime, name):
     assert len(runtime.rng.calls) == 2
 
 
-@pytest.mark.parametrize("rel,anger,mood,eligible", ((4, 0, 0, True), (5, 0, 0, False), (40, 1, 0, True), (40, 0, 1, True)))
+@pytest.mark.parametrize("rel,anger,mood,eligible", ((4, 0, 0, True), (5, 0, 0, True), (6, 0, 0, False), (40, 1, 0, True), (40, 0, 1, True)))
 def test_apology_reads_existing_anger_and_legacy_low_relationship(runtime, rel, anger, mood, eligible):
     npc = runtime.make_npc(rel=rel, anger=anger)
     if mood:
@@ -197,6 +218,16 @@ def test_three_daily_attempts_exhaust_apology_without_additional_changes(runtime
     assert npc.attempt_apology() == (False, 0)
     assert snapshot(npc) == before
     assert len(runtime.rng.calls) == 3
+
+
+@pytest.mark.parametrize("name", NON_TEAM_IDS)
+def test_outsiders_cannot_use_household_apology(runtime, name):
+    npc = runtime.make_npc(name, rel=0, anger=3)
+    before = snapshot(npc)
+    assert not npc.can_apologize()
+    assert npc.attempt_apology() == (False, 0)
+    assert snapshot(npc) == before
+    assert runtime.rng.calls == []
 
 
 @pytest.mark.parametrize("name", NPC_IDS + ("unhired_woman",))

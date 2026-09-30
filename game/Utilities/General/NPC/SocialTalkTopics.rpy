@@ -591,8 +591,6 @@ init -39 python:
             if action_key == "flirt":
                 return bool(Clara.can_start_social_events()) and social_external_requirement_met(key, "flirt")
             if action_key == "gift":
-                if social_flirted_today_value(key) <= 0:
-                    return False
                 return bool((Clara.can_receive_gifts() or Clara.has_caught_cat_gift()) and Clara.has_giftable_entries())
             if action_key == "share":
                 if social_flirted_today_value(key) <= 0:

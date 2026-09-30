@@ -1305,8 +1305,8 @@ init -999 python:
             return self.rel - before
 
         def can_apologize(self):
-            return self.talked_today < 3 and (
-                self.rel < 5
+            return self.name in ("amanda", "melissa", "sandra") and self.talked_today < 3 and (
+                self.rel <= 5
                 or people_to_int(getattr(self, "anger_with_player", 0), 0) > 0
                 or relationship_anger(self.name) > 0
             )

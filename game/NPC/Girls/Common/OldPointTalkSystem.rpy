@@ -101,24 +101,6 @@ label OldPointKinoAttempt(girl_name=""):
     return
 
 
-label OldPointApology(girl_name=""):
-    $ renpy.dynamic("_apology_info", "_apology_accepted", "_apology_gain")
-    $ _apology_info = people.get_info(girl_name)
-    if _apology_info is None or not _apology_info.can_apologize():
-        return
-    $ _apology_accepted, _apology_gain = _apology_info.attempt_apology()
-    if _apology_accepted:
-        $ scene_runtime.text = "%s выслушивает извинение. Обиды не исчезают мгновенно, но она видит, что вы признаете ошибку." % _action_display_name(girl_name)
-        $ scene_runtime.text += "\n\nОтношения: +%d." % _apology_gain
-    else:
-        $ scene_runtime.text = "%s все еще сердится. Слова помогают, но ей нужно больше времени и нормального поведения." % _action_display_name(girl_name)
-    $ scene_runtime.location_text = scene_runtime.text
-    $ calendar_v2.advance_minutes(10)
-    if _apology_accepted:
-        call ReconciliationFavorMenu(girl_name)
-    return
-
-
 # Returnable care-request scene; appointments remain owned by existing systems.
 label ReconciliationFavorMenu(girl_name=""):
     $ renpy.dynamic("_favor_info", "_favor_tailor", "_favor_barber")

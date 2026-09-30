@@ -60,8 +60,6 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                 call IntGeorgettAskEddieVisit(girl_name, girl_loc)
             "Снять" if (player.economy.money>=8 or (player.economy.money>=4 and girl_loc=="tavern")) and player.intimacy.can_cum() and Georgett.can_have_sex_today():
                 call IntGeorgettHire(girl_name, girl_loc)
-            "Извиниться перед Жоржеттой" if Georgett.can_apologize():
-                call OldPointApology(girl_name)
             "Лапать":
                 call IntGeorgettGrope(girl_name, girl_loc)
             "Поинтересоваться, знает ли она от кого залетела" if Georgett.can_talk_today() and int(Georgett.rel or 0)>=8 and int(Georgett.stats.get("pregnancy",0) or 0)>=120 and str(DaddyAskBuildPhrase(girl_name) or "")!="":
