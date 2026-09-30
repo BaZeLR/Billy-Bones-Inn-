@@ -1279,6 +1279,8 @@ label TavernKitchenBreakfastMenu:
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
     while True:
+        if story_event_available("TavernKitchen", "breakfast_tease"):
+            call checkTriggers("TavernKitchen", "breakfast_tease", 0)
         $ _breakfast_soap_girl = str(tavern_breakfast_soap_request_girl() or "")
         $ _breakfast_dress_girl = str(tavern_breakfast_dress_request_girl() or "")
         $ _breakfast_issue_girl = str(tavern_breakfast_morning_issue_girl() or "")
@@ -1310,9 +1312,6 @@ label TavernKitchenBreakfastMenu:
 
             "Разобрать спор Мелиссы и Аманды" if tavern_breakfast_melissa_amanda_gerhard_ready():
                 call TavernKitchenBreakfastMelissaAmandaGerhard
-
-            "Заметить провокацию за столом" if tavern_breakfast_tease_ready():
-                call TavernKitchenBreakfastTease
 
             "Выслушать просьбу о мыле" if _breakfast_soap_girl != "":
                 call HouseholdSoapRequestEvent(_breakfast_soap_girl)
@@ -1797,10 +1796,6 @@ label TavernKitchenBreakfastLookAtGirl(girl_name=""):
         menu:
             "Предложить сходить к Серджио" if household_barber_request_ready(_breakfast_look_girl, "breakfast"):
                 call HouseholdBarberRequestEvent(_breakfast_look_girl, "breakfast")
-
-            "Ответить на её поддразнивание" if tavern_breakfast_tease_candidate(_breakfast_look_girl).get("girl") == _breakfast_look_girl:
-                call TavernKitchenBreakfastTease(_breakfast_look_girl)
-                return
 
             "Сделать комплимент" if int(_breakfast_look_info.var.get("breakfast_comment_day", -1)) != current_game_day():
                 $ _breakfast_look_info.fun = min(100, int(getattr(_breakfast_look_info, "fun", 0) or 0) + 2)

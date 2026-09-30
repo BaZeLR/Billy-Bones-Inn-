@@ -137,7 +137,7 @@ init -24 python:
                 and str(people.location("amanda") or "") == "TavernAmandaRoom"
                 and household_morning_issue_type("amanda") != "sick"
                 and not Amanda.room_entry_blocked_today
-                and not player.tavern_management.breakfast.today
+                and (not player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active)
                 and not (
                     player.tavern_management.breakfast.event_active
                     and "amanda" in (player.tavern_management.breakfast.present_ids or [])

@@ -28,15 +28,20 @@ label TavernMyRoomWindowLookBackyard:
     if _return:
         return
 
+    $ main_ui_begin_native_scene_state("Маленькое окно")
+    show screen main_ui
     if _window_is_night:
         $ _window_text = "Ночь делает задний двор почти безлюдным. В синем свете луны видны старая будка нужника, колодец, бочка у стены и темная крыша сарая. Только огонь во дворе и редкие огоньки в окнах напоминают, что трактир еще не спит."
-        $ TavernMyRoomWindowObject.picture = "images/player_room/window2.png"
+        vscene "images/player_room/window2.png"
     else:
         $ _window_text = "Через маленькое окно хорошо виден задний двор трактира: мокрая земля у колодца, низкий нужник у забора, поленница возле сарая и кострище, возле которого обычно сушат вещи после дождя. Двор выглядит тесным, рабочим и по-домашнему знакомым."
-        $ TavernMyRoomWindowObject.picture = "images/player_room/window0.png"
+        vscene "images/player_room/window0.png"
 
-    call TavernMyRoomObjectMenu("myroom_window_001", _window_text)
-    $ TavernMyRoomWindowObject.picture = ""
+    $ scene_runtime.text = _window_text
+    menu:
+        "Закрыть окно":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
@@ -49,7 +54,12 @@ label story_amanda_night_bowl_window_0:
         $ _window_text = "Вы осторожно выглядываете во двор и замечаете, как Аманда, кутаясь в ночную рубашку и недовольно озираясь по сторонам, все равно выбирается наружу. Похоже, даже получив новый горшок, она не до конца отказалась от ночных вылазок. Аманда, краснея даже в темноте, торопливо присаживается у забора, делает свое дело и почти бегом скрывается обратно в доме."
     else:
         $ _window_text = "Вы осторожно выглядываете во двор и замечаете, как Аманда, кутаясь в ночную рубашку и недовольно озираясь по сторонам, торопливо выскальзывает наружу. Без своей привычной ночной миски ей приходится искать облегчения во дворе. Аманда, краснея даже в темноте, поспешно присаживается у забора, делает свое дело и почти бегом скрывается обратно в доме."
-    $ TavernMyRoomWindowObject.picture = "images/player_room/windowAmand.png"
-    call TavernMyRoomObjectMenu("myroom_window_001", _window_text)
-    $ TavernMyRoomWindowObject.picture = ""
+    $ main_ui_begin_native_scene_state("Маленькое окно")
+    show screen main_ui
+    vscene "images/player_room/windowAmand.png"
+    $ scene_runtime.text = _window_text
+    menu:
+        "Закрыть окно":
+            pass
+    $ main_ui_end_native_scene_state()
     return True

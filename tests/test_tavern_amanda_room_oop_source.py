@@ -110,6 +110,15 @@ def test_morning_episode_uses_owned_scene_and_returns_to_requested_kitchen():
     assert "main_ui_end_native_scene_state()" in block
     assert "jump TavernKitchen" in block
     assert "event_runtime.active_thread.advance()" in block
+
+
+def test_morning_window_entry_remains_available_while_amanda_misses_breakfast():
+    event_model = (Path(__file__).resolve().parents[1] / "game/NPC/Girls/Amanda/AmandaEventModel.rpy").read_text(encoding="utf-8-sig")
+    block = event_model.split("class AmandaMorningWindowEpisodeEvent(AmandaEvent):", 1)[1].split(
+        "class AmandaMorningWoodEvent(AmandaEvent):", 1
+    )[0]
+    assert "not player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active" in block
+    assert '"amanda" in (player.tavern_management.breakfast.present_ids or [])' in block
     assert "attic_window_favor_stage" not in MORNING_SOURCE
 
 

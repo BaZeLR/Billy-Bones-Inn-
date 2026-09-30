@@ -37,3 +37,16 @@ def test_player_room_window_has_distinct_descriptions_for_each_state():
     assert "Через маленькое окно хорошо виден задний двор трактира" in source
     assert "Без своей привычной ночной миски" in source
     assert "даже получив новый горшок" in source
+
+
+def test_player_room_window_scenes_hide_object_actions_until_closed():
+    source = read_rel("game/Inn/TavernMyRoomWindow001.rpy")
+    look = source.split("label TavernMyRoomWindowLookBackyard:", 1)[1].split(
+        "label story_amanda_night_bowl_window_0:", 1
+    )[0]
+    event = source.split("label story_amanda_night_bowl_window_0:", 1)[1]
+    for block in (look, event):
+        assert 'main_ui_begin_native_scene_state("Маленькое окно")' in block
+        assert '"Закрыть окно":' in block
+        assert "main_ui_end_native_scene_state()" in block
+        assert "call TavernMyRoomObjectMenu" not in block

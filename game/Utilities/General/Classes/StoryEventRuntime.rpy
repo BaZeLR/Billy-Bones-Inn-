@@ -2139,6 +2139,12 @@ define sherwoodThreadList = [
     ], highlight=False, threaded=True),
 ]
 define tavernThreadList = [
+    LThreadData(0, "tavern", "BreakfastTease", None, [
+        ("TavernKitchenBreakfastTease", None, (6, 11), None, 1, None,
+         ["#player.tavern_management.breakfast.event_active",
+          "#tavern_breakfast_tease_ready()"],
+         None, "TavernKitchen", "breakfast_tease", 100),
+    ], highlight=False, threaded=False),
     LThreadData(0, "tavern", "ShedRenovationBreakfast", None, [
         ("story_shed_renovation_breakfast", None, (6, 11), None, 1, None,
          ["#tavern.renovation_complete('shed')",
