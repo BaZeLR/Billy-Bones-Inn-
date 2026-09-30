@@ -84,7 +84,7 @@ The Sofa/witch supply line is a distinct ordered quest, not hidden state in the 
 
 ## Replacement opening: playable order and memory reveal
 
-The playable prologue now starts at the Market, three weeks after Steven/Tempest vanish, and follows the guard, Blind Pirate news, Sandra's reunion, tavern-team confrontation, Duchess Conchitta's letter, Stephan's childhood/sailor memory flashes, and the damaged comm-unit call. Steven remembers the time-field attack before play begins. `Intro` calls the returnable `OpeningCinematic` label and then enters the normal tavern checkpoint; the main-menu `Introduction` entry calls the same label and returns to the menu. The sequence uses native Ren'Py dialogue over full-screen art with black cinematic bars above and below, and the bottom text window; it does not use the room HUD or the obsolete JSON slideshow. The original two memory pictures remain untouched.
+The age filter runs before the main menu. New game calls the returnable `OpeningCinematic` label, then rolls the preserved original notice and introduction text, then offers the button to manage the tavern. The main-menu `Introduction` entry replays the cinematic without starting a new game. The prologue begins at the Market three weeks after Steven/Tempest vanish, follows the guard, the original Blind Pirate Market account, the reunion, the team confrontation, the inheritance letter, childhood/sailor memory flashes, and the incoming comm-unit call. Before the letter and call, the protagonist cannot identify himself or the women, so the cinematic uses unnamed speaker tags. Native Ren'Py dialogue appears over art with black cinematic bars; no room HUD or JSON slideshow is used.
 
 The numbered shots and the supplied Penny picture live in `game/images/intro/`:
 
@@ -93,19 +93,19 @@ The numbered shots and the supplied Penny picture live in `game/images/intro/`:
 | `intro_1`–`intro_4` | Market awakening, near collision (wide/close), peasant and Blind Pirate wagon. |
 | `intro_5`–`intro_6` | Sandra reunion and walk home through Butchery Street. |
 | `intro_7`–`intro_8` | Kitchen confrontation and Amanda checking whether Stephan is sober. |
-| `intro_9`–`intro_10` | Inheritance letter and Steven's mirror shock. |
+| `player_room`, `intro_28`, cropped `intro_25` | Canonical bedroom establishes the actual room layout; the established bar-stand reading pose uses MC's portrait face and introductory clothes, followed by a tight hand-mirror shot. The letter is a dated notarial transfer from Duchess Conchitta's merchant-fleet office, signed and sealed by Don Martin de Vega, including the inn's property, duties and any debts. |
 | `intro_11`–`intro_12` | Corrected memory: uncle expels young Stephan from Wild Stallion before Sandra/young Melissa/young Amanda; later Stephan as sailor. |
-| `intro_13` | Steven on his bed, gloves off, checking the wrist unit; reused when the call dies. |
-| `intro_14`–`intro_15` | Earlier wrist-screen art retained as source/reference; `intro_15` supplies the brief static interruption. |
+| `intro_23` | Steven on the bed; the communicator calls on its own. Reused when the call dies. |
+| `intro_26`–`intro_27` | Bare arm, palm and wrist unit; then the screen close-up. Static remains behind the caller feed. |
 | `intro_16` | Steven and Tempest colliding inside the time-field, shown **during** Dr Evil's explanation. |
 | `intro_17`–`intro_19` | The three supplied Dr Evil reactions: startled, finger to lips, and laughing; all appear in the call. |
 | `intro_20`–`intro_21` | The two supplied Tempest images, intercut with Dr Evil's explanation before the collision shot. |
-| `intro_22` | Corrected communicator close-up: human forearm, wrist, open palm and fingers all visible. |
+| `intro_9`–`intro_10`, `intro_13`–`intro_15`, `intro_22`, `intro_24` | Earlier room/device compositions retained as references but not played. |
 | `penny_ass` | User-supplied mistaken picture appears in Penny's interrupted feed. Dr Evil says “Wrong picture” over static immediately before his laugh; the words are not baked into the art. |
 
 The two separate `GameItem`s, `comm_unit_001` (wrist) and `vibranium_ring_001` (finger), use `game/images/general/comm_unit_item.png` and `game/images/general/vibranium_ring_item.png`. Fresh Player state begins with both worn. The player card can remove/replace them, and the bedroom chest can store/retrieve them without a second inventory authority. Existing saves do not receive them automatically; no retroactive grant is planned without a migration decision.
 
-The peasant's opening account is narrative only: it does **not** mark the independent `cityBlindPirateFall` Market-entry event completed. The three missing weeks also do not advance the live calendar. The supplied Penny image is the deliberate mistaken feed; a separate live-call portrait is not needed for this joke. “Goddess” is Tempest's superhero nickname, not a deity classification. The later Franchesca/mirror arc explains this opening but must never jump back to it or reset game state.
+The cinematic uses the first three original `cityBlindPirateFall` Market paragraphs and its concluding reaction. After new-game initialization, the thread advances once so the witnessed scene does not repeat on the first Market visit; its later breakfast chapter remains available. The three missing weeks do not advance the live calendar. All Dr Evil, Tempest, fight, and mistaken Penny images appear inside the monitor close-up, interrupted by static; “Wrong picture” precedes Dr Evil's laugh. “Goddess” is Tempest's superhero nickname, not a deity classification. The later Franchesca/mirror arc explains this opening but must never jump back to it or reset game state.
 
 ## Implementation boundaries and acceptance checks
 
