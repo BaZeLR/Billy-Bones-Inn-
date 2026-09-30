@@ -308,6 +308,9 @@ screen current_action_panel(native_choice=None):
     if native_choice is not None:
         $ _native_choice_items = list(native_choice.scope.get("items", []) or [])
         use choice_panel(_native_choice_items)
+    elif renpy.get_screen("say") is not None:
+        # A story paragraph never exposes actions from the room beneath it.
+        null
     elif str(main_ui_runtime.mode or "") in ("dog", "werecat") and main_ui_runtime.card_origin is not None:
         textbutton "Назад":
             style "mui_hud_button"
@@ -343,6 +346,7 @@ screen main_ui_hud_button(caption, action_value, selected_value=False, button_id
         alt button_id
         style "mui_hud_button"
         selected bool(selected_value)
+        sensitive not (renpy.get_screen("say") is not None or renpy.get_screen("choice") is not None or str(main_ui_runtime.mode or "") == "event")
         action action_value
 
 
@@ -441,23 +445,26 @@ screen debug_builder_state_controls(chores):
 
 screen main_ui():
     zorder 0
+    $ _say_displayable = renpy.get_screen("say")
+    $ _native_dialogue = _say_displayable is not None and bool(_say_displayable.scope.get("what", ""))
+    $ _native_choice_screen = renpy.get_screen("choice")
+    $ _room_actions_visible = _say_displayable is None and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"
 
     if rooms.current_code == "Intro":
         key "game_menu" action NullAction()
     else:
         key "game_menu" action ShowMenu("save")
-        key "K_l" action SetField(main_ui_runtime, "overlay", "people")
-        key "K_t" action SetField(main_ui_runtime, "overlay", "story")
-        key "K_i" action Function(main_ui_toggle_inventory_dropdown)
-        key "K_p" action Function(show_player_card_main_ui_state)
+        if _room_actions_visible:
+            key "K_l" action SetField(main_ui_runtime, "overlay", "people")
+            key "K_t" action SetField(main_ui_runtime, "overlay", "story")
+            key "K_i" action Function(main_ui_toggle_inventory_dropdown)
+            key "K_p" action Function(show_player_card_main_ui_state)
         if config.developer:
             key "K_F8" action Jump("dev_after_report_checkpoint")
 
     $ _room = rooms.current
     $ _room_name = _room.display_name if _room is not None else str(rooms.current_code or "")
     $ _desc = str(_coerce_panel_text_value(scene_runtime.text if scene_runtime.text is not None else scene_runtime.location_text) or "")
-    $ _say_displayable = renpy.get_screen("say")
-    $ _native_dialogue = _say_displayable is not None and bool(_say_displayable.scope.get("what", ""))
     $ _picture = resolve_main_ui_picture(_room)
     $ current_location = str(rooms.current_code or getattr(_room, "code_name", "") or "")
     $ _npc_ids_here = list(people.ids_at(current_location) or []) if current_location else []
@@ -563,7 +570,7 @@ screen main_ui():
                                             Jump("DebugBuilderRoom"),
                                         ], str(rooms.current_code or "") == "DebugBuilderRoom", "main_ui_debug_builder_button")
 
-                                    if bool(main_ui_runtime.inventory_dropdown_open):
+                                    if _room_actions_visible and bool(main_ui_runtime.inventory_dropdown_open):
                                         for _inv_section in player_card_inventory_section_ids():
                                             textbutton player_card_inventory_section_button_caption(_inv_section):
                                                 id ("main_ui_inventory_section_%s" % _inv_section)
@@ -577,27 +584,27 @@ screen main_ui():
                             text "дрова [int(_chores.get('bring_woods', 0) or 0)]/[player_chore_target('bring_woods')]   колка [int(_chores.get('chop_wood', 0) or 0)]/[player_chore_target('chop_wood')]   огонь [int(_chores.get('make_fire', 0) or 0)]/[player_chore_target('make_fire')]" size 17 xalign 0.5 color "#aaaaaa"
                             text "зола [int(_chores.get('clean_ashes', 0) or 0)]/[player_chore_target('clean_ashes')]   вода [int(_chores.get('boil_water', 0) or 0)]/[player_chore_target('boil_water')]   комнаты [int(_chores.get('clean_upstairs_rooms', 0) or 0)]/[player_chore_target('clean_upstairs_rooms')]" size 17 xalign 0.5 color "#aaaaaa"
 
-                    if str(rooms.current_code or "") == "DebugBuilderRoom":
+                    if _room_actions_visible and str(rooms.current_code or "") == "DebugBuilderRoom":
                         use debug_builder_state_controls(_chores)
 
-                    frame:
-                        xfill True
-                        yminimum 300
-                        padding (10, 10)
-                        background "#000000ff"
-                        $ _native_choice_screen = renpy.get_screen("choice")
-                        $ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None
-                        vbox:
-                            spacing 10
-
-                            text (_native_choice_label or main_ui_runtime.action_title) size 22 xalign 0.5
-
+                    if _room_actions_visible or _native_choice_screen is not None:
+                        frame:
+                            xfill True
+                            yminimum 300
+                            padding (10, 10)
+                            background "#000000ff"
+                            $ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None
                             vbox:
-                                xfill True
-                                spacing 6
-                                use current_action_panel(_native_choice_screen)
+                                spacing 10
 
-                    if str(main_ui_runtime.mode or "") != "event":
+                                text (_native_choice_label or ("Выбор" if _native_choice_screen is not None else main_ui_runtime.action_title)) size 22 xalign 0.5
+
+                                vbox:
+                                    xfill True
+                                    spacing 6
+                                    use current_action_panel(_native_choice_screen)
+
+                    if _room_actions_visible:
                         null yfill True
 
                         frame:
@@ -666,13 +673,13 @@ screen main_ui():
                                 else:
                                     text "Никого нет." size 20
 
-    if str(main_ui_runtime.overlay or "") == "story":
+    if _room_actions_visible and str(main_ui_runtime.overlay or "") == "story":
         use story_thread_board_panel
-    elif str(main_ui_runtime.overlay or "") == "time":
+    elif _room_actions_visible and str(main_ui_runtime.overlay or "") == "time":
         use time_change_panel
-    elif str(main_ui_runtime.overlay or "") == "people":
+    elif _room_actions_visible and str(main_ui_runtime.overlay or "") == "people":
         use people_locate_panel
-    elif str(main_ui_runtime.overlay or "") == "progress":
+    elif _room_actions_visible and str(main_ui_runtime.overlay or "") == "progress":
         use tractir_progress_panel
 
 

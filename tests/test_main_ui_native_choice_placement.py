@@ -45,12 +45,30 @@ def test_native_menu_uses_the_named_main_ui_action_region_contract():
     assert '$ _native_choice_screen = renpy.get_screen("choice")' in source
     assert 'use current_action_panel(_native_choice_screen)' in source
     assert 'if renpy.get_screen("choice") is None:' not in source
-    action_region = source.split('$ _native_choice_screen = renpy.get_screen("choice")', 1)[1].split(
-        'if str(main_ui_runtime.mode or "") != "event":', 1
+    action_region = source.split('$ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None', 1)[1].split(
+        'use current_action_panel(_native_choice_screen)', 1
     )[0]
     assert "viewport:" not in action_region
     assert "mousewheel True" not in action_region
     assert "draggable True" not in action_region
+
+
+def test_dialogue_and_native_choices_exclude_room_controls():
+    source = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
+    panel = source.split("screen current_action_panel(native_choice=None):", 1)[1].split("screen main_ui_status_item", 1)[0]
+    main_ui = source.split("screen main_ui():", 1)[1].split("screen main_ui_left_panel", 1)[0]
+    rat_scene = (ROOT / "game/NPC/Girls/Melissa/MelissaEvents.rpy").read_text(encoding="utf-8-sig").split(
+        "label story_melissa_storage_rat_0:", 1
+    )[1].split("label story_melissa_werecat_intro_0:", 1)[0]
+
+    assert panel.index("if native_choice is not None:") < panel.index('elif renpy.get_screen("say") is not None:') < panel.index("elif main_ui_runtime.action_items:")
+    assert '_room_actions_visible = _say_displayable is None and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"' in main_ui
+    assert 'sensitive not (renpy.get_screen("say") is not None or renpy.get_screen("choice") is not None or str(main_ui_runtime.mode or "") == "event")' in source
+    assert "if _room_actions_visible:" in main_ui
+    assert "if _room_actions_visible or _native_choice_screen is not None:" in main_ui
+    assert 'if _room_actions_visible and str(main_ui_runtime.overlay or "") == "story":' in main_ui
+    assert '"[scene_runtime.text]"' in rat_scene
+    assert 'menu:' in rat_scene
 
 
 def test_room_and_object_action_buttons_use_the_same_hud_button_design():
