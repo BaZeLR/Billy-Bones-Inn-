@@ -107,7 +107,6 @@ init python:
             "legare_choice_start_day": -1,
             "legare_choice_outcome": "",
             "legare_service_decision_day": -1,
-            "legare_service_savings": 0,
             "legare_service_reconciled": False,
         }
 
@@ -233,6 +232,8 @@ init python:
         def update(self):
             super(AmandaInfo, self).update()
             self.data = AmandaStaticData
+            if "legare_service_savings" in self.var:
+                self.receive_personal_money(self.var.pop("legare_service_savings"))
             if not hasattr(self, "backyard_relief_seen"):
                 self.backyard_relief_seen = False
             if "legare_confrontations" not in self.var:

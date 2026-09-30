@@ -47,10 +47,20 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
 
 
 label GirlDressBuyLeave(GirlName=""):
-    $ renpy.dynamic("_rn")
+    $ renpy.dynamic("_rn", "_dress_prices")
     hide screen dress_shop_catalog_page
     $ _rn = people_display_name(GirlName)
     if int(player.appearance.girl_dresses_bought or 0) <= 0:
+        $ _dress_prices = [int(getattr(item, "price", 0) or 0) for item in dress_shop_catalog_items("female") if not _gds_has_dress_for_girl(GirlName, dress_shop_item_code(item)) and int(getattr(item, "price", 0) or 0) > 0]
+        if GirlName in household.outfit_requests and _dress_prices and int(player.economy.money or 0) < min(_dress_prices):
+            $ people.get_info(GirlName).record_broken_care_promise()
+            $ household_cancel_outfit_request(GirlName)
+            $ scene_runtime.text = "У Ирмы есть подходящие наряды, но у вас нет денег даже на самый дешевый. %s замечает это раньше, чем вы успеваете придумать отговорку. \"Ты обещал мне обновку, Стефан. Зачем тогда привел сюда?\" Она выходит из лавки, не дожидаясь ответа." % str(_rn)
+            $ scene_runtime.location_text = scene_runtime.text
+            $ main_ui_runtime.action_title = "Действия"
+            $ main_ui_runtime.action_content = None
+            $ main_ui_runtime.action_items = [MenuItem("Выйти из лавки", Jump("ArtisansQuarter"))]
+            return
         $ scene_runtime.text = "Осмотрев предлагаемый товар и обратив особое внимание на цены, вы буркнули: \"Покупать нечего, зайдем в другой раз!\" и бодро направились к выходу.\n\n%s ваше мнение, судя по всему, не разделяла и попыталась вас остановить: \"Стефан, давай еще посмотрим, ты же обещал мне что-нибудь купить!\"" % str(_rn)
         $ scene_runtime.location_text = scene_runtime.text
         $ dress_shop.girl_dress_block = 1

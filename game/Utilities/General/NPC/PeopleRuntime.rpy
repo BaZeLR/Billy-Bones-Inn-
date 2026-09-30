@@ -970,6 +970,7 @@ init -999 python:
             self.openness = 0
             self.rebel_baseline = 0
             self.corruption = 0
+            self.personal_money = 0
             self.known = False
             self.unknown_name = str(unknown_name or getattr(self.__class__, "unknown_name", "") or "")
             self.data = None
@@ -978,6 +979,7 @@ init -999 python:
 
         def update(self):
             self.name = people_normalize_id(self.name)
+            self.__dict__.setdefault("personal_money", 0)
             if hasattr(self, "location"):
                 delattr(self, "location")
             if not getattr(self, "unknown_name", ""):
@@ -1295,6 +1297,25 @@ init -999 python:
             self.rel = max(0, min(relationship_cap, people_to_int(getattr(self, "rel", 0), 0) + people_to_int(friend_delta, 0)))
             self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
             self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
+            return self
+
+        def receive_personal_money(self, amount=0):
+            self.personal_money = max(0, people_to_int(getattr(self, "personal_money", 0), 0) + max(0, people_to_int(amount, 0)))
+            return self.personal_money
+
+        def spend_personal_money(self, amount=0):
+            cost = max(0, people_to_int(amount, 0))
+            balance = max(0, people_to_int(getattr(self, "personal_money", 0), 0))
+            if balance < cost:
+                return False
+            self.personal_money = balance - cost
+            return True
+
+        def record_broken_care_promise(self):
+            self.trust = max(0, people_to_int(getattr(self, "trust", 0), 0) - 2)
+            self.change_social(friend_delta=-2)
+            self.rebel_baseline = max(0, people_to_int(getattr(self, "rebel_baseline", 0), 0) + 2)
+            self.change_anger(2, "broken_care_promise")
             return self
 
         def record_negative_reaction(self, reason=""):

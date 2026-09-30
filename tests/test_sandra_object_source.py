@@ -72,6 +72,38 @@ def test_weekly_evaluation_accepts_sunday_finished_just_after_midnight():
     assert not next_morning["applied"]
 
 
+def test_weekly_chore_reward_not_attendance_sets_matching_obedience_gain():
+    source = PLAYER_CHORES.read_text(encoding="utf-8-sig")
+    body = source.split("    def weekly_chores_evaluation_preview(", 1)[1].split(
+        "    def evaluate_weekly_chores_and_rewards", 1
+    )[0]
+    namespace = {
+        "PLAYER_CHORE_KEYS": ("a", "b", "c", "d", "e", "f"),
+        "PLAYER_CORE_OTHER_GIRLS": ("melissa", "amanda"),
+        "_pc_to_int": lambda value, fallback=0: int(value) if value is not None else fallback,
+        "player_chore_target": lambda key: 1,
+    }
+    exec(textwrap.dedent("def weekly_chores_evaluation_preview(" + body), namespace)
+    preview = namespace["weekly_chores_evaluation_preview"]
+    common = dict(
+        week_now=7, time_now=3, sandra_friend=10,
+        rebel_state={"melissa": 4, "amanda": 1},
+        visitors_track={"sum": 30, "days": 1, "prev_avg": 10},
+    )
+
+    all_done = preview(chores_state={key: 1 for key in namespace["PLAYER_CHORE_KEYS"]}, **common)
+    five_done = preview(chores_state={key: 1 for key in "abcde"}, **common)
+    four_done = preview(chores_state={key: 1 for key in "abcd"}, **common)
+    capped = preview(chores_state={key: 1 for key in "abcdef"}, **dict(common, sandra_friend=19))
+    maxed = preview(chores_state={key: 1 for key in "abcdef"}, **dict(common, sandra_friend=20))
+
+    assert (all_done["sandra_friend"], all_done["rebel"]) == (12, {"melissa": 2, "amanda": 0})
+    assert (five_done["sandra_friend"], five_done["rebel"]) == (11, {"melissa": 3, "amanda": 0})
+    assert (four_done["sandra_friend"], four_done["rebel"]) == (10, {"melissa": 4, "amanda": 1})
+    assert (capped["sandra_friend"], capped["rebel"]) == (20, {"melissa": 3, "amanda": 0})
+    assert (maxed["sandra_friend"], maxed["rebel"]) == (20, {"melissa": 4, "amanda": 1})
+
+
 def test_sandra_data_keeps_only_immutable_identity_references():
     source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     data_block = source.split("class SandraData(PeopleData):", 1)[1].split("class SandraInfo(Girl):", 1)[0]

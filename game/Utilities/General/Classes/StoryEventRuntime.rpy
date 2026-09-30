@@ -87,7 +87,7 @@ define amandaThreadList = [
             None, (9, 11), None,
             1, None, [
                 "#not Amanda.wardrobe.owns('slutdress')",
-                "#Amanda.var_int('legare_service_savings', 0) >= _gds_dress_cost('slutdress')",
+                "#Amanda.personal_money >= _gds_dress_cost('slutdress')",
                 "#not bool(dress_shop.produced)",
                 "#rooms.get('DressShop').is_open()",
             ], None,

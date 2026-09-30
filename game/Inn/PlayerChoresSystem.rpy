@@ -360,12 +360,9 @@ init -45 python:
         sandra_gain = 0
         chore_score = 0
 
-        chores_ok = True
         for key in PLAYER_CHORE_KEYS:
             if _pc_to_int(chores.get(key, 0), 0) >= player_chore_target(key):
                 chore_score += 1
-            else:
-                chores_ok = False
         if chore_score >= 5:
             chore_evaluation = "good"
             reward_lines.append("Сандра признала, что по хозяйству неделя вышла {b}хорошей{/b}.")
@@ -377,30 +374,31 @@ init -45 python:
             reward_lines.append("Сандра признала, что по хозяйству неделя вышла {b}плохой{/b}.")
         if chore_score >= 4:
             reward_lines.append("Сандра отметила, что по хозяйству вы закрыли %d из %d еженедельных дел." % (chore_score, len(PLAYER_CHORE_KEYS)))
-        if chores_ok:
-            sandra_gain += 1
-            reward_lines.append("Сандра заметила, что вы не запускали хозяйские дела всю неделю.")
+        if chore_score >= 5:
+            sandra_gain = 2 if chore_score == len(PLAYER_CHORE_KEYS) else 1
+            reward_lines.append("Сандра заметила, что вы не запускали хозяйские дела всю неделю." if sandra_gain == 2 else "Сандра оценила, что почти все хозяйские дела сделаны.")
 
         days = max(0, _pc_to_int(week_vis.get("days", 0), 0))
         visitors_sum = max(0, _pc_to_int(week_vis.get("sum", 0), 0))
         prev_avg = float(week_vis.get("prev_avg", 0.0) or 0.0)
         cur_avg = (float(visitors_sum) / float(days)) if days > 0 else 0.0
         if days > 0 and prev_avg > 0.0 and cur_avg > prev_avg:
-            sandra_gain += 1
             reward_lines.append("Средняя посещаемость трактира за неделю выросла.")
 
         if sandra_gain > 0:
-            sandra_friend_value = max(0, min(20, sandra_friend_value + sandra_gain))
-            reward_lines.append("Уровень дружбы Сандры вырос на %d." % sandra_gain)
-
-            reduced = []
-            for girl in PLAYER_CORE_OTHER_GIRLS:
-                old = _pc_to_int(next_rebel.get(girl, 0), 0)
-                if old > 0:
-                    next_rebel[girl] = old - 1
-                    reduced.append(girl)
-            if reduced:
-                reward_lines.append("После ее благодарности остальные стали посговорчивее.")
+            new_sandra_friend = max(0, min(20, sandra_friend_value + sandra_gain))
+            sandra_gain = new_sandra_friend - sandra_friend_value
+            sandra_friend_value = new_sandra_friend
+            if sandra_gain > 0:
+                reward_lines.append("Уровень дружбы Сандры вырос на %d." % sandra_gain)
+                reduced = []
+                for girl in PLAYER_CORE_OTHER_GIRLS:
+                    old = _pc_to_int(next_rebel.get(girl, 0), 0)
+                    if old > 0:
+                        next_rebel[girl] = max(0, old - sandra_gain)
+                        reduced.append(girl)
+                if reduced:
+                    reward_lines.append("После ее благодарности остальные стали посговорчивее.")
 
         for key in PLAYER_CHORE_KEYS:
             chores[key] = 0

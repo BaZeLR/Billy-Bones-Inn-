@@ -293,13 +293,18 @@ label BarberShopServePendingGuest:
     $ _barber_guest_name = people_display_name(_barber_guest)
     $ _barber_guest_price = int(barber_shop_haircut_price("female") or 0)
     $ _barber_self_paid = _barber_guest == "amanda" and Amanda.var_value("legare_choice_outcome", "") == "service" and not Amanda.var_value("legare_service_reconciled", False)
-    if (Amanda.var_int("legare_service_savings", 0) if _barber_self_paid else int(player.economy.money or 0)) < _barber_guest_price:
-        $ scene_runtime.text = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" " % (_barber_guest_name, _barber_guest_price)
+    if (Amanda.personal_money if _barber_self_paid else int(player.economy.money or 0)) < _barber_guest_price:
+        if not _barber_self_paid:
+            $ people.get_info(_barber_guest).record_broken_care_promise()
+            $ household.barber_appointments.pop(_barber_guest, None)
+            $ scene_runtime.text = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" %s смотрит на вас: \"Ты же обещал, Стефан.\" Возразить нечего. Она поворачивается и выходит первой." % (_barber_guest_name, _barber_guest_price, _barber_guest_name)
+        else:
+            $ scene_runtime.text = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" " % (_barber_guest_name, _barber_guest_price)
         $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
         return
     if _barber_self_paid:
-        $ Amanda.add_var_int("legare_service_savings", -_barber_guest_price)
+        $ Amanda.spend_personal_money(_barber_guest_price)
     else:
         $ player.spend_money(_barber_guest_price)
     $ calendar_v2.advance_minutes(45)

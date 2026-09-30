@@ -104,10 +104,10 @@ label NextDay(retlocname, timepassed):
     python:
         TotalDay['whorerevenue'] = sum(tavern.service_house_revenue(girl, "intimate", count) for girl, count in TotalWhoreClients.items())
         TotalDay['gloryholerevenue'] = sum(tavern.service_house_revenue(girl, "gloryhole", count) for girl, count in TotalGloryHoleClients.items())
-        Amanda.add_var_int("legare_service_savings", tavern.service_worker_revenue("amanda", "intimate", TotalWhoreClients.get("amanda", 0)) + tavern.service_worker_revenue("amanda", "gloryhole", TotalGloryHoleClients.get("amanda", 0)))
+        Amanda.receive_personal_money(tavern.service_worker_revenue("amanda", "intimate", TotalWhoreClients.get("amanda", 0)) + tavern.service_worker_revenue("amanda", "gloryhole", TotalGloryHoleClients.get("amanda", 0)))
         if (Amanda.var_value("legare_choice_outcome", "") == "service"
                 and not Amanda.var_value("legare_service_reconciled", False)
-                and Amanda.var_int("legare_service_savings", 0) >= barber_shop_haircut_price("female")
+                and Amanda.personal_money >= barber_shop_haircut_price("female")
                 and not household.barber_appointments.get("amanda", 0)
                 and current_game_day() - int(household.barber_visit_last_day.get("amanda", -14) or -14) >= 14):
             household.barber_appointments["amanda"] = 1

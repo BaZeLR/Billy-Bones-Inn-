@@ -99,7 +99,7 @@ label story_amanda_service_dress_order:
     menu:
         "Продолжить":
             pass
-    $ Amanda.add_var_int("legare_service_savings", -_amanda_dress_price)
+    $ Amanda.spend_personal_money(_amanda_dress_price)
     $ dress_shop.produced = "slutdress"
     $ dress_shop.buyer = "amanda"
     $ event_runtime.active_thread.advance()

@@ -45,8 +45,9 @@ init python:
 
 
 label DressNoShow(girl_name_dns):
-    $ renpy.dynamic("_dns_girl", "_dress_no_show_restore_ui", "DressBuyIsRelative", "_dns_real_name", "_dns_real_name3")
+    $ renpy.dynamic("_dns_girl", "_dns_silent", "_dress_no_show_restore_ui", "DressBuyIsRelative", "_dns_real_name", "_dns_real_name3")
     $ _dns_girl = str(girl_name_dns or "").strip().lower()
+    $ _dns_silent = False
     if _dns_girl == "":
         return
 
@@ -55,6 +56,12 @@ label DressNoShow(girl_name_dns):
     $ _dns_real_name = people_display_name(_dns_girl)
     $ _dns_real_name3 = people_name(_dns_girl, 'dative')
     $ dress_no_show_open_picture(_dns_girl)
+
+    if _dns_girl in ("sandra", "melissa", "amanda") and int(getattr(people.get_info(_dns_girl), "personal_money", 0) or 0) > 0:
+        $ people.get_info(_dns_girl).change_anger(2, "missed_tailor_with_premium")
+        $ _dns_silent = True
+        '[_dns_real_name] замечает вас, но при других работниках не заводит разговор о несостоявшемся походе к Ирме. Она лишь отворачивается и сжимает губы. Премия у нее в кармане; обиду придется заглаживать самому.'
+        jump DressNoShow_End
 
     '"Ага!" воскликнула [_dns_real_name], едва завидев вас. "Явился значит! Мы где договаривались встретиться? Я тебя ждала, как дура, битый час под дверью, а ты шлялся незнамо где! Ну и нафига было предлагать мне обновку купить если ты даже зад свой от кровати не способен вовремя оторвать!'
     if DressBuyIsRelative == 1:
@@ -101,5 +108,6 @@ label DressNoShow(girl_name_dns):
 label DressNoShow_End:
     if _dress_no_show_restore_ui:
         show screen main_ui
-    "Вот и поболтали."
+    if not _dns_silent:
+        "Вот и поболтали."
     return

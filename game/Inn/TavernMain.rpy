@@ -239,7 +239,7 @@ init python:
         return items
 
 label TavernMain:
-    $ renpy.dynamic("_household_request_girl", "_household_request_type")
+    $ renpy.dynamic("_household_request_girl", "_household_request_type", "_tavern_entry_event_played")
     $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "kitchenlist", "cleaninglist", "waitresslist", "_client_candidate", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
     $ _tavern_main_base_desc = rooms.get("TavernMain").descriptions[0].text
     $ scene_runtime.text = _tavern_main_base_desc
@@ -281,14 +281,18 @@ label TavernMain:
         $ scene_runtime.picture = tavern_main_picture()
 
     call RoomEnterEventGate(rooms.current_code, False)
+    $ _tavern_entry_event_played = bool(_return)
     $ _tavern_kids_description = []
     if player.tavern_management.isTavernOpen:
-        if str(people.location('amanda') or "") == rooms.current_code:
+        if not _tavern_entry_event_played and str(people.location('amanda') or "") == rooms.current_code:
             call check_daily_event('amanda', None, rooms.current_code, calendar_v2.time_slot())
-        if str(people.location('sandra') or "") == rooms.current_code:
+            $ _tavern_entry_event_played = bool(_return)
+        if not _tavern_entry_event_played and str(people.location('sandra') or "") == rooms.current_code:
             call check_daily_event('sandra', None, rooms.current_code, calendar_v2.time_slot())
-        if str(people.location('melissa') or "") == rooms.current_code:
+            $ _tavern_entry_event_played = bool(_return)
+        if not _tavern_entry_event_played and str(people.location('melissa') or "") == rooms.current_code:
             call check_daily_event('melissa', None, rooms.current_code, calendar_v2.time_slot())
+            $ _tavern_entry_event_played = bool(_return)
         $ _tmp_bf_sandra = DescribeBreastFeeding('sandra')
         if _tmp_bf_sandra:
             $ _tavern_kids_description.append(_tmp_bf_sandra)
@@ -312,10 +316,12 @@ label TavernMain:
             $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
         if _tmp_kids_list:
             $ _tavern_kids_description.append(_tmp_kids_list)
-        if (str(people.location("georgett") or "") == rooms.current_code and int(Georgett.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "georgett") or (str(people.location("georgett") or "") == rooms.current_code and calendar_v2.time_slot() < 2):
+        if not _tavern_entry_event_played and ((str(people.location("georgett") or "") == rooms.current_code and int(Georgett.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "georgett") or (str(people.location("georgett") or "") == rooms.current_code and calendar_v2.time_slot() < 2)):
             call check_daily_event('georgett', None, rooms.current_code, calendar_v2.time_slot())
-        if (str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "liza") or (str(people.location("liza") or "") == rooms.current_code and calendar_v2.time_slot() < 2):
+            $ _tavern_entry_event_played = bool(_return)
+        if not _tavern_entry_event_played and ((str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "liza") or (str(people.location("liza") or "") == rooms.current_code and calendar_v2.time_slot() < 2)):
             call check_daily_event('liza', None, rooms.current_code, calendar_v2.time_slot())
+            $ _tavern_entry_event_played = bool(_return)
     $ main_ui_runtime.action_title = "Действия в трактире"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_main_action_items()
@@ -325,7 +331,7 @@ label TavernMain:
         $ scene_runtime.location_text += "\n\n" + "\n\n".join(_tavern_kids_description)
     $ scene_runtime.text = scene_runtime.location_text
 
-    if tavern_main_closed_text() == "":
+    if not _tavern_entry_event_played and tavern_main_closed_text() == "":
         if story_event_available("TavernMain", "amanda_dress_request") and str(people.location("amanda") or "") == "TavernMain":
             call AmandaDressRequestEvent
         elif story_event_available("TavernMain", "melissa_dress_request") and str(people.location("melissa") or "") == "TavernMain":

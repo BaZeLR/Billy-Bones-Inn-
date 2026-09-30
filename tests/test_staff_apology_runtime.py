@@ -230,6 +230,23 @@ def test_outsiders_cannot_use_household_apology(runtime, name):
     assert runtime.rng.calls == []
 
 
+def test_premium_purse_and_broken_appointment_use_npc_authority(runtime):
+    npc = runtime.make_npc("melissa", rel=12)
+    npc.trust = 8
+    npc.rebel_baseline = 1
+
+    assert npc.receive_personal_money(25) == 25
+    assert npc.receive_personal_money(50) == 75
+    assert not npc.spend_personal_money(80)
+    assert npc.personal_money == 75
+    assert npc.spend_personal_money(20)
+    assert npc.personal_money == 55
+
+    npc.record_broken_care_promise()
+    assert (npc.trust, npc.rel, npc.rebel_baseline, npc.anger_with_player) == (6, 10, 3, 2)
+    assert npc.can_apologize()
+
+
 @pytest.mark.parametrize("name", NPC_IDS + ("unhired_woman",))
 @pytest.mark.parametrize("favor", ("tailor", "barber"))
 @pytest.mark.parametrize("rel", (0, 15))
