@@ -5,6 +5,8 @@ label DailySetstatdefault(girl_name):
     $ renpy.dynamic("_dssd_slut_dress_trigger", "_dssd_know_about_birth", "_dssd_pregnancy_days", "_dssd_info", "_dssd_suspects_count", "_dssd_top_slut", "_dssd_bottom_slut", "_dssd_talked_before", "_dssd_was_drunk", "_dssd_days_age_young_kid", "_dssd_jobs", "_dssd_clients")
     $ _dssd_info = people.get_info(girl_name)
     if _dssd_info is not None:
+        if _dssd_info.wardrobe.age_day(current_game_day()) and current_game_day() % 3 == 0:
+            $ _dssd_info.change_skin_quality(-1)
         $ _dssd_info.set_arousal(_dssd_info.sex_stat("PussyWetStart", 0))
         $ _dssd_info.clear_cum()
         $ _dssd_info.set_sex_stat("breastfeed", 0)

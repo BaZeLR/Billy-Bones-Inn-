@@ -528,9 +528,9 @@ init python:
             mood_text = "оживлённое"
         else:
             mood_text = "спокойное"
-        beauty = int(info.sex_stat("beauty", 0) or 0)
-        care_text = "неухоженный" if beauty < 40 else ("ухоженный" if beauty >= 65 else "обычный")
-        return "%s\n\n%s\n\nСейчас на ней: %s. Настроение: %s. Вид кожи и уход за собой: %s." % (intro, description, clothing_text, mood_text, care_text)
+        garment_lines = info.wardrobe.worn_condition_lines()
+        garment_text = "; ".join(garment_lines) if garment_lines else "носимых вещей нет"
+        return "%s\n\n%s\n\nСейчас на ней: %s. Состояние одежды: %s. Настроение: %s. Кожа: %s. Общий вид: %s." % (intro, description, clothing_text, garment_text, mood_text, info.skin_description(), info.appearance_description())
 
     def tavern_breakfast_record_group_perk(item_id="", score=1, targets=None):
 

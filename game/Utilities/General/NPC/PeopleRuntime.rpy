@@ -54,6 +54,7 @@ init -999 python:
     class GirlWardrobeState(object):
         """One NPC-owned authority for preferred clothes and exact current wear."""
 
+        GARMENT_LIFE_DAYS = 84  # Three 28-day game months.
         LAYERS = ("top", "bottom", "bra", "panties", "legs", "shoes")
         RAISED_LAYERS = ("top", "bottom")
         LEGACY_SEX_KEYS = (
@@ -65,6 +66,8 @@ init -999 python:
         def __init__(self, owned_items=None, day_dress="", day_underwear=None,
                     current_layers=None, raised_layers=None, context="day"):
             self.owned_items = self._unique_items(owned_items)
+            self.life_days = {item_id: self.GARMENT_LIFE_DAYS for item_id in self.owned_items}
+            self.last_aged_day = -1
             self.day_dress = str(day_dress or "")
             self.day_underwear = self._normalized_underwear(day_underwear)
             self.current_layers = self._normalized_layers(current_layers)
@@ -124,6 +127,7 @@ init -999 python:
             owned = list(base.get("owned", []) or [])
             if not owned:
                 owned = [day_dress, underwear["bra"], underwear["panties"], underwear["legs"], underwear["shoes"]]
+            owned.append("nightshirt")
             return cls(owned, day_dress, underwear)
 
         @classmethod
@@ -163,6 +167,16 @@ init -999 python:
 
         def repair(self):
             self.owned_items = self._unique_items(getattr(self, "owned_items", []))
+            if "nightshirt" not in self.owned_items:
+                self.owned_items.append("nightshirt")
+            saved_life = getattr(self, "life_days", {})
+            if not isinstance(saved_life, dict):
+                saved_life = {}
+            self.life_days = {
+                item_id: people_clamp(saved_life.get(item_id, self.GARMENT_LIFE_DAYS), 0, self.GARMENT_LIFE_DAYS)
+                for item_id in self.owned_items
+            }
+            self.last_aged_day = people_to_int(getattr(self, "last_aged_day", -1), -1)
             self.day_dress = str(getattr(self, "day_dress", "") or "")
             self.day_underwear = self._normalized_underwear(getattr(self, "day_underwear", {}))
             self.current_layers = self._normalized_layers(getattr(self, "current_layers", {}))
@@ -178,7 +192,69 @@ init -999 python:
             key = str(item_id or "").strip()
             if key and key not in self.owned_items:
                 self.owned_items.append(key)
+            if key:
+                self.life_days[key] = self.GARMENT_LIFE_DAYS
             return key
+
+        def condition(self, item_id=""):
+            key = str(item_id or "").strip()
+            if not key or key not in self.owned_items:
+                return 0
+            return (100 * people_clamp(self.life_days.get(key, self.GARMENT_LIFE_DAYS), 0, self.GARMENT_LIFE_DAYS)) // self.GARMENT_LIFE_DAYS
+
+        def condition_text(self, item_id=""):
+            value = self.condition(item_id)
+            if value >= 85:
+                return "отличное"
+            if value >= 65:
+                return "хорошее"
+            if value >= 45:
+                return "поношенное"
+            if value >= 25:
+                return "грязное"
+            if value > 0:
+                return "плохое, с прорехами"
+            return "непригодное для носки"
+
+        def wearable(self, item_id=""):
+            key = str(item_id or "").strip()
+            return not key or key not in self.owned_items or self.condition(key) > 0
+
+        def age_day(self, day_value):
+            day = people_to_int(day_value, 0)
+            if day <= self.last_aged_day:
+                return False
+            if self.last_aged_day >= 0:
+                elapsed = day - self.last_aged_day
+                for item_id in self.owned_items:
+                    self.life_days[item_id] = max(0, people_to_int(self.life_days.get(item_id, self.GARMENT_LIFE_DAYS), self.GARMENT_LIFE_DAYS) - elapsed)
+            self.last_aged_day = day
+            return True
+
+        def worn_condition_lines(self):
+            worn = []
+            shown = set()
+            dress = self.current_dress()
+            if dress and self.owns(dress):
+                worn.append((str(ShortDressName.get(dress, dress)).lower(), self.condition_text(dress)))
+                shown.add(dress)
+            for layer in ("bra", "panties", "legs", "shoes"):
+                item_id = self.layer(layer)
+                if item_id and self.owns(item_id) and item_id not in shown:
+                    worn.append((str(ShortDressName.get(item_id, item_id)).lower(), self.condition_text(item_id)))
+                    shown.add(item_id)
+            for item_id in self.owned_items:
+                if item_id not in shown and not self.wearable(item_id):
+                    worn.append((str(ShortDressName.get(item_id, item_id)).lower(), self.condition_text(item_id)))
+            return ["%s — %s" % row for row in worn]
+
+        def worn_condition(self):
+            items = []
+            dress = self.current_dress()
+            if dress and self.owns(dress):
+                items.append(dress)
+            items.extend(self.layer(layer) for layer in ("bra", "panties", "legs", "shoes") if self.layer(layer) and self.owns(self.layer(layer)))
+            return min([self.condition(item_id) for item_id in items] or [100])
 
         def layer(self, layer=""):
             key = str(layer or "").strip().lower()
@@ -223,6 +299,8 @@ init -999 python:
 
         def set_day_dress(self, dress_code="", wear_now=False):
             self.day_dress = str(dress_code or "").strip()
+            if self.day_dress and self.day_dress not in self.owned_items:
+                self.add_owned(self.day_dress)
             if wear_now:
                 self.wear_day()
             return self.day_dress
@@ -236,19 +314,23 @@ init -999 python:
             if key not in self.day_underwear:
                 return ""
             self.day_underwear[key] = str(item_id or "")
+            if self.day_underwear[key] and self.day_underwear[key] not in self.owned_items:
+                self.add_owned(self.day_underwear[key])
             if wear_now:
                 self.set_current(key, item_id)
             return self.day_underwear[key]
 
         def wear_day(self):
-            top, bottom = self._dress_layers(self.day_dress)
+            if not self.wearable(self.day_dress):
+                self.day_dress = next((item_id for item_id in self.owned_items if item_id != "nightshirt" and item_id in DressTopPart and item_id in DressBottomPart and self.wearable(item_id)), "")
+            top, bottom = self._dress_layers(self.day_dress) if self.wearable(self.day_dress) else ("", "")
             self.current_layers = {
                 "top": top,
                 "bottom": bottom,
-                "bra": self.preferred_underwear("bra"),
-                "panties": self.preferred_underwear("panties"),
-                "legs": self.preferred_underwear("legs"),
-                "shoes": self.preferred_underwear("shoes"),
+                "bra": self.preferred_underwear("bra") if self.wearable(self.preferred_underwear("bra")) else "",
+                "panties": self.preferred_underwear("panties") if self.wearable(self.preferred_underwear("panties")) else "",
+                "legs": self.preferred_underwear("legs") if self.wearable(self.preferred_underwear("legs")) else "",
+                "shoes": self.preferred_underwear("shoes") if self.wearable(self.preferred_underwear("shoes")) else "",
             }
             self.raised_layers = {"top": 0, "bottom": 0}
             self.context = "day"
@@ -256,7 +338,7 @@ init -999 python:
 
         def wear_night(self, mode=0):
             night_mode = max(0, min(2, people_to_int(mode, 0)))
-            top, bottom = self._dress_layers("nightshirt") if night_mode == 0 else ("", "")
+            top, bottom = self._dress_layers("nightshirt") if night_mode == 0 and self.wearable("nightshirt") else ("", "")
             self.current_layers = {
                 "top": top,
                 "bottom": bottom,
@@ -1119,8 +1201,12 @@ init -999 python:
 
         def set_cum_state(self, key, value=1):
             state = self.ensure_sex_state()
-            state[str(key or "")] = 1 if people_to_int(value, 0) else 0
-            return state[str(key or "")]
+            state_key = str(key or "")
+            previous = people_to_int(state.get(state_key, 0), 0)
+            state[state_key] = 1 if people_to_int(value, 0) else 0
+            if state_key in ("cum_face_you", "cum_face_others") and state[state_key] and not previous and hasattr(self, "change_skin_quality"):
+                self.change_skin_quality(1)
+            return state[state_key]
 
         def clear_cum(self, *keys):
             state = self.ensure_sex_state()
@@ -1420,6 +1506,7 @@ init -999 python:
             self.detailed_sex_history = []
             self.renovation_requests = {}
             self.wardrobe = GirlWardrobeState()
+            self.skin_quality = 65
             self.temporary_fertility = {"item_id": "", "until_day": -1}
             self.bathday_day = -1
 
@@ -1437,8 +1524,37 @@ init -999 python:
                 getattr(self, "sex_state", None),
                 base_clothing,
             )
+            self.skin_quality = people_clamp(getattr(self, "skin_quality", 65), 0, 100)
             self.ensure_temporary_fertility_state()
             return self
+
+        def change_skin_quality(self, amount=0):
+            self.skin_quality = people_clamp(getattr(self, "skin_quality", 65) + people_to_int(amount, 0), 0, 100)
+            return self.skin_quality
+
+        def skin_description(self):
+            value = people_clamp(getattr(self, "skin_quality", 65), 0, 100)
+            if value < 20:
+                return "жирная кожа"
+            if value < 35:
+                return "кожа с чёрными точками"
+            if value < 50:
+                return "кожа с прыщами"
+            if value < 65:
+                return "кожа с нездоровыми красными пятнами"
+            if value < 85:
+                return "чистая здоровая кожа"
+            return "шелковистая, сияющая здоровьем кожа"
+
+        def appearance_description(self):
+            score = self.tavern_client_attraction()
+            if score < 35:
+                return "неприметный и запущенный вид"
+            if score < 55:
+                return "скромная привлекательность"
+            if score < 75:
+                return "ухоженный, привлекательный вид"
+            return "яркая внешность, притягивающая взгляды гостей"
 
         def ensure_temporary_fertility_state(self):
             if not isinstance(getattr(self, "temporary_fertility", None), dict):
@@ -1710,15 +1826,17 @@ init -999 python:
             return 3
 
         def tavern_client_attraction(self):
-            # Beauty already includes care from soap and the barber. Read the
-            # actual worn outfit, not owned gifts or the selected day outfit.
+            # Read the actually worn outfit; care and condition belong to the girl.
             outfit_look = max([
                 people_to_int(value, 0)
                 for dress_code, value in DressLookValue.items()
                 if DressTopPart.get(dress_code) == self.clothing_layer("top")
                 and DressBottomPart.get(dress_code) == self.clothing_layer("bottom")
             ] or [0])
-            return max(0, min(100, people_to_int(self.sex_stat("beauty", 0), 0) + outfit_look))
+            condition_penalty = (100 - self.wardrobe.worn_condition()) // 5
+            skin_bonus = (people_clamp(getattr(self, "skin_quality", 65), 0, 100) - 65) // 10
+            exposure_bonus = (self.clothing_slut("top") + self.clothing_slut("bottom")) // 4 if outfit_look else 0
+            return max(0, min(100, people_to_int(self.sex_stat("beauty", 0), 0) + outfit_look + skin_bonus + exposure_bonus - condition_penalty))
 
         def tavern_glory_hole_client_limit(self):
             return max(0, people_to_int(player.tavern_management.visitors, 0) // 6)

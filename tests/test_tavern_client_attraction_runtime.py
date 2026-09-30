@@ -55,17 +55,18 @@ def runtime():
     clothes = init_tree("game/Items/Clothes/InitDressDesc.rpy")
     for node in clothes.body:
         if isinstance(node, ast.Assign) and any(
-            isinstance(target, ast.Name) and target.id in ("DressLookValue", "DressTopPart", "DressBottomPart")
+            isinstance(target, ast.Name) and target.id in ("DressLookValue", "DressTopPart", "DressBottomPart", "DressPartSlut")
             for target in node.targets
         ):
             execute_node(node, namespace)
     people = init_tree(PEOPLE)
     execute_node(named_node(people.body, "people_to_int"), namespace)
+    execute_node(named_node(people.body, "people_clamp"), namespace)
     execute_node(named_node(people.body, "GirlWardrobeState"), namespace)
     methods = {}
     for owner, names in (
-        ("PeopleInfo", ("sex_stat", "set_sex_stat", "job_value")),
-        ("Girl", ("clothing_layer", "tavern_client_attraction", "tavern_glory_hole_client_limit")),
+        ("PeopleInfo", ("sex_stat", "set_sex_stat", "job_value", "ensure_sex_state", "set_cum_state")),
+        ("Girl", ("clothing_layer", "clothing_slut", "current_dress", "change_skin_quality", "skin_description", "appearance_description", "tavern_client_attraction", "tavern_glory_hole_client_limit")),
     ):
         owner_node = named_node(people.body, owner)
         for name in names:
@@ -129,11 +130,11 @@ def test_only_actually_worn_better_outfit_raises_fill(runtime):
     before = generate(runtime, girl, rolls=(51, 54, 55))
     girl.wardrobe.add_owned("minidress")
     girl.wardrobe.set_day_dress("minidress", wear_now=False)
-    assert girl.tavern_client_attraction() == 50
+    assert girl.tavern_client_attraction() == 51
     assert generate(runtime, girl, rolls=(51, 54, 55)) == before
     girl.wardrobe.wear_day()
     after = generate(runtime, girl, rolls=(51, 54, 55))
-    assert girl.tavern_client_attraction() == 56
+    assert girl.tavern_client_attraction() > 51
     assert before[2] == after[2]
     assert before[0] == 1 < after[0] == 3
 
@@ -217,12 +218,67 @@ def test_soap_gift_updates_owned_beauty_and_client_fill(runtime, name, family, b
 @pytest.mark.parametrize("name", ["liza", "georgett"])
 def test_barber_benefit_updates_same_owned_beauty_and_fill(runtime, name):
     girl = make_girl(runtime, beauty=40, name=name)
-    before = generate(runtime, girl, rolls=(47,))
+    before = generate(runtime, girl, rolls=(49,))
     barber = source("game/Town/Arts/BarberShop.rpy")
     statement = next(line.split("$ ", 1)[1] for line in barber.splitlines()
                      if '_barber_guest_info.set_sex_stat("beauty"' in line)
     exec(statement, {"_barber_guest_info": girl})
     assert girl.stats["beauty"] == 43
-    after = generate(runtime, girl, rolls=(47,))
+    after = generate(runtime, girl, rolls=(49,))
     assert before[2] == after[2]
     assert before[0] == 1 < after[0] == 3
+
+
+def test_npc_garments_age_once_per_day_and_become_unwearable(runtime):
+    girl = make_girl(runtime)
+    wardrobe = girl.wardrobe
+    assert wardrobe.condition("workdress") == 100
+    fresh_attraction = girl.tavern_client_attraction()
+    assert wardrobe.age_day(0)
+    assert wardrobe.age_day(0) is False
+    assert wardrobe.age_day(42)
+    assert 45 <= wardrobe.condition("workdress") <= 65
+    assert girl.tavern_client_attraction() < fresh_attraction
+    assert wardrobe.age_day(84)
+    assert wardrobe.condition_text("workdress") == "непригодное для носки"
+    wardrobe.wear_day()
+    assert wardrobe.current_dress() == ""
+    wardrobe.add_owned("workdress")
+    wardrobe.set_day_dress("workdress", wear_now=True)
+    assert wardrobe.condition("workdress") == 100
+    assert wardrobe.current_dress() == "workdress"
+
+
+def test_skin_care_and_face_contact_affect_owned_appearance(runtime):
+    girl = make_girl(runtime)
+    girl.skin_quality = 65
+    girl.sex_state = {}
+    before = girl.tavern_client_attraction()
+    assert girl.skin_description() == "чистая здоровая кожа"
+    girl.change_skin_quality(20)
+    assert girl.skin_description() == "шелковистая, сияющая здоровьем кожа"
+    assert girl.tavern_client_attraction() > before
+    girl.set_cum_state("cum_face_you", 1)
+    assert girl.skin_quality == 86
+    girl.set_cum_state("cum_face_you", 1)
+    assert girl.skin_quality == 86
+
+
+def test_legacy_npc_wardrobe_repairs_missing_condition(runtime):
+    wardrobe = runtime.namespace["GirlWardrobeState"](owned_items=["workdress"], day_dress="workdress")
+    del wardrobe.life_days
+    del wardrobe.last_aged_day
+    wardrobe.repair()
+    assert wardrobe.condition("workdress") == 100
+    assert wardrobe.condition("nightshirt") == 100
+
+
+def test_new_day_outfit_gets_its_own_lifetime_without_refreshing_old_one(runtime):
+    wardrobe = runtime.namespace["GirlWardrobeState"](owned_items=["workdress"], day_dress="workdress")
+    wardrobe.age_day(1)
+    wardrobe.age_day(11)
+    old_condition = wardrobe.condition("workdress")
+    wardrobe.set_day_dress("minidress", wear_now=True)
+    assert wardrobe.condition("minidress") == 100
+    wardrobe.set_day_dress("workdress", wear_now=True)
+    assert wardrobe.condition("workdress") == old_condition

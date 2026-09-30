@@ -21,6 +21,8 @@ def wardrobe_class():
     module_name = "_tractir_wardrobe_test_runtime"
     module = types.ModuleType(module_name)
     module.people_to_int = lambda value, default=0: int(value if value is not None else default)
+    module.people_clamp = lambda value, low=0, high=100: max(low, min(high, int(value)))
+    module.ShortDressName = {}
     module.DressTopPart = {
         "workdress": "worktop",
         "minidress": "minitop",

@@ -73,6 +73,7 @@ label story_tavern_bathday:
     python:
         for _bathday_girl in (Sandra, Melissa, Amanda):
             _bathday_girl.set_sex_stat("beauty", min(100, int(_bathday_girl.sex_stat("beauty", 0) or 0) + 10))
+            _bathday_girl.change_skin_quality(4)
             _bathday_girl.bathday_day = current_game_day()
     $ _set_object_state_int(ShedHotWaterStoveObject, "hot_water_until_minute", 0)
     "После купания все трое выглядят отдохнувшими и ухоженными. Горячая вода в баке закончилась."

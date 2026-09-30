@@ -114,6 +114,7 @@ label story_melissa_ointment_try_2:
                     $ scene_runtime.text = "Мелисса проводит ладонью по своей коже и довольно улыбается. «Мягкая. И я всё ещё чувствую тепло твоих рук». Она целует вас на прощание, обещая скоро снова прийти поговорить."
                     $ scene_runtime.location_text = scene_runtime.text
                     $ Melissa.set_sex_stat("beauty", min(100, int(Melissa.sex_stat("beauty", 0) or 0) + 2))
+                    $ Melissa.change_skin_quality(5)
                     $ Melissa.add_arousal(8)
                     $ Melissa.change_social(friend_delta=1, open_delta=1)
                     $ calendar_v2.advance_minutes(40)

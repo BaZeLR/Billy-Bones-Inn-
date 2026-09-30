@@ -311,6 +311,7 @@ label BarberShopServePendingGuest:
         if _barber_guest == "amanda":
             $ _barber_guest_info.add_arousal(5)
         $ _barber_guest_info.set_sex_stat("beauty", min(100, int(_barber_guest_info.sex_stat("beauty", 0) or 0) + 3))
+        $ _barber_guest_info.change_skin_quality(4)
         if _barber_guest == "sandra":
             $ _barber_guest_info.change_skill("cooking", 1)
             $ _barber_guest_info.change_skill("cleaning", 1)

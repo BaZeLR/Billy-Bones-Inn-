@@ -117,6 +117,11 @@ init python:
         barber_line = _girls_desc_recent_barber_line(g)
         if barber_line:
             lines.append(barber_line)
+        if girl_info is not None:
+            lines.append("Кожа: %s. Общий вид: %s." % (girl_info.skin_description(), girl_info.appearance_description()))
+            garment_lines = girl_info.wardrobe.worn_condition_lines()
+            if garment_lines:
+                lines.append("Состояние одежды: %s." % "; ".join(garment_lines))
 
         top = girl_info.clothing_layer("top") if girl_info is not None else ""
         bra = girl_info.clothing_layer("bra") if girl_info is not None else ""

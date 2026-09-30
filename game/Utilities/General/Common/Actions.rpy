@@ -811,6 +811,8 @@ init -46 python:
                     player.change_stat("fun", int(rule.get("fun_bonus", 0) or 0))
                 if info is not None and int(rule.get("beauty_bonus", 0) or 0) != 0:
                     info.set_sex_stat("beauty", max(0, min(100, int(info.sex_stat("beauty", 0) or 0) + int(rule.get("beauty_bonus", 0) or 0))))
+                    if hasattr(info, "change_skin_quality"):
+                        info.change_skin_quality(12 if item_key == "luxury_soap_001" else (5 if item_key == "special_cream_001" else 8))
                 if info is not None and int(rule.get("horny_bonus", 0) or 0) != 0:
                     info.change_social(corruption_delta=int(rule.get("horny_bonus", 0) or 0))
                 if info is not None and int(rule.get("neshlush_delta", 0) or 0) != 0:

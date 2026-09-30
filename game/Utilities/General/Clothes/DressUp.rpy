@@ -20,7 +20,7 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             TMPAllDressArray = [
                 str(item_id or "")
                 for item_id in list(_dress_wardrobe.owned_items or [])
-                if str(item_id or "") in DressTopPart and str(item_id or "") in DressBottomPart
+                if str(item_id or "") != "nightshirt" and str(item_id or "") in DressTopPart and str(item_id or "") in DressBottomPart and _dress_wardrobe.wearable(item_id)
             ]
             TMPBraArray = []
             TMPPantiesArray = []
@@ -28,6 +28,8 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
 
             for item_id in list(_dress_wardrobe.owned_items or []):
                 dname = str(item_id or "")
+                if not _dress_wardrobe.wearable(dname):
+                    continue
                 lname = dname.lower()
                 if "bra" in lname:
                     TMPBraArray.append(dname)
