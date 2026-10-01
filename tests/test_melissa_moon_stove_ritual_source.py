@@ -50,9 +50,9 @@ def test_old_stove_is_reachable_after_shed_renovation():
     assert "tavern.renovation_complete('shed')" not in old_stove
 
 
-def test_ritual_art_exists_for_window_each_visitor_and_room():
+def test_ritual_art_exists_for_window_conversation_each_visitor_and_room():
     art = ROOT / "game/images/tavern/backyard/shed/moon_ritual"
-    for name in ("window_clue.png", "amanda_enters_shed.png", "amanda_stove.png", "melissa_stove.png", "night_visit.png", "fur_glove.png"):
+    for name in ("window_clue.png", "amanda_enters_shed.png", "stove_conversation.png", "amanda_stove.png", "melissa_stove.png", "night_visit.png", "fur_glove.png"):
         assert (art / name).is_file()
 
     scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
@@ -61,3 +61,10 @@ def test_ritual_art_exists_for_window_each_visitor_and_room():
     assert scene.index('vscene "images/tavern/backyard/shed/moon_ritual/window_clue.png"') < scene.index(
         'vscene "images/tavern/backyard/shed/moon_ritual/amanda_enters_shed.png"'
     )
+
+    stove_scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
+        "label story_melissa_moon_stove_wait_1:", 1
+    )[1].split("label story_melissa_moon_room_protection_2:", 1)[0]
+    assert stove_scene.index('vscene "images/tavern/backyard/shed/moon_ritual/stove_conversation.png"') < stove_scene.index(
+        'vscene "images/tavern/backyard/shed/moon_ritual/amanda_stove.png"'
+    ) < stove_scene.index('vscene "images/tavern/backyard/shed/moon_ritual/melissa_stove.png"')
