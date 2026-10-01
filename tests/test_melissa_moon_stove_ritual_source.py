@@ -32,6 +32,7 @@ def test_glove_is_wearable_and_can_be_cut_from_existing_fur_goods():
 
     assert 'object_id="fur_glove_001"' in items
     assert '"wear_slot": "hand"' in items
+    assert 'picture="images/tavern/backyard/shed/ghostEvent/fur_glove.png"' in items
     assert '"warm_fur_cloak_001", "fur_bedroll_001"' in card
     assert 'label PlayerCardMakeFurGlove' in card
     assert 'self.hand = ""' in player
@@ -51,20 +52,20 @@ def test_old_stove_is_reachable_after_shed_renovation():
 
 
 def test_ritual_art_exists_for_window_conversation_each_visitor_and_room():
-    art = ROOT / "game/images/tavern/backyard/shed/moon_ritual"
+    art = ROOT / "game/images/tavern/backyard/shed/ghostEvent"
     for name in ("window_clue.png", "amanda_enters_shed.png", "stove_conversation.png", "amanda_stove.png", "melissa_stove.png", "night_visit.png", "fur_glove.png"):
         assert (art / name).is_file()
 
     scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
         "label story_melissa_moon_window_clue_0:", 1
     )[1].split("label story_melissa_moon_stove_wait_1:", 1)[0]
-    assert scene.index('vscene "images/tavern/backyard/shed/moon_ritual/window_clue.png"') < scene.index(
-        'vscene "images/tavern/backyard/shed/moon_ritual/amanda_enters_shed.png"'
+    assert scene.index('vscene "images/tavern/backyard/shed/ghostEvent/window_clue.png"') < scene.index(
+        'vscene "images/tavern/backyard/shed/ghostEvent/amanda_enters_shed.png"'
     )
 
     stove_scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
         "label story_melissa_moon_stove_wait_1:", 1
     )[1].split("label story_melissa_moon_room_protection_2:", 1)[0]
-    assert stove_scene.index('vscene "images/tavern/backyard/shed/moon_ritual/stove_conversation.png"') < stove_scene.index(
-        'vscene "images/tavern/backyard/shed/moon_ritual/amanda_stove.png"'
-    ) < stove_scene.index('vscene "images/tavern/backyard/shed/moon_ritual/melissa_stove.png"')
+    assert stove_scene.index('vscene "images/tavern/backyard/shed/ghostEvent/stove_conversation.png"') < stove_scene.index(
+        'vscene "images/tavern/backyard/shed/ghostEvent/amanda_stove.png"'
+    ) < stove_scene.index('vscene "images/tavern/backyard/shed/ghostEvent/melissa_stove.png"')

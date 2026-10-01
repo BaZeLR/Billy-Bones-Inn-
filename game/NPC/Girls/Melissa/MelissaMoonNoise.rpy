@@ -140,13 +140,13 @@ label story_melissa_moon_noise_repeat:
 label story_melissa_moon_window_clue_0:
     $ main_ui_begin_native_scene_state("Окно во двор")
     show screen main_ui
-    vscene "images/tavern/backyard/shed/moon_ritual/window_clue.png"
+    vscene "images/tavern/backyard/shed/ghostEvent/window_clue.png"
     $ scene_runtime.text = "За маленьким окном мелькают две белые ночные сорочки. Аманда и Мелисса стоят у сарая, шепчутся и по очереди оглядываются на окна трактира. «Завтра попробуем по одной, — доносится голос Аманды. — Ровно в полночь. Ты ведь помнишь слова Сандры?» Мелисса кивает и уходит обратно к трактиру."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Понаблюдать за Амандой":
             pass
-    vscene "images/tavern/backyard/shed/moon_ritual/amanda_enters_shed.png"
+    vscene "images/tavern/backyard/shed/ghostEvent/amanda_enters_shed.png"
     $ scene_runtime.text = "Оставшись одна, Аманда осторожно берётся за косяк и скользит внутрь сарая. Похоже, она решила заранее проверить дорогу к старой печи. Теперь вы знаете, куда девушки собираются вернуться завтра ночью."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
@@ -176,7 +176,7 @@ label story_melissa_moon_stove_wait_1:
         "Притаиться и дождаться полуночи":
             pass
     $ calendar_v2.advance_minutes(60 - int(calendar_v2.minute or 0))
-    vscene "images/tavern/backyard/shed/moon_ritual/stove_conversation.png"
+    vscene "images/tavern/backyard/shed/ghostEvent/stove_conversation.png"
     if Amanda.sex_stat("virginity", True) and Melissa.sex_stat("virginity", True):
         $ scene_runtime.text = "Дверь сарая тихо скрипит. Аманда и Мелисса останавливаются перед разваленной печью. «Вот он, ваш Олли, — шепчет Аманда. — Если чихнёт золой, считай, благословил». Мелисса сдерживает смешок: «Сандра велела три раза позвать его, а не довести до кашля. Давай по очереди. Ты первая, я подожду за дверью». «Если закричу, заходи. Только не смей потом рассказывать, что я испугалась кирпича!» — Аманда подталкивает её к выходу."
     elif Amanda.sex_stat("virginity", True):
@@ -188,7 +188,7 @@ label story_melissa_moon_stove_wait_1:
         "Затаиться и дослушать их разговор":
             pass
     if Amanda.sex_stat("virginity", True):
-        vscene "images/tavern/backyard/shed/moon_ritual/amanda_stove.png"
+        vscene "images/tavern/backyard/shed/ghostEvent/amanda_stove.png"
         $ scene_runtime.text = "Оставшись одна, Аманда трижды шепчет: «Олли, Олли, защити меня от того, кто приходит во сне». Потом подходит к печному окошку и, всё ещё оглядываясь, приподнимает подол. Мягкая перчатка появляется из темноты, но Аманда замечает ваши сапоги под сводом: «Стефан? Так это ты? Ну и домовой!»"
         $ scene_runtime.location_text = scene_runtime.text
         menu:
@@ -201,7 +201,7 @@ label story_melissa_moon_stove_wait_1:
             "Подождать, кто придёт следом":
                 pass
     if Melissa.sex_stat("virginity", True):
-        vscene "images/tavern/backyard/shed/moon_ritual/melissa_stove.png"
+        vscene "images/tavern/backyard/shed/ghostEvent/melissa_stove.png"
         $ scene_runtime.text = "Позднее скрипит дверь. Мелисса в простой ночной сорочке повторяет просьбу к Олли три раза и медленно приближается к остывшей печи. На пороге топки мелькает меховая перчатка. «Кто там?» — спрашивает она и, услышав ваше дыхание, прищуривается: «Стефан, выходи. Я хочу знать, кому доверяю»."
         $ scene_runtime.location_text = scene_runtime.text
         menu:
@@ -225,7 +225,7 @@ label story_melissa_moon_stove_wait_1:
 label story_melissa_moon_room_protection_2:
     $ main_ui_begin_native_scene_state("Ночные гостьи")
     show screen main_ui
-    vscene "images/tavern/backyard/shed/moon_ritual/night_visit.png"
+    vscene "images/tavern/backyard/shed/ghostEvent/night_visit.png"
     $ scene_runtime.text = "К вашей комнате неслышно подходят Аманда и Мелисса. Вчерашняя печь не дала ответа о ночном стуке, зато обе теперь знают, что вы слушаете их всерьёз. «Если опять начнётся, можно мы посидим здесь, пока не успокоимся?» — спрашивает Мелисса. Аманда заглядывает через её плечо: «И без маскарада с домовыми, договорились?»"
     $ scene_runtime.location_text = scene_runtime.text
     menu:

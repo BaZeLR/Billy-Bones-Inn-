@@ -411,7 +411,7 @@ init 4 python:
         object_id="fur_glove_001",
         name="меховая перчатка",
         description="Старая кожаная перчатка, подшитая мягким мехом. На ладони ещё видны неровные стежки.",
-        picture="images/tavern/backyard/shed/moon_ritual/fur_glove.png",
+        picture="images/tavern/backyard/shed/ghostEvent/fur_glove.png",
         carriable=True,
         wearable=True,
         stackable=False,
