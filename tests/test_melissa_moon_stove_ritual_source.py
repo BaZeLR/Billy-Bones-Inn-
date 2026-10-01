@@ -53,19 +53,23 @@ def test_old_stove_is_reachable_after_shed_renovation():
 
 def test_ritual_art_exists_for_window_conversation_each_visitor_and_room():
     art = ROOT / "game/images/tavern/backyard/shed/ghostEvent"
-    for name in ("window_clue.png", "amanda_enters_shed.png", "stove_conversation.png", "amanda_stove.png", "melissa_stove.png", "night_visit.png", "fur_glove.png"):
+    for name in ("window_clue.png", "stove_conversation.png", "night_visit.png", "fur_glove.png"):
         assert (art / name).is_file()
+    for name in ("amanda_enters_shed.png", "amanda_stove.png", "amanda_stove_over_melissa_shoulder.png", "amanda_surprised_closeup.png", "amanda_laughing_stove_closeup.png"):
+        assert (art / "amanda" / name).is_file()
+    for name in ("melissa_stove.png", "melissa_stove_over_amanda_shoulder.png", "melissa_surprised_closeup.png", "melissa_laughing_stove_closeup.png"):
+        assert (art / "melissa" / name).is_file()
 
     scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
         "label story_melissa_moon_window_clue_0:", 1
     )[1].split("label story_melissa_moon_stove_wait_1:", 1)[0]
     assert scene.index('vscene "images/tavern/backyard/shed/ghostEvent/window_clue.png"') < scene.index(
-        'vscene "images/tavern/backyard/shed/ghostEvent/amanda_enters_shed.png"'
+        'vscene "images/tavern/backyard/shed/ghostEvent/amanda/amanda_enters_shed.png"'
     )
 
     stove_scene = source("game/NPC/Girls/Melissa/MelissaMoonNoise.rpy").split(
         "label story_melissa_moon_stove_wait_1:", 1
     )[1].split("label story_melissa_moon_room_protection_2:", 1)[0]
     assert stove_scene.index('vscene "images/tavern/backyard/shed/ghostEvent/stove_conversation.png"') < stove_scene.index(
-        'vscene "images/tavern/backyard/shed/ghostEvent/amanda_stove.png"'
-    ) < stove_scene.index('vscene "images/tavern/backyard/shed/ghostEvent/melissa_stove.png"')
+        'vscene "images/tavern/backyard/shed/ghostEvent/amanda/amanda_stove.png"'
+    ) < stove_scene.index('vscene "images/tavern/backyard/shed/ghostEvent/melissa/melissa_stove.png"')

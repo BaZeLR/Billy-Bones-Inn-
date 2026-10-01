@@ -146,7 +146,7 @@ label story_melissa_moon_window_clue_0:
     menu:
         "Понаблюдать за Амандой":
             pass
-    vscene "images/tavern/backyard/shed/ghostEvent/amanda_enters_shed.png"
+    vscene "images/tavern/backyard/shed/ghostEvent/amanda/amanda_enters_shed.png"
     $ scene_runtime.text = "Оставшись одна, Аманда осторожно берётся за косяк и скользит внутрь сарая. Похоже, она решила заранее проверить дорогу к старой печи. Теперь вы знаете, куда девушки собираются вернуться завтра ночью."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
@@ -188,7 +188,7 @@ label story_melissa_moon_stove_wait_1:
         "Затаиться и дослушать их разговор":
             pass
     if Amanda.sex_stat("virginity", True):
-        vscene "images/tavern/backyard/shed/ghostEvent/amanda_stove.png"
+        vscene "images/tavern/backyard/shed/ghostEvent/amanda/amanda_stove.png"
         $ scene_runtime.text = "Оставшись одна, Аманда трижды шепчет: «Олли, Олли, защити меня от того, кто приходит во сне». Потом подходит к печному окошку и, всё ещё оглядываясь, приподнимает подол. Мягкая перчатка появляется из темноты, но Аманда замечает ваши сапоги под сводом: «Стефан? Так это ты? Ну и домовой!»"
         $ scene_runtime.location_text = scene_runtime.text
         menu:
@@ -201,7 +201,7 @@ label story_melissa_moon_stove_wait_1:
             "Подождать, кто придёт следом":
                 pass
     if Melissa.sex_stat("virginity", True):
-        vscene "images/tavern/backyard/shed/ghostEvent/melissa_stove.png"
+        vscene "images/tavern/backyard/shed/ghostEvent/melissa/melissa_stove.png"
         $ scene_runtime.text = "Позднее скрипит дверь. Мелисса в простой ночной сорочке повторяет просьбу к Олли три раза и медленно приближается к остывшей печи. На пороге топки мелькает меховая перчатка. «Кто там?» — спрашивает она и, услышав ваше дыхание, прищуривается: «Стефан, выходи. Я хочу знать, кому доверяю»."
         $ scene_runtime.location_text = scene_runtime.text
         menu:
