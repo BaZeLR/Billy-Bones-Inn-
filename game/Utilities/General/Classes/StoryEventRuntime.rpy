@@ -496,14 +496,14 @@ define melissaThreadList = [
             None, (21, 23), None,
             1, None,
             ["#14 <= int(calendar_v2.day or 0) <= 23",
-             "#bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+             "#bool(Amanda.sex_stat('virginity', True)) or bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
             None, "TavernUpstairs", "enter", 22,
         ),
         (
             "story_melissa_moon_breakfast_1",
             None, (6, 11), 1,
             1, None,
-            ["#('melissa' in tavern_breakfast_present_ids() and bool(Melissa.sex_stat('virginity', True))) or ('clara' in tavern_breakfast_present_ids() and Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+            ["#('amanda' in tavern_breakfast_present_ids() and bool(Amanda.sex_stat('virginity', True))) or ('melissa' in tavern_breakfast_present_ids() and bool(Melissa.sex_stat('virginity', True))) or ('clara' in tavern_breakfast_present_ids() and Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
             None, "TavernKitchen", "breakfast", 25,
         ),
         (
@@ -518,42 +518,110 @@ define melissaThreadList = [
             1, None, ["#'sandra' in tavern_breakfast_present_ids()"],
             None, "TavernKitchen", "breakfast", 25,
         ),
-        (
-            "story_melissa_moon_old_stove_4",
-            None, (20, 23), None,
-            1, None,
-            ["#17 <= int(calendar_v2.day or 0) <= 20",
-             "#not rooms.get('ShedRuinedChamber').is_hidden"],
-            None, "ShedRuinedChamber", "enter", 25,
-        ),
     ], highlight=True, threaded=True),
     LThreadData(0, "melissa", "MoonStoveRitual", [
         "#threads['melissaMoonNoise'].completed",
-        "#bool(Amanda.sex_stat('virginity', True)) or bool(Melissa.sex_stat('virginity', True))",
     ], [
         (
             "story_melissa_moon_window_clue_0",
-            None, (21, 23), None,
+            None, (21, 22), None,
             1, None,
-            ["#17 <= int(calendar_v2.day or 0) <= 18"],
+            ["#17 <= int(calendar_v2.day or 0) <= 18",
+             "#not rooms.get('ShedRuinedChamber').is_hidden",
+             "#moon_stove_npc_available('amanda') and moon_stove_npc_available('melissa')",
+             "#Amanda.sex_stat('virginity', True) or Melissa.sex_stat('virginity', True)"],
             None, "TavernMyRoom", "window_look", 30,
         ),
         (
-            "story_melissa_moon_stove_wait_1",
-            None, (23, 23), 1,
+            "story_melissa_moon_shed_check_1",
+            None, (21, 23), None,
             1, None,
-            ["#18 <= int(calendar_v2.day or 0) <= 19",
+            ["#17 <= int(calendar_v2.day or 0) <= 18",
+             "#calendar_v2.clock_minutes() < 1410",
              "#not rooms.get('ShedRuinedChamber').is_hidden",
-             "#player.item_count('fur_glove_001') > 0",
-             "#str(player.equipment.hand or '') == 'fur_glove_001'"],
-            None, "ShedRuinedChamber", "enter", 30,
+             "#moon_stove_npc_available('amanda')"],
+            None, "Shed", "enter", 30,
         ),
         (
-            "story_melissa_moon_room_protection_2",
-            None, (21, 23), 1,
-            1, None, None,
-            None, "TavernMyRoom", "enter", 30,
+            "story_melissa_moon_second_window_2",
+            None, (21, 22), 1,
+            1, None,
+            ["#18 <= int(calendar_v2.day or 0) <= 19",
+             "#moon_stove_npc_available('amanda') and moon_stove_npc_available('melissa')"],
+            None, "TavernMyRoom", "window_look", 30,
         ),
+        (
+            "story_melissa_moon_shed_conversation_3",
+            None, (21, 23), None,
+            1, None,
+            ["#18 <= int(calendar_v2.day or 0) <= 19",
+             "#calendar_v2.clock_minutes() < 1410",
+             "#not rooms.get('ShedRuinedChamber').is_hidden",
+             "#moon_stove_npc_available('amanda') and moon_stove_npc_available('melissa')"],
+            None, "Shed", "enter", 30,
+        ),
+        [
+            (
+                "story_melissa_moon_stove_wait_1",
+                None, (23, 23), 1,
+                1, None,
+                ["#19 <= int(calendar_v2.day or 0) <= 20",
+                 "#int(calendar_v2.minute or 0) <= 45",
+                 "#not rooms.get('ShedRuinedChamber').is_hidden",
+                 "#moon_stove_npc_available('amanda') and moon_stove_npc_available('melissa')",
+                 "#Amanda.sex_stat('virginity', True) or Melissa.sex_stat('virginity', True)"],
+                None, "ShedRuinedChamber", "stove_hide_wait", 30, True,
+            ),
+            (
+                "story_melissa_moon_stove_not_needed",
+                None, (21, 23), None,
+                1, None,
+                ["#not Amanda.sex_stat('virginity', True) and not Melissa.sex_stat('virginity', True)",
+                 "#moon_stove_npc_available('amanda') and moon_stove_npc_available('melissa')"],
+                None, "Shed", "enter", 30,
+            ),
+        ],
+    ], highlight=True, threaded=True),
+    LThreadData(0, "amanda", "MoonProtection", [
+        "#threads['melissaMoonStoveRitual'].completed",
+    ], [
+        ("story_amanda_moon_protection_0", None, (22, 22), None, 1, None,
+         ["#threads['melissaMoonStoveRitual'].ritual_result['route'] == 'no_glove'",
+          "#'amanda' in threads['melissaMoonStoveRitual'].ritual_result['ritual_participants']",
+          "#calendar_v2.daysInGame >= threads['melissaMoonStoveRitual'].day",
+          "#14 <= int(calendar_v2.day or 0) <= 23",
+          "#Amanda.sex_stat('virginity', True) and moon_stove_npc_available('amanda')",
+          "#int(Amanda.anger_with_player or 0) <= 0 and relationship_anger('amanda') <= 0"],
+         None, "TavernMyRoom", "bedtime", 30),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "MoonProtection", [
+        "#threads['melissaMoonStoveRitual'].completed",
+    ], [
+        ("story_melissa_moon_protection_0", None, (23, 23), None, 1, None,
+         ["#threads['melissaMoonStoveRitual'].ritual_result['route'] == 'no_glove'",
+          "#'melissa' in threads['melissaMoonStoveRitual'].ritual_result['ritual_participants']",
+          "#calendar_v2.daysInGame >= threads['melissaMoonStoveRitual'].day",
+          "#14 <= int(calendar_v2.day or 0) <= 23",
+          "#Melissa.sex_stat('virginity', True) and moon_stove_npc_available('melissa')",
+          "#Melissa.intimacy_story_ready()",
+          "#int(Melissa.anger_with_player or 0) <= 0 and relationship_anger('melissa') <= 0"],
+         None, "TavernMyRoom", "bedtime", 30),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "amanda", "StoveDebrief", [
+        "#threads['melissaMoonStoveRitual'].completed",
+    ], [
+        ("story_amanda_stove_debrief_0", None, None, None, 1, None,
+         ["#'amanda' in threads['melissaMoonStoveRitual'].ritual_result['participants']",
+          "#int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3"],
+         None, "talk_amanda", "stove_debrief", 30),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "StoveDebrief", [
+        "#threads['melissaMoonStoveRitual'].completed",
+    ], [
+        ("story_melissa_stove_debrief_0", None, None, None, 1, None,
+         ["#'melissa' in threads['melissaMoonStoveRitual'].ritual_result['participants']",
+          "#int(Melissa.asked_today or 0) == 0 and int(Melissa.talked_today or 0) < 3"],
+         None, "talk_melissa", "stove_debrief", 30),
     ], highlight=True, threaded=True),
     LThreadData(0, "melissa", "MoonNoiseRepeat", [
         "#threads['melissaMoonNoise'].completed",
@@ -563,7 +631,7 @@ define melissaThreadList = [
             None, (21, 23), None,
             1, None,
             ["#14 <= int(calendar_v2.day or 0) <= 23",
-             "#bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
+             "#bool(Amanda.sex_stat('virginity', True)) or bool(Melissa.sex_stat('virginity', True)) or (Clara.tavern_resident() and bool(Clara.sex_stat('virginity', True)))"],
             None, "TavernUpstairs", "enter", 22,
         ),
     ], highlight=False, threaded=False),
@@ -2002,7 +2070,18 @@ define ingaThreadList = [
 ]
 define eddieThreadList = []
 define irmaThreadList = []
-define churchThreadList = []
+define churchThreadList = [
+    LThreadData(0, "church", "FullMoonBats", [
+        "#threads['melissaMoonNoise'].completed",
+    ], [[
+        ("story_church_full_moon_bats_0", None, (20, 23), None, 1, None,
+         ["#calendar_v2.moon_phase_name_en() == 'Full Moon'"],
+         None, "Church", "enter", 0, False, "church_full_moon_bats"),
+        ("story_church_full_moon_bats_0", None, (0, 5), None, 1, None,
+         ["#calendar_v2.moon_phase_name_en() == 'Full Moon'"],
+         None, "Church", "enter", 0, False, "church_full_moon_bats"),
+    ]], highlight=False, threaded=False),
+]
 define mongolThreadList = [
     LThreadData(0, "mongol", "TavernArrival", [
         "#bool(threads['robinEddieRecovery'].completed)",

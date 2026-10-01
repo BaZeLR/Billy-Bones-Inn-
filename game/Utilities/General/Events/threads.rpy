@@ -195,6 +195,8 @@ init -25 python:
     class LThreadInfo(ThreadInfo):
         def __init__(self, data):
             super(LThreadInfo, self).__init__(data)
+            if data.name == "melissaMoonStoveRitual":
+                self.ritual_result = None
 
         def advance(self):
             if self.num < self.data.length:

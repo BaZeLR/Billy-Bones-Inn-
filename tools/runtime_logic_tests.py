@@ -371,8 +371,8 @@ def valid_reqs(value: object) -> bool:
 def validate_event_schema(events: list[StoryEvent], report: RuntimeLogicReport) -> None:
     for event in events:
         name = event_type_name(event)
-        if event.raw_len not in (11, 12):
-            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected 11 or 12")
+        if event.raw_len not in (11, 12, 13):
+            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected 11, 12 or 13")
         if not event.target:
             report.fail("event_schema", f"{name}: empty target label")
         if not valid_time_spec(event.day):

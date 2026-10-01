@@ -6,7 +6,7 @@ SOURCE = (Path(__file__).resolve().parents[1] / "game/NPC/Girls/Melissa/MelissaM
 
 def test_sandra_tells_the_complete_stove_spirit_legend():
     scene = SOURCE.split("label story_melissa_moon_sandra_story_3:", 1)[1].split(
-        "label story_melissa_moon_old_stove_4:", 1
+        "label story_melissa_moon_noise_repeat:", 1
     )[0]
 
     assert 'Amanda.sex_stat("virginity", True)' in scene

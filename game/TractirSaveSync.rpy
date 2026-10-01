@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 109
+define currentVersion = 110
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -844,6 +844,9 @@ init -100 python:
         if loaded_version < 109:
             updateSave_V108()
             loaded_version = 109
+        if loaded_version < 110:
+            updateSave_V109()
+            loaded_version = 110
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3391,6 +3394,39 @@ init -100 python:
         player.horse.__dict__.setdefault("carriage_ready", False)
         rooms.repair()
         initThreads()
+
+    def updateSave_V109():
+        # Map the old three-stage stove thread by meaning before rebinding it.
+        player.equipment.__dict__.setdefault("hand", "")
+        ritual = threads.get("melissaMoonStoveRitual")
+        old_stage = int(ritual.num or 0) if ritual is not None else 0
+        old_complete = bool(ritual.completed) if ritual is not None else False
+        already_mapped = ritual is not None and hasattr(ritual, "ritual_result")
+        old_targets = {
+            event.target for stage in ritual.data.triggers for event in stage
+        } if ritual is not None else set()
+        initThreads()
+        noise = threads.get("melissaMoonNoise")
+        if noise is not None and int(noise.num or 0) >= 4:
+            noise.advanceTo(4, complete_at_end=True)
+        ritual = threads["melissaMoonStoveRitual"]
+        if already_mapped:
+            return
+        ritual.ritual_result = None
+        if old_complete or old_stage >= 2:
+            proved_glove = "story_melissa_moon_room_protection_2" in old_targets
+            ritual.ritual_result = {
+                "route": "glove" if proved_glove else "legacy_unknown",
+                "participants": ["amanda", "melissa"] if proved_glove else [],
+                "ritual_participants": [],
+            }
+            ritual.advanceTo(5, complete_at_end=True)
+            # Preserve the old accepted joint introduction without replaying it.
+            if old_complete:
+                threads["amandaMoonProtection"].advanceTo(1, complete_at_end=True)
+                threads["melissaMoonProtection"].advanceTo(1, complete_at_end=True)
+        elif old_stage == 1:
+            ritual.advanceTo(1)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

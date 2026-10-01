@@ -1,6 +1,17 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+define 4 FurGloveItem = GameItem(
+    object_id="fur_glove_001",
+    name="меховая перчатка",
+    description="Старая кожаная перчатка, подшитая мягким мехом. На ладони ещё видны неровные стежки.",
+    picture="images/tavern/backyard/shed/ghostEvent/fur_glove.png",
+    carriable=True,
+    wearable=True,
+    stackable=False,
+    custom_properties={"item_kind": "device", "wear_slot": "hand"},
+)
+
 init 4 python:
     AleItem = GameItem(
         object_id="drink_ale_001",
@@ -405,17 +416,6 @@ init 4 python:
             "shared_effect_text": "Жар от редкого гриба останется с ней на два дня и резко повысит вероятность зачатия.",
             "gift_value": 1,
         },
-    )
-
-    FurGloveItem = GameItem(
-        object_id="fur_glove_001",
-        name="меховая перчатка",
-        description="Старая кожаная перчатка, подшитая мягким мехом. На ладони ещё видны неровные стежки.",
-        picture="images/tavern/backyard/shed/ghostEvent/fur_glove.png",
-        carriable=True,
-        wearable=True,
-        stackable=False,
-        custom_properties={"item_kind": "device", "wear_slot": "hand"},
     )
 
     SpecialHerbsItem = GameItem(

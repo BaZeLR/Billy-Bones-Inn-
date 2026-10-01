@@ -26,6 +26,10 @@ label IntAmandaTalk(girl_name="amanda"):
     $ _dad_phrase = DaddyAskBuildPhrase(girl_name) if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and int(Amanda.rel or 0) >= 8 and Amanda.pregnancy_days() >= 120 else ""
     $ _amanda_special_entry = household_special_talk_entry(girl_name) if int(Amanda.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
     menu:
+        "Что ты тогда искала у старой печи?" if story_event_available("talk_amanda", "stove_debrief"):
+            call checkTriggers("talk_amanda", "stove_debrief", 0)
+            $ main_ui_end_talk_state()
+            return
         "Осмотреть":
             call ShowGirlCard(girl_name)
             jump IntAmandaTalk

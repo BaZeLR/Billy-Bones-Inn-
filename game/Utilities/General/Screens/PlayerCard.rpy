@@ -368,7 +368,7 @@ init python:
                 else:
                     _items.append(MenuItem("Надеть", Call("PlayerCardEquipItem", _item_id)))
         if _item_id in ("warm_fur_cloak_001", "fur_bedroll_001") and player.item_count("fur_glove_001") <= 0 and threads["melissaMoonStoveRitual"].num >= 1:
-            _items.append(MenuItem("Срезать мех и сшить перчатку", Call("PlayerCardMakeFurGlove", _item_id)))
+            _items.append(MenuItem("Срезать мех и сшить перчатку — 20 минут", Call("PlayerCardMakeFurGlove", _item_id)))
         if str(rooms.current_code or "") == "TavernMyRoom":
             if _item_id == "recipe_book_001" and not tavern_my_room_has_floor_item("recipe_book_001"):
                 _items.append(MenuItem("Положить на стол", Call("PlayerCardPutRecipeBookOnTable")))
@@ -700,7 +700,7 @@ label PlayerCardUnequipItem(item_id=""):
 label PlayerCardMakeFurGlove(item_id=""):
     $ renpy.dynamic("_source_item")
     $ _source_item = str(item_id or "")
-    if _source_item in ("warm_fur_cloak_001", "fur_bedroll_001") and player.item_count(_source_item) > 0 and player.item_count("fur_glove_001") <= 0:
+    if threads["melissaMoonStoveRitual"].num >= 1 and _source_item in ("warm_fur_cloak_001", "fur_bedroll_001") and player.item_count(_source_item) > 0 and player.item_count("fur_glove_001") <= 0:
         $ player.add_item("fur_glove_001", 1)
         $ calendar_v2.advance_minutes(20)
         $ scene_runtime.text = "Вы срезаете небольшую полосу меха с подкладки и пришиваете её к старой кожаной перчатке. Плащ или постель остаются целы, но у края теперь заметна прореха."

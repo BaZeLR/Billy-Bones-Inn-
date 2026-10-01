@@ -338,6 +338,7 @@ label story_tavern_renovation_complete:
     return True
 
 label ShedRuinedStove(object_id="shed_ruined_stove"):
+    $ renpy.dynamic("_stove_day")
     $ main_ui_begin_native_scene_state(ShedRuinedStoveObject.name)
     if 6 <= int(calendar_v2.hour) < 20:
         vscene "images/tavern/backyard/shed/ruined_stove_chamber.png"
@@ -345,6 +346,12 @@ label ShedRuinedStove(object_id="shed_ruined_stove"):
         vscene "images/tavern/backyard/shed/ruined_stove_chamber_night.png"
     "За покосившейся перегородкой прячется каморка. Старая печь наполовину осыпалась, но под уцелевшим сводом осталось просторное темное нутро. Здесь давно не топили; если пригнуться, взрослый мужчина вполне поместится внутри."
     menu:
+        "Спрятаться в печи и ждать" if story_event_available("ShedRuinedChamber", "stove_hide_wait"):
+            $ _stove_day = threads["melissaMoonStoveRitual"].day
+            call checkTriggers("ShedRuinedChamber", "stove_hide_wait", 0)
+            if threads["melissaMoonStoveRitual"].num == 4:
+                $ threads["melissaMoonStoveRitual"].day = _stove_day
+                $ event_runtime.evaluation_time = None
         "Заглянуть внутрь":
             "В глубине лежат только холодная зола и кирпичная крошка. Пока здесь никто не прячется. Топить такую печь нельзя — сначала ее нужно переложить."
             menu:
