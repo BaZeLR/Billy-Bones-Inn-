@@ -2,7 +2,7 @@
 
 Date: 2026-10-01. Audited baseline: `28f6c77`. Status: **scenario specification, not an implemented gameplay change**. This document records the current request, its complete event order, and the changes needed in the existing owners. Existing dialogue remains in its source files; the new investigation/comedy dialogue below is a draft. Detailed adult ritual prose is an authored-content slot, not newly generated prose in this document.
 
-Review update: the user's supplied scene text replaces the corresponding draft, rather than adding alternate versions. The clarified first shed scene has no conversation: MC stays unnoticed.
+Review update: the user's supplied scene text replaces the corresponding draft verbatim, including its spelling and punctuation, rather than adding alternate versions. The clarified first shed scene has no conversation: MC stays unnoticed.
 
 ## Story contract
 
@@ -127,9 +127,9 @@ Label: keep `story_melissa_moon_window_clue_0`.
 Trigger: `TavernMyRoom / window_look`; Sandra's story finished; old chamber accessible; Amanda and Melissa are available for the excursion, and at least one of them remains a virgin. Amanda's first reconnaissance does not require her to hear the noise herself: if non-virgin, she is checking the place for Melissa. Recheck those states in event conditions, since thread-wide prerequisites can be cached. The full two-person ritual requires both to remain virgins; a non-virgin companion has no personal trial.
 
 1. `vscene "images/player_room/windowAmand.png"`
-   Text: «Во дворе Аманда. Пописав, она встала, промакнула подолом ночнушки свой лобок, не пошла как обычно спать, а, оглянувшись вокруг, направилась к сараю».
+   Text: «Во дворе Аманда,.пописав,она встала , промакнула подолом ночнушки свой лобок, не пошла как обычно спать,а оглянувшись вокруг направилась к сараю.»
 2. `vscene "images/tavern/backyard/shed/ghostEvent/amanda/amanda_enters_shed.png"`
-   Text: «И шмыгнула во внутрь. Вас просто распирает от любопытства. А не пойти ли и посмотреть?»
+   Text: «И шмыгнула во внутрь. Вас просто распирает от любопытсва, А не пойти ли и посмотреть?»
    Choices: `Да` → the next scene, first shed check; `Нет` → the ordinary MC-room menu.
 3. Record D1 on the existing thread, advance to stage 1, expose the existing fur-crafting option. Both choices deliver the clue; `Нет` ends this window event and leaves the first shed check pending. Do not add another observation-choice menu before `Да` / `Нет`.
 
@@ -142,12 +142,14 @@ Proposed event label: `story_melissa_moon_shed_check_1`.
 Trigger: `Shed / enter`, normally the same eligible night after stage 0; a missed check remains pending for the next moon-day-17/18 night. The scene can continue into the real `ShedRuinedChamber` as an authored room transition.
 
 1. Establishing frame: `images/tavern/backyard/shed/ruined_stove_chamber_night.png`.
-   Text: «Вы потихонечку заглядываете во внутрь. Аманда внимательно изучает старинную печь и даже заглядывает во внутрь!»
+   Text: «Вы потихонечку заглядываете во внутрь, Аманда внимательно изучает старинную печь и даже заглядывает во внутрь!»
 2. Desired front-view frame: `images/tavern/backyard/shed/ghostEvent/amanda/amanda_stove_front.png` — **missing, not a loadable asset**. The prior generation failed. Do not silently substitute an inside-stove glove or trial image. Existing Amanda face close-ups can supply reaction frames, but do not depict this missing pose.
-   MC's thought: «Вот так история! — подумали Вы. — Видать, рассказ Сандры был воспринят чертовкой всерьёз».
-3. Text: «Вдруг из печи раздался странный звук, глухой полустон-полувой, приведший Аманду в ужас. Охнув, она поспешно ретировалась и, пулей вылетев из сарайчика, поспешно ретировалась в трактир! Вы еле увернулись и чудом не были замечены».
+   MC's thought: «вот так история! подумали Вы, видать рассказ Сандры был воспринят чертовкой всерьёз».
+3. Text: «Друг из-печи раздался странный звук, глухой полу-стон полу вой, преведший Аманду в ужас,
+   Охнув она поспешно ретировалась и , пулей вылетев из сарайчика,поспешно ретировалась в трактир!
+   Вы еле увернулись и чудом не были замечены.»
    This is an audible physical stove sound, not the virgin-only lunar disturbance. MC remains unseen; do not play the superseded conversation or invent a detection roll.
-4. Choice: `Пойду-ка я отсюда` → leave the shed and restore ordinary tavern navigation.
+4. Choice: `пойду-ка я отсюда.` → leave the shed and restore ordinary tavern navigation.
 5. Stamp the first check's actual day, then advance to stage 2. In the normal run this is still D1; after a missed check this is the new timing anchor for the remaining two nights. No trials, touch, intimacy rewards or new apology state are introduced by this reconnaissance.
 
 #### Stage 2 — second night, window clue with both girls
@@ -174,20 +176,21 @@ Use **only** `images/tavern/backyard/shed/ghostEvent/stove_conversation.png` for
    Choice: `Послушать`.
 2. User-supplied replacement dialogue:
    - Аманда: «Если Олли правда такой мохнатый, как Сандра говорит, зимой ему цены не будет».
-   - Мелисса: «Ахаха, эт же не кошечка какая в кровать тащить. Сперва узнай, дома ли он. Свободен ли он. Вдруг ты с чужим домовым заигрываешь? Или вдруг ты ему на ощупь не понравишься? Ааа?»
-   - Аманда: «Ой ой, смотрите, королева сранделей нашлась, хаха. Посмотрим, чья попка лучше, хаха».
-   - Аманда: «Так, кароче, не хочешь, так и скажи, Мэл. Мне тож ссыкотно, но козёл с снов надоел. Он на Херхарда похож».
-   - Мелисса: «Не, вместе пойдём. По очереди, если что, будем орать».
-   - Мелисса: «Ну всё, договорились, панталоны снять не забудь только!»
-   - Аманда: «Тише, ты корова».
-   - Мелисса: «Сама корова».
-   - Аманда: «Завтра в полночь. Ты только не смей хохотать, когда я его позову».
-   - Мелисса, ехидно: «Или попкой как вертеть будешь».
-   - Аманда: «Не ссы ты».
+   - Мелисса: «Ахаха эт же не кошечка какая в кровать тащить
+     Сперва узнай, дома ли он. Свободен ли он, Вдруг ты с чужим домовым заигрываешь?)
+     Или вдруг ты ему на ощупь не понравишься? ааа?»
+   - Аманда: «Ой ой смотрите королева сранделей нашлась,хаха Посмотрим чья попка лучше хаха.»
+   - Аманда: «Так,кароче не хочешь,так и скажи Мэл. Мне тож ссыкотно, но козел с снов надоел. Он на Херхарда похож.»
+   - Меллисса: «не вместе пойдем. По очереди,есличто будем орать»
+   - Мелисса: «Ну всё) договорились, панталоны снять не забудь только!»
+   - Аманда: «Тише,ты корова.»
+   - Мелисса: «Сама, корова»
+   - Мелисса: «или попкой как вертеть будешь», ехидно говорит Мелисса.
+   - Аманда: «не ссы ты»
    Choice: `Дослушать`.
 3. «Сквозняк протискивается в трещину над топкой. Из каменного нутра выходит низкое, глухое „у-у-ум“. Обе разом перестают улыбаться».
    - Аманда: «Это ты?»
-   - Мелисса: «Че совсем дура, вааще... блин!»
+   - Мелисса: «Че совсем дура,вааще...блин!»
    - Аманда: «Тогда завтра. Сегодня он, кажется, занят».
 4. «Они торопливо выбираются из каморки. Вы остаётесь у перегородки, пока их шаги не стихают во дворе. Теперь вы знаете и место, и время».
    Choice: `Вернуться в трактир и подготовиться к завтрашней ночи`.
@@ -385,7 +388,7 @@ Before a save migration changes the stove thread's length, map stages semantical
 - Sandra's breakfast activates the window route without demanding an old-stove entry first. Original roof/booklet quest stays completed.
 - D1 alone, D1+1 conversation only, D1+2 ambush; a delay or missed cycle does not collapse the stages.
 - Both actual window clues run through the existing `window_look` action and use the correct single/two-person pictures.
-- First window choice is `Да` / `Нет`: `Да` continues to the shed scene; `Нет` restores the MC-room menu. In the first shed scene MC stays unnoticed while Amanda flees from the sound; `Пойду-ка я отсюда` ends the encounter.
+- First window choice is `Да` / `Нет`: `Да` continues to the shed scene; `Нет` restores the MC-room menu. In the first shed scene MC stays unnoticed while Amanda flees from the sound; `пойду-ка я отсюда.` ends the encounter.
 - No glove, owned-but-unequipped glove, equipped glove and absent donor: all yield their proper menu/outcome; no-glove media contains no trial or fur-touch frame.
 - Craft during either preparation day, then equip; no duplicate glove production. A post-resolution craft cannot replay trials.
 - Midnight increments once; sleeping afterward uses the existing skip-first-roll behavior. No repeated daily report or duplicated stat reward.
