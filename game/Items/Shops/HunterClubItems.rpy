@@ -407,6 +407,17 @@ init 4 python:
         },
     )
 
+    FurGloveItem = GameItem(
+        object_id="fur_glove_001",
+        name="меховая перчатка",
+        description="Старая кожаная перчатка, подшитая мягким мехом. На ладони ещё видны неровные стежки.",
+        picture="images/tavern/backyard/shed/moon_ritual/fur_glove.png",
+        carriable=True,
+        wearable=True,
+        stackable=False,
+        custom_properties={"item_kind": "device", "wear_slot": "hand"},
+    )
+
     SpecialHerbsItem = GameItem(
         object_id="special_herbs_001",
         name="редкие травы",

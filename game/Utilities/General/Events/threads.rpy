@@ -135,6 +135,9 @@ init -25 python:
                 self.done += [False] * delta
             elif delta < 0:
                 self.done = self.done[: self.data.length]
+            if self.num >= self.data.length:
+                self.num = self.data.length
+                self.completed = True
 
         def checkBlocks(self):
             if self.completed:

@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def shed_ruined_chamber_accessible():
-        return not tavern.renovation_complete("shed")
+        return not rooms.get("ShedRuinedChamber").is_hidden
 
     ShedRoomDefinition = Room(
         code_name="Shed",
@@ -61,7 +61,9 @@ init 6 python:
         intro_value = str(intro_text or "").strip()
         if intro_value:
             if tavern.renovation_complete("shed"):
-                text_parts.append("Сарай отремонтирован. Здесь стоят печь с баком горячей воды, бревна и отдельная поленница колотых дров. За плотно закрывающейся дверью находится другая комната — прачечная с купальней.")
+                text_parts.append("Сарай отремонтирован. Здесь стоят печь с баком горячей воды, бревна и отдельная поленница колотых дров. За плотно закрывающейся дверью находится прачечная с купальней.")
+                if not rooms.get("ShedRuinedChamber").is_hidden:
+                    text_parts.append("За старой перегородкой уцелела каморка с холодной печью.")
             else:
                 text_parts.append(intro_value)
                 if not rooms.get("ShedRuinedChamber").is_hidden:
@@ -240,7 +242,7 @@ label ShedTakeChoppedWood(quantity=1):
 
 
 label ShedExamine:
-    if not tavern.renovation_complete("shed") and rooms.get("ShedRuinedChamber").is_hidden:
+    if rooms.get("ShedRuinedChamber").is_hidden:
         $ rooms.get("ShedRuinedChamber").is_hidden = False
         $ scene_runtime.text = "Осматривая дальнюю стену сарая, вы замечаете щель за покосившейся перегородкой. Там скрыта отдельная каморка со старой печью. Теперь туда можно пройти."
     else:

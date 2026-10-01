@@ -183,13 +183,14 @@ init -998 python:
             self.armor = ""
             self.wrist = ""
             self.finger = ""
+            self.hand = ""
 
         def equip(self, item_id, slot=""):
             item_key = player_normalize_item_id(item_id)
             if not item_key:
                 return False
             slot_key = str(slot or "").strip().lower()
-            if slot_key not in ("weapon", "armor", "wrist", "finger"):
+            if slot_key not in ("weapon", "armor", "wrist", "finger", "hand"):
                 try:
                     item_obj = get_game_item(item_key)
                     item_type = str(getattr(item_obj, "item_type", "") or getattr(item_obj, "category", "") or "").lower()
@@ -201,7 +202,7 @@ init -998 python:
 
         def unequip(self, slot=""):
             slot_key = str(slot or "").strip().lower()
-            if slot_key not in ("weapon", "armor", "wrist", "finger"):
+            if slot_key not in ("weapon", "armor", "wrist", "finger", "hand"):
                 return False
             setattr(self, slot_key, "")
             return True

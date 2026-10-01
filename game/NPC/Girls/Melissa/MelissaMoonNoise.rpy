@@ -121,23 +121,6 @@ label story_melissa_moon_old_stove_4:
     return True
 
 
-label story_melissa_moon_stove_gone_4:
-    $ main_ui_begin_native_scene_state("След старой печи")
-    show screen main_ui
-    vscene shed_picture()
-    $ scene_runtime.text = "Вы вспоминаете рассказ Сандры и осматриваете место, где прежде стояла старая развалившаяся печь. После ремонта сарая от нее не осталось ничего, кроме следа на камне. Если в истории о ночном шуме есть правда, искать ее придется не внутри этой печи."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Продолжить поиски позже":
-            pass
-    $ calendar_v2.advance_minutes(15)
-    $ event_runtime.active_thread.advance()
-    $ event_runtime.evaluation_time = None
-    $ findAvailableEvents(True)
-    $ main_ui_end_native_scene_state()
-    return True
-
-
 label story_melissa_moon_noise_repeat:
     $ main_ui_begin_native_scene_state("Ночной шум")
     show screen main_ui
@@ -148,6 +131,97 @@ label story_melissa_moon_noise_repeat:
         "Запомнить эту ночь":
             pass
     $ calendar_v2.advance_minutes(5)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_melissa_moon_window_clue_0:
+    $ main_ui_begin_native_scene_state("Окно во двор")
+    show screen main_ui
+    vscene "images/tavern/backyard/shed/moon_ritual/window_clue.png"
+    $ scene_runtime.text = "За маленьким окном мелькают две белые ночные сорочки. Аманда и Мелисса стоят у сарая, шепчутся и по очереди оглядываются на окна трактира. «Завтра попробуем по одной, — доносится голос Аманды. — Ровно в полночь. Ты ведь помнишь слова Сандры?» Мелисса кивает и притворяет дверь сарая. Теперь вы знаете, куда они собрались."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Закрыть окно и обдумать услышанное":
+            pass
+    $ scene_runtime.text = "В холодной печи за перегородкой можно спрятаться заранее. Для истории о мохнатой руке понадобится мягкая меховая перчатка: кусочек меха можно срезать с вашего плаща или меховой постели, если они лежат в сумке. Готовую перчатку нужно надеть через инвентарь."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Запомнить их уговор":
+            pass
+    $ event_runtime.active_thread.setDay()
+    $ calendar_v2.advance_minutes(5)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_melissa_moon_stove_wait_1:
+    $ main_ui_begin_native_scene_state("В старой печи")
+    show screen main_ui
+    vscene "images/tavern/backyard/shed/ruined_stove_chamber_night.png"
+    $ scene_runtime.text = "До полуночи ещё есть время. Вы надеваете меховую перчатку, забираетесь в холодное нутро старой печи и устраиваетесь за кирпичным выступом. Отсюда видно окошко топки, а из каморки вас не разглядеть."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Притаиться и дождаться полуночи":
+            pass
+    $ calendar_v2.advance_minutes(60 - int(calendar_v2.minute or 0))
+    if Amanda.sex_stat("virginity", True):
+        vscene "images/tavern/backyard/shed/moon_ritual/amanda_stove.png"
+        $ scene_runtime.text = "Первой входит Аманда в лёгкой хлопковой сорочке. Она трижды шепчет: «Олли, Олли, защити меня от того, кто приходит во сне». Потом подходит к печному окошку и, всё ещё оглядываясь, приподнимает подол. Мягкая перчатка появляется из темноты, но Аманда замечает ваши сапоги под сводом: «Стефан? Так это ты? Ну и домовой!»"
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Назваться и спросить, нужна ли ей ваша помощь":
+                $ scene_runtime.text = "Вы выбираетесь из печи и говорите правду. Аманда фыркает, но не уходит: «Напугал меня, дурак. Если хочешь помочь — сначала спроси. Сегодня просто проводи меня обратно». Она сама берёт вас за руку в меховой перчатке."
+            "Остаться на месте и дать ей уйти":
+                $ scene_runtime.text = "Вы не шевелитесь. Аманда опускает сорочку и выходит, так и не дождавшись ответа от старой печи."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Подождать, кто придёт следом":
+                pass
+    if Melissa.sex_stat("virginity", True):
+        vscene "images/tavern/backyard/shed/moon_ritual/melissa_stove.png"
+        $ scene_runtime.text = "Позднее скрипит дверь. Мелисса в простой ночной сорочке повторяет просьбу к Олли три раза и медленно приближается к остывшей печи. На пороге топки мелькает меховая перчатка. «Кто там?» — спрашивает она и, услышав ваше дыхание, прищуривается: «Стефан, выходи. Я хочу знать, кому доверяю»."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Выйти и поговорить с Мелиссой":
+                $ scene_runtime.text = "Вы вылезаете из-за кирпичей. Мелисса сердится на уловку, но выслушивает вас. «Никаких тайн за моей спиной. Если хочешь помочь нам, начни с правды». Вы обещаете не выдавать её ночной поход."
+            "Остаться в темноте":
+                $ scene_runtime.text = "Вы молчите. Мелисса отступает от печи и уходит, решив, что с этим домовым лучше не связываться."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Покинуть холодную печь":
+                pass
+    $ calendar_v2.advance_minutes(10)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.active_thread.setDay()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_melissa_moon_room_protection_2:
+    $ main_ui_begin_native_scene_state("Ночные гостьи")
+    show screen main_ui
+    vscene "images/tavern/backyard/shed/moon_ritual/night_visit.png"
+    $ scene_runtime.text = "К вашей комнате неслышно подходят Аманда и Мелисса. Вчерашняя печь не дала ответа о ночном стуке, зато обе теперь знают, что вы слушаете их всерьёз. «Если опять начнётся, можно мы посидим здесь, пока не успокоимся?» — спрашивает Мелисса. Аманда заглядывает через её плечо: «И без маскарада с домовыми, договорились?»"
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Пригласить их войти и поговорить о ночном шуме":
+            $ scene_runtime.text = "Вы ставите на стол свечу и даёте девушкам высказать всё, что они слышали. Аманда то шутит, то вздрагивает от скрипа крыши; Мелисса внимательно слушает ваши вопросы. Когда за окном стихает ветер, обе благодарят вас и возвращаются в спальню."
+        "Проводить их обратно":
+            $ scene_runtime.text = "Вы провожаете их по коридору и обещаете утром ещё раз проверить, откуда доносится стук."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Пожелать им спокойной ночи":
+            pass
+    $ calendar_v2.advance_minutes(15)
+    $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     $ main_ui_end_native_scene_state()

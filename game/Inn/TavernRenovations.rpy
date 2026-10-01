@@ -189,7 +189,6 @@ init 5 python:
         object_id="shed_ruined_stove", name="Каморка со старой печью",
         description="В глубине сарая есть тесная каморка с наполовину развалившейся печью. В ее давно остывшем нутре может спрятаться взрослый человек.",
         picture="images/tavern/backyard/shed/ruined_stove_chamber.png",
-        condition={"rule": "tavern_renovation", "code": "shed", "completed": False},
         actions=[ObjectAction(action_id="inspect_ruined_stove", label="Осмотреть каморку и печь", hook="call", target="ShedRuinedStove")],
         custom_properties={"object_menu_label": "ShedRuinedStove"},
     )

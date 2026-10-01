@@ -156,6 +156,8 @@ init python:
             lines.append("На вашем запястье закреплён наручный коммуникатор.")
         if player.item_count("vibranium_ring_001") > 0 and str(getattr(player.equipment, "finger", "") or "") == "vibranium_ring_001":
             lines.append("На пальце вы носите вибраниумное кольцо.")
+        if player.item_count("fur_glove_001") > 0 and str(getattr(player.equipment, "hand", "") or "") == "fur_glove_001":
+            lines.append("На руке у вас мягкая меховая перчатка.")
         if player_card_equipped_armor() == "old_leather_cuirass_001":
             lines.append("Поверх одежды на вас затянута старая кожаная кираса, придающая вам суровый и дорожный вид.")
         if player_card_equipped_weapon() == "rusty_hunter_rifle_001":
@@ -277,7 +279,7 @@ init python:
         if str(_item_id) == player_card_equipped_armor():
             _suffixes.append("надето")
         _wear_slot = str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "").strip()
-        if _wear_slot in ("wrist", "finger") and str(getattr(player.equipment, _wear_slot, "") or "") == _item_id:
+        if _wear_slot in ("wrist", "finger", "hand") and str(getattr(player.equipment, _wear_slot, "") or "") == _item_id:
             _suffixes.append("надето")
 
         _caption = _item_name
@@ -305,7 +307,7 @@ init python:
         if str(_item_id) == player_card_equipped_armor():
             _lines.append("Эта вещь сейчас на вас.")
         _wear_slot = str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "").strip()
-        if _wear_slot in ("wrist", "finger") and str(getattr(player.equipment, _wear_slot, "") or "") == _item_id:
+        if _wear_slot in ("wrist", "finger", "hand") and str(getattr(player.equipment, _wear_slot, "") or "") == _item_id:
             _lines.append("Эта вещь сейчас на вас.")
         if _item_id == "rusty_hunter_rifle_001":
             _lines.extend(list(rusty_hunter_rifle_status_lines() or []))
@@ -360,11 +362,13 @@ init python:
                 _items.append(MenuItem("Надеть", Call("PlayerCardEquipItem", _item_id)))
         if _item_kind == "device":
             _wear_slot = str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "").strip()
-            if _wear_slot in ("wrist", "finger"):
+            if _wear_slot in ("wrist", "finger", "hand"):
                 if str(getattr(player.equipment, _wear_slot, "") or "") == _item_id:
                     _items.append(MenuItem("Снять", Call("PlayerCardUnequipItem", _item_id)))
                 else:
                     _items.append(MenuItem("Надеть", Call("PlayerCardEquipItem", _item_id)))
+        if _item_id in ("warm_fur_cloak_001", "fur_bedroll_001") and player.item_count("fur_glove_001") <= 0 and threads["melissaMoonStoveRitual"].num >= 1:
+            _items.append(MenuItem("Срезать мех и сшить перчатку", Call("PlayerCardMakeFurGlove", _item_id)))
         if str(rooms.current_code or "") == "TavernMyRoom":
             if _item_id == "recipe_book_001" and not tavern_my_room_has_floor_item("recipe_book_001"):
                 _items.append(MenuItem("Положить на стол", Call("PlayerCardPutRecipeBookOnTable")))
@@ -658,7 +662,7 @@ label PlayerCardEquipItem(item_id=""):
     elif str(player_card_item_kind(_item_id) or "") == "armor":
         $ player.equip(_item_id, "armor")
         $ scene_runtime.text = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
-    elif str(player_card_item_kind(_item_id) or "") == "device" and str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "") in ("wrist", "finger"):
+    elif str(player_card_item_kind(_item_id) or "") == "device" and str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "") in ("wrist", "finger", "hand"):
         $ player.equip(_item_id, str(player_card_item_custom_props(_item_id)["wear_slot"]))
         $ scene_runtime.text = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
     else:
@@ -682,7 +686,7 @@ label PlayerCardUnequipItem(item_id=""):
     elif _item_id == player_card_equipped_armor():
         $ player.unequip("armor")
         $ scene_runtime.text = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
-    elif str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "") in ("wrist", "finger") and _item_id == str(getattr(player.equipment, player_card_item_custom_props(_item_id)["wear_slot"], "") or ""):
+    elif str(player_card_item_custom_props(_item_id).get("wear_slot", "") or "") in ("wrist", "finger", "hand") and _item_id == str(getattr(player.equipment, player_card_item_custom_props(_item_id)["wear_slot"], "") or ""):
         $ player.unequip(str(player_card_item_custom_props(_item_id)["wear_slot"]))
         $ scene_runtime.text = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
     else:
@@ -690,6 +694,20 @@ label PlayerCardUnequipItem(item_id=""):
     $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventoryItemMenu(_item_id, True)
+    return
+
+
+label PlayerCardMakeFurGlove(item_id=""):
+    $ renpy.dynamic("_source_item")
+    $ _source_item = str(item_id or "")
+    if _source_item in ("warm_fur_cloak_001", "fur_bedroll_001") and player.item_count(_source_item) > 0 and player.item_count("fur_glove_001") <= 0:
+        $ player.add_item("fur_glove_001", 1)
+        $ calendar_v2.advance_minutes(20)
+        $ scene_runtime.text = "Вы срезаете небольшую полосу меха с подкладки и пришиваете её к старой кожаной перчатке. Плащ или постель остаются целы, но у края теперь заметна прореха."
+    else:
+        $ scene_runtime.text = "Подходящего меха при себе нет."
+    $ scene_runtime.location_text = scene_runtime.text
+    call PlayerCardInventoryItemMenu(_source_item, True)
     return
 
 
