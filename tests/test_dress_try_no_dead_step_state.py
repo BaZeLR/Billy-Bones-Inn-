@@ -69,6 +69,14 @@ def test_girl_dress_scene_reads_player_intimacy_authority_directly():
     assert "_gds_player_cum_cap" not in scene + suggest
 
 
+def test_girl_dress_purchase_keeps_hud_visible_before_its_authored_dialogue():
+    source = (ROOT / "game/NPC/Girls/Common/GirlDressSuggest.rpy").read_text(encoding="utf-8-sig")
+    label = source.split('label GirlDressSuggest(GirlName="", DressToBuy=""):', 1)[1]
+    assert label.index("hide screen dress_shop_catalog_page") < label.index("show screen main_ui")
+    assert label.index("show screen main_ui") < label.index("предложили вы")
+    assert label.index("предложили вы") < label.index("call GirlSuggestDressFunc(")
+
+
 def test_girl_card_does_not_accept_fake_navigation_callback():
     source = (ROOT / "game/NPC/Girls/Common/GirlCard.rpy").read_text(encoding="utf-8-sig")
 

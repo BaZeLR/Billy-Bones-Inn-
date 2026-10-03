@@ -4,9 +4,21 @@ Date: 2026-10-01. Audited baseline: `28f6c77`. Status: **scenario specification,
 
 Review update: the user's supplied scene text replaces the corresponding draft verbatim, including its spelling and punctuation, rather than adding alternate versions. The clarified first shed scene has no conversation: MC stays unnoticed.
 
+Specification correction: **2026-10-03**. The accepted Melissa reward chart,
+early corruption ceiling and public/team context rules are recorded in
+[Melissa's specification](melissa.md#corrected-lunar--early-intimacy-specification-2026-10-03).
+These corrections supersede the earlier no-glove-only Melissa visit rule and
+zero-corruption glove outcome. This is a documentation update, not delivery of
+the remaining gameplay changes. The 2026-10-01 audit below is historical; several
+of its planned structural changes already exist in current code.
+
 ## Story contract
 
-The repaired roof does not end the recurring lunar disturbance. Only NPCs whose live virginity state is true hear that disturbance. Melissa complains at breakfast; Amanda and resident Clarissa can join according to their own state. MC checks the attic and finds no renewed infestation. At a subsequent breakfast Sandra tells her existing village account, including the legend of Ollie in old stoves. That breakfast activates the shed continuation.
+Melissa owns this continuation: `melissaBatProblem` owns the completed bat quest and thanks, `melissaMoonNoise` owns the post-repair investigation, and `melissaMoonStoveRitual` owns the shed sequence. Amanda is a participant, not a second progression owner. The user-facing order is: (1) bats resolved and roof repaired; (2) Melissa's thanks; (3) returning complaints and Sandra's story, retaining the empty-attic recheck; (4) Amanda's window clue and unnoticed stove inspection; (5) both women's window clue and shed conversation; (6) the later stove ambush, including Amanda's individual touch and Melissa's individual climax on the glove route.
+
+The original bat-quest opening and returning noise use lunar days **14–23 inclusive**, not just the calendar's narrower Full Moon phase. The repaired roof does not end the recurring lunar disturbance; its post-repair return begins in a later lunar month. Only NPCs whose live virginity state is true hear it. Melissa and other actual virgin listeners can complain at breakfast; Amanda keeps her enjoyment private and does not complain publicly there. MC checks the attic and finds no renewed infestation. At a subsequent breakfast Sandra tells her existing village account, including the legend of Ollie in old stoves. That breakfast activates the shed continuation.
+
+After Sandra's kitchen story, `melissaMoonNoiseRepeat` is a separate private corridor reminder: Melissa and Amanda approach MC worried, messy-haired and in dishevelled nightshirts. Personal hearing depends on each woman's live virginity; an accompanying non-listener does not claim to hear the supernatural sound. Complete that conversation once per lunar month on days 14–23. It queues no additional breakfast, replays no roof/thanks/investigation, advances no stove stage, and does not solve the curse.
 
 Distinguish that supernatural noise from real wind, footsteps and visible church bats. MC discovers the lunar disturbance through the women's complaints and sleeplessness; the opening must not make him hear the same virgin-only sound. Everyone in the shed can hear the ordinary gust through the cracked stonework.
 
@@ -14,13 +26,13 @@ The continuation has **three distinct nights**:
 
 1. Through his ordinary backyard window, MC sees Amanda finish her usual nighttime outing but enter the shed instead of returning to bed. If he investigates, he stays unnoticed while she inspects the stove; a strange sound frightens her back to the tavern.
 2. On the following night the same window reveals Amanda and Melissa at the shed. Investigating yields their conversation in front of the ruined stove, its existing conversation picture, and the wind frightening them away. No ritual trials play on this night.
-3. On the third night MC can hide in the cold stove and wait. A fur glove is optional for entering this event. Equipped glove: the complete individual trial picture sequences can play. No glove: those pictures and their associated adult detail are omitted, but the ambush still resolves and unlocks Amanda's and Melissa's separate night protection visits. A renewed gust frightens the girls away and closes this part of the story.
+3. On the third night MC can hide in the cold stove and wait. A fur glove is optional for entering this event. Equipped glove: the complete individual trial picture sequences can play, with Melissa's outcome leading into her protection/night-visit progression and earning her +1 corruption. No glove: those pictures and their associated adult detail are omitted, but the ambush still resolves and retains Amanda's and Melissa's separate protection introductions. A renewed gust frightens the girls away and closes this part of the story. The glove outcome must not exclude Melissa from the requested follow-up; Amanda's existing no-glove introduction is otherwise unchanged.
 
 Afterward MC can ask each participant about the shed through her own talk menu. The curse remains unresolved. Church bats at full moon are an independent clue toward the later weregoat story.
 
-All characters in these current-day scenes are adults. The two women's individual scenes and night visits are separate. This arc does not change anyone's virginity or record a sexual encounter.
+All characters in these current-day scenes are adults. The two women's individual scenes and night visits are separate. This arc does not change anyone's virginity. Melissa's glove outcome includes her individual climax; do not confuse that outcome with resolution of the curse or completion of her later intimacy stages.
 
-## Authority and current-code audit
+## Authority and baseline audit (2026-10-01; historical)
 
 | Subject | Current authoritative owner | Observed baseline | Planned delta |
 | --- | --- | --- | --- |
@@ -43,7 +55,8 @@ All characters in these current-day scenes are adults. The two women's individua
 
 ```mermaid
 flowchart TD
-    B[Bat quest completed, roof repaired, booklet resolved] --> N[Virgin listeners hear lunar noise]
+    B[Bat quest completed, roof repaired, booklet resolved] --> BT[Melissa's thanks]
+    BT --> N[Virgin listeners hear returning lunar noise]
     N --> BF[Breakfast complaint]
     BF --> A[Attic recheck: no bats]
     A --> S[Sandra's next-breakfast legend]
@@ -61,10 +74,12 @@ flowchart TD
     NG --> F
     NG --> PA[Amanda night protection event]
     NG --> PM[Melissa night protection event]
+    T --> PM
     PA --> AP[Later Amanda visits retain their own gates]
     PM --> MP[Existing Melissa courtship retains its own gates]
     F --> DA[Ask Amanda about shed]
     F --> DM[Ask Melissa about shed]
+    S --> R[Independent monthly corridor reminder; no extra breakfast]
     S --> CH[Independent full-moon church bats clue]
     CH --> WG[Later weregoat continuation]
     F --> WG
@@ -76,20 +91,22 @@ The exact clock ranges below are **proposed authoring values**; the user specifi
 
 | Encounter | Proposed time | Delay and lunar rule |
 | --- | --- | --- |
-| Initial noise | 21:00–23:59 | Moon day 14–23, after the original bat/roof resolution. |
+| Original bat-quest opening | Existing 06:00–07:59 entry slot | Moon day 14–23; retain original rat-help and story prerequisites. |
+| Initial post-repair noise | 21:00–23:59 | Moon day 14–23, in a later lunar month after bat/roof resolution and thanks. |
 | Complaint and Sandra | Existing breakfast slot 06:00–11:59 | Separate breakfasts; keep the existing one-day story delays. |
-| First window clue | D1, 21:00–22:59 | Start on moon day 17 or 18, leaving enough nights for the sequence. |
-| First shed check | D1, before 23:30 | Same night as the first clue. |
-| Second window clue and conversation | D1+1, 21:00–23:29 | Minimum one absolute day since D1; first valid full-moon night after that delay. |
-| Hide and wait | Next night after the conversation, 23:00–23:45 | Start on moon day 19 or 20 in the normal three-night run. Advance to midnight within the event. |
-| Ambush resolution | About 00:00–00:25 | Midnight belongs to the same physical story night. If moon day changes to 21, do not cancel the already-running scene. |
+| Monthly corridor reminder | 21:00–23:59 | Sandra heard; moon day 14–23; both women available; once per lunar month, independent of the one-time stove cursor. |
+| First window clue | D1, 21:00–22:59 | Moon day 14–21, leaving two later nights inside the noise window. |
+| First shed check | D1, before 23:30 | Moon day 14–21; normally the same night as the first clue. |
+| Second window clue and conversation | Later night; window 21:00–22:59, shed before 23:30 | Moon day 15–22; minimum one absolute day from the actual first shed check. |
+| Hide and wait | Later night after the conversation, 23:00–23:45 | Moon day 16–23; minimum one absolute day from the actual conversation. Advance to midnight within the event. |
+| Ambush resolution | About 00:00–00:25 | Midnight belongs to the same physical story night. Crossing the end of the eligibility window does not cancel an already-running scene. |
 | Amanda protection visit | Following eligible bedtime, 22:00–22:59 | No-glove outcome; noise-window days 14–23. Individual one-time event. |
-| Melissa protection visit | Following eligible bedtime, 23:00–23:59 | No-glove outcome; noise-window days 14–23. Individual one-time event. |
+| Melissa protection visit | Following eligible bedtime, 23:00–23:59 | Glove or no-glove completed outcome with Melissa eligible; noise-window days 14–23. Individual introduction, followed by her own progression. |
 | Church bats | 20:00–23:59 and 00:00–05:59 | Full Moon only. Two clock alternatives for one event, one common daily key. |
 
 The glove can be made during D1 after the clue, throughout D1+1, and before the D1+2 ambush. No extra two-day craft timer is needed. The current craft itself takes 20 minutes.
 
-Missing a night does not abort the story. Leave the current stage pending until its next eligible full-moon opportunity. If the first shed check is postponed, perform it on a later moon-day-17/18 night and restamp the thread day when that check finishes; the second night is then relative to that actual check. Likewise, a postponed second-night conversation restamps its actual date and must occur on moon day 18 or 19, leaving a valid subsequent ambush night. Thus an old date never makes a pending stage permanently unreachable, and a late observation never compresses the remaining stages into one night. No-glove protection visits also stay pending when an NPC is unavailable, MC sleeps outside her time window, or another event takes priority.
+Missing a night does not abort the story. Leave the current stage pending until its next eligible lunar opportunity. A postponed first shed check can occur on days 14–21; stamp its actual completion day. A postponed second-night conversation can occur on days 15–22; stamp that actual day before the next-night delay. Waiting is eligible on days 16–23. Thus an old date never makes a pending stage permanently unreachable, and a late observation never compresses remaining encounters into one night. Protection visits stay pending when an NPC is unavailable, MC sleeps outside her window, or another event takes priority; the eligible glove outcome must also retain Melissa's introduction.
 
 ## Event registry and scene beats
 
@@ -99,11 +116,11 @@ The expanded stove registry uses the following rows; `None` weekday means the ca
 
 | Stage | Target | Location / action | Hour field | Delay | Additional event conditions |
 | --- | --- | --- | --- | --- | --- |
-| 0 | `story_melissa_moon_window_clue_0` | `TavernMyRoom / window_look` | `(21, 22)` | `None` | Moon day 17/18; Sandra heard; chamber accessible; available household participants; at least one virgin listener. |
-| 1 | `story_melissa_moon_shed_check_1` | `Shed / enter` | `(21, 23)` | `None` | First valid moon-day-17/18 night after the clue; current minute before 23:30. |
-| 2 | `story_melissa_moon_second_window_2` | `TavernMyRoom / window_look` | `(21, 22)` | `1` | Moon day 18/19; delay from actual first shed check. |
-| 3 | `story_melissa_moon_shed_conversation_3` | `Shed / enter` | `(21, 23)` | `None` | Same valid story night as second clue, or next moon-day-18/19 catch-up night; before 23:30; both women actually available. |
-| 4 | `story_melissa_moon_stove_wait_1` | `ShedRuinedChamber / stove_hide_wait` | `(23, 23)` | `1` | Moon day 19/20; minute ≤45; delay from actual conversation; old stove accessible and cold; glove optional. |
+| 0 | `story_melissa_moon_window_clue_0` | `TavernMyRoom / window_look` | `(21, 22)` | `None` | Moon day 14–21; Sandra heard; chamber accessible; available household participants; at least one virgin listener. |
+| 1 | `story_melissa_moon_shed_check_1` | `Shed / enter` | `(21, 23)` | `None` | First valid moon-day-14–21 night after the clue; current minute before 23:30. |
+| 2 | `story_melissa_moon_second_window_2` | `TavernMyRoom / window_look` | `(21, 22)` | `1` | Moon day 15–22; delay from actual first shed check. |
+| 3 | `story_melissa_moon_shed_conversation_3` | `Shed / enter` | `(21, 23)` | `None` | Same valid story night as second clue, or next moon-day-15–22 catch-up night; before 23:30; both women actually available. |
+| 4 | `story_melissa_moon_stove_wait_1` | `ShedRuinedChamber / stove_hide_wait` | `(23, 23)` | `1` | Moon day 16–23; minute ≤45; delay from actual conversation; old stove accessible and cold; glove optional. |
 
 The real closure event for loss of both virgin listeners is an alternative at stage 4, with no glove/media requirement. It is a story outcome, not a refresh or handler label.
 
@@ -114,7 +131,7 @@ The real closure event for loss of both virgin listeners is an alternative at st
 | `story_melissa_moon_noise_0` | `TavernUpstairs / enter` | Existing upstairs frame. Correct the current line that makes MC directly hear the disturbance: he instead hears the women ask about it from their rooms. Add Amanda's contribution only if her live virginity is true; resident Clarissa uses her own state. | Existing observation choice; stamp day, advance. |
 | `story_melissa_moon_breakfast_1` | `TavernKitchen / breakfast` | `tavern_kitchen_breakfast_picture()`; preserve the complaint, with one combined scene for the actual listeners. | Promise an attic recheck; advance. |
 | `story_melissa_moon_roof_check_2` | `TavernAtic / enter` | `attic_room_picture_path()`; preserve the empty, repaired attic result. | Return with the finding; stamp day, advance. |
-| `story_melissa_moon_sandra_story_3` | `TavernKitchen / breakfast` | Preserve the existing complete Sandra scene and its `Продолжить` choices. Amanda's response depends on virginity; non-virgin Amanda does not claim to hear the noise. | Finish Sandra's story; complete the shortened investigation. The stove thread becomes eligible. |
+| `story_melissa_moon_sandra_story_3` | `TavernKitchen / breakfast` | Preserve the complete Sandra scene and its `Продолжить` choices. Amanda keeps her enjoyment private; non-virgin Amanda does not claim to hear the noise. | Finish Sandra's story; complete the shortened investigation. The stove thread and independent monthly corridor reminder become eligible. |
 
 The original bat quest is already completed. Do not replay its roof repair, missing-booklet argument or thanks. MC's room is not an entry location for the initial noise discovery.
 
@@ -139,7 +156,7 @@ The descent follows the real route: `TavernMyRoom → TavernUpstairs → TavernM
 
 Proposed event label: `story_melissa_moon_shed_check_1`.
 
-Trigger: `Shed / enter`, normally the same eligible night after stage 0; a missed check remains pending for the next moon-day-17/18 night. The scene can continue into the real `ShedRuinedChamber` as an authored room transition.
+Trigger: `Shed / enter`, normally the same eligible night after stage 0; a missed check remains pending for the next eligible night on moon days 14–21. The scene can continue into the real `ShedRuinedChamber` as an authored room transition.
 
 1. Establishing frame: `images/tavern/backyard/shed/ruined_stove_chamber_night.png`.
    Text: «Вы потихонечку заглядываете во внутрь, Аманда внимательно изучает старинную печь и даже заглядывает во внутрь!»
@@ -156,7 +173,7 @@ Trigger: `Shed / enter`, normally the same eligible night after stage 0; a misse
 
 Proposed event label: `story_melissa_moon_second_window_2`.
 
-Trigger: the usual `TavernMyRoom / window_look`, at least one day after D1, during the next eligible full-moon night.
+Trigger: the usual `TavernMyRoom / window_look`, at least one absolute day after the actual first shed check, on a later eligible night during moon days 15–22.
 
 Picture: `images/tavern/backyard/shed/ghostEvent/window_clue.png`. This image actually depicts **both girls** outside the shed, so it belongs here rather than in the Amanda-only first clue.
 
@@ -200,7 +217,7 @@ Use **only** `images/tavern/backyard/shed/ghostEvent/stove_conversation.png` for
 
 Keep the existing event label `story_melissa_moon_stove_wait_1`; its legacy suffix does not require renaming a live label merely to match the new stage index.
 
-Trigger: `ShedRuinedChamber / stove_hide_wait`, after the second-night conversation, minimum one day later, 23:00–23:45 on the valid lunar night. The old stove must be accessible and cold. **Neither glove possession nor glove equipment belongs in this event's availability condition.**
+Trigger: `ShedRuinedChamber / stove_hide_wait`, after the second-night conversation, minimum one day later, 23:00–23:45 on moon days 16–23. The old stove must be accessible and cold. **Neither glove possession nor glove equipment belongs in this event's availability condition.**
 
 The real `ShedRuinedStove` object menu offers `Спрятаться в печи и ждать` when that event is available, and directly calls the existing `checkTriggers` for this action. This is an actual object action; do not create a label whose sole purpose is forwarding to the event.
 
@@ -280,7 +297,7 @@ The existing front-through-stove `amanda_stove.png` includes a glove in the fore
    Мелисса не обращая внимания на колькости товарки,признается Вау! кажется я кончила,аж коленки подогнулись такой пушистик ласковый... И итерично захохотала...
    Кнопка: `Далее` → общий финал ниже, не меню комнаты.
 
-Каждая индивидуальная последовательность относится только к той участнице, которая ещё подходит для собственного испытания. Если другая присутствует лишь как спутница, её последовательность не запускается. Только после этих эпизодов следуют новый звук, бегство девушек и выход MC из укрытия. Результат `glove` и предусмотренные награды фиксируются один раз в общем финале. Эта ветка сама по себе не открывает новые защитные ночные визиты, предназначенные для исхода без перчатки.
+Каждая индивидуальная последовательность относится только к той участнице, которая ещё подходит для собственного испытания. Если другая присутствует лишь как спутница, её последовательность не запускается. Только после этих эпизодов следуют новый звук, бегство девушек и выход MC из укрытия. Результат `glove` и предусмотренные награды фиксируются один раз в общем финале. По исправленной спецификации эта ветка также открывает личное вступление к ночным визитам Мелиссы; ограничение только исходом без перчатки для неё отменено. Её завершённый индивидуальный эпизод даёт +1 к развращённости в пределах раннего потолка 20.
 
 ### Общий финал обеих веток
 
@@ -309,20 +326,22 @@ The described damage to the donor is presently text only; the craft does not vis
 
 No material, no crafting, or an unequipped glove produces the no-glove route. This is a completed alternative outcome, not a blocked thread. Crafting the glove after resolution cannot replay the one-time ambush or retroactively switch its recorded route.
 
-## Separate protection visits after the no-glove route
+## Separate protection visits after the completed ambush
+
+Correction: Melissa's introduction must follow her eligible **glove or no-glove** outcome. Amanda's introduction retains its no-glove rule; this correction does not rewrite her separate progression. The current code still has a no-glove-only Melissa gate, which remains an implementation discrepancy. The introduction leads into gradual night/morning stages, not immediate completion of courtship; use the +1 chart in `melissa.md`.
 
 Proposed single-event linear threads: `amandaMoonProtection` and `melissaMoonProtection`. Each owns its own `done`, `num` and completion, registered in the existing event catalog. Remove the joint `story_melissa_moon_room_protection_2` from the ritual's trigger list; do not keep both joint and individual routes active.
 
 | Label | Trigger and individual gates | Picture / text / choices | Completion |
 | --- | --- | --- | --- |
 | Proposed `story_amanda_moon_protection_0` | `TavernMyRoom / bedtime`, proposed 22:00–22:59; ritual completed with no glove; Amanda participated, remains virgin, is in the household and available; noise window active; her existing anger/ignore rules permit approaching MC. | Candidate arrival art: `images/player_room/amandaVisits/amanda_visit_0.jpg`, subject to scene review. «У двери мнётся Аманда. „Не смей смеяться. Домовой нас выставил, а наверху опять стучит. Я немного побуду здесь. Если усну — утром скажешь, что пришла проверить окна“». Choices: `Пустить её и выслушать` / `Проводить её обратно`. | Accept: complete her protection introduction only. Refuse: do not mark accepted or advance another thread; retry at a later valid opportunity. |
-| Proposed `story_melissa_moon_protection_0` | `TavernMyRoom / bedtime`, proposed 23:00–23:59; same route, but Melissa's own participation, virginity, availability and existing `intimacy_story_ready()` checks. | Candidate arrival art: `images/player_room/batsProblem/melissa in the room.png`, already in her courtship manifest. «Позже Мелисса тихо стучит в дверь. „У тебя тоже слышно? Я думала, после печи станет легче. Можно сегодня побыть здесь? Только не рассказывай утром всем за столом“». Choices: `Пригласить Мелиссу` / `Проводить её в комнату`. | Accept: complete her introduction. Keep the existing courtship cursor and later intimacy gates intact. Refuse: accepted visit remains pending. |
+| Proposed `story_melissa_moon_protection_0` | `TavernMyRoom / bedtime`, proposed 23:00–23:59; ritual completed with `glove` or `no_glove`; Melissa's own eligible participation, virginity, availability and existing `intimacy_story_ready()` checks. | Candidate arrival art: `images/player_room/batsProblem/melissa in the room.png`, already in her courtship manifest. «Позже Мелисса тихо стучит в дверь. „У тебя тоже слышно? Я думала, после печи станет легче. Можно сегодня побыть здесь? Только не рассказывай утром всем за столом“». Choices: `Пригласить Мелиссу` / `Проводить её в комнату`. | Accept: complete her introduction. Keep the existing courtship cursor and later intimacy gates intact. Refuse: accepted visit remains pending. |
 
 These windows are disjoint. `Sleep` evaluates the event for the actual bedtime selected; it does not run an invisible overnight queue. One girl's visit must not mark the other's thread complete. If a visit is skipped because MC sleeps earlier, it remains available on a later eligible night. If the noise window ends, eligibility resumes in the next moon month.
 
 Existing Amanda curiosity/erection/remorse sequences and Melissa's staged bedtime/morning progression retain their individual conditions. This ghost arc supplies a narrative cause for seeking company; it does not grant advanced sex options, clear an apology, bypass the original corruption gates, or turn food/drunkenness into permanent corruption. The older Amanda ordinary-night sequence still needs its own implementation audit.
 
-A previous independent visit remains unlocked if the glove route is later encountered in an older save. The current request specifically grants **new** protection introductions from the no-glove outcome; the glove outcome alone does not create those new introductions.
+A previous independent visit remains unlocked in an older save. Melissa's glove outcome must now also make her eligible introduction available without replaying the ambush; Amanda's no-glove introduction remains separate. Do not invent a historical route where the save records only `legacy_unknown`, grant speculative backdated rewards, or complete an unplayed visit.
 
 ## Later questions in the NPC talk menus
 
@@ -357,7 +376,7 @@ This record is needed because taking off the glove or losing virginity later can
 
 The paired conversations require both women to be present. Temporary unavailability postpones them. Virginity is checked individually: if only one remains a virgin, the other can accompany her without claiming to hear the noise. If it changes after a clue, preserve the clue and handle the remaining eligible participant independently at the ambush. A companion receives no personal trial or automatic protection visit. If neither remains a virgin before the ambush, the same thread stage has a real closure-event alternative: the girls explain that the disturbance has stopped for them, the thread records `not_needed`, and no ritual rewards or protection introductions are granted. Do not leave a permanently impossible virginity condition waiting forever.
 
-Proposed balancing values, **not original QSP awards**:
+Earlier non-corruption balancing proposal, **not original QSP awards**. These retained fun/arousal values do not authorize +2/+3 corruption rewards; the corrected Melissa corruption schedule is in `melissa.md`.
 
 | Resolved route | MC fun | MC arousal | Each actual participant's fun | Her arousal | Her openness |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -368,7 +387,7 @@ Proposed balancing values, **not original QSP awards**:
 
 Apply these once at the ambush's final choice. Respect existing caps. Use `player.change_stat("fun", ...)`, `player.intimacy.add_arousal(...)`, `NPC.add_arousal(...)`, `NPC.change_social(open_delta=...)` and each NPC's existing `fun` field. Neither observation night awards these rewards. Leaving before the trial outcome awards nothing.
 
-This episode adds **zero** corruption, friendship, trust, mana, karma, sex-act count, conception chance or virginity change. The requested temporary excitement and modest openness remain separate from Amanda's original corruption progression. The per-NPC virginity checks still control who hears the noise next time.
+Correction: Melissa's completed individual glove encounter earns **+1 corruption**, capped at 20 during the early phase. No-glove observation, the two reconnaissance nights and the monthly reminder do not earn that intimate milestone. Each completed later Melissa progression step earns +1, and each completed Clarissa night visit involving Melissa adds another +1 under the same ceiling. Openness and friendship remain separate; their new award amounts are not specified here, and an anonymous Ollie encounter is not automatically a friendship reward with MC. Amanda's existing corruption progression is not changed by this Melissa correction. Do not change virginity, grant conception effects or infer intercourse from the glove outcome. Neither this encounter nor reaching the early ceiling solves the curse or unlocks the later cream/anal stage: Melissa's cream request must wait until Clarissa's cure and the anal introduction, with a real plug required for later preparation. Use existing owners, not duplicate counters or readiness flags.
 
 ## Event presentation and implementation boundary
 
@@ -389,8 +408,11 @@ Before a save migration changes the stove thread's length, map stages semantical
 ## Verification cases for implementation
 
 - Noise on moon days 14 and 23; none on 13 or 24; each woman's virginity state checked independently, including Amanda.
+- Original bat-quest opening also uses days 14–23; roof repair and thanks remain completed before the returning-noise continuation.
+- Amanda does not complain publicly at breakfast. After Sandra, the dishevelled two-woman corridor reminder ends once per lunar month without queuing breakfast or resetting stove progress.
 - Sandra's breakfast activates the window route without demanding an old-stove entry first. Original roof/booklet quest stays completed.
 - D1 alone, D1+1 conversation only, D1+2 ambush; a delay or missed cycle does not collapse the stages.
+- First clue/check accepts days 14–21, second clue/conversation 15–22, waiting 16–23; a save pending after Amanda's retreat on day 20 can continue on day 21 and wait on day 22.
 - Both actual window clues run through the existing `window_look` action and use the correct single/two-person pictures.
 - First window choice is `Да` / `Нет`: `Да` continues to the shed scene; `Нет` restores the MC-room menu. In the first shed scene MC stays unnoticed while Amanda flees from the sound; `пойду-ка я отсюда.` ends the encounter.
 - No glove, owned-but-unequipped glove, equipped glove and absent donor: all yield their proper menu/outcome; no-glove media contains no trial or fur-touch frame.
@@ -398,6 +420,9 @@ Before a save migration changes the stove thread's length, map stages semantical
 - Midnight increments once; sleeping afterward uses the existing skip-first-roll behavior. No repeated daily report or duplicated stat reward.
 - Second-night sound occurs on the conversation image only. Third-night sound is described from the hiding POV after the individual beats.
 - Each visit uses its own hour window and NPC state. Declining or skipping one never consumes the other. Normal bedtime progression and apology gates remain intact.
+- Melissa's eligible glove outcome opens her introduction too; Amanda's no-glove rule remains separate. Each completed early Melissa milestone gives +1 corruption, each completed Clarissa night visit involving her another +1, with no early gain above 20 or load/menu reward replay.
+- Private/team clothing or flirting never implies public/customer permission. The general dress-buying reward table requires a separate audit, not invented values in this arc.
+- Melissa's cream request cannot precede Clarissa's cure and the anal introduction; later plug possession is checked on the player's real inventory.
 - Each talk question is available only after that NPC participated; it is a one-time lore event with no repeat stat award.
 - Church bats appear at full-moon night entry once per day. No attack frame, combat, repeated Gerhardt award or interference with Sunday morning priorities.
 - Active event picture, text and choices stay together; normal room navigation returns only after event end.

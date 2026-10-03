@@ -1,6 +1,15 @@
 # The ordered post-roof lunar investigation is owned by melissaMoonNoise.
 
 init python:
+    def moon_noise_listener_ids(at_breakfast=False):
+        residents = set(household.resident_ids())
+        present = set(tavern_breakfast_present_ids()) if at_breakfast else None
+        return [npc_id for npc_id, npc in people.girl_items()
+                if npc_id in residents and npc.sex_stat("virginity", False)
+                and ((npc_id in present) if at_breakfast else
+                     (str(people.location(npc_id) or "").startswith("Tavern")
+                      or people.location(npc_id) in ("Backyard", "Shed", "ShedRuinedChamber")))]
+
     def moon_stove_npc_available(npc_id):
         npc = people.get_info(npc_id)
         location = str(people.location(npc_id) or "")
@@ -10,23 +19,30 @@ init python:
 
 
 label story_melissa_moon_noise_0:
+    $ renpy.dynamic("_moon_listeners", "_moon_listener")
+    $ _moon_listeners = moon_noise_listener_ids()
     $ main_ui_begin_native_scene_state("Ночной шум")
     show screen main_ui
     vscene "images/tavern/secondfloor/second_floor.png"
     $ scene_runtime.text = "Верхний коридор уже затих. Крыша починена, летучих мышей больше нет, но за дверями жилых комнат снова не спят."
-    if Amanda.sex_stat("virginity", True):
+    if "amanda" in _moon_listeners:
         $ scene_runtime.text += "\n\nАманда спрашивает из своей комнаты, слышит ли Мелисса шум над крышей."
-    if Melissa.sex_stat("virginity", True):
+    if "melissa" in _moon_listeners:
         $ scene_runtime.text += " Из комнаты Мелиссы доносится: «Ты тоже слышишь этот стук?»"
-    if Clara.tavern_resident() and Clara.sex_stat("virginity", True):
+    if "clara" in _moon_listeners:
         $ scene_runtime.text += " За другой дверью Кларисса спрашивает, кто опять стучит над крышей."
+    python:
+        for _moon_listener in _moon_listeners:
+            if _moon_listener not in ("amanda", "melissa", "clara"):
+                scene_runtime.text += "\n\n%s тоже жалуется на стук над крышей." % people_display_name(_moon_listener)
+    $ scene_runtime.text += "\n\n«Утром поговорим за завтраком», — отвечаете вы."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Запомнить, откуда доносится шум":
             pass
+    $ event_runtime.active_thread.setDay()
     $ calendar_v2.advance_minutes(10)
     $ event_runtime.active_thread.advance()
-    $ event_runtime.active_thread.setDay()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     $ main_ui_end_native_scene_state()
@@ -34,16 +50,22 @@ label story_melissa_moon_noise_0:
 
 
 label story_melissa_moon_breakfast_1:
+    $ renpy.dynamic("_moon_listeners", "_moon_listener")
+    $ _moon_listeners = moon_noise_listener_ids(True)
     $ main_ui_begin_native_scene_state("Завтрак: шум вернулся")
     show screen main_ui
     vscene tavern_kitchen_breakfast_picture()
     $ scene_runtime.text = "За столом вспоминают ночной стук над спальнями. После ремонта крыши обвинить в нем летучих мышей уже не выходит."
-    if "amanda" in tavern_breakfast_present_ids() and Amanda.sex_stat("virginity", True):
-        $ scene_runtime.text += "\n\nАманда подтверждает, что тоже слышала ночной шум."
-    if "melissa" in tavern_breakfast_present_ids() and Melissa.sex_stat("virginity", True):
+    if "amanda" in _moon_listeners:
+        $ scene_runtime.text += "\n\nАманда молчит и вертит ложку в пальцах. Она тоже слышала шум, но жаловаться за столом не собирается."
+    if "melissa" in _moon_listeners:
         $ scene_runtime.text += "\n\nМелисса сердито отодвигает миску: «Снова всю ночь слышала. Не надо говорить, что мне показалось. Я эту крышу теперь наизусть знаю»."
-    if "clara" in tavern_breakfast_present_ids() and Clara.tavern_resident() and Clara.sex_stat("virginity", True):
+    if "clara" in _moon_listeners:
         $ scene_runtime.text += "\n\nКларисса неожиданно перестает улыбаться: «И я слышала. Это не мыши и не ветер»."
+    python:
+        for _moon_listener in _moon_listeners:
+            if _moon_listener not in ("amanda", "melissa", "clara"):
+                scene_runtime.text += "\n\n%s тоже не спала из-за ночного шума." % people_display_name(_moon_listener)
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Пообещать снова осмотреть чердак":
@@ -81,7 +103,7 @@ label story_melissa_moon_sandra_story_3:
     $ scene_runtime.text = "Услышав, что на чердаке опять пусто, Сандра откладывает ложку. «Перед полнолунием у нас в деревне тоже стучало над крышей. Старухи говорили: это козёл-оборотень ищет девственниц. Сначала стук, потом такой сон, что просыпаешься горячая и сама тянешься под одеяло. Остальные ничего не слышат. Я слышала»."
     if "amanda" in tavern_breakfast_present_ids():
         if Amanda.sex_stat("virginity", True):
-            $ scene_runtime.text += "\n\n«Правда? — Аманда вскидывает брови. — Я тоже слышала. Только мне после этих снов вовсе не плохо: просыпаюсь горячая и довольная, а потом весь день хочется смеяться». Сандра бросает на неё внимательный взгляд."
+            $ scene_runtime.text += "\n\nАманда опускает глаза в тарелку и молчит. Рассказать за столом, что ей нравятся эти сны, она не решается."
         else:
             $ scene_runtime.text += "\n\nАманда молча вертит ложку в пальцах. На этот раз ей нечего прибавить к разговору."
     $ scene_runtime.location_text = scene_runtime.text
@@ -119,14 +141,36 @@ label story_melissa_moon_sandra_story_3:
 
 
 label story_melissa_moon_noise_repeat:
+    $ renpy.dynamic("_moon_listeners", "_moon_listener")
+    $ _moon_listeners = moon_noise_listener_ids()
+    $ Amanda.wear_night_clothes(0)
+    $ Melissa.wear_night_clothes(0)
     $ main_ui_begin_native_scene_state("Ночной шум")
     show screen main_ui
-    vscene "images/tavern/secondfloor/second_floor.png"
-    $ scene_runtime.text = "С наступлением нового лунного месяца женщины, которые всё ещё слышат ночной шум, снова жалуются на него. После осмотра крыши винить летучих мышей вы уже не можете."
+    vscene "images/tavern/secondfloor/moon_noise_corridor-consistent.png"
+    $ scene_runtime.text = "В коридор выходят Мелисса и Аманда. Обе встревожены, волосы растрёпаны, ночные сорочки надеты кое-как: у Мелиссы ворот съехал с плеча, Аманда на ходу поправляет перекрученный подол. Девушки останавливают вас у дверей."
+    if "melissa" in _moon_listeners:
+        $ scene_runtime.text += "\n\n— Стефан, опять стучит, — жалуется Мелисса. — Ты же всё на чердаке проверил. Крыша целая, мышей нет. Откуда это теперь?"
+    elif "amanda" in _moon_listeners:
+        $ scene_runtime.text += "\n\n— Стефан, Аманда опять не может уснуть из-за этого стука, — говорит Мелисса. — Ты же всё на чердаке проверил."
+    else:
+        $ scene_runtime.text += "\n\n— Девушки опять жалуются на стук, — говорит Мелисса. — Мы их слышали из комнаты. Ты же всё на чердаке проверил."
+    if "amanda" in _moon_listeners:
+        $ scene_runtime.text += "\n\n— Я тоже слышу, — тихо добавляет Аманда. — После того, что Сандра рассказала, уже не до смешков. Сделай что-нибудь, а?"
+    elif "melissa" in _moon_listeners:
+        $ scene_runtime.text += "\n\n— Она меня разбудила, — добавляет Аманда. — После того, что Сандра рассказала, я бы тоже перепугалась."
+    else:
+        $ scene_runtime.text += "\n\n— Они нас разбудили, — добавляет Аманда. — После того, что Сандра рассказала, я бы тоже перепугалась."
+    python:
+        for _moon_listener in _moon_listeners:
+            if _moon_listener not in ("amanda", "melissa"):
+                scene_runtime.text += "\n\n%s тоже жалуется на ночной стук." % people_display_name(_moon_listener)
+    $ scene_runtime.text += "\n\nСамого стука вы не слышите. Девушки ждут ответа, но после пустого чердака обещать им ещё одну починку крыши бессмысленно."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Запомнить эту ночь":
+        "Я помню. Попробую выяснить, что вас тревожит":
             pass
+    $ threads["melissaMoonNoiseRepeat"].setDay()
     $ calendar_v2.advance_minutes(5)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)

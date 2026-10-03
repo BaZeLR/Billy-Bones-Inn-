@@ -118,6 +118,7 @@ init -24 python:
 
     class AmandaMorningWindowEpisodeEvent(AmandaEvent):
         def __init__(self, stage=0):
+            self.stage = stage
             super(AmandaMorningWindowEpisodeEvent, self).__init__(
                 "morning_window_episode_%d" % stage,
                 "story_amanda_room_morning_window_%d" % stage,
@@ -137,7 +138,11 @@ init -24 python:
                 and str(people.location("amanda") or "") == "TavernAmandaRoom"
                 and household_morning_issue_type("amanda") != "sick"
                 and not Amanda.room_entry_blocked_today
-                and (not player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active)
+                and (self.stage != 0 or player.tavern_management.breakfast.today
+                     or player.tavern_management.breakfast.event_active)
+                and (not player.tavern_management.breakfast.today
+                     or player.tavern_management.breakfast.event_active
+                     or household_morning_issue_type("amanda") == "sleepy")
                 and not (
                     player.tavern_management.breakfast.event_active
                     and "amanda" in (player.tavern_management.breakfast.present_ids or [])

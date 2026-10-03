@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 110
+define currentVersion = 112
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -36,6 +36,16 @@ init -100 python:
             werecat_thread.advanceTo(0)
 
     def tractir_save_patch_loaded_state():
+        noise_repeat = threads.get("melissaMoonNoiseRepeat")
+        if noise_repeat is not None and (
+                (noise_repeat.data.length == 2 and any(
+                    event.target == "story_melissa_moon_breakfast_repeat"
+                    for stage in noise_repeat.data.triggers for event in stage))
+                or (noise_repeat.data.length == 1 and noise_repeat.num >= 1)):
+            # Remove the unintended breakfast loop, preserving lunar history.
+            noise_repeat.num = 0
+            noise_repeat.done = [False]
+            noise_repeat.completed = False
         if not hasattr(tavern, "renovations"):
             updateSave_V100()
         ensure_game_item_registry()
@@ -111,7 +121,6 @@ init -100 python:
         tractir_save_normalize_sex_positions()
         tractir_save_normalize_rooms()
         tractir_save_remove_owned_unique_items_from_rooms()
-        tractir_save_clear_room_ui_cache()
         amanda_obj = globals().get("Amanda")
         if amanda_obj is not None and not hasattr(amanda_obj, "attic_window_favor_stage"):
             if bool(getattr(amanda_obj, "attic_mock_exposed", False)) or people_to_int(getattr(amanda_obj, "attic_window_breakfast_bj_day", -1), -1) >= 0:
@@ -367,24 +376,6 @@ init -100 python:
                 continue
             next_rows = [row for row in normalize_room_item_rows(getattr(room_obj, "game_items", [])) if get_object_id(row) not in owned_unique]
             room_obj.game_items = list(next_rows)
-
-    def tractir_save_clear_room_ui_cache():
-        main_ui_runtime.mode = "scene"
-        main_ui_runtime.action_content = None
-        main_ui_runtime.action_items = []
-        main_ui_runtime.object_id = ""
-        main_ui_runtime.inventory_dropdown_open = False
-        main_ui_runtime.overlay = ""
-        main_ui_runtime.girl_key = ""
-        main_ui_runtime.selected_char = ""
-
-        room_code = str(rooms.current_code or "").strip()
-        if room_code == "":
-            return
-
-        room_obj = rooms.get(room_code)
-        if room_obj is not None:
-            main_ui_runtime.action_title = str(getattr(room_obj, "display_name", "") or room_code)
 
     def tractir_save_upgrade_people_registry():
         """Consume pre-registry save state once; never recreate retired stores."""
@@ -847,6 +838,12 @@ init -100 python:
         if loaded_version < 110:
             updateSave_V109()
             loaded_version = 110
+        if loaded_version < 111:
+            updateSave_V110()
+            loaded_version = 111
+        if loaded_version < 112:
+            updateSave_V111()
+            loaded_version = 112
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3427,6 +3424,47 @@ init -100 python:
                 threads["melissaMoonProtection"].advanceTo(1, complete_at_end=True)
         elif old_stage == 1:
             ritual.advanceTo(1)
+
+    def updateSave_V110():
+        # A sold forest catch is not the named, adopted household pet.
+        # Consume the old mixed state once; retain care stats and quest history.
+        old_state = werecat.var
+        hunt_state = werecat_state()
+        for name, value in (("owned", False), ("pet_name", "Луна"), ("adopted_day", -1),
+                ("adoption_breakfast_seen", False), ("first_month_thanks_day", -1)):
+            werecat.__dict__.setdefault(name, value)
+        if "adopted" in old_state or "adopted_count" in old_state:
+            werecat.owned = bool(int(old_state.get("adopted", 0) or 0)
+                or int(old_state.get("adopted_count", 0) or 0) >= 1)
+            werecat.pet_name = str(old_state.get("name", "") or "Луна")
+            werecat.adopted_day = people_to_int(old_state.get("adopted_day", -1), -1)
+            werecat.adoption_breakfast_seen = bool(old_state.get("adoption_breakfast_seen", 0))
+            werecat.first_month_thanks_day = people_to_int(old_state.get("first_month_thanks_day", -1), -1)
+        hunt_state.update(old_state)
+        # Older saves recorded only whether a sale happened, not how many.
+        hunt_state["sold_count"] = max(int(hunt_state.get("sold_count", 0) or 0),
+            1 if int(old_state.get("sold", 0) or 0) else 0)
+        old_state.clear()
+        for key in ("adopted", "adopted_count", "sold", "name", "adopted_day",
+                "adoption_breakfast_seen", "first_month_thanks_day"):
+            hunt_state.pop(key, None)
+        WerecatStaticData.invalidate_daily_schedule()
+        people.register(WerecatStaticData, werecat)
+        initThreads()
+
+    def updateSave_V111():
+        # Earlier saves could reach Amanda's morning scenes or Melissa's
+        # booklet quarrel before the newly authored first night visit. Keep
+        # those completed scenes and skip only the missing introduction;
+        # never grant its morning reward or replay it as remembered history.
+        initThreads()
+        visits = threads.get("amandaAtticNightVisits")
+        morning = threads.get("amandaMorningWindowEpisode")
+        bat = threads.get("melissaBatProblem")
+        if visits is None or morning is None or bat is None:
+            return
+        if int(morning.num or 0) >= 1 or int(bat.num or 0) >= 9 or bool(bat.completed):
+            visits.advanceTo(1, force_active=True)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

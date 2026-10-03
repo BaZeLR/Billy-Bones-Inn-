@@ -3,6 +3,8 @@ import textwrap
 from pathlib import Path
 from types import SimpleNamespace
 
+from tests.test_tavern_renovations_runtime import _exec_definitions
+
 
 ROOT = Path(__file__).resolve().parents[1]
 GAME = ROOT / "game"
@@ -166,6 +168,68 @@ def test_clearing_a_morning_issue_immediately_releases_its_schedule_condition():
     assert namespace["household_morning_issue_matches"]("melissa", "sleepy")
     assert namespace["household_clear_morning_issue"]("melissa") == 1
     assert not namespace["household_morning_issue_matches"]("melissa", "sleepy")
+
+
+def test_resolved_mornings_can_recur_for_each_person_on_later_absolute_days():
+    for issue, kind in (("sick", 1), ("sleepy", 2)):
+        namespace = _morning_namespace(weekday=2)
+        clock = namespace["calendar_v2"]
+        clock.daysInGame = 42
+        namespace["current_game_day"] = lambda: clock.daysInGame
+        rolls = []
+
+        def randint(low, high, key=""):
+            rolls.append(key)
+            return kind if high == 2 else low
+
+        namespace["procedural_randint"] = randint
+        prepare = namespace["prepare_household_morning_states"]
+        matches = namespace["household_morning_issue_matches"]
+        clear = namespace["household_clear_morning_issue"]
+        state = namespace["household"].morning_state
+
+        for day in (42, 43, 70):
+            clock.daysInGame = day
+            prepare(day)
+            assert all(matches(person, issue) for person in PRIVATE_ROOMS)
+            for person in PRIVATE_ROOMS:
+                assert clear(person) == 1
+                assert not matches(person, issue)
+                # Resolving one person's morning cannot consume another's.
+                for other in PRIVATE_ROOMS:
+                    assert matches(other, issue) == (state[f"{other}:{day}"]["resolved"] == 0)
+            rolled = list(rolls)
+            prepare(day)
+            assert rolls == rolled
+            assert not any(matches(person, issue) for person in PRIVATE_ROOMS)
+
+        assert all(entry["resolved"] == 1 for entry in state.values())
+
+
+def test_completed_melissa_story_does_not_consume_recurring_wake_or_care_actions():
+    namespace = _morning_namespace(weekday=2)
+    clock = namespace["calendar_v2"]
+    clock.daysInGame = 42
+    namespace.update({
+        "current_game_day": lambda: clock.daysInGame,
+        "player": SimpleNamespace(item_count=lambda item: 1),
+        "story_event_available": lambda *args: False,
+        "household_warm_drink_ready": lambda person: False,
+        "_action_display_name": lambda person: person,
+    })
+    _exec_definitions("Inn/HouseholdRuntimeEvents.rpy", {
+        "household_room_issue_action_specs",
+    }, namespace)
+    state = namespace["household"].morning_state
+    actions = namespace["household_room_issue_action_specs"]
+    for day in (42, 43):
+        clock.daysInGame = day
+        for person in PRIVATE_ROOMS:
+            for issue, target in (("sleepy", "HouseholdWakeSleepyGirl"), ("sick", "HouseholdMorningIssueCure")):
+                state[f"{person}:{day}"] = {"issue": issue, "resolved": 0, "indecent": 0}
+                assert any(row["target"] == target and row["args"] == (person,) for row in actions(person))
+                namespace["household_clear_morning_issue"](person)
+                assert actions(person) == []
 
 
 def test_people_registry_projects_issue_room_awake_state_and_release_at_runtime():

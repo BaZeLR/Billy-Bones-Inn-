@@ -53,7 +53,8 @@ init python:
         seen = set()
         for npc_id in present:
             key = str(npc_id or "").strip().lower()
-            if key not in ("sandra", "melissa", "amanda", "becky", "clara"):
+            if key not in ("sandra", "melissa", "amanda", "becky", "clara") and not (
+                    key in household.resident_ids() and isinstance(people.get_info(key), Girl)):
                 continue
             if key in ("sandra", "melissa", "amanda", "clara") and household_morning_issue_type(key) in ("sick", "sleepy"):
                 continue

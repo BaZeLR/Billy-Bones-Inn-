@@ -213,6 +213,24 @@ init python:
         def date_intimacy_available(self):
             return self.relationship_allows("intimacy")
 
+        def wear_night_clothes(self, mode=None):
+            if mode is None:
+                corruption = people_to_int(self.corruption, 0)
+                close = people_to_int(self.rel, 0) >= 10
+                cycle = girl_decision_cycle_state(self.code_name)
+                willing = self.arousal_value() >= 65 or float(cycle.get("horny", 0.0)) >= 0.20
+                invited = (
+                    people_to_int(threads["sandraWeeklyEvaluation"].num, 0) == 4
+                    and 22 <= people_to_int(calendar_v2.hour, 0) <= 23
+                )
+                mode = 2 if corruption >= 50 or (close and (invited or (corruption >= 30 and willing))) else 0
+                self.wardrobe.wear_night(mode)
+                if mode == 0 and corruption >= 30:
+                    self.wardrobe.remove("panties")
+            else:
+                self.wardrobe.wear_night(mode)
+            return self
+
         def intimacy_available(self, action_code="intimacy"):
             return self.relationship_allows(action_code)
 

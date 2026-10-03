@@ -32,9 +32,9 @@ init python:
         ),
         (
             "Сандра появляется в вашей комнате так, будто давно приняла для себя решение и больше не собирается его прятать.",
-            "\"Стефан, ты свой первый месяц выдержал как хозяин,\" говорит она низким, теплым голосом. \"Теперь я уже не хочу ограничиваться одними благодарностями за хозяйство.\"",
-            "\"Придешь сегодня ночью тихо, без глупостей и пустого трепа,\" продолжает она, глядя вам прямо в глаза. \"И я отблагодарю тебя уже совсем не словами. Хватит нам обоим ходить вокруг да около.\"",
-            "\"Запомни только одно: если зайдешь, назад дороги к прежней Сандре уже не будет,\" говорит она и уходит, оставляя вас с совершенно недвусмысленным обещанием.",
+            "\"Привет,хозяин, ты достойно управлял Жеребцом целый месяц,\" говорит она низким, бархатным голосом и положив ладонь прям на ваш утренний стояк, выпирающий из под одеяла. \"Ты б зашел вечерком на огонёк,а?\"",
+            "\"Дела обсудить,за жизнь поболтать\" продолжает она, глядя вам прямо в глаза. \"Выпьем чаю,поговорим \"",
+            "\"Давай,жду\" говорит она и уходит, оставляя вас с совершенно недвусмысленным обещанием.",
         ),
     )
 
@@ -43,8 +43,8 @@ label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
     $ renpy.dynamic("_sandra_step", "_sandra_gains", "_sandra_media_key", "_sandra_picture", "_sandra_lines", "_sandra_achievement_now")
     $ _sandra_step = max(0, min(int(step_index or 0), len(SANDRA_WEEKLY_EVALUATION_TEXTS) - 1))
     $ _sandra_gains = dict(SANDRA_WEEKLY_EVALUATION_STAT_GAINS[_sandra_step] or {})
-    $ Sandra.rel = max(0, min(20, int(Sandra.rel or 0) + int(_sandra_gains.get("rel", 0) or 0)))
-    $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + int(_sandra_gains.get("openness", 0) or 0)))
+    $ Sandra.rel = max(0, min(100, int(Sandra.rel or 0) + int(_sandra_gains.get("rel", 0) or 0)))
+    $ Sandra.openness = max(0, min(100, int(Sandra.openness or 0) + int(_sandra_gains.get("openness", 0) or 0)))
     $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + int(_sandra_gains.get("corruption", 0) or 0)))
     $ _sandra_media_key = ("standing", "leaning", "leaning", "thanks")[_sandra_step]
     $ _sandra_picture = SandraStaticData.image_path("weekly_evaluation", _sandra_media_key)
@@ -269,8 +269,9 @@ label TavernSandraNightThanksScene:
         $ main_ui_runtime.action_content = None
         $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
         return
-    $ Sandra.rel = max(0, min(20, int(Sandra.rel or 0) + 2))
-    $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + 2))
+    $ Sandra.wear_night_clothes()
+    $ Sandra.rel = max(0, min(100, int(Sandra.rel or 0) + 2))
+    $ Sandra.openness = max(0, min(100, int(Sandra.openness or 0) + 2))
     $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + 3))
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()

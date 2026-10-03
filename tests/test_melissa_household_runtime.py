@@ -45,7 +45,7 @@ def runtime():
     ):
         _exec_definitions(path, names, namespace)
 
-    namespace["werecat"] = SimpleNamespace(var=namespace["werecat_story_defaults"]())
+    namespace["werecat_hunt"] = SimpleNamespace(state=namespace["werecat_story_defaults"]())
     namespace["tavern"] = namespace["TavernInfo"]()
     namespace["Melissa"] = namespace["MelissaInfo"]()
     namespace["Melissa"].reward_need_fulfilled = lambda *args: None
@@ -64,7 +64,7 @@ def runtime():
     namespace["relationship_apply_weekly_chore_evaluation"] = lambda preview: None
     return SimpleNamespace(
         namespace=namespace, melissa=namespace["Melissa"], player=player, calendar=calendar,
-        tavern=namespace["tavern"], rats=namespace["werecat"].var,
+        tavern=namespace["tavern"], rats=namespace["werecat_hunt"].state,
         bat_thread=namespace["threads"]["melissaBatProblem"],
         progress=namespace["tractir_progress"],
         evaluate=namespace["evaluate_weekly_chores_and_rewards"],

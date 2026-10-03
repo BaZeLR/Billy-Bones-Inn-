@@ -5,21 +5,15 @@ init -8 python:
     def werecat_story_defaults():
         return {
             "rats_problem_active": 1,
-            "adoption_breakfast_seen": 0,
             "woods_exploration": 0,
             "tracks_seen": 0,
             "tracks_first_text_seen": 0,
             "tracks_room": "",
             "trap_rooms": {},
             "caught": 0,
-            "adopted": 0,
-            "adopted_count": 0,
-            "sold": 0,
+            "sold_count": 0,
             "gifted_clara": 0,
             "clara_gift_day": -1,
-            "name": "",
-            "adopted_day": -1,
-            "first_month_thanks_day": -1,
             "hunter_tease_day": -1,
             "rat_carcass_cached": 0,
             "rat_food_loss_next_day": 7,
@@ -34,27 +28,42 @@ init -8 python:
             "comfort": 0,
         }
 
+    class WerecatHuntState(object):
+        """Repeatable forest catches, independent of the household pet."""
+
+        def __init__(self):
+            self.state = werecat_story_defaults()
+
     class WerecatInfo(BaseNPC):
         talk_label = "IntWerecatTalk"
         unknown_name = "Кошкодевочка"
 
         def __init__(self):
             super().__init__("werecat")
-            self.var = werecat_story_defaults()
+            self.owned = False
+            self.pet_name = "Луна"
+            self.adopted_day = -1
+            self.adoption_breakfast_seen = False
+            self.first_month_thanks_day = -1
             self.stats = werecat_pet_defaults()
 
+        def display_name(self):
+            return self.pet_name if self.owned else super(WerecatInfo, self).display_name()
+
     def werecat_state():
-        return werecat.var
+        return werecat_hunt.state
 
     def werecat_pet_state():
         return werecat.stats
 
     def werecat_is_living_with_household():
-        state = werecat_state()
-        adopted_count = int(state.get("adopted_count", 0) or 0)
-        if int(state.get("adopted", 0) or 0) == 1:
-            adopted_count = max(1, adopted_count)
-        return adopted_count >= 1 and int(state.get("sold", 0) or 0) == 0
+        return bool(werecat.owned)
+
+    def werecat_name_value():
+        return str(werecat.pet_name or "").strip() if werecat.owned else ""
+
+    def werecat_display_name():
+        return werecat_name_value() or "оборотница-кошка"
 
     WERECAT_MILK_ITEM_IDS = ("milk_pitcher_001",)
 
@@ -362,6 +371,7 @@ define WerecatStaticData = PeopleData(
     description="Домовая кошка-оборотень, если она решила остаться при трактире.",
 )
 default werecat = WerecatInfo()
+default werecat_hunt = WerecatHuntState()
 
 label InitWerecat:
     $ people.register(WerecatStaticData, werecat)

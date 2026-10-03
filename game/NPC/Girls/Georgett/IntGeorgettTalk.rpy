@@ -180,6 +180,12 @@ label IntGeorgettTellLizaGerhard(girl_name="georgett", girl_loc="street"):
         $ Georgett.mark_asked_topic("TalkChurchAfterCermonLiza")
         $ Georgett.finish_talk()
         $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "На портовые улицы" if girl_loc == "street":
+                pass
+            "Вернуться в трактир" if girl_loc == "tavern":
+                pass
+        $ main_ui_end_talk_state()
         return
     $ scene_runtime.text = "Вы рассказываете Жоржетте что вы снова видели как отец Герхард трахал ее дочь после воскресной службы.\n«Молодец дочка, благословление Ильматера лишним не будет, да и любовник отец Герхард хороший!» - отвечает Жоржетта."
     $ Georgett.finish_talk()

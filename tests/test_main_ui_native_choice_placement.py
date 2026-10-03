@@ -38,15 +38,15 @@ def test_native_menu_uses_the_named_main_ui_action_region_contract():
     assert "MAIN_UI_NATIVE_CHOICE_TOP" not in source
     assert "MAIN_UI_NATIVE_CHOICE_HEIGHT" not in source
     assert "yminimum 300" in source
-    assert 'screen current_action_panel(native_choice=None):' in source
+    assert 'screen current_action_panel(native_choice=None, dialogue=False):' in source
     assert 'if native_choice is not None:' in source
     assert 'native_choice.scope.get("items", [])' in source
     assert "use choice_panel(_native_choice_items)" in source
     assert '$ _native_choice_screen = renpy.get_screen("choice")' in source
-    assert 'use current_action_panel(_native_choice_screen)' in source
+    assert 'use current_action_panel(_native_choice_screen, _native_dialogue)' in source
     assert 'if renpy.get_screen("choice") is None:' not in source
     action_region = source.split('$ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None', 1)[1].split(
-        'use current_action_panel(_native_choice_screen)', 1
+        'use current_action_panel(_native_choice_screen, _native_dialogue)', 1
     )[0]
     assert "viewport:" not in action_region
     assert "mousewheel True" not in action_region
@@ -55,20 +55,38 @@ def test_native_menu_uses_the_named_main_ui_action_region_contract():
 
 def test_dialogue_and_native_choices_exclude_room_controls():
     source = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
-    panel = source.split("screen current_action_panel(native_choice=None):", 1)[1].split("screen main_ui_status_item", 1)[0]
+    panel = source.split("screen current_action_panel(native_choice=None, dialogue=False):", 1)[1].split("screen main_ui_status_item", 1)[0]
     main_ui = source.split("screen main_ui():", 1)[1].split("screen main_ui_left_panel", 1)[0]
     rat_scene = (ROOT / "game/NPC/Girls/Melissa/MelissaEvents.rpy").read_text(encoding="utf-8-sig").split(
         "label story_melissa_storage_rat_0:", 1
     )[1].split("label story_melissa_werecat_intro_0:", 1)[0]
 
-    assert panel.index("if native_choice is not None:") < panel.index('elif renpy.get_screen("say") is not None:') < panel.index("elif main_ui_runtime.action_items:")
-    assert '_room_actions_visible = _say_displayable is None and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"' in main_ui
-    assert 'sensitive not (renpy.get_screen("say") is not None or renpy.get_screen("choice") is not None or str(main_ui_runtime.mode or "") == "event")' in source
+    assert panel.index("if native_choice is not None:") < panel.index('elif dialogue:') < panel.index("elif main_ui_runtime.action_items:")
+    assert '_room_actions_visible = not _native_dialogue and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"' in main_ui
+    assert 'sensitive enabled' in source
+    assert 'enabled=_room_actions_visible' in main_ui
+    assert 'elif renpy.get_screen("say") is not None:' not in panel
     assert "if _room_actions_visible:" in main_ui
-    assert "if _room_actions_visible or _native_choice_screen is not None:" in main_ui
+    assert "if _room_actions_visible or _native_choice_screen is not None:" not in main_ui
     assert 'if _room_actions_visible and str(main_ui_runtime.overlay or "") == "story":' in main_ui
     assert '"[scene_runtime.text]"' in rat_scene
     assert 'menu:' in rat_scene
+
+
+def test_empty_say_screen_does_not_draw_a_window_over_main_ui_room_text():
+    source = SCREENS.read_text(encoding="utf-8-sig")
+    say = source.split("screen say(who, what):", 1)[1].split(
+        "## Make the namebox available", 1
+    )[0]
+    dialogue, empty = say.split('    elif renpy.get_screen("main_ui") is not None:', 1)
+    empty, fallback = empty.split("    else:", 1)
+
+    assert 'elif renpy.get_screen("main_ui") is not None and what:' in dialogue
+    assert 'use main_ui_left_panel(_room_name, what, resolve_main_ui_picture(_room), True, who)' in dialogue
+    assert "null" in empty
+    assert "window:" not in empty
+    assert "text " not in empty
+    assert "window:" in fallback
 
 
 def test_room_and_object_action_buttons_use_the_same_hud_button_design():
@@ -138,7 +156,7 @@ def test_story_event_dispatch_keeps_main_ui_visible():
     assert "jump expression evt.target" in trigger
 
 
-def test_after_load_clears_every_saved_main_ui_context():
+def test_context_reset_is_explicit_not_a_load_side_effect():
     source = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
     clear_contexts = source.split("def clear_contexts(self):", 1)[1].split(
         "def main_ui_context_snapshot", 1
@@ -149,6 +167,10 @@ def test_after_load_clears_every_saved_main_ui_context():
     assert "self.scene_origin = None" in clear_contexts
     assert 'self.tavern_report_person = ""' in clear_contexts
     assert "self.tavern_report_origin = None" in clear_contexts
+    after_load = source.split("def tractir_after_load_restore_ui():", 1)[1].split("init -5:", 1)[0]
+    assert "clear_contexts()" not in after_load
+    assert 'main_ui_runtime.mode = "scene"' not in after_load
+    assert 'main_ui_runtime.mode != "scene" or main_ui_runtime.action_items or main_ui_runtime.action_content' in after_load
 
 
 def test_tavern_report_uses_main_ui_context_without_detached_overlay_or_room_jump():

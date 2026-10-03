@@ -93,30 +93,20 @@ init 6 python:
         )
 
     def tavern_sandra_room_picture():
-        slot = int(calendar_v2.time_slot())
-        if slot >= 4:
-            for picture_path in (
-                "images/sandra/sleeps .png",
-                "images/sandra/player_room_sandra_0.jpg",
-                "images/sandra/talk_0.png",
-            ):
-                if renpy.loadable(picture_path):
-                    return picture_path
-        if slot == 0:
-            for picture_path in (
-                "images/sandra/player_room_sandra_0.jpg",
-                "images/sandra/talk_0.png",
-            ):
-                if renpy.loadable(picture_path):
-                    return picture_path
+        room_picture = str(rooms.get("TavernSandraRoom").bg_picture or "") or None
         if str(people.location("sandra") or "") == "TavernSandraRoom":
-            for picture_path in (
-                "images/sandra/talk_0.png",
-                "images/sandra/player_room_sandra_0.jpg",
-            ):
-                if renpy.loadable(picture_path):
-                    return picture_path
-        return str(rooms.get("TavernSandraRoom").bg_picture or "") or None
+            if not people.is_awake("sandra"):
+                # The verified sleeping frame depicts a nightshirt, not nudity.
+                picture_path = "images/sandra/sleeps .png" if Sandra.current_dress() == "nightshirt" else ""
+            elif Sandra.wardrobe.naked():
+                picture_path = "images/sandra/thanks/sandraInHerRoonm.jfif"
+            elif Sandra.current_dress() == "nightshirt":
+                picture_path = "images/sandra/player_room_sandra_0.jpg"
+            else:
+                picture_path = ""
+            if picture_path and renpy.loadable(picture_path):
+                return picture_path
+        return room_picture
 
     def tavern_sandra_ledger_picture():
         for picture_path in (
@@ -130,6 +120,11 @@ init 6 python:
 
     def tavern_sandra_room_text():
         text = str(rooms.get("TavernSandraRoom").descriptions[0].text or "")
+        if str(people.location("sandra") or "") == "TavernSandraRoom":
+            if not people.is_awake("sandra"):
+                text = "В комнате Сандры тихо. Она спит в своей кровати; вещи убраны в ларь."
+            if str(Sandra.wardrobe.context or "day") == "night":
+                text += "\n\nСандра без одежды." if Sandra.wardrobe.naked() else "\n\nНа Сандре ночная рубашка."
         issue_notice = str(household_room_issue_notice_text("sandra") or "").strip()
         if issue_notice:
             text += "\n\n" + issue_notice
@@ -195,9 +190,9 @@ label TavernSandraRoom:
         while True:
             call screen main_ui
     $ rooms.enter("TavernSandraRoom")
-    call RoomEnterEventGate(rooms.current_code, False)
     if tavern_sandra_room_nightwear_now():
-        $ Sandra.wear_night_clothes(0)
+        $ Sandra.wear_night_clothes()
+    call RoomEnterEventGate(rooms.current_code, False)
     $ scene_runtime.picture = tavern_sandra_room_picture()
     if scene_runtime.picture:
         vscene scene_runtime.picture

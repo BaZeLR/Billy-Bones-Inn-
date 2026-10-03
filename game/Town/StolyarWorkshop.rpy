@@ -118,7 +118,7 @@ label StolyarWorkshop:
     if not rooms.current.is_open():
         $ scene_runtime.text = rooms.current.schedule.closed_text
         $ scene_runtime.location_text = scene_runtime.text
-        call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+        $ scene_runtime.picture = artisans_quarter_picture()
         $ main_ui_runtime.action_items = rooms.get("StolyarWorkshop").build_exit_items()
         while True:
             call screen main_ui
@@ -126,7 +126,7 @@ label StolyarWorkshop:
     if tavern.active_renovation is not None:
         $ scene_runtime.text = "Мастерская закрыта. " + tavern.renovation_work_description
         $ scene_runtime.location_text = scene_runtime.text
-        call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+        $ scene_runtime.picture = artisans_quarter_picture()
         $ main_ui_runtime.action_items = rooms.get("StolyarWorkshop").build_exit_items()
         while True:
             call screen main_ui

@@ -30,7 +30,7 @@ init -24 python:
                 and not people.is_awake("amanda")
                 and not bool(Melissa.drawings_found)
                 and int(threads["melissaBatProblem"].num or 0) >= 6
-                and int(threads["melissaBatProblem"].num or 0) < 8
+                and int(threads["melissaBatProblem"].num or 0) < 9
             )
 
 

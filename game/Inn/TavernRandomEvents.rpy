@@ -423,13 +423,7 @@ define tavern_work_events_by_type = {
 
 
 label TavernWorkEventTrigger:
-    $ renpy.dynamic("_tavern_event_text")
     call DisplayTavernEventShort(calendar_v2.time_slot(), 1)
-    $ _tavern_event_text = str(_return or "")
-    if str(_tavern_event_text or "").strip():
-        $ scene_runtime.text = _tavern_event_text
-        $ scene_runtime.location_text = scene_runtime.text
-        return True
     return True
 
 

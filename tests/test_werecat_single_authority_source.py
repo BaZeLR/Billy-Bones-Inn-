@@ -30,7 +30,7 @@ def test_werecat_is_a_registered_singleton_without_live_repairs():
     assert "default werecat = WerecatInfo()" in source
     assert "label InitWerecat:" in source
     assert "def werecat_info()" not in source
-    assert "return werecat.var" in source
+    assert "return werecat_hunt.state" in source
     assert "return werecat.stats" in source
     assert "call InitWerecat" in people
     assert "def tractir_save_promote_werecat():" not in migration
@@ -45,15 +45,12 @@ def test_werecat_adoption_and_gift_have_one_owner_and_direct_menu_outcomes():
     clara = (ROOT / "game/NPC/Girls/Clara/InitClara.rpy").read_text(
         encoding="utf-8-sig"
     )
-    adopted_count = quest.split("def werecat_adopted_count():", 1)[1].split(
-        "def werecat_first_home_exists", 1
-    )[0]
-
-    assert 'werecat_state()["adopted_count"] =' not in adopted_count
+    assert "def werecat_adopted_count():" not in quest
+    assert 'werecat_state()["adopted"]' not in quest
     assert "werecat_gifted" not in clara
     assert "werecat_gift_day" not in clara
     assert "WerecatAdoptChoice" not in quest
-    assert '"Забрать ее домой":' in quest
+    assert '"Забрать ее домой" if not werecat.owned:' in quest
     assert '"Продать работорговцам за 5000":' in quest
 
 
@@ -101,7 +98,7 @@ def test_adopted_werecat_has_one_nickname_and_native_interaction_menu():
         "label ShowWerecatCard", 1
     )[0]
 
-    assert 'werecat_state()["name"] = "Луна"' in quest
+    assert 'werecat.pet_name = "Луна"' in quest
     assert 'fullname="Луна"' in owner
     assert 'talk_label = "IntWerecatTalk"' in owner
     assert '"Погладить кошку"' in interaction

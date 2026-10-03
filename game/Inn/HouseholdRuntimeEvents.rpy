@@ -883,7 +883,10 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     $ _wake_indecent = household_morning_issue_indecent(_wake_girl)
     $ _wake_info = people.get_info(_wake_girl)
     if isinstance(_wake_info, Girl):
-        $ _wake_info.wear_night_clothes(tavern_amanda_room_sleep_dress() if _wake_girl == "amanda" else 0)
+        if _wake_girl == "sandra":
+            $ _wake_info.wear_night_clothes()
+        else:
+            $ _wake_info.wear_night_clothes(tavern_amanda_room_sleep_dress() if _wake_girl == "amanda" else 0)
     if _wake_girl == "melissa":
         $ _wake_started_scene = main_ui_runtime.scene_origin is None
         if _wake_started_scene:
@@ -978,7 +981,10 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     if _wake_girl == "sandra":
         $ scene_runtime.text = "Вы осторожно будите Сандру. Та сначала недовольно морщится, потом резко собирается, будто сама сердится не на вас, а на то, что дала себе лишнюю слабину."
         if _wake_indecent:
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\nПока Сандра поднималась, вы невольно успели заметить, что рубаха на ней сбилась куда выше приличного. Поймав ваш взгляд, она без лишней суеты поправляет ткань, но в ее лице на миг мелькает совсем не хозяйская, а женская неловкость."
+            if Sandra.wardrobe.naked():
+                $ scene_runtime.text = str(scene_runtime.text or "") + "\nСандра спала без одежды. Заметив вас, она прикрывается одеялом."
+            else:
+                $ scene_runtime.text = str(scene_runtime.text or "") + "\nПока Сандра поднималась, вы невольно успели заметить, что рубаха на ней сбилась куда выше приличного. Поймав ваш взгляд, она без лишней суеты поправляет ткань, но в ее лице на миг мелькает совсем не хозяйская, а женская неловкость."
             $ Sandra.change_social(corruption_delta=1)
         if _wake_bulge:
             if int(Sandra.rel or 0) >= 10 or int(Sandra.corruption or 0) >= 20:

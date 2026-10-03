@@ -227,6 +227,13 @@ screen dress_shop_catalog_page(rack_type="male", girl_name=""):
                 xalign 0.5
                 spacing 18
 
+                textbutton "Назад":
+                    id "dress_shop_catalog_back"
+                    alt "dress_shop_catalog_back"
+                    style "dress_shop_catalog_button"
+                    text_style "dress_shop_catalog_button_text"
+                    action Hide("dress_shop_catalog_page")
+
                 textbutton "<":
                     id "dress_shop_catalog_previous"
                     alt "dress_shop_catalog_previous"

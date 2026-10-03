@@ -146,7 +146,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
         _hse_full_engine = household_sex_available(_hse_girl, "sex")
         _hse_info.set_cock_position("none")
     $ main_ui_begin_native_scene_state(_hse_display)
-    $ _hse_picture = _hse_data.image_path("portrait", "default")
+    $ _hse_picture = tavern_sandra_room_picture() if _hse_girl == "sandra" and _hse_info.wardrobe.context == "night" and rooms.current_code == "TavernSandraRoom" else _hse_data.image_path("portrait", "default")
     if str(_hse_picture or "").strip():
         $ scene_runtime.picture = _hse_picture
         vscene scene_runtime.picture
@@ -177,7 +177,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
             menu:
                 "Осмотреть её":
                     $ scene_runtime.text = household_sex_scene_summary(_hse_girl, _hse_full_engine)
-                    $ _hse_picture = _hse_data.image_path("portrait", "default")
+                    $ _hse_picture = tavern_sandra_room_picture() if _hse_girl == "sandra" and _hse_info.wardrobe.context == "night" and rooms.current_code == "TavernSandraRoom" else _hse_data.image_path("portrait", "default")
                     if str(_hse_picture or "").strip():
                         $ scene_runtime.picture = _hse_picture
 
@@ -210,7 +210,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                 "Поцеловать [_hse_display]":
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "kiss", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "kiss", _hse_effect, _hse_full_engine)
-                    $ _hse_picture = _hse_data.image_path("portrait", "default")
+                    $ _hse_picture = tavern_sandra_room_picture() if _hse_girl == "sandra" and _hse_info.wardrobe.context == "night" and rooms.current_code == "TavernSandraRoom" else _hse_data.image_path("portrait", "default")
                     if str(_hse_picture or "").strip():
                         $ scene_runtime.picture = _hse_picture
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
@@ -455,7 +455,10 @@ label HouseholdSexFinish:
         $ scene_runtime.picture = _hse_picture
         vscene scene_runtime.picture
     if str(_hse_info.wardrobe.context or "day") == "night":
-        $ _hse_info.wear_night_clothes(0)
+        if _hse_girl == "sandra":
+            $ _hse_info.wear_night_clothes()
+        else:
+            $ _hse_info.wear_night_clothes(0)
     else:
         call DressUp(_hse_girl)
     menu:

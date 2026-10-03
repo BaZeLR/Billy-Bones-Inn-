@@ -2,6 +2,13 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def artisans_quarter_picture():
+        if 6 <= int(calendar_v2.hour or 0) < 18:
+            pictures = ("images/general/LocArtisansQuarter1.jpg", "images/general/LocArtisansQuarter2.jpg", "images/general/LocArtisansQuarter3.jpg")
+        else:
+            pictures = ("images/general/LocArtisansQuarter3.png", "images/general/LocArtisansQuarter4.jpg")
+        return procedural_choice(pictures, "artisans_quarter_picture")
+
     def artisans_quarter_sofa_asked():
         return int(getattr(threads.get("nostarRosarioSofa"), "num", 0) or 0) >= 1
 
@@ -90,7 +97,7 @@ label ArtisansQuarter:
     $ rooms.get("ArtisansQuarter").state["display_text"] = scene_runtime.text
     $ rooms.current.mark_visited()
 
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    $ scene_runtime.picture = artisans_quarter_picture()
 
     call RoomEnterEventGate(rooms.current_code, False)
 
@@ -131,7 +138,7 @@ label ArtisansQuarterObjectMenu(object_id=""):
                 main_ui_runtime.action_items.append(MenuItem(_artisans_action.label, Jump(_artisans_action.target)))
 
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [
-        SetField(scene_runtime, "picture", rooms.get("ArtisansQuarter").bg_picture or None),
+        SetField(scene_runtime, "picture", artisans_quarter_picture()),
         SetField(scene_runtime, "text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
         SetField(scene_runtime, "location_text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
         SetField(main_ui_runtime, "action_title", "Действия"),

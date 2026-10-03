@@ -19,10 +19,12 @@ work, or upstairs-flirt events. No pictures were generated or overwritten.
 - The obsolete `tavern_amanda_morning_window_outcome` decision function and
   its former repeatable scene were removed. No other room actions were removed.
 
-Prerequisites: attic fall completed (`Amanda.attic_busted()`), actual clock
+Prerequisites: Amanda's first attic-follow-up night visit completed, actual clock
 **06:00–11:59**, Amanda's schedule puts her in her room, she is not sick,
-entry has not been blocked for the day, breakfast is not completed, and she
-is not on the current active breakfast attendance list.
+entry has not been blocked for the day, and she is not on the current active
+breakfast attendance list. The first bedroom catch waits until breakfast is
+under way or finished. A missed-breakfast sleepy issue remains eligible after
+breakfast; an attended breakfast does not turn into a missed one.
 
 The event no longer requires a random `sleepy` issue: ordinary scheduled
 presence in her room can qualify too. Her schedule itself is unchanged.
@@ -43,7 +45,7 @@ for the files the user moved there; they were not copied back to the old path.
 
 | Stage | Main picture | Supplied story beat / consequence |
 | --- | --- | --- |
-| 1 (`num=0`) | `amanda_bedroom_004.jpeg` | Knock remark, window, breakfast apology, leave |
+| 1 (`num=0`) | `amanda_bedroom_004.jpeg` | Knock remark, hypocrisy challenge, window, breakfast apology, +1 corruption, leave |
 | 2 (`num=1`) | `amanda_bedroom_003.jpeg` | Finger/secret remark, leave |
 | 3 (`num=2`) | `amanda_bedroom_002.jpeg` | Teasing conversation, leave; activate morning-visit thread |
 | 4 (`num=3`) | `amanda_bedroom_001.jpeg`, then `amanda_bedroomAPI.webp` | Show/refuse menu; conditional booklet and clients remarks; leave |
@@ -59,7 +61,7 @@ no instruction below 30. This does not change her work instructions. It adds
 one anger point through the existing NPC method, enabling the ordinary apology
 option without imposing another friendship loss.
 
-Only the fourth visit adds **one corruption point**, once. Stages 2 and 3 add
+The first bedroom catch adds **one corruption point**, once. Stages 2 and 3 add
 10 MC arousal on departure; they do not record a sex act or a finish. All four
 visits retain the prior event's 20-minute cost, restore daytime clothing,
 resolve the morning absence issue, and return to the kitchen. The no-knock
@@ -68,6 +70,27 @@ route retains its existing additional five-minute movement cost.
 The new sequence does not set `attic_window_favor_stage` and therefore does
 not open the old immediate kitchen-favor outcome. Previously pending favors
 from older saves are not erased.
+
+## Attic-fall night-visit order (2026-10-03)
+
+`amandaAtticNightVisits` now owns two one-time bedtime stages, separate from
+Amanda's moon-protection introduction and unrelated later visits. The first
+uses the supplied `amanda_visit_0.jpg` through `amanda_visit_8.jpg` pictures
+in order (the file for frame 3 is literally `amanda_visit_3 .jpg`). It follows
+Melissa's temporary move into Amanda's room and schedules Amanda to miss the
+next breakfast. It adds no relationship reward. The first morning catch then
+adds the point above.
+
+Melissa's existing breakfast dispute about the lost illustrated booklet is
+held until that morning catch is complete. The second night visit uses
+`amanda_visit_provoke_0.jpg` through `_3.jpg` in order after the dispute and
+adds +1 friendship and +1 corruption once. No new sex act or virginity change
+is recorded. Each actual visit stamps the existing thread day before advancing.
+
+Save version 112 skips only the unplayed first-night introduction when an
+older save already passed Amanda's first morning or Melissa's booklet dispute;
+it does not invent a corruption reward. The second visit remains available
+after its real gates are met.
 
 ## New morning-visit thread and pending author choices
 

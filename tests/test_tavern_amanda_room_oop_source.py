@@ -104,7 +104,7 @@ def test_morning_episode_uses_owned_scene_and_returns_to_requested_kitchen():
     assert "attic_window_morning_day" not in SOURCE
     assert 'main_ui_begin_native_scene_state("Аманда у окна")' in MORNING_SOURCE
     assert "vscene picture" in MORNING_SOURCE
-    assert block.count("menu:") == 2
+    assert block.count("menu:") == 3
     assert '"Продолжить":' in block
     assert '"Вернуться на кухню":' in block
     assert "main_ui_end_native_scene_state()" in block
@@ -117,7 +117,8 @@ def test_morning_window_entry_remains_available_while_amanda_misses_breakfast():
     block = event_model.split("class AmandaMorningWindowEpisodeEvent(AmandaEvent):", 1)[1].split(
         "class AmandaMorningWoodEvent(AmandaEvent):", 1
     )[0]
-    assert "not player.tavern_management.breakfast.today or player.tavern_management.breakfast.event_active" in block
+    assert 'household_morning_issue_type("amanda") == "sleepy"' in block
+    assert "self.stage != 0 or player.tavern_management.breakfast.today" in block
     assert '"amanda" in (player.tavern_management.breakfast.present_ids or [])' in block
     assert "attic_window_favor_stage" not in MORNING_SOURCE
 

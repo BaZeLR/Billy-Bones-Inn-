@@ -103,7 +103,7 @@ label story_melissa_werecat_rumor_0:
 
 
 label story_melissa_werecat_home_0:
-    $ werecat_state()["adoption_breakfast_seen"] = 1
+    $ werecat.adoption_breakfast_seen = True
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = current_game_day()
     $ player.tavern_management.breakfast.day = current_game_day()
@@ -139,7 +139,7 @@ label story_melissa_werecat_home_0:
 
 
 label story_melissa_werecat_home_1:
-    $ werecat_state()["first_month_thanks_day"] = current_game_day()
+    $ werecat.first_month_thanks_day = current_game_day()
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = current_game_day()
     $ player.tavern_management.breakfast.day = current_game_day()

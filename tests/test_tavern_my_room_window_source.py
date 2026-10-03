@@ -30,6 +30,14 @@ def test_player_room_window_uses_calendar_hour_for_day_night_choice():
     assert "night_bowl_window_seen_day" not in source
 
 
+def test_player_room_window_object_menu_selects_existing_night_picture():
+    source = read_rel("game/Inn/TavernMyRoom.rpy")
+    menu = source.split('label TavernMyRoomObjectMenu(', 1)[1].split('\nlabel ', 1)[0]
+    assert 'if object_id == "myroom_window_001" and (int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6):' in menu
+    assert '_object_picture = "images/player_room/window2.png"' in menu
+    assert menu.index('_object_picture = "images/player_room/window2.png"') < menu.index('scene_runtime.picture = _object_picture')
+
+
 def test_player_room_window_has_distinct_descriptions_for_each_state():
     source = read_rel("game/Inn/TavernMyRoomWindow001.rpy")
 

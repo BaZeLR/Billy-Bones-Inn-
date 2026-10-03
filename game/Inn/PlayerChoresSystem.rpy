@@ -386,7 +386,7 @@ init -45 python:
             reward_lines.append("Средняя посещаемость трактира за неделю выросла.")
 
         if sandra_gain > 0:
-            new_sandra_friend = max(0, min(20, sandra_friend_value + sandra_gain))
+            new_sandra_friend = max(0, min(100, sandra_friend_value + sandra_gain))
             sandra_gain = new_sandra_friend - sandra_friend_value
             sandra_friend_value = new_sandra_friend
             if sandra_gain > 0:
@@ -440,7 +440,7 @@ init -45 python:
         player.tavern_management.weekly_chores_last_eval_stamp = str(preview.get("stamp", "") or player.tavern_management.weekly_chores_last_eval_stamp)
         player.chores.last_score = max(0, _pc_to_int(preview.get("chore_score", 0), 0))
         player.chores.last_evaluation = str(preview.get("chore_evaluation", "") or "").strip().lower()
-        Sandra.rel = max(0, min(20, _pc_to_int(preview.get("sandra_friend", Sandra.rel), Sandra.rel)))
+        Sandra.rel = max(0, min(100, _pc_to_int(preview.get("sandra_friend", Sandra.rel), Sandra.rel)))
         if player.chores.last_evaluation == "good":
             Sandra.change_mana(3, "weekly_check_good")
             Sandra.change_fear(-5, "weekly_check_good")

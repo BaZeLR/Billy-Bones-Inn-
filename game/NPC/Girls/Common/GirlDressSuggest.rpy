@@ -187,6 +187,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         return
 
     hide screen dress_shop_catalog_page
+    show screen main_ui
     $ _gds_ensure_stats(GirlName)
     $ _gds_ensure_stats("irma")
 

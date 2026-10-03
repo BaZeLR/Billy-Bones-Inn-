@@ -51,7 +51,7 @@ TEST_RPY += r'''
         Amanda.attic_window_favor_stage = 0
         Amanda.set_harass_instruction("notallow" if argument else "allow")
         Melissa.drawings_found = booklet
-        player.tavern_management.breakfast.today = False
+        player.tavern_management.breakfast.today = stage == 0
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None
         player.intimacy.came_today = 0
@@ -123,7 +123,7 @@ testcase external_window_stage_STAGE:
         run Jump("TavernAmandaRoom")
 '''.replace("STAGE", str(stage))
     TEST_RPY += ARRIVAL.replace("STAGE", str(stage)).replace("PICTURE", str(4 - stage))
-    for _ in range(2 if stage == 2 else 1):
+    for _ in range(2 if stage in (0, 2) else 1):
         TEST_RPY += r'''
     advance until eval (external_amanda_flirt_choices() == ["Продолжить"]) timeout 20.0
     pause 0.1
@@ -132,9 +132,9 @@ testcase external_window_stage_STAGE:
 '''
     TEST_RPY += LEAVE.replace("STAGE", str(stage)).replace("NEXT", str(stage + 1))
     TEST_RPY += r'''
-    assert eval (Amanda.corruption == _window_corruption)
+    assert eval (Amanda.corruption == _window_corruption + (1 if STAGE == 0 else 0))
     assert eval (calendar_v2.clock_minutes() == 8 * 60 + 20 + (5 if door else 0))
-'''
+'''.replace("STAGE", str(stage))
     if stage == 2:
         TEST_RPY += r'''
     assert eval (threads["amandaMorningWood"].checkActive() and threads["amandaMorningWood"].day == 40)
@@ -208,7 +208,7 @@ testcase external_window_gates_delay_and_save:
         assert not window.getAvailableEvents()
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.today = True
-        assert not window.getAvailableEvents()
+        assert window.getAvailableEvents()
         player.tavern_management.breakfast.today = False
         Amanda.room_entry_blocked_today = True
         assert not window.getAvailableEvents()
@@ -269,6 +269,81 @@ testcase external_window_unlock_morning_visit:
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (threads["amandaMorningWood"].completed) timeout 20.0
     assert eval (not story_event_available("TavernMyRoom", "morning"))
+'''
+
+TEST_RPY += r'''
+testcase external_attic_first_night_visit:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_window_prepare()
+    $ calendar_v2.hour = 22
+    $ player.tavern_management.breakfast.today = False
+    $ visits = threads["amandaAtticNightVisits"]
+    $ visits.reset()
+    $ Melissa.temp_room_code = ""
+    assert eval (not visits.getAvailableEvents())
+    $ Melissa.temp_room_code = "TavernAmandaRoom"
+    $ event_runtime.active_thread = visits
+    assert eval (visits.getAvailableEvents()[0].target == "story_amanda_attic_night_visit_0")
+    $ _starting_corruption = Amanda.corruption
+    run Call("story_amanda_attic_night_visit_0")
+'''
+for n, choice in enumerate((
+    "Притвориться спящим", "Не шевелиться", "Ждать", "Не выдавать себя",
+    "Ждать", "Продолжить", "Продолжить", "Продолжить", "Уснуть",
+)):
+    filename = "amanda_visit_%s%s.jpg" % (n, " " if n == 3 else "")
+    TEST_RPY += '''
+    advance until eval (scene_runtime.picture == "images/player_room/amandaVisits/%s" and external_amanda_flirt_choices() == ["%s"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+''' % (filename, choice)
+TEST_RPY += r'''
+    advance until eval (visits.num == 1) timeout 20.0
+    assert eval (household.morning_state["amanda:41"]["issue"] == "sleepy")
+    assert eval (Amanda.corruption == _starting_corruption)
+    assert eval (not visits.getAvailableEvents())
+
+testcase external_attic_second_night_visit:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_window_prepare()
+    $ calendar_v2.hour = 22
+    $ visits = threads["amandaAtticNightVisits"]
+    $ visits.advanceTo(1, force_active=True)
+    $ visits.day = 39
+    assert eval (not visits.getAvailableEvents())
+    $ threads["amandaMorningWindowEpisode"].advanceTo(1, force_active=True)
+    assert eval (not visits.getAvailableEvents())
+    $ threads["melissaBatProblem"].num = 9
+    $ event_runtime.active_thread = visits
+    assert eval (visits.getAvailableEvents()[0].target == "story_amanda_attic_night_visit_1")
+    $ _starting_corruption = Amanda.corruption
+    $ _starting_friendship = Amanda.rel
+    run Call("story_amanda_attic_night_visit_1")
+'''
+for n, choice in enumerate((
+    "Выслушать её", "Пообещать молчать", "Продолжить", "Пожелать ей спокойной ночи",
+)):
+    TEST_RPY += '''
+    advance until eval (scene_runtime.picture == "images/player_room/amandaVisits/amanda_visit_provoke_%s.jpg" and external_amanda_flirt_choices() == ["%s"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+''' % (n, choice)
+TEST_RPY += r'''
+    advance until eval (visits.completed) timeout 20.0
+    assert eval (Amanda.corruption == _starting_corruption + 1)
+    assert eval (Amanda.rel == _starting_friendship + 1)
+
+testcase external_attic_visit_old_save_mapping:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_window_prepare()
+    $ visits = threads["amandaAtticNightVisits"]
+    $ visits.reset()
+    $ threads["amandaMorningWindowEpisode"].advanceTo(1, force_active=True)
+    $ _starting_corruption = Amanda.corruption
+    $ updateSave_V111()
+    assert eval (visits.num == 1 and visits.done == [True, False])
+    assert eval (Amanda.corruption == _starting_corruption)
 '''
 
 

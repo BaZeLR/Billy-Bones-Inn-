@@ -126,6 +126,9 @@ screen say(who, what):
             yfill True
             spacing 10
             use main_ui_left_panel(_room_name, what, resolve_main_ui_picture(_room), True, who)
+    elif renpy.get_screen("main_ui") is not None:
+        # The room panel owns its text; an empty say window must not cover it.
+        null
     else:
         window:
             id "window"

@@ -143,10 +143,11 @@ testcase external_moon_crafting:
 testcase external_moon_window_routes:
     parameter stage = [0, 2]
     parameter follow = [False, True]
+    parameter late = [False, True]
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 25.0
     $ external_moon_prepare(stage)
-    $ calendar_v2.day = 17 if stage == 0 else 18
+    $ calendar_v2.day = (20 if stage == 0 else 21) if late else (17 if stage == 0 else 18)
     $ calendar_v2.hour = 22
     $ calendar_v2.minute = 0
     $ rooms.enter("TavernMyRoom")
@@ -180,6 +181,11 @@ SECOND_NIGHT_BEATS
     assert eval (threads["melissaMoonStoveRitual"].num == stage + (2 if follow else 1))
     assert eval (main_ui_runtime.scene_origin is None and main_ui_runtime.action_items)
     assert eval (not story_event_available("ShedRuinedChamber", "stove_hide_wait"))
+    if eval (late and stage == 2 and follow):
+        $ calendar_v2.advance_minutes(1380 - calendar_v2.clock_minutes())
+        assert eval (not story_event_available("ShedRuinedChamber", "stove_hide_wait"))
+        $ calendar_v2.advance_minutes(1440)
+        assert eval (calendar_v2.day == 22 and story_event_available("ShedRuinedChamber", "stove_hide_wait"))
 
 testcase external_moon_individual_visits:
     parameter npc = ["amanda", "melissa"]

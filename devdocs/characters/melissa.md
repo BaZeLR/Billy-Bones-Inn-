@@ -26,6 +26,135 @@
 
 ## Current Runtime Story Logic
 
+### Corrected lunar / early-intimacy specification (2026-10-03)
+
+**User-approved specification; not a claim that all corrections are implemented.**
+This section supersedes the earlier proposed +2/+3 corruption awards, the
+no-glove-only Melissa visit restriction, and the early cream-request route.
+The scene composition is in [the noise/stove plan](moon_noise_stove_ghost_event_plan.md).
+This documentation update changes no gameplay code, saves or authored dialogue.
+
+#### Story ownership and order
+
+Melissa owns the noise continuation. Amanda participates; she does not own or
+advance a duplicate version of Melissa's story. Existing thread cursors remain
+authoritative; this narrative order is not a request for another master thread.
+
+| Story step | Existing owner | Required outcome |
+| --- | --- | --- |
+| 1. Bat problem resolved | `melissaBatProblem`; `tavern.renovations` owns the roof | Roof repaired. The original quest opening is eligible on lunar days 14–23. |
+| 2. Melissa's thanks | Final authored stage of `melissaBatProblem` | Play thanks before the post-repair continuation; do not replay it monthly. |
+| 3. Returning complaints and Sandra's story | `melissaMoonNoise` | Noise returns in a later lunar month on days 14–23. Live virgin listeners hear it; MC does not. Amanda keeps her enjoyment private and does not complain publicly at breakfast. Preserve the attic recheck and Sandra's account. |
+| 4. Amanda alone at the stove | `melissaMoonStoveRitual`, stages 0–1 | Ordinary backyard-window action, then unnoticed inspection; Amanda flees from the sound. Glove crafting becomes available after the clue. |
+| 5. Both women at the shed | `melissaMoonStoveRitual`, stages 2–3 | On a later night, see both through the window and follow to overhear their conversation. No ambush on this night. |
+| 6. Stove ambush | `melissaMoonStoveRitual`, stage 4 | On a later night, hide and wait. Glove branch: Amanda's individual touch and Melissa's individual climax. This outcome must lead into Melissa's night visits, not exclude them. No glove remains a valid alternative outcome. |
+
+After Sandra's story, `melissaMoonNoiseRepeat` supplies one private corridor
+reminder per lunar month on days 14–23: Melissa and Amanda approach MC worried,
+messy-haired and wearing dishevelled nightshirts. Its ending finishes only the
+reminder. It queues no extra breakfast, resets no investigation or stove stage,
+and does not resolve the curse. The one-time stove encounter is not replayed.
+
+The three-night stove windows are 14–21 for the first clue/check, 15–22 for
+the second clue/conversation, and 16–23 for waiting. Retain at least one absolute
+day after the actual first check and another after the actual conversation.
+Missed encounters stay pending; completed scenes and save history stay earned.
+
+#### Corruption chart: one point per completed step
+
+Melissa's current new-game corruption is 3. The approved reward is **+1**, not
++2 or +3, for each completed early-intimacy progression step below. This is a
+reward chart, not a list of automatic unlock thresholds or a guarantee that
+every step has already been coded in this order.
+
+| Completed Melissa milestone | Corruption award | Progression rule |
+| --- | ---: | --- |
+| Her individual glove encounter | +1 | Resolve once; the completed outcome leads into her night visits. |
+| Accepted protection visit / first sleepover | +1 | Seeking protection starts the gradual visit progression, not advanced actions. |
+| First playful morning tickling | +1 | A later sleepy-morning opportunity; illness is not an intimacy shortcut. |
+| She asks to look at MC | +1 | Separate accepted step. |
+| Further tickling and mutual teasing | +1 | Separate later encounter, not the first morning repeated for rewards. |
+| She asks to touch MC | +1 | Separate accepted step. |
+| First completed handjob milestone | +1 | Only the completed interaction earns this point. |
+| She requests touching and receives oral stimulation | +1 | Her own requested/accepted progression step. |
+| Reciprocal oral milestone | +1 | A possible returning favour, not an automatic obligation. |
+| Accepted new-clothing progression milestone | +1 | Apply through the existing outfit interaction, not a menu read or duplicate reward. |
+| Each completed Clarissa night visit involving Melissa | +1 additional | Each real completed visit supplies its own point, subject to the same early cap. |
+
+Roof repair, thanks, complaints, reminders and observation alone are not new
+sexual-corruption rewards. Successful personal progression also improves
+openness and friendship as requested, but their per-step amounts have not been
+approved here; do not invent another numerical reward chart. Friendship with
+MC must reflect an interaction she credits to MC, not an anonymous encounter
+she attributes to Ollie. Clarissa-only interactions do not automatically award
+friendship with MC.
+
+**Early-phase corruption ceiling: 20.** All Melissa corruption gains during
+these stages, including Clarissa's additional visit points, stop at that ceiling.
+Friendship, trust, comfort and openness remain separate values. Do not change
+the shared Girl ceiling to 20, cap other characters, lower an already-earned
+score in an older save, or maintain a second Melissa corruption counter.
+Re-entering a menu, loading a save, refusing, or presenting an already-completed
+event earns nothing; a genuinely separate eligible visit is not a UI replay.
+
+#### Later cream / anal gate
+
+Melissa asks about the cream **only after Clarissa's cure and the start of the
+anal progression**. Merely reaching 20 corruption, buying an outfit or waiting
+28 days after bat completion does not unlock that request. Cure and the anal
+introduction must be verified on their existing story owners, not invented
+parallel flags. Do not make Clarissa's cure depend on Melissa's later request.
+
+The player must obtain a real plug as part of the later preparation. The current
+item is `blackwood_smooth_plug_001`, obtainable from Robin's abandoned-camp chest
+in `story_robin_blackwood_camp_loot_0`; player inventory owns possession. Cream
+and plug possession do not themselves mean treatment or a later encounter has
+occurred. Progression beyond the early ceiling belongs to that later phase;
+its further reward schedule is not specified by this early chart.
+
+#### Protection, comfort and public versus team behaviour
+
+Melissa prioritizes feeling protected and comfortable. Reliable care, fulfilled
+promises and the existing derived `Melissa.comfort` should support willingness
+to cooperate, tease and flirt. Corruption is sexual familiarity, not obedience,
+trust or safety; high corruption must not bypass her story gates, refusal or
+current condition. Keep one owner for each value and derive world-state needs
+from existing repair, provision and household owners.
+
+| Context | Behaviour / clothing rule |
+| --- | --- |
+| Private with MC | Use her relationship with MC, comfort, protection, current condition and completed personal stages. Private teasing is not permission for a public scene. |
+| Trusted tavern team | Evaluate the actual participants and staff-only context. Comfort with MC does not imply identical willingness with every team member. |
+| Public / customers / strangers | Separate context conditions govern public clothing, flirting and interaction. A customer-facing tavern hall is public even though it is inside the tavern building. |
+
+Use the same canonical Melissa stats with different context conditions; do not
+create public/private corruption copies. Buying clothing, accepting it, wearing
+it privately, and agreeing to wear it publicly are distinct decisions. A dress
+purchase does not automatically unlock customer behaviour or public exposure.
+The **general dress-buying/reward table remains a separate requested audit**;
+this Melissa-specific +1 milestone does not establish reward rates for every
+garment or other NPC. Preserve existing clothing text pending that audit.
+
+#### Current-code discrepancies to address separately
+
+The preceding rules are the corrected target specification. The last code
+audit found these remaining differences, not fixes delivered by this update:
+
+- `melissaMoonProtection` is still restricted to `no_glove`; the glove outcome
+  does not yet supply the requested introduction, and courtship can begin
+  without completing the stove encounter.
+- The stove outcome currently awards openness but no corruption; morning
+  stages mostly award openness/friendship, with corruption only at the handjob
+  stage. Later courtship awards include +2/+3 and need alignment to +1.
+- Melissa's early ceiling of 20 is not enforced by the shared `change_social`.
+  Clarissa's existing social/room visits also have differing corruption awards,
+  rather than the specified +1 per completed night visit.
+- The 28-day cream entry can precede Clarissa's cure; the plug is obtainable but
+  is not yet required by Melissa's progression.
+
+Implementation requires a separate code request; preserve completed history and
+existing authored content when correcting those owners.
+
 ### Household comfort and stock appreciation (2026-09-22)
 
 User correction: these mechanics belong to the EXISTING

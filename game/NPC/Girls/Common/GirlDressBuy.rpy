@@ -4,8 +4,9 @@
 init python:
     def girl_dress_buy_actions(girl_name):
         options = [
+            MenuItem("Выбрать одежду", Show("dress_shop_catalog_page", rack_type="female", girl_name=girl_name)),
             MenuItem("Осмотреть портниху", Call("GirlsDesc", "irma")),
-            MenuItem("Посмотреть во что одета " + str(people_display_name(girl_name)), Call("GirlsDesc", girl_name)),
+            MenuItem("Посмотреть во что одета " + str(people_display_name(girl_name)), Call("GirlDressBuyClothing", girl_name)),
         ]
 
         options.append(MenuItem("Уйти из лавки", Call("GirlDressBuyLeave", girl_name)))
@@ -44,6 +45,23 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
     show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
     while True:
         call screen main_ui
+
+
+label GirlDressBuyClothing(GirlName=""):
+    $ renpy.dynamic("_dress_clothing_page")
+    $ _dress_clothing_page = int(renpy.get_screen("dress_shop_catalog_page").scope.get("catalog_page", 0)) if renpy.get_screen("dress_shop_catalog_page") is not None else None
+    hide screen dress_shop_catalog_page
+    $ main_ui_begin_native_scene_state("Одежда: " + str(people_display_name(GirlName)))
+    show screen main_ui
+    $ scene_runtime.text = "\n\n".join(_girls_desc_build_lines(GirlName, clothing_only=True))
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
+    if _dress_clothing_page is not None:
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
+        $ renpy.set_screen_variable("catalog_page", _dress_clothing_page, screen="dress_shop_catalog_page")
+    return
 
 
 label GirlDressBuyLeave(GirlName=""):

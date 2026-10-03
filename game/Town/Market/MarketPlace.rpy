@@ -99,7 +99,7 @@ label MarketPlace:
         if marketplace_becky_home_visible():
             $ scene_runtime.text += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ scene_runtime.location_text = scene_runtime.text
-        $ scene_runtime.picture = MARKETPLACE_CLOSED_PICTURE
+        $ scene_runtime.picture = "images/market/LocMarketPlace2.jpg" if 6 <= int(calendar_v2.hour or 0) < 18 else MARKETPLACE_CLOSED_PICTURE
         vscene scene_runtime.picture
         $ main_ui_runtime.action_items = [MenuItem("Вернуться к трактиру", movement_actions("StreetTavern", navigation_group_travel_minutes()))]
         if marketplace_stocks_visible():
@@ -113,7 +113,7 @@ label MarketPlace:
         if marketplace_becky_home_visible():
             $ scene_runtime.text += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ scene_runtime.location_text = scene_runtime.text
-        $ scene_runtime.picture = MARKETPLACE_CLOSED_PICTURE
+        $ scene_runtime.picture = "images/market/LocMarketPlace2.jpg" if 6 <= int(calendar_v2.hour or 0) < 18 else MARKETPLACE_CLOSED_PICTURE
         vscene scene_runtime.picture
         $ main_ui_runtime.action_items = [MenuItem("Вернуться к трактиру", movement_actions("StreetTavern", navigation_group_travel_minutes()))]
         if marketplace_stocks_visible():

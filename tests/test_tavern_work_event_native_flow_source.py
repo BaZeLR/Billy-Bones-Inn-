@@ -14,6 +14,15 @@ def test_tavern_work_trigger_returns_through_existing_ui_context():
     assert "return True" in block
 
 
+def test_tavern_work_trigger_does_not_repaint_a_completed_native_event():
+    source = (ROOT / "game/Inn/TavernRandomEvents.rpy").read_text(encoding="utf-8-sig")
+    trigger = source.split("label TavernWorkEventTrigger:", 1)[1].split("\nlabel ", 1)[0]
+    assert "call DisplayTavernEventShort(calendar_v2.time_slot(), 1)" in trigger
+    assert "scene_runtime.text =" not in trigger
+    assert "scene_runtime.location_text =" not in trigger
+    assert "_tavern_event_text" not in trigger
+
+
 def test_amanda_liza_work_event_uses_the_daily_plan_directly():
     source = (ROOT / "game/Inn/TavernRandomEvents.rpy").read_text(encoding="utf-8-sig")
 

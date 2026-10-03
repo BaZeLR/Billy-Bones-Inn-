@@ -201,42 +201,27 @@ init python:
             main_ui_restore_context(origin)
         main_ui_restart_interaction()
 
-    def main_ui_dialogue_text(event, interact=True, what="", **kwargs):
+    def main_ui_dialogue_text(event, interact=True, **kwargs):
         # Native labels own the paragraph; retain it in the existing UI projection
         # for their next menu, after Ren'Py hides the say screen.
-        if event == "begin" and interact and what and renpy_module.get_screen("main_ui") is not None:
-            if main_ui_runtime.mode in ("event", "talk"):
-                scene_runtime.text = what
+        if event == "show_done" and interact and renpy_module.get_screen("main_ui") is not None:
+            say = renpy_module.get_screen("say")
+            if say is not None and say.scope.get("what"):
+                scene_runtime.text = say.scope["what"]
 
     config.all_character_callbacks.append(main_ui_dialogue_text)
 
     def tractir_after_load_restore_ui():
-
-        try:
-            main_ui_runtime.action_content = None
-            main_ui_runtime.action_items = []
-            main_ui_runtime.clear_contexts()
-        except Exception:
-            pass
-
-        try:
-            if str(rooms.current_code or "") == "Intro":
-                return
-        except Exception:
+        # Ren'Py resumes the saved label. Keep its event/object/talk menu and
+        # caller context; only an empty room projection needs reconstruction.
+        if str(rooms.current_code or "") == "Intro":
             return
-
-        try:
-            restored_room = rooms.get(str(rooms.current_code or ""))
-            if restored_room is not None:
-                main_ui_runtime.mode = "scene"
-                main_ui_runtime.selected_char = ""
-                main_ui_runtime.girl_key = ""
-                main_ui_runtime.talk_picture = ""
-                main_ui_runtime.object_id = ""
-                main_ui_runtime.action_title = "Действия в трактире" if str(rooms.current_code or "") == "TavernMain" else "Действия"
-                main_ui_runtime.action_items = build_room_action_items(restored_room)
-        except Exception:
-            pass
+        if main_ui_runtime.mode != "scene" or main_ui_runtime.action_items or main_ui_runtime.action_content:
+            return
+        restored_room = rooms.get(str(rooms.current_code or ""))
+        if restored_room is not None:
+            main_ui_runtime.action_title = "Действия в трактире" if str(rooms.current_code or "") == "TavernMain" else "Действия"
+            main_ui_runtime.action_items = build_room_action_items(restored_room)
 
 init -5:
     style mui_text is default
@@ -304,12 +289,12 @@ init -5:
     style mui_status_value is default:
         size 18
 
-screen current_action_panel(native_choice=None):
+screen current_action_panel(native_choice=None, dialogue=False):
     if native_choice is not None:
         $ _native_choice_items = list(native_choice.scope.get("items", []) or [])
         use choice_panel(_native_choice_items)
-    elif renpy.get_screen("say") is not None:
-        # A story paragraph never exposes actions from the room beneath it.
+    elif dialogue:
+        # The authored paragraph is the current interaction, not a room menu.
         null
     elif str(main_ui_runtime.mode or "") in ("dog", "werecat") and main_ui_runtime.card_origin is not None:
         textbutton "Назад":
@@ -326,7 +311,7 @@ screen current_action_panel(native_choice=None):
         null
     elif str(getattr(rooms.current, "code_name", "") or rooms.current_code or "").strip() == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
         null
-    elif rooms.current is not None:
+    elif main_ui_runtime.mode == "scene" and rooms.current is not None:
         $ action_items = build_room_action_items(rooms.current)
         use choice_panel(action_items)
     else:
@@ -340,13 +325,13 @@ screen main_ui_status_item(label, value, value_color="#f0e6d2"):
         text str(value or "") style "mui_status_value" color value_color
 
 
-screen main_ui_hud_button(caption, action_value, selected_value=False, button_id=""):
+screen main_ui_hud_button(caption, action_value, selected_value=False, button_id="", enabled=True):
     textbutton str(caption or ""):
         id button_id
         alt button_id
         style "mui_hud_button"
         selected bool(selected_value)
-        sensitive not (renpy.get_screen("say") is not None or renpy.get_screen("choice") is not None or str(main_ui_runtime.mode or "") == "event")
+        sensitive enabled
         action action_value
 
 
@@ -448,7 +433,7 @@ screen main_ui():
     $ _say_displayable = renpy.get_screen("say")
     $ _native_dialogue = _say_displayable is not None and bool(_say_displayable.scope.get("what", ""))
     $ _native_choice_screen = renpy.get_screen("choice")
-    $ _room_actions_visible = _say_displayable is None and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"
+    $ _room_actions_visible = not _native_dialogue and _native_choice_screen is None and str(main_ui_runtime.mode or "") != "event"
 
     if rooms.current_code == "Intro":
         key "game_menu" action NullAction()
@@ -558,17 +543,17 @@ screen main_ui():
                                     use main_ui_hud_button("Трактир", [
                                         Function(main_ui_close_inventory_dropdown),
                                         Call("ShowTavernReport", "__main_ui__"),
-                                    ], str(main_ui_runtime.mode or "") == "tavern", "main_ui_tavern_button")
-                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "time")], str(main_ui_runtime.overlay or "") == "time", "main_ui_time_button")
-                                    use main_ui_hud_button("Сюжеты", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "story")], str(main_ui_runtime.overlay or "") == "story", "main_ui_story_button")
-                                    use main_ui_hud_button("Итоги", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "progress")], str(main_ui_runtime.overlay or "") == "progress", "main_ui_progress_button")
-                                    use main_ui_hud_button("Кто где", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "people")], str(main_ui_runtime.overlay or "") == "people", "main_ui_people_button")
-                                    use main_ui_hud_button("Инвентарь", Function(main_ui_toggle_inventory_dropdown), bool(main_ui_runtime.inventory_dropdown_open), "main_ui_inventory_button")
+                                    ], str(main_ui_runtime.mode or "") == "tavern", "main_ui_tavern_button", enabled=_room_actions_visible)
+                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "time")], str(main_ui_runtime.overlay or "") == "time", "main_ui_time_button", enabled=_room_actions_visible)
+                                    use main_ui_hud_button("Сюжеты", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "story")], str(main_ui_runtime.overlay or "") == "story", "main_ui_story_button", enabled=_room_actions_visible)
+                                    use main_ui_hud_button("Итоги", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "progress")], str(main_ui_runtime.overlay or "") == "progress", "main_ui_progress_button", enabled=_room_actions_visible)
+                                    use main_ui_hud_button("Кто где", [Function(main_ui_close_inventory_dropdown), SetField(main_ui_runtime, "overlay", "people")], str(main_ui_runtime.overlay or "") == "people", "main_ui_people_button", enabled=_room_actions_visible)
+                                    use main_ui_hud_button("Инвентарь", Function(main_ui_toggle_inventory_dropdown), bool(main_ui_runtime.inventory_dropdown_open), "main_ui_inventory_button", enabled=_room_actions_visible)
                                     if config.developer:
                                         use main_ui_hud_button("Debug", [
                                             Function(main_ui_close_inventory_dropdown),
                                             Jump("DebugBuilderRoom"),
-                                        ], str(rooms.current_code or "") == "DebugBuilderRoom", "main_ui_debug_builder_button")
+                                        ], str(rooms.current_code or "") == "DebugBuilderRoom", "main_ui_debug_builder_button", enabled=_room_actions_visible)
 
                                     if _room_actions_visible and bool(main_ui_runtime.inventory_dropdown_open):
                                         for _inv_section in player_card_inventory_section_ids():
@@ -587,22 +572,21 @@ screen main_ui():
                     if _room_actions_visible and str(rooms.current_code or "") == "DebugBuilderRoom":
                         use debug_builder_state_controls(_chores)
 
-                    if _room_actions_visible or _native_choice_screen is not None:
-                        frame:
-                            xfill True
-                            yminimum 300
-                            padding (10, 10)
-                            background "#000000ff"
-                            $ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None
+                    frame:
+                        xfill True
+                        yminimum 300
+                        padding (10, 10)
+                        background "#000000ff"
+                        $ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None
+                        vbox:
+                            spacing 10
+
+                            text (_native_choice_label or ("Выбор" if _native_choice_screen is not None else main_ui_runtime.action_title)) size 22 xalign 0.5
+
                             vbox:
-                                spacing 10
-
-                                text (_native_choice_label or ("Выбор" if _native_choice_screen is not None else main_ui_runtime.action_title)) size 22 xalign 0.5
-
-                                vbox:
-                                    xfill True
-                                    spacing 6
-                                    use current_action_panel(_native_choice_screen)
+                                xfill True
+                                spacing 6
+                                use current_action_panel(_native_choice_screen, _native_dialogue)
 
                     if _room_actions_visible:
                         null yfill True

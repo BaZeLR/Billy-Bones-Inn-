@@ -201,6 +201,8 @@ label TavernMyRoomObjectMenu(object_id="", display_text=""):
         $ scene_runtime.location_text = scene_runtime.text
     python:
         _object_picture = str(getattr(_room_object, "picture", "") or "").strip()
+        if object_id == "myroom_window_001" and (int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6):
+            _object_picture = "images/player_room/window2.png"
         if _object_picture and renpy.loadable(_object_picture):
             scene_runtime.picture = _object_picture
         else:

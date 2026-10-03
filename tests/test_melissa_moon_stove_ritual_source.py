@@ -21,9 +21,9 @@ def test_three_nights_use_window_shed_and_explicit_stove_action():
     assert '"story_melissa_moon_room_protection_2"' not in thread
     assert '"TavernMyRoom", "window_look"' in thread
     assert '"ShedRuinedChamber", "stove_hide_wait"' in thread
-    assert "#17 <= int(calendar_v2.day or 0) <= 18" in thread
-    assert "#18 <= int(calendar_v2.day or 0) <= 19" in thread
-    assert "#19 <= int(calendar_v2.day or 0) <= 20" in thread
+    assert "#14 <= int(calendar_v2.day or 0) <= 21" in thread
+    assert "#15 <= int(calendar_v2.day or 0) <= 22" in thread
+    assert "#16 <= int(calendar_v2.day or 0) <= 23" in thread
     assert "player.equipment.hand" not in thread
     assert "player.item_count('fur_glove_001')" not in thread
     assert '"TavernMyRoom", "bedtime"' in thread

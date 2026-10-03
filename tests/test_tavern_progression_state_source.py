@@ -101,4 +101,4 @@ def test_save_repair_has_no_legacy_store_import_or_migration_layer():
 
     assert "tractir_save_normalize_rooms()" in migration
     assert "tractir_save_remove_owned_unique_items_from_rooms()" in migration
-    assert "tractir_save_clear_room_ui_cache()" in migration
+    assert "tractir_save_clear_room_ui_cache" not in migration

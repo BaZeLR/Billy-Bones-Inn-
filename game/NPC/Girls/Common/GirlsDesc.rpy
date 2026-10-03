@@ -100,7 +100,7 @@ init python:
             return "Недавний визит к Серджио пошел Бекки на пользу: она выглядит свежее и явно знает об этом."
         return "После визита к Серджио она выглядит аккуратнее и заметно ухоженнее обычного."
 
-    def _girls_desc_build_lines(girl_name):
+    def _girls_desc_build_lines(girl_name, clothing_only=False):
         g = _girls_desc_resolve_key(girl_name)
         if not g:
             g = str(girl_name or "")
@@ -111,14 +111,16 @@ init python:
         real_name2 = str(person_data.genitive or real_name) if person_data is not None else real_name
         lines = []
 
-        base_desc = str(person_data.description or "") if person_data is not None else ""
-        if base_desc:
-            lines.append(base_desc)
-        barber_line = _girls_desc_recent_barber_line(g)
-        if barber_line:
-            lines.append(barber_line)
+        if not clothing_only:
+            base_desc = str(person_data.description or "") if person_data is not None else ""
+            if base_desc:
+                lines.append(base_desc)
+            barber_line = _girls_desc_recent_barber_line(g)
+            if barber_line:
+                lines.append(barber_line)
+            if girl_info is not None:
+                lines.append("Кожа: %s. Общий вид: %s." % (girl_info.skin_description(), girl_info.appearance_description()))
         if girl_info is not None:
-            lines.append("Кожа: %s. Общий вид: %s." % (girl_info.skin_description(), girl_info.appearance_description()))
             garment_lines = girl_info.wardrobe.worn_condition_lines()
             if garment_lines:
                 lines.append("Состояние одежды: %s." % "; ".join(garment_lines))
@@ -222,6 +224,9 @@ init python:
             lines.append("На ее ногах простые башмаки.")
         elif shoes == "highshoes":
             lines.append("На ее ногах башмачки на очень высоком каблуке.")
+
+        if clothing_only:
+            return [line for line in lines if line]
 
         if girl_info is not None and girl_info.tits_visible():
             line = "Ее сиськи бесстыдно обнажены."

@@ -94,6 +94,42 @@ def test_distinct_nights_and_next_cycle_catch_up(runtime):
     assert targets(thread) == ["story_melissa_moon_stove_wait_1"]
 
 
+def test_saved_amanda_retreat_can_continue_after_the_old_window(runtime):
+    thread = runtime["threads"]["melissaMoonStoveRitual"]
+    c = runtime["calendar_v2"]
+    thread.advanceTo(2)
+    thread.day = 44
+    c.day, c.daysInGame, c.hour, c.minute = 20, 47, 23, 42
+    assert targets(thread) == []
+    c.day, c.daysInGame, c.hour, c.minute = 21, 48, 21, 0
+    assert targets(thread) == ["story_melissa_moon_second_window_2"]
+    thread.advance()
+    assert targets(thread) == ["story_melissa_moon_shed_conversation_3"]
+    thread.setDay()
+    thread.advance()
+    c.hour = 23
+    assert targets(thread) == []
+    c.day, c.daysInGame = 22, 49
+    assert targets(thread) == ["story_melissa_moon_stove_wait_1"]
+    assert thread.done == [True, True, True, True, False]
+
+
+@pytest.mark.parametrize("stage,day,eligible", [
+    (0, 13, False), (0, 14, True), (0, 21, True), (0, 22, False),
+    (1, 13, False), (1, 14, True), (1, 21, True), (1, 22, False),
+    (2, 14, False), (2, 15, True), (2, 22, True), (2, 23, False),
+    (3, 14, False), (3, 15, True), (3, 22, True), (3, 23, False),
+    (4, 15, False), (4, 16, True), (4, 23, True), (4, 24, False),
+])
+def test_stove_lunar_window_leaves_preparation_nights(runtime, stage, day, eligible):
+    thread = runtime["threads"]["melissaMoonStoveRitual"]
+    thread.advanceTo(stage)
+    thread.day = 1
+    c = runtime["calendar_v2"]
+    c.day, c.daysInGame, c.hour = day, 28 + day - 1, 23 if stage == 4 else 21
+    assert bool(targets(thread)) is eligible
+
+
 @pytest.mark.parametrize("owned,equipped", [(False, False), (True, False), (True, True)])
 def test_glove_does_not_block_wait(runtime, owned, equipped):
     thread = runtime["threads"]["melissaMoonStoveRitual"]

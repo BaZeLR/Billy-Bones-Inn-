@@ -131,6 +131,7 @@ label BeckyHomeFront(arrive_mode=""):
     $ _becky_front_text = _becky_front_room.visible_descriptions()[0].text
     $ scene_runtime.text = _becky_front_text
     $ scene_runtime.location_text = _becky_front_text
+    show screen main_ui
 
     if rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances":
         if story_event_available("BeckyHomeFront", "enter"):
@@ -146,8 +147,7 @@ label BeckyHomeFront(arrive_mode=""):
     $ _becky_front_room.mark_visited()
 
     if rooms.get("BeckyHomeFront").state["inga_scene_roll"] <= 3:
-        "Вдруг какое-то движение в темном углу за крыльцом привлекло ваше внимание."
-        "Что делать?"
+        "Вдруг какое-то движение в темном углу за крыльцом привлекло ваше внимание.\n\nЧто делать?"
     menu:
         "Зайти в дом":
             call BeckyHome(rooms.get("BeckyHomeFront").state["arrival_mode"])

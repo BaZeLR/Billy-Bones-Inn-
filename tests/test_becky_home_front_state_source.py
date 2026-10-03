@@ -92,3 +92,11 @@ def test_becky_home_entries_replace_foreign_scene_text_before_authored_dialogue(
     assert front_entry.index("vscene scene_runtime.picture") < front_entry.index(
         '"[_becky_front_room.descriptions[0].text]"'
     )
+
+
+def test_becky_front_shows_hud_before_dialogue_and_keeps_corner_prompt_together():
+    source = (ROOT / "game/Town/BeckyHomeFront.rpy").read_text(encoding="utf-8-sig")
+    entry = source.split('label BeckyHomeFront(arrive_mode=""):', 1)[1].split('\nlabel ', 1)[0]
+    assert entry.index("show screen main_ui") < entry.index('call checkTriggers("BeckyHomeFront", "enter", 0)')
+    assert r'"Вдруг какое-то движение в темном углу за крыльцом привлекло ваше внимание.\n\nЧто делать?"' in entry
+    assert "hide screen main_ui" not in entry

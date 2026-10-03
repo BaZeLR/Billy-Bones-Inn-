@@ -28,6 +28,10 @@ label AmandaMorningWindowArrival(picture, opening):
 
 label story_amanda_room_morning_window_0:
     call AmandaMorningWindowArrival("images/amanda/Room/Masturbation/amanda_bedroom_004.jpeg", "Аманда лежит на кровати, кое-как прикрывшись одеялом. Увидев вас, она резко прижимает его к груди.\n\n«Ой, мессир! Стучаться надо!»")
+    $ scene_runtime.text = "«Ты и сама любишь подглядывать и развлекаться тайком, а других извращенцами зовёшь?» — спрашиваете вы. Аманда краснеет, но не отворачивается: «Потише. Мелисса за стеной услышит»."
+    menu:
+        "Продолжить":
+            pass
     $ scene_runtime.text = "«Прости, что не вышла к завтраку», — говорит Аманда. Но взгляд её уже скользнул ниже вашего пояса."
     menu:
         "Продолжить":
@@ -37,8 +41,10 @@ label story_amanda_room_morning_window_0:
         "Вернуться на кухню":
             pass
     $ household_clear_morning_issue("amanda")
+    $ Amanda.change_social(corruption_delta=1)
     $ Amanda.wear_day_clothes()
     $ calendar_v2.advance_minutes(20)
+    $ event_runtime.active_thread.setDay()
     $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
     jump TavernKitchen
@@ -60,6 +66,7 @@ label story_amanda_room_morning_window_1:
     $ household_clear_morning_issue("amanda")
     $ Amanda.wear_day_clothes()
     $ calendar_v2.advance_minutes(20)
+    $ event_runtime.active_thread.setDay()
     $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
     jump TavernKitchen
@@ -84,6 +91,7 @@ label story_amanda_room_morning_window_2:
     $ household_clear_morning_issue("amanda")
     $ Amanda.wear_day_clothes()
     $ calendar_v2.advance_minutes(20)
+    $ event_runtime.active_thread.setDay()
     $ event_runtime.active_thread.advance()
     $ threads["amandaMorningWood"].forceEnable()
     $ threads["amandaMorningWood"].setDay()

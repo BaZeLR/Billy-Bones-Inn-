@@ -113,7 +113,7 @@ init -20 python:
         day_count = _tractir_progress_int(calendar_v2.daysInGame, 0)
         notoriety_value = _tractir_progress_int(player.stats.notoriety, 0)
 
-        if int(werecat_state().get("adopted", 0) or 0) == 1:
+        if werecat.owned:
             tractir_activate_achievement("werecat_home")
 
         if day_count >= 28:
