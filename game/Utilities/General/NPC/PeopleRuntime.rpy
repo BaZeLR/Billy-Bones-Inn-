@@ -13,6 +13,17 @@
 init -999 python:
     import json
 
+    NPC_DIALOGUE_COLORS = {
+        "sandra": "#E5BD89", "melissa": "#ADD6F2", "amanda": "#EBA5C8",
+        "becky": "#DCC591", "clara": "#C8B7F1", "georgett": "#DEA6E6",
+        "liza": "#9DDDBD", "irma": "#E8B99D", "inga": "#B8DFDC",
+        "pauline": "#C7D994", "gerhard": "#C1C9EC", "sergio": "#E6CAAD",
+        "robin": "#A9D3AA", "nostar": "#E2B4AD", "mongol": "#D8BEFA",
+        "hordus": "#C9D39B", "zimmer": "#B4CFE0", "eddie": "#E6B6D4",
+        "alber": "#D9CBA6", "draupnir": "#A9D4D2", "luisa": "#D6B5EA",
+        "francheska": "#C5DCA8", "sofa": "#CDC2B9",
+    }
+
     HOUSEHOLD_INTIMACY_PRIVATE_ROOMS = frozenset((
         "TavernMelissaRoom",
         "TavernMyRoom",
@@ -68,6 +79,7 @@ init -999 python:
             self.owned_items = self._unique_items(owned_items)
             self.life_days = {item_id: self.GARMENT_LIFE_DAYS for item_id in self.owned_items}
             self.last_aged_day = -1
+            self.last_clothing_remark_day = -1
             self.day_dress = str(day_dress or "")
             self.day_underwear = self._normalized_underwear(day_underwear)
             self.current_layers = self._normalized_layers(current_layers)
@@ -177,6 +189,7 @@ init -999 python:
                 for item_id in self.owned_items
             }
             self.last_aged_day = people_to_int(getattr(self, "last_aged_day", -1), -1)
+            self.last_clothing_remark_day = people_to_int(getattr(self, "last_clothing_remark_day", -1), -1)
             self.day_dress = str(getattr(self, "day_dress", "") or "")
             self.day_underwear = self._normalized_underwear(getattr(self, "day_underwear", {}))
             self.current_layers = self._normalized_layers(getattr(self, "current_layers", {}))
@@ -215,6 +228,48 @@ init -999 python:
             if value > 0:
                 return "плохое, с прорехами"
             return "непригодное для носки"
+
+        def day_garment_needing_attention(self, maximum_condition=44, replacement_for="", minimum_condition=0, include_stored=True):
+            candidates = [self.day_dress]
+            candidates.extend(self.day_underwear.get(layer, "") for layer in ("bra", "panties", "legs"))
+            if include_stored:
+                candidates.extend(self.owned_items)
+            new_code = str(replacement_for or "")
+            for item_id in candidates:
+                if (item_id and item_id in FemaleDressCodes and item_id in self.owned_items
+                        and minimum_condition <= self.condition(item_id) <= maximum_condition):
+                    if new_code:
+                        if new_code in DressTopPart and new_code in DressBottomPart:
+                            if item_id not in DressTopPart or item_id not in DressBottomPart:
+                                continue
+                        elif new_code.endswith("stockings"):
+                            if not item_id.endswith("stockings"):
+                                continue
+                        elif new_code != item_id:
+                            continue
+                    return item_id
+            return ""
+
+        def retire_replaced_item(self, old_item="", new_item=""):
+            old_code = str(old_item or "").strip()
+            new_code = str(new_item or "").strip()
+            if not old_code or not new_code or old_code not in self.owned_items:
+                return False
+            if old_code != new_code:
+                self.owned_items.remove(old_code)
+                self.life_days.pop(old_code, None)
+            self.add_owned(new_code)
+            if old_code == self.day_dress or (old_code in DressTopPart and old_code in DressBottomPart
+                    and new_code in DressTopPart and new_code in DressBottomPart):
+                self.day_dress = new_code
+            else:
+                for layer in ("bra", "panties", "legs"):
+                    if self.day_underwear.get(layer, "") == old_code:
+                        self.day_underwear[layer] = new_code
+                        break
+            if self.context == "day":
+                self.wear_day()
+            return True
 
         def wearable(self, item_id=""):
             key = str(item_id or "").strip()
@@ -1491,6 +1546,12 @@ init -999 python:
             if self.known:
                 return str(people_display_name(self.name) or self.name)
             return str(getattr(self, "unknown_name", "") or self.name)
+
+        @property
+        def character(self):
+            if self.name in ("dog", "werecat"):
+                return None
+            return Character(self.display_name(), who_color=NPC_DIALOGUE_COLORS.get(self.name, "#D8DFE9"))
 
     class Girl(BaseNPC):
         """Girls with body layers, pregnancy, detailed history, lunar fertility."""

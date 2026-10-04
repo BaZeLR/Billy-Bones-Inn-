@@ -17,6 +17,9 @@ label IntSandraTalk(girl_name="sandra"):
         "Осмотреть":
             call ShowGirlCard(girl_name)
             jump IntSandraTalk
+        "Сделать замечание о грязной одежде" if girl_clothing_dirty_remark_available(girl_name):
+            call GirlClothingDirtyRemark(girl_name)
+            jump IntSandraTalk
         "Поговорить" if social_has_visible_topics(girl_name, "talk"):
             call SocialTalkTopicMenu(girl_name, "talk")
             jump IntSandraTalk

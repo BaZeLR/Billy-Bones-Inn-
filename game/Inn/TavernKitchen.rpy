@@ -359,10 +359,13 @@ init python:
         kitchen_crew = NamesList("jobkitchen", "TavernKitchen")
         crew_names = str(kitchen_crew or "никто")
         if int(calendar_v2.hour or 0) < 12:
-            text_parts.append("До полудня кухня живет скорее ритмом большого двора, чем трактирной службой. Здесь собирают завтрак, ставят воду, проверяют припасы и только готовятся к дневной работе.")
+            if int(calendar_v2.week or 0) == 7:
+                text_parts.append("В воскресное утро на кухне готовят общую дневную трапезу.")
+            else:
+                text_parts.append("До полудня кухня живет скорее ритмом большого двора, чем трактирной службой. Здесь собирают завтрак, ставят воду, проверяют припасы и только готовятся к дневной работе.")
             text_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
             if int(calendar_v2.week or 0) == 7:
-                text_parts.append("После службы здесь наверняка соберутся и на более основательную воскресную трапезу, но пока речь идет только о спокойном утреннем сборе.")
+                text_parts.append("После службы здесь соберутся за воскресным обедом.")
         else:
             text_parts.append("На кухне работают: " + crew_names + ".")
         if str(people.location("becky") or "") == "TavernKitchen":
@@ -405,6 +408,9 @@ label TavernKitchen:
     $ rooms.enter("TavernKitchen")
     $ tavern_kitchen_hearth_wood_stock()
     $ scene_runtime.picture = tavern_kitchen_picture() or rooms.current.bg_picture or None
+    if int(calendar_v2.week or 0) == 7 and player.tavern_management.breakfast.event_active:
+        $ player.tavern_management.breakfast.event_active = False
+        $ player.tavern_management.breakfast.present_ids = None
     call RoomEnterEventGate(rooms.current_code, False)
     $ main_ui_runtime.object_id = ""
     $ main_ui_runtime.girl_key = ""

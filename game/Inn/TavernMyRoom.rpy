@@ -75,6 +75,16 @@ init python:
             return room_object
         return get_game_object(object_key)
 
+    def tavern_my_room_store_retired_clothing(dress_code):
+        code = str(dress_code or "").strip()
+        chest = tavern_my_room_get_object("chest_001")
+        if not code or chest is None:
+            return False
+        retired = list(chest.state.get("retired_clothes", []) or [])
+        retired.append(code)
+        chest.state["retired_clothes"] = retired
+        return True
+
     def tavern_my_room_can_go_forest():
         return not rooms.get("Forest").is_first_visit()
 
@@ -273,7 +283,7 @@ label TavernMyRoomTakeFloorItem(item_id=""):
 
 
 label TavernMyRoomOpenChest(preserve_text=False):
-    $ renpy.dynamic("_room_object", "_all_dresses", "_appearance", "_current_dress", "_dress", "_dress_key", "_short", "_device_id", "_device_name", "_stored_devices")
+    $ renpy.dynamic("_room_object", "_all_dresses", "_appearance", "_current_dress", "_dress", "_dress_key", "_short", "_device_id", "_device_name", "_stored_devices", "_retired_clothes")
     $ _room_object = tavern_my_room_get_object("chest_001")
     $ player_ensure_nightwear_in_chest()
     if _room_object is not None:
@@ -294,7 +304,8 @@ label TavernMyRoomOpenChest(preserve_text=False):
         _current_dress = str(_appearance.current_dress or "").strip()
         if _current_dress and _appearance.has_dress(_current_dress) and _current_dress not in _all_dresses:
             _all_dresses.append(_current_dress)
-        if len(_all_dresses) <= 0 and not bool(preserve_text):
+        _retired_clothes = list(_room_object.state.get("retired_clothes", []) or []) if _room_object is not None else []
+        if len(_all_dresses) <= 0 and len(_retired_clothes) <= 0 and not bool(preserve_text):
             scene_runtime.text = "В ларе пока пусто."
             scene_runtime.location_text = scene_runtime.text
         else:
@@ -306,6 +317,9 @@ label TavernMyRoomOpenChest(preserve_text=False):
                         main_ui_runtime.action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
                 else:
                     main_ui_runtime.action_items.append(MenuItem("Снять " + _short, Call("TavernMyRoomRemoveDress", _dress)))
+        for _dress in dict.fromkeys(_retired_clothes):
+            _short = tavern_my_room_dress_short_name(_dress)
+            main_ui_runtime.action_items.append(MenuItem("Порвать старую вещь: " + _short + " (" + str(_retired_clothes.count(_dress)) + ")", Call("TavernMyRoomTearRetiredClothing", _dress)))
         if not player_is_naked():
             main_ui_runtime.action_items.append(MenuItem("Раздеться для сна", Call("TavernMyRoomSetSleepLayer", "nothing")))
         _stored_devices = list(_room_object.state.get("stored_devices", []) or []) if _room_object is not None else []
@@ -526,6 +540,23 @@ label TavernMyRoomTearDressToCloth(dress_code=""):
     $ renpy.dynamic("_tear_result")
     $ _tear_result = player_tear_wardrobe_dress(dress_code)
     $ scene_runtime.text = str((_tear_result or {}).get("text", "") or "Вы откладываете одежду в сторону.")
+    $ scene_runtime.location_text = scene_runtime.text
+    call TavernMyRoomOpenChest(True)
+    return
+
+
+label TavernMyRoomTearRetiredClothing(dress_code=""):
+    $ renpy.dynamic("_chest", "_retired", "_scrap_count")
+    $ _chest = tavern_my_room_get_object("chest_001")
+    $ _retired = list(_chest.state.get("retired_clothes", []) or []) if _chest is not None else []
+    $ _scrap_count = cloth_scrap_yield_for_dress(dress_code)
+    if str(rooms.current_code or "") == "TavernMyRoom" and dress_code in _retired and _scrap_count > 0:
+        $ _retired.remove(dress_code)
+        $ _chest.state["retired_clothes"] = _retired
+        $ player.add_item("cloth_scrap_001", _scrap_count)
+        $ scene_runtime.text = "Вы порвали старую одежду на лоскуты. Получено: %d." % _scrap_count
+    else:
+        $ scene_runtime.text = "Этой вещи в ларе нет."
     $ scene_runtime.location_text = scene_runtime.text
     call TavernMyRoomOpenChest(True)
     return

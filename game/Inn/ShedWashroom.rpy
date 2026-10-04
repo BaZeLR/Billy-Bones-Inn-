@@ -50,7 +50,7 @@ label ShedWashroom:
     $ rooms.current.mark_visited()
     $ main_ui_runtime.action_title = "Прачечная и купальня"
     $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
     while True:
         call screen main_ui
 

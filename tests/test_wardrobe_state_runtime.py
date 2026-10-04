@@ -33,6 +33,7 @@ def wardrobe_class():
         "minidress": "minibottom",
         "nightshirt": "nightshirtbottom",
     }
+    module.FemaleDressCodes = ["workdress", "minidress", "simplebra", "simplepanties", "blackstockings"]
     sys.modules[module_name] = module
     exec(class_source, module.__dict__)
     return module.GirlWardrobeState
@@ -46,6 +47,37 @@ def base_clothing():
         "legs": "blackstockings",
         "shoes": "simpleshoes",
     }
+
+
+def test_worn_clothing_notice_and_exact_replacement():
+    wardrobe = wardrobe_class().from_base(base_clothing())
+    wardrobe.life_days["workdress"] = 30
+    assert wardrobe.day_garment_needing_attention(44, minimum_condition=25) == "workdress"
+    wardrobe.life_days["workdress"] = 12
+    assert wardrobe.day_garment_needing_attention(24) == "workdress"
+    assert wardrobe.day_garment_needing_attention(24, "minidress") == "workdress"
+    assert wardrobe.retire_replaced_item("workdress", "workdress")
+    assert wardrobe.condition("workdress") == 100
+    assert wardrobe.day_garment_needing_attention(24) == ""
+
+
+def test_replacement_with_another_dress_retains_only_new_ownership():
+    wardrobe = wardrobe_class().from_base(base_clothing())
+    wardrobe.life_days["workdress"] = 8
+    assert wardrobe.retire_replaced_item("workdress", "minidress")
+    assert "workdress" not in wardrobe.owned_items
+    assert wardrobe.day_dress == "minidress"
+    assert wardrobe.current_dress() == "minidress"
+    assert wardrobe.condition("minidress") == 100
+
+
+def test_replaced_underwear_keeps_preference_and_freshens_condition():
+    wardrobe = wardrobe_class().from_base(base_clothing())
+    wardrobe.life_days["simplebra"] = 7
+    assert wardrobe.day_garment_needing_attention(24, "simplebra") == "simplebra"
+    assert wardrobe.retire_replaced_item("simplebra", "simplebra")
+    assert wardrobe.preferred_underwear("bra") == "simplebra"
+    assert wardrobe.condition("simplebra") == 100
 
 
 def test_day_night_strip_and_redress_keep_exact_layers_and_day_preference():

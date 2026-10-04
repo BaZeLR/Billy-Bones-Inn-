@@ -316,10 +316,10 @@ label TavernMain:
             $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
         if _tmp_kids_list:
             $ _tavern_kids_description.append(_tmp_kids_list)
-        if not _tavern_entry_event_played and ((str(people.location("georgett") or "") == rooms.current_code and int(Georgett.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "georgett") or (str(people.location("georgett") or "") == rooms.current_code and calendar_v2.time_slot() < 2)):
+        if not _tavern_entry_event_played and ((str(people.location("georgett") or "") == rooms.current_code and int(Georgett.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "georgett") or (str(people.location("georgett") or "") == rooms.current_code and (calendar_v2.time_slot() < 2 or daily_events.exists("georgett", "ClothingPoorComplaint")))):
             call check_daily_event('georgett', None, rooms.current_code, calendar_v2.time_slot())
             $ _tavern_entry_event_played = bool(_return)
-        if not _tavern_entry_event_played and ((str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "liza") or (str(people.location("liza") or "") == rooms.current_code and calendar_v2.time_slot() < 2)):
+        if not _tavern_entry_event_played and ((str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "liza") or (str(people.location("liza") or "") == rooms.current_code and (calendar_v2.time_slot() < 2 or daily_events.exists("liza", "ClothingPoorComplaint")))):
             call check_daily_event('liza', None, rooms.current_code, calendar_v2.time_slot())
             $ _tavern_entry_event_played = bool(_return)
     $ main_ui_runtime.action_title = "Действия в трактире"

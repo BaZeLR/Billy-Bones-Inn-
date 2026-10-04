@@ -8,6 +8,7 @@ init python:
         def __init__(self):
             self.produced = ""
             self.buyer = ""
+            self.replacement_old_item = ""
             self.measure_stage = 0
             self.sex_step = 0
             self.girl_dress_block = 0

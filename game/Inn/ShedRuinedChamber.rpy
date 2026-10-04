@@ -22,7 +22,7 @@ init 6 python:
 
 
 label ShedRuinedChamber:
-    if rooms.get("ShedRuinedChamber").is_hidden:
+    if not shed_ruined_chamber_accessible():
         jump Shed
     $ rooms.enter("ShedRuinedChamber")
     call RoomEnterEventGate(rooms.current_code, False)

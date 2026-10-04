@@ -139,6 +139,7 @@ label Church:
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
+    call RoomEnterEventGate(rooms.current_code, False)
     if not rooms.get("Church").is_open():
         $ scene_runtime.text = rooms.get("Church").schedule.closed_text
         $ scene_runtime.location_text = scene_runtime.text

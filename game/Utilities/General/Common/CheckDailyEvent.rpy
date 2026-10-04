@@ -125,10 +125,15 @@ init -25 python:
                 if keep_next_day < 0:
                     self.rows.pop(index)
                     continue
+                # week_value is the day being finished. Irma is closed on the
+                # following Sunday, so keep Saturday's appointment for Monday.
+                if event_type == "BuyDressTom" and week_value == 6:
+                    index += 1
+                    continue
                 row["KeepNextDay"] = keep_next_day - 1
                 if event_type == "DressNoShow":
                     row["Time"] = -1
-                if event_type == "BuyDressTom" and week_value != 7:
+                if event_type == "BuyDressTom":
                     self.add(girl_name, "dressshop", 0, "=", 1, 0, "BuyDress", "GirlDressBuy", "girl_location")
                     self.add(girl_name, "alllocs", 0, ">", 1, 5 + procedural_randint(1, 5, key="procedural:Utilities/General/Common/CheckDailyEvent.rpy:procedural_randint:227:2"), "DressNoShow", "DressNoShow", "girl")
                     self.rows.pop(index)

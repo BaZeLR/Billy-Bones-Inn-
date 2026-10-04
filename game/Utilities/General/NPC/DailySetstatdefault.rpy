@@ -43,6 +43,14 @@ label DailySetstatdefault(girl_name):
 
     call DressUp(girl_name, 1)
 
+    if (_dssd_info is not None and girl_clothing_team_member(girl_name)
+            and _dssd_info.wardrobe.day_garment_needing_attention(24)
+            and daily_events.exists(girl_name, "ClothingPoorComplaint") == 0
+            and daily_events.exists(girl_name, "BuyDressTom") == 0
+            and daily_events.exists(girl_name, "BuyDress") == 0
+            and not (str(dress_shop.buyer or "") == girl_name and str(getattr(dress_shop, "replacement_old_item", "") or ""))):
+        $ daily_events.add(girl_name, "TavernMain", 1, ">", 1, 1, "ClothingPoorComplaint", "GirlClothingPoorComplaint", "girl")
+
     if girl_name == "amanda" or girl_name == "melissa":
         if daily_events.exists(girl_name, "MomDressComplain") == 0:
             $ _dssd_top_slut = _dssd_info.clothing_slut("top")

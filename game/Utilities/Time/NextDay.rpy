@@ -126,12 +126,21 @@ label NextDay(retlocname, timepassed):
                 dress_name = ShortDressName.get(dress_shop.produced, dress_shop.produced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
                 player.appearance.replace_dress(dress_shop.produced, int(current_game_day()))
-            elif dress_shop.buyer == 'amanda':
-                Amanda.wardrobe.add_owned(dress_shop.produced)
-                Amanda.wardrobe.set_day_dress(dress_shop.produced)
-                NewDressCame = 'Ирма прислала Аманде заказанное ею платье. За обновку она расплатилась из своих денег.'
+            elif str(dress_shop.buyer or "") in ("sandra", "melissa", "amanda", "georgett", "liza"):
+                dress_buyer = people.get_info(dress_shop.buyer)
+                replaced_item = str(getattr(dress_shop, "replacement_old_item", "") or "")
+                if replaced_item and dress_buyer.wardrobe.retire_replaced_item(replaced_item, dress_shop.produced):
+                    tavern_my_room_store_retired_clothing(replaced_item)
+                    NewDressCame = '%s получила готовую обновку от Ирмы. Старую вещь она отдала вам; вы положили ее в ларь.' % people_display_name(dress_shop.buyer)
+                else:
+                    dress_buyer.wardrobe.add_owned(dress_shop.produced)
+                    dress_buyer.wardrobe.set_day_dress(dress_shop.produced)
+                    if dress_shop.buyer == 'amanda':
+                        NewDressCame = 'Ирма прислала Аманде заказанное ею платье. За обновку она расплатилась из своих денег.'
+                    else:
+                        NewDressCame = 'Ирма прислала %s заказанную обновку.' % people_name(dress_shop.buyer, 'dative')
                 
-            if dress_shop.buyer != 'amanda':
+            if dress_shop.buyer not in ('sandra', 'melissa', 'amanda', 'georgett', 'liza'):
                 if player.economy.money >= 50:
                     NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
                     player.spend_money(5)
@@ -141,6 +150,7 @@ label NextDay(retlocname, timepassed):
                 
         dress_shop.produced = ''
         dress_shop.buyer = ''
+        dress_shop.replacement_old_item = ''
         
         # Calculate tavern level based on happiness
         avg_happy = TotalDay['happy'] / float(timepassed) if timepassed else 0

@@ -20,6 +20,8 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
         menu:
             "Осмотреть":
                 call ShowGirlCard(girl_name_ilt)
+            "Сделать замечание о грязной одежде" if girl_clothing_dirty_remark_available(girl_name_ilt):
+                call GirlClothingDirtyRemark(girl_name_ilt)
             "Болтать":
                 call IntLizaTalkSmalltalk(girl_name_ilt, girl_loc_ilt)
             "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name_ilt, "gift"):

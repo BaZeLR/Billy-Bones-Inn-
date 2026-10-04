@@ -792,6 +792,10 @@ init -998 python:
         def display_name(self):
             return self.identity.display_name
 
+        @property
+        def character(self):
+            return Character(self.display_name, who_color="#9FD6FF")
+
         def add_money(self, amount):
             return self.economy.add_money(amount)
 

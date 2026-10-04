@@ -2,6 +2,21 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def girl_clothing_team_member(girl_name):
+        key = str(girl_name or "").strip().lower()
+        return key in ("sandra", "melissa", "amanda") or (key in ("georgett", "liza") and tavern.is_team_member(key))
+
+    def girl_clothing_dirty_remark_available(girl_name):
+        key = str(girl_name or "").strip().lower()
+        info = people.get_info(key)
+        return bool(
+            info is not None
+            and girl_clothing_team_member(key)
+            and str(info.wardrobe.context or "") == "day"
+            and info.wardrobe.day_garment_needing_attention(44, minimum_condition=25, include_stored=False)
+            and people_to_int(getattr(info.wardrobe, "last_clothing_remark_day", -1), -1) != current_game_day()
+        )
+
     def girl_dress_buy_actions(girl_name):
         options = [
             MenuItem("Выбрать одежду", Show("dress_shop_catalog_page", rack_type="female", girl_name=girl_name)),
@@ -11,6 +26,74 @@ init python:
 
         options.append(MenuItem("Уйти из лавки", Call("GirlDressBuyLeave", girl_name)))
         return options
+
+
+label GirlClothingDirtyRemark(girl_name=""):
+    $ renpy.dynamic("_dirty_info", "_dirty_item", "_dirty_name")
+    if not girl_clothing_dirty_remark_available(girl_name):
+        return
+    $ _dirty_info = people.get_info(girl_name)
+    $ _dirty_item = _dirty_info.wardrobe.day_garment_needing_attention(44, minimum_condition=25, include_stored=False)
+    $ _dirty_name = str(ShortDressName.get(_dirty_item, _dirty_item) or _dirty_item).lower()
+    $ _dirty_info.wardrobe.last_clothing_remark_day = current_game_day()
+    $ scene_runtime.text = "Вы указываете на %s: «Одежда уже грязная. Приведи её в порядок до следующей смены». %s осматривает вещь и кивает: «Вижу»." % (_dirty_name, people_display_name(girl_name))
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить разговор":
+            pass
+    return
+
+
+label GirlClothingPoorComplaint(girl_name=""):
+    $ renpy.dynamic("_worn_info", "_worn_item", "_worn_cost", "_worn_name")
+    $ _worn_info = people.get_info(girl_name)
+    $ _worn_item = _worn_info.wardrobe.day_garment_needing_attention(24) if _worn_info is not None else ""
+    if not _worn_item:
+        return
+    $ _worn_cost = _gds_dress_cost(_worn_item)
+    $ _worn_name = str(ShortDressName.get(_worn_item, _worn_item) or _worn_item).lower()
+    $ main_ui_begin_native_scene_state("Изношенная одежда")
+    show screen main_ui
+    $ scene_runtime.text = "%s подходит к вам в зале и показывает %s: «Вот, смотри. Ткань уже рвётся. В таком на работу выходить нельзя»." % (people_display_name(girl_name), _worn_name)
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Выслушать":
+            pass
+    if _worn_cost > 0 and int(_worn_info.personal_money or 0) >= _worn_cost and not str(dress_shop.produced or ""):
+        $ _worn_info.spend_personal_money(_worn_cost)
+        $ dress_shop.produced = _worn_item
+        $ dress_shop.buyer = girl_name
+        $ dress_shop.replacement_old_item = _worn_item
+        $ scene_runtime.text = "«За обновку заплачу сама. Своих денег хватит», — говорит %s. Она уже побывала у Ирмы: портниха сняла мерку и обещала прислать новую вещь завтра. Старую она отдаст вам, когда получит заказ." % people_display_name(girl_name)
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Хорошо":
+                pass
+    elif str(dress_shop.produced or ""):
+        $ scene_runtime.text = "Ирма пока занята другим заказом. %s придётся подождать, прежде чем портниха сможет снять мерку для замены." % people_display_name(girl_name)
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+    else:
+        $ scene_runtime.text = "«У меня на новую вещь денег нет. Сходишь со мной к Ирме?» — спрашивает %s. Портниха сможет снять мерку и сшить замену обычным порядком." % people_display_name(girl_name)
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Согласиться оплатить замену":
+                $ daily_events.add(girl_name, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
+                $ scene_runtime.text = "Вы договариваетесь встретиться у Ирмы завтра утром. Там выберете замену и снимете мерку."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+            "Пока не обещать":
+                $ scene_runtime.text = "«Тогда я пока поберегу то, что осталось», — отвечает %s. К разговору придётся вернуться позже." % people_display_name(girl_name)
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+    $ main_ui_end_native_scene_state()
+    return True
 
 
 label GirlDressBuy(GirlName="", CurLocArg=""):

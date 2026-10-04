@@ -2104,7 +2104,7 @@ define churchThreadList = [
         ("story_church_full_moon_bats_0", None, (0, 5), None, 1, None,
          ["#calendar_v2.moon_phase_name_en() == 'Full Moon'"],
          None, "Church", "enter", 0, False, "church_full_moon_bats"),
-    ]], highlight=False, threaded=False),
+    ]], highlight=False, threaded=True),
 ]
 define mongolThreadList = [
     LThreadData(0, "mongol", "TavernArrival", [

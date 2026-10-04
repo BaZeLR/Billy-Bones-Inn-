@@ -183,6 +183,20 @@ label BarberShopTalk:
                 $ scene_runtime.text = barber_shop_talk_text()
                 $ scene_runtime.location_text = scene_runtime.text
 
+            "Рассказать о Жоржетте, Лизетте и глорихоле" if tavern_adult_services_ready() and not Sergio.story_value("tavern_adult_services_told", False):
+                $ Sergio.set_story_value("tavern_adult_services_told", True)
+                $ scene_runtime.text = "Вы рассказываете Серджио, что Жоржетта и Лизетта принимают гостей в трактире и что теперь есть отдельный глорихол. Серджио прыскает: «Кто бы мог подумать! Нет, в кресле я об этом кричать не стану. Но если спросят, где провести вечер, адрес назову»."
+                $ scene_runtime.location_text = scene_runtime.text
+
+            "Спросить о креме для Мелиссы" if int(threads["melissaOintmentIntimacy"].num or 0) >= 2 and not crafting.special_cream_recipe_unlocked and not Sergio.story_value("melissa_cream_asked", False):
+                $ Sergio.set_story_value("melissa_cream_asked", True)
+                if procedural_randint(1, 100, key="sergio_melissa_cream_%s" % current_game_day()) <= 30:
+                    $ crafting.special_cream_recipe_unlocked = True
+                    $ scene_runtime.text = "Вы спрашиваете о креме, который просила Мелисса. Серджио достаёт листок и записывает состав и порядок приготовления. «Только не перепутайте масло с водой. Теперь у вас есть рецепт»."
+                else:
+                    $ scene_runtime.text = "Вы спрашиваете о креме для Мелиссы. Серджио убирает баночку с прилавка: «Рецепт я пока не раздаю. Если когда-нибудь поможете мне в серьёзном деле, вернёмся к разговору»."
+                $ scene_runtime.location_text = scene_runtime.text
+
             "Подстричься за [_barber_haircut_price] мараведи":
                 call BarberShopHaircut
 

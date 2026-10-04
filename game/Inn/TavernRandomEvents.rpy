@@ -91,7 +91,7 @@ init -20 python:
             and people.is_awake("liza")
             and tavern_work_person_on_property("amanda")
             and tavern_work_person_on_property("liza")
-            and not Liza.tavern_service_busy_now()
+            and not player.tavern_management.isTavernOpen
         )
 
 
@@ -428,14 +428,19 @@ label TavernWorkEventTrigger:
 
 
 label event_tavern_client_referral(eyewitness=0):
-    $ renpy.dynamic("_referral_guides", "_referral_source", "_referral_target", "_referral_info", "_referral_place", "_referral_text")
+    $ renpy.dynamic("_referral_guides", "_referral_source", "_referral_decision", "_referral_target", "_referral_info", "_referral_place", "_referral_text")
     if not eyewitness:
-        return "Работницы объясняли посетителям, к кому обратиться, и направляли желающих к свободным девушкам на их рабочих местах."
+        return "Работницы сами решали, подсказывать ли посетителям, к кому обратиться за отдельными услугами."
     $ _referral_guides = [key for key in sorted(set(tavern_work_job_candidates("jobwaitress", "TavernMain") + tavern_work_job_candidates("jobcleaning", "TavernMain"))) if people.get_info(key).tavern_service_target(False) == ""]
     $ _referral_source = procedural_choice(_referral_guides, "client_referral_guide_%s_%s" % (current_game_day(), calendar_v2.time_slot())) if _referral_guides else ""
+    if not _referral_source:
+        return ""
+    $ _referral_decision = people.get_info(_referral_source).decide("customer_referral")
+    if _referral_decision["reaction"] not in ("good", "capricious_bad_is_good"):
+        return ""
     $ _referral_target = procedural_choice(people.available_tavern_service_workers(), "client_referral_worker_%s_%s" % (current_game_day(), calendar_v2.time_slot()))
     $ _referral_info = people.get_info(_referral_target)
-    if not _referral_source or _referral_info is None:
+    if _referral_info is None:
         return ""
     $ _referral_place = _referral_info.tavern_service_target(False)
     $ _referral_text = "%s объясняет посетителю, к кому обратиться: %s %s. Посетитель благодарит ее и идет куда направили." % (people_display_name(_referral_source), people_display_name(_referral_target), "принимает гостей за ширмой глорихола" if _referral_place == "gloryhole" else "свободна в гостевой комнате")

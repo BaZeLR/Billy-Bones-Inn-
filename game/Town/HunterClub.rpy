@@ -558,6 +558,10 @@ label HunterClubLuiseTalk:
     $ main_ui_runtime.action_items = []
     if story_event_available("talk_luisa", "clara_fiance_case"):
         $ main_ui_runtime.action_items.append(MenuItem("Спросить о Клариссе и Серджио", Call("checkTriggers", "talk_luisa", "clara_fiance_case", 0)))
+    if tavern_adult_services_ready() and not Luisa.story_value("tavern_adult_services_told", False):
+        $ main_ui_runtime.action_items.append(MenuItem("Рассказать Луизе о новых услугах трактира", Call("HunterClubTellLuisaServices")))
+    if tavern_adult_services_ready() and Luisa.story_value("tavern_adult_services_told", False) and not Luisa.story_value("tavern_adult_services_promised", False) and hunter_club_reputation() > 7:
+        $ main_ui_runtime.action_items.append(MenuItem("Попросить Луизу рассказать охотникам о трактире", Call("HunterClubAskLuisaSpreadWord")))
     $ main_ui_runtime.action_items.extend([
         MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
         MenuItem("Подать добычу", Call("HunterClubSellMenu")),
@@ -572,6 +576,26 @@ label HunterClubLuiseTalk:
             Function(main_ui_restart_interaction),
         ]),
     ])
+    return
+
+
+label HunterClubTellLuisaServices:
+    $ Luisa.set_story_value("tavern_adult_services_told", True)
+    $ main_ui_runtime.action_items = [item for item in main_ui_runtime.action_items if item.caption != "Рассказать Луизе о новых услугах трактира"]
+    if hunter_club_reputation() > 7:
+        $ Luisa.set_story_value("tavern_adult_services_promised", True)
+        $ scene_runtime.text = "Вы рассказываете Луизе, что в «Диком Жеребце» теперь работают Жоржетта и Лизетта, а в отдельной комнате устроен глорихол. Луиза усмехается: «Знаю я охотников. После вылазки им только дай повод зайти. Скажу своим, что у тебя открылось. И сама как-нибудь загляну»."
+    else:
+        $ scene_runtime.text = "Вы рассказываете Луизе о Жоржетте, Лизетте и глорихоле. Она хмыкает: «Весть полезная. Но обещать за тебя среди охотников пока не стану: сначала добудь себе имя в клубе»."
+    $ scene_runtime.location_text = scene_runtime.text
+    return
+
+
+label HunterClubAskLuisaSpreadWord:
+    $ Luisa.set_story_value("tavern_adult_services_promised", True)
+    $ main_ui_runtime.action_items = [item for item in main_ui_runtime.action_items if item.caption != "Попросить Луизу рассказать охотникам о трактире"]
+    $ scene_runtime.text = "Вы напоминаете Луизе о новых услугах трактира. Она окидывает вас взглядом: «Теперь в клубе тебя знают. Скажу охотникам, где выпить и к кому обратиться после охоты. И сама загляну»."
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 

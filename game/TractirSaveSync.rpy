@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 112
+define currentVersion = 113
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -844,6 +844,9 @@ init -100 python:
         if loaded_version < 112:
             updateSave_V111()
             loaded_version = 112
+        if loaded_version < 113:
+            updateSave_V112()
+            loaded_version = 113
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3465,6 +3468,22 @@ init -100 python:
             return
         if int(morning.num or 0) >= 1 or int(bat.num or 0) >= 9 or bool(bat.completed):
             visits.advanceTo(1, force_active=True)
+
+    def updateSave_V112():
+        # A pending welcome must precede both hired workers' first shift.
+        # Completed welcomes stay completed; only their house rule changes.
+        if not (Georgett.can_work_tavern() and Liza.can_work_tavern()):
+            return
+        if int(player.tavern_management.breakfast.georgett_liza_pending or 0) == 1:
+            for info in (Georgett, Liza):
+                info.assign_tavern_service("", False)
+                info.assign_tavern_service("", True)
+                info.data.invalidate_daily_schedule()
+            return
+        tavern.client_touch_policy = "hands_off"
+        for girl_id, girl_info in people.girl_items():
+            if (girl_id in household.resident_ids() or tavern.is_team_member(girl_id)) and not girl_info.harass_instruction():
+                girl_info.set_harass_instruction("notallow")
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

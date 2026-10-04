@@ -5,6 +5,13 @@ init 6 python:
     def tavern_glory_hole_available():
         return tavern.renovation_complete('glory_hole')
 
+    def tavern_adult_services_ready():
+        return (
+            tavern_glory_hole_available()
+            and Georgett.tavern_service_available("intimate")
+            and Liza.tavern_service_available("intimate")
+        )
+
     def tavern_glory_hole_workers():
         return girls_by_job("jobgloryhole", "TavernGloryHole")
 
@@ -85,8 +92,41 @@ label TavernGloryHole:
 label TavernGloryHoleCheck:
     if not tavern_glory_hole_available():
         return
+    $ renpy.dynamic("_tgh_visit", "_tgh_visit_state", "_tgh_visit_day", "_tgh_visit_week")
     $ main_ui_begin_native_scene_state("Глорихол")
     show screen main_ui
+    $ _tgh_visit_state = rooms.get("TavernGloryHole").state
+    $ _tgh_visit_day = current_game_day()
+    $ _tgh_visit_week = _tgh_visit_day // 7
+    $ _tgh_visit = ""
+    if tavern_glory_hole_working_now() and int(_tgh_visit_state.get("visitor_roll_day", -1)) != _tgh_visit_day:
+        $ _tgh_visit_state["visitor_roll_day"] = _tgh_visit_day
+        if Luisa.story_value("tavern_adult_services_promised", False) and int(calendar_v2.week or 0) == 5 and int(_tgh_visit_state.get("luisa_visit_week", -1)) != _tgh_visit_week:
+            $ _tgh_visit = "luisa"
+            $ _tgh_visit_state["luisa_visit_week"] = _tgh_visit_week
+        elif Irma.story_value("tavern_adult_services_told", False) and int(Irma.rel or 0) > 2 and int(_tgh_visit_state.get("irma_visit_week", -1)) != _tgh_visit_week:
+            $ _tgh_visit = "irma"
+            $ _tgh_visit_state["irma_visit_week"] = _tgh_visit_week
+        elif Sergio.story_value("tavern_adult_services_told", False) and not Clara.fiance_case_detained() and procedural_randint(1, 100, key="glory_sergio_%s" % _tgh_visit_day) <= 15:
+            $ _tgh_visit = "sergio"
+        elif procedural_randint(1, 100, key="glory_woman_%s" % _tgh_visit_day) <= 20:
+            $ _tgh_visit = "woman"
+    if _tgh_visit:
+        vscene "images/gloryhole/glory1.jpg"
+        if _tgh_visit == "luisa":
+            $ scene_runtime.text = "Луиза кладёт монету на стойку и проходит к отдельной комнате. Увидев вас, она ухмыляется: «Обещала заглянуть — вот и заглянула. Про ваших девочек охотникам уже сказала. Только не вздумай устроить из этого представление»."
+        elif _tgh_visit == "irma":
+            $ scene_runtime.text = "В отдельную комнату заходит Ирма. Она узнаёт вас и, чуть покраснев, говорит: «Я сама решила посмотреть, что ты тут устроил. Мы ведь друзья; надеюсь, ты не станешь рассказывать об этом на рынке?»"
+        elif _tgh_visit == "sergio":
+            $ scene_runtime.text = "На месте работницы сидит какой-то странный мужчина в женском чепце и обслуживает взрослого клиента через отверстие. Он поворачивается — да это же Серджио! Цирюльник прижимает палец к губам: «Ни слова, Стефан. Он знает, кто я, а вот всему городу знать незачем»."
+        else:
+            $ scene_runtime.text = "К отдельной комнате подходит незнакомая горожанка. Она оглядывается, платит за вход и скрывается за ширмой. Вы оставляете гостью в покое."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Оставить посетителя в покое":
+                pass
+        $ main_ui_end_native_scene_state()
+        return
     python hide:
         session = player.tavern_management.glory_hole_session
         session.reset()

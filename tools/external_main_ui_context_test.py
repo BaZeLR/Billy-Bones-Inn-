@@ -18,6 +18,15 @@ init python:
     def external_ui_items():
         return [str(item.caption) for item in main_ui_runtime.action_items]
 
+    def external_ui_clara_church_ready_on_sunday():
+        previous = (calendar_v2.week, calendar_v2.hour, calendar_v2.minute)
+        try:
+            calendar_v2.week, calendar_v2.hour, calendar_v2.minute = 7, 8, 30
+            return bool(story_event_available("Church", "clara_paintings"))
+        finally:
+            calendar_v2.week, calendar_v2.hour, calendar_v2.minute = previous
+            event_runtime.evaluation_time = None
+
     def external_ui_prepare():
         global saveVersion
         saveVersion = currentVersion
@@ -63,6 +72,41 @@ init python:
         if expected.get("user_save"):
             assert rooms.current_code == "TavernMyRoom"
             assert "Вернуться в коридор наверху" in external_ui_items()
+            print("USER_SAVE_STORY_STATE", repr({
+                "day": int(calendar_v2.daysInGame or 0),
+                "weekday": int(calendar_v2.week or 0),
+                "clock": (int(calendar_v2.hour or 0), int(calendar_v2.minute or 0)),
+                "clara_booklet": (int(threads["claraBookletMarket"].num or 0), int(threads["claraBookletMarket"].day or 0)),
+                "mongol_arrest_day": int(Mongol.stocks_arrest_day),
+                "clara_paintings": int(threads["claraPaintingsPath"].num or 0),
+                "clara_detained": bool(Clara.mongol_case_detained()),
+                "clara_church_ready_on_sunday": external_ui_clara_church_ready_on_sunday(),
+                "becky_home": int(threads["beckyHome"].num or 0),
+                "becky_dinner": int(threads["beckyDinner"].num or 0),
+                "becky_rel": int(Becky.rel or 0),
+                "becky_talk_count": int(Becky.talk_count() or 0),
+                "becky_invite_available": bool(story_event_available("talk_becky", "becky_home_invite")),
+                "becky_husband_story": int(threads["beckyHusbandBackstory"].num or 0),
+                "becky_eddie_story": int(threads["beckyEddieBackstory"].num or 0),
+                "eddie_talked_about_georgett": bool(Eddie.talked_about_georgett),
+                "eddie_seen_with_georgett": bool(Eddie.seen_with_georgett),
+                "eddie_told_about_whores": bool(Eddie.told_about_tavern_whores),
+                "georgett_work_location": str(people.location("georgett", int(calendar_v2.week or 0), 19 * 60) or ""),
+                "georgett_team": bool(tavern.is_team_member("georgett")),
+                "georgett_whore_job": int(Georgett.job_value("jobwhore", 0) or 0),
+                "georgett_glory_job": int(Georgett.job_value("jobgloryhole", 0) or 0),
+                "hunter_club_seen": bool(hunter_club_seen_first_visit()),
+                "hunter_rumor_available": bool(story_event_available("HunterClub", "overheard")),
+                "eddie_today_events": [row for row in SexEvents.today_events if str(row.get("GirlName", "")) == "georgett"],
+                "becky_inga_story": int(threads["beckyIngaLucasPath"].num or 0),
+                "player_dress": str(player.appearance.current_dress or ""),
+                "amanda_night_visits": int(threads["amandaAtticNightVisits"].num or 0),
+                "amanda_oral_history": (int(Amanda.var_int("glorysuck", 0)), int(Amanda.var_int("suckyou", 0)), bool(Amanda.performed_oral_with_legare), int(Amanda.sex_stat("sexacts", 0) or 0), bool(Amanda.sex_stat("virginity", True))),
+                "shed_renovated": bool(tavern.renovation_complete("shed")),
+                "moon_stove_stage": (int(threads["melissaMoonStoveRitual"].num or 0), bool(threads["melissaMoonStoveRitual"].completed)),
+                "clothing_order": (str(dress_shop.buyer or ""), str(dress_shop.produced or ""), str(dress_shop.replacement_old_item or "")),
+                "clothing_worn": {key: (str(people.get_info(key).wardrobe.day_dress or ""), str(people.get_info(key).wardrobe.day_garment_needing_attention(24) or ""), int(people.get_info(key).personal_money or 0)) for key in ("sandra", "melissa", "amanda", "georgett", "liza")},
+            }), flush=True)
         else:
             assert main_ui_runtime.action_title == expected["title"]
             assert external_ui_items() == expected["items"]
@@ -477,6 +521,188 @@ testcase external_ui_user_save_load:
     $ renpy.session["ui_expected"] = {"mode": "scene", "user_save": True}
     run FileLoad("ui-user", slot=True, confirm=False)
     advance until eval (False) timeout 30.0
+
+testcase external_ui_self_funded_clothing_replacement_delivery:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    python:
+        calendar_v2.week = 2
+        Melissa.wardrobe.set_day_dress("workdress", wear_now=True)
+        Melissa.wardrobe.life_days["workdress"] = 10
+        Melissa.personal_money = 1000
+        dress_shop.produced = ""
+        dress_shop.buyer = ""
+        dress_shop.replacement_old_item = ""
+        _clothing_money_before = Melissa.personal_money
+        _clothing_chest_before = len(tavern_my_room_get_object("chest_001").state.get("retired_clothes", []))
+        assert Melissa.wardrobe.day_garment_needing_attention(24) == "workdress"
+    run Jump("TavernMain")
+    advance until eval (rooms.current_code == "TavernMain" and main_ui_runtime.mode == "scene") timeout 20.0
+    run Call("GirlClothingPoorComplaint", "melissa")
+    advance until eval (external_ui_choices() == ["Выслушать"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Хорошо"]) timeout 20.0
+    assert eval (dress_shop.produced == "workdress" and dress_shop.buyer == "melissa" and dress_shop.replacement_old_item == "workdress")
+    assert eval (Melissa.personal_money == _clothing_money_before - _gds_dress_cost("workdress"))
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.mode == "scene" and not external_ui_choices()) timeout 20.0
+    run Call("NextDay", "TavernMyRoom", 1)
+    advance until screen "nextday_report_card_overlay" timeout 60.0
+    assert eval (Melissa.wardrobe.condition("workdress") == 100)
+    assert eval (dress_shop.produced == "" and dress_shop.replacement_old_item == "")
+    assert eval (len(tavern_my_room_get_object("chest_001").state.get("retired_clothes", [])) == _clothing_chest_before + 1)
+    assert eval (tavern_my_room_get_object("chest_001").state.get("retired_clothes", [])[-1] == "workdress")
+
+testcase external_ui_mc_funded_clothing_replacement_delivery:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    python:
+        calendar_v2.week = 2
+        Melissa.wardrobe.set_day_dress("workdress", wear_now=True)
+        Melissa.wardrobe.life_days["workdress"] = 10
+        Melissa.personal_money = 0
+        dress_shop.produced = ""
+        dress_shop.buyer = ""
+        dress_shop.replacement_old_item = ""
+        _mc_money_before = player.economy.money
+        _mc_chest_before = len(tavern_my_room_get_object("chest_001").state.get("retired_clothes", []))
+        assert Melissa.wardrobe.day_garment_needing_attention(24) == "workdress"
+    run Jump("TavernMain")
+    advance until eval (rooms.current_code == "TavernMain" and main_ui_runtime.mode == "scene") timeout 20.0
+    run Call("GirlClothingPoorComplaint", "melissa")
+    advance until eval (external_ui_choices() == ["Выслушать"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Согласиться оплатить замену", "Пока не обещать"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Продолжить"]) timeout 20.0
+    assert eval (daily_events.exists("melissa", "BuyDressTom") == 1)
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.mode == "scene" and not external_ui_choices()) timeout 20.0
+    $ daily_events.end_day(2)
+    assert eval (daily_events.exists("melissa", "BuyDress") == 1)
+    run Call("GirlDressBuyPay", "melissa", "workdress")
+    advance until eval (dress_shop.produced == "workdress" and dress_shop.buyer == "melissa") timeout 20.0
+    assert eval (dress_shop.replacement_old_item == "workdress")
+    assert eval (player.economy.money == _mc_money_before - _gds_dress_cost("workdress"))
+    run Call("NextDay", "TavernMyRoom", 1)
+    advance until screen "nextday_report_card_overlay" timeout 60.0
+    assert eval (Melissa.wardrobe.condition("workdress") == 100)
+    assert eval (dress_shop.produced == "" and dress_shop.replacement_old_item == "")
+    assert eval (len(tavern_my_room_get_object("chest_001").state.get("retired_clothes", [])) == _mc_chest_before + 1)
+    assert eval (tavern_my_room_get_object("chest_001").state.get("retired_clothes", [])[-1] == "workdress")
+
+testcase external_ui_amanda_attic_visit_uses_numbered_art:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run Call("story_amanda_attic_night_visit_0")
+    advance until eval (external_ui_choices() == ["Притвориться спящим"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/player_room/amandaVisits/amanda_visit_0.jpg" and renpy.loadable(scene_runtime.picture))
+    assert eval (renpy.get_screen("main_ui") is not None and main_ui_runtime.mode == "event")
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Не шевелиться"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/player_room/amandaVisits/amanda_visit_1.jpg" and renpy.loadable(scene_runtime.picture))
+
+testcase external_ui_amanda_second_visit_uses_numbered_art:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run Call("story_amanda_attic_night_visit_1")
+    advance until eval (external_ui_choices() == ["Выслушать её"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/player_room/amandaVisits/amanda_visit_provoke_0.jpg" and renpy.loadable(scene_runtime.picture))
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Пообещать молчать"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/player_room/amandaVisits/amanda_visit_provoke_1.jpg" and renpy.loadable(scene_runtime.picture))
+
+testcase external_ui_sunday_has_no_breakfast:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    $ calendar_v2.week = 7
+    $ calendar_v2.hour = 8
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = True
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    run Jump("TavernKitchen")
+    advance until eval (rooms.current_code == "TavernKitchen" and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval (not tavern_breakfast_available()) timeout 5.0
+    assert eval (not player.tavern_management.breakfast.event_active) timeout 5.0
+    assert eval ("Позавтракать" not in external_ui_items()) timeout 5.0
+
+testcase external_ui_renovated_shed_replaces_old_stove_with_washroom:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    $ tavern.renovations["shed"].status = "completed"
+    $ rooms.get("ShedRuinedChamber").is_hidden = False
+    run Jump("Shed")
+    advance until eval (rooms.current_code == "Shed" and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval ("Пройти за старую перегородку" not in external_ui_items()) timeout 5.0
+    assert eval ("Войти в прачечную и купальню" in external_ui_items()) timeout 5.0
+    run Jump("ShedWashroom")
+    advance until eval (rooms.current_code == "ShedWashroom" and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval ("Купель" in external_ui_items()) timeout 5.0
+    assert eval ("Вернуться к печи и поленнице" in external_ui_items()) timeout 5.0
+    run Jump("ShedRuinedChamber")
+    advance until eval (rooms.current_code == "Shed" and main_ui_runtime.mode == "scene") timeout 20.0
+
+testcase external_ui_church_full_moon_bats_once:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    python:
+        calendar_v2.day = 17
+        calendar_v2.hour = 21
+        calendar_v2.minute = 0
+        threads["melissaMoonNoise"].complete()
+        threads["churchFullMoonBats"].forceEnable()
+        initStoryEventRuntime(True)
+        assert story_event_available("Church", "enter")
+    run Jump("Church")
+    advance until eval (external_ui_choices() == ["Понаблюдать за карнизом", "Продолжить путь"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/church/fullMoonBatsEntry.png" and main_ui_runtime.mode == "event")
+    click id "choice_panel_button_1" pos (0.5, 0.5)
+    advance until eval (rooms.current_code == "Church" and main_ui_runtime.mode == "scene" and not external_ui_choices()) timeout 20.0
+    assert eval (threads["churchFullMoonBats"].completed and Gerhard.var_value("church_full_moon_bats_seen", False))
+    run Jump("Church")
+    advance until eval (rooms.current_code == "Church" and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval (not external_ui_choices())
+
+testcase external_ui_clara_fiance_church_when_ready:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    python:
+        calendar_v2.week = 7
+        calendar_v2.hour = 8
+        calendar_v2.minute = 30
+        Clara.rel = 20
+        Clara.known = True
+        Mongol.stocks_arrest_day = max(0, current_game_day() - 1)
+        threads["claraPaintingsPath"].advanceTo(6, force_active=True)
+        initStoryEventRuntime(True)
+        assert story_event_available("Church", "clara_paintings")
+    run Jump("Church")
+    advance until eval (rooms.current_code == "Church" and "Прихожане" in external_ui_items()) timeout 20.0
+    $ _attendees_index = external_ui_items().index("Прихожане")
+    click id ("choice_panel_button_%d" % _attendees_index) pos (0.5, 0.5)
+    advance until eval ("Найти семейство Легаре" in external_ui_items()) timeout 20.0
+    $ _legare_index = external_ui_items().index("Найти семейство Легаре")
+    click id ("choice_panel_button_%d" % _legare_index) pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Продолжить"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/Alber/church/cermon_fiance_clara.png" and renpy.loadable(scene_runtime.picture))
+    assert eval (main_ui_runtime.mode == "event")
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Вернуться к прихожанам"]) timeout 20.0
+    assert eval (scene_runtime.picture == "images/Alber/church/cermon_fiance1_clara.png" and renpy.loadable(scene_runtime.picture))
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (threads["claraPaintingsPath"].num == 7) timeout 20.0
 '''
 
 

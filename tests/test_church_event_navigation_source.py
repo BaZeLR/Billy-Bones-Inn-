@@ -38,3 +38,13 @@ def test_church_room_entry_restores_scene_mode_after_events():
 
     assert '$ rooms.enter("Church")' in room_entry
     assert '$ main_ui_runtime.mode = "scene"' in room_entry
+
+
+def test_full_moon_bats_enter_once_through_church_room():
+    church = _source(Path("game") / "Town" / "Church" / "Church.rpy")
+    room_entry = church.split("label Church:", 1)[1].split("label ChurchServiceMenu", 1)[0]
+    bats = _source(Path("game") / "NPC" / "Girls" / "Melissa" / "MelissaMoonNoise.rpy")
+    bat_label = bats.split("label story_church_full_moon_bats_0:", 1)[1]
+
+    assert 'call RoomEnterEventGate(rooms.current_code, False)' in room_entry
+    assert '$ event_runtime.active_thread.advance()' in bat_label

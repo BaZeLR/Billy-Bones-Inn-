@@ -11,13 +11,16 @@ label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass
         "Сказать что она не должна позволять себя лапать":
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 1)
 
-        "Объяснить [_girl_dative], что она должна быть чуть вежливее" if not strcomp(_harass_instruction, "^allow"):
+        "Объяснить [_girl_dative], что она должна быть чуть вежливее" if tavern.client_touch_policy != "hands_off" and not strcomp(_harass_instruction, "^allow"):
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 2)
 
-        "Еще раз все объяснить [_girl_dative]" if strcomp(_harass_instruction, "^allow"):
+        "Еще раз все объяснить [_girl_dative]" if tavern.client_touch_policy != "hands_off" and strcomp(_harass_instruction, "^allow"):
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 3)
 
-        "Сказать [_girl_dative], чтобы она поступала как считает нужным" if _harass_instruction != "":
+        "Сказать [_girl_dative], чтобы она поступала как считает нужным" if _harass_instruction != "" and tavern.client_touch_policy != "hands_off":
+            call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 4)
+
+        "Спросить [_girl_dative], как она сама хочет поступать" if _harass_instruction != "" and tavern.client_touch_policy == "hands_off":
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 4)
 
         "Сказать, что вы обдумаете проблему" if _girl_unhappy:
@@ -33,7 +36,7 @@ label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 5)
     return
 
-label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _discussion_text="", _girl_info=None, _girl_corruption=0, _harass_instruction=""):
+label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _discussion_text="", _girl_info=None, _girl_corruption=0, _harass_instruction="", _girl_decision=None):
     $ _discussion_text = ""
     $ _girl_info = people.get_info(GirlNameMHD)
     $ _girl_corruption = int(getattr(_girl_info, "corruption", 0) or 0)
@@ -101,11 +104,21 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
         if _girl_info is not None:
             $ _girl_info.set_harass_instruction("allow")
     elif choice_code == 4:
-        $ _discussion_text = "Вы сказали {}, что вы решили что сколько она позволяет посетителям должно быть полностью ее решением. Если она хочет позволять им многое - то пускай, а если она расценивает распущенные руки как наглость - то может раздавать пощечины, не стесняясь. Вы поддержите ее в любом случае, но решение как поступать - должно быть ее, вы не хотите навязывать своего мнения.".format(people_name(GirlNameMHD, 'dative'))
+        if tavern.client_touch_policy == "hands_off" and _girl_info is not None:
+            $ _girl_decision = _girl_info.decide("customer_touch")
+            if _girl_decision["reaction"] in ("good", "capricious_bad_is_good"):
+                $ _girl_info.set_harass_instruction("allow")
+                $ _discussion_text = "Вы спрашиваете {}, как она сама хочет общаться с гостями. «Если мне кто-то понравится, я скажу ему сама, — отвечает она. — Но остальные пусть держат руки при себе». Вы соглашаетесь оставить решение за ней.".format(people_name(GirlNameMHD, 'dative'))
+            else:
+                $ _girl_info.set_harass_instruction("notallow")
+                $ _discussion_text = "Вы спрашиваете {}, как она сама хочет общаться с гостями. «Без рук. Если кому-то нужно другое, я покажу, к кому обратиться», — отвечает она. Вы обещаете поддержать её отказ.".format(people_name(GirlNameMHD, 'dative'))
+        else:
+            $ _discussion_text = "Вы сказали {}, что вы решили что сколько она позволяет посетителям должно быть полностью ее решением. Если она хочет позволять им многое - то пускай, а если она расценивает распущенные руки как наглость - то может раздавать пощечины, не стесняясь. Вы поддержите ее в любом случае, но решение как поступать - должно быть ее, вы не хотите навязывать своего мнения.".format(people_name(GirlNameMHD, 'dative'))
+            if _girl_info is not None:
+                $ _girl_info.set_harass_instruction("")
         call HarassDiscussImage(GirlNameMHD, 2)
         $ _discussion_text += "\n\n{} восприняла ваши слова с благодарностью за оказанное ей доверие.".format(people_display_name(GirlNameMHD))
         if _girl_info is not None:
-            $ _girl_info.set_harass_instruction("")
             $ _girl_info.change_social(friend_delta=1)
             $ _girl_info.change_mana(1, "harass_free_choice")
             $ _girl_info.change_rebellion(-1, "harass_free_choice")

@@ -20,6 +20,8 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
         menu:
             "Осмотреть":
                 call ShowGirlCard(girl_name)
+            "Сделать замечание о грязной одежде" if girl_clothing_dirty_remark_available(girl_name):
+                call GirlClothingDirtyRemark(girl_name)
             "Болтать":
                 call IntGeorgettSmalltalk(girl_name, girl_loc)
             "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
@@ -209,6 +211,10 @@ label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
         $ Georgett.add_relation(1)
         $ Georgett.set_hired(True)
         $ Liza.set_hired(True)
+        $ Georgett.assign_tavern_service("", False)
+        $ Georgett.assign_tavern_service("", True)
+        $ Liza.assign_tavern_service("", False)
+        $ Liza.assign_tavern_service("", True)
         $ player.tavern_management.breakfast.georgett_liza_pending = 1
         if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[7]:
             $ event_runtime.active_thread.seen(7)

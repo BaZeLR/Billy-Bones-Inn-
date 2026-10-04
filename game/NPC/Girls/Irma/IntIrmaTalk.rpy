@@ -96,6 +96,11 @@ label IntIrmaTalk:
                 $ scene_runtime.text = "Ирма объясняет: для теплого плаща нужен один медвежий мех или две волчьи шкуры и 35 мараведи. Для меховой постели — два медвежьих меха, один медвежий и две волчьи шкуры или четыре волчьи, а за работу 55 мараведи."
                 $ scene_runtime.location_text = scene_runtime.text
 
+            "Рассказать о Жоржетте, Лизетте и глорихоле" if tavern_adult_services_ready() and not Irma.story_value("tavern_adult_services_told", False):
+                $ Irma.set_story_value("tavern_adult_services_told", True)
+                $ scene_runtime.text = "Вы рассказываете Ирме о новых услугах трактира. Она откладывает ножницы: «Жоржетта и Лизетта сами согласились? Тогда это их дело. А про отдельную комнату я запомню»."
+                $ scene_runtime.location_text = scene_runtime.text
+
             "Заказать теплый меховой плащ" if irma_can_make_warm_cloak():
                 $ irma_make_warm_cloak()
                 $ scene_runtime.text = "Вы отдаете Ирме мех и серебро и получаете добротный теплый меховой плащ."

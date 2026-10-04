@@ -176,16 +176,17 @@ def test_visits_have_separate_windows_and_cursors(runtime):
     assert targets(m) == []
 
 
-def test_church_alternatives_share_daily_consumption(runtime):
+def test_church_alternatives_complete_once(runtime):
     thread = runtime["threads"]["churchFullMoonBats"]
     first = thread.getAvailableEvents()[0]
     runtime["story_event_mark_fired_today"](first)
     assert targets(thread) == []
+    thread.advance()
     c = runtime["calendar_v2"]
     c.hour = 0
     assert targets(thread) == []
     c.daysInGame += 1
-    assert targets(thread) == ["story_church_full_moon_bats_0"]
+    assert targets(thread) == []
     c.day = 21
     assert targets(thread) == []
 

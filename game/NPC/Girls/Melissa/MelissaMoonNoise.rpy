@@ -635,6 +635,7 @@ label story_church_full_moon_bats_0:
             pass
     $ Gerhard.set_var("church_full_moon_bats_seen", True)
     $ calendar_v2.advance_minutes(5)
+    $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     $ main_ui_end_native_scene_state()

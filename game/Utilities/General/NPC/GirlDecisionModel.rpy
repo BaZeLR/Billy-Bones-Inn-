@@ -145,6 +145,25 @@ init -34 python:
                 "mana_value": -0.01,
             },
         },
+        "customer_touch": {
+            "good": {
+                "trust": 0.8,
+                "openness": 1.1,
+                "sexual_openness": 1.0,
+                "mana_value": 0.02,
+                "anger": -1.2,
+            },
+            "bad": {
+                "anger": 1.4,
+                "need_pressure": 0.8,
+                "openness": -0.5,
+                "trust": -0.5,
+            },
+        },
+        "customer_referral": {
+            "good": {"trust": 0.8, "openness": 0.5, "mana_value": 0.02, "anger": -1.0},
+            "bad": {"anger": 1.0, "need_pressure": 0.6, "trust": -0.3},
+        },
         "intimate_help": {
             "good": {
                 "trust": 1.7,

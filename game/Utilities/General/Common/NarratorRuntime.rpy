@@ -4,8 +4,9 @@
 image side tractir_narrator = Transform("images/general/narrator.png", zoom=0.72)
 
 define tractir_narrator_char = Character(
-    None,
+    "Рассказчик",
     image="tractir_narrator",
+    who_color="#C6CCD8",
     what_color="#f0e6d2",
     what_italic=True,
 )

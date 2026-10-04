@@ -302,14 +302,15 @@ init python:
             sexacts_val = int(girl_info.sex_stat("sexacts", 0) or 0)
             virginity_val = int(girl_info.sex_stat("virginity", True))
             cuminside_val = int(girl_info.sex_stat("cuminside", 0) or 0)
-            if sexacts_val == 0:
-                lines.append("Она девственница.")
-            elif virginity_val == 1:
-                lines.append("Она не настолько невинна, как хочет казаться, но еще девственница.")
-                lines.append("У нее было %d половых актов." % sexacts_val)
-                lines.append("Ей кончали в киску %d раз." % cuminside_val)
+            if virginity_val == 1:
+                if sexacts_val == 0:
+                    lines.append("Она девственница.")
+                else:
+                    lines.append("Она не настолько невинна, как хочет казаться, но еще девственница.")
             else:
-                lines.append("У нее было %d половых актов." % sexacts_val)
+                lines.append("Она не девственница.")
+            if sexacts_val > 0:
+                lines.append("У нее было %d сексуальных контактов." % sexacts_val)
                 lines.append("Ей кончали в киску %d раз." % cuminside_val)
 
         if preg < 120:

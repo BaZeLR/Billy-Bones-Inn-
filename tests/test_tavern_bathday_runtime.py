@@ -73,6 +73,14 @@ def test_bathday_is_room_entry_event_not_a_competing_breakfast_trigger():
     assert bath_thread.count("tavern_bathday_ready") == 2
 
 
+def test_renovated_washroom_has_tub_and_exit_and_old_chamber_is_inaccessible():
+    washroom_entry = WASHROOM.split("label ShedWashroom:", 1)[1].split("\nlabel ", 1)[0]
+    old_chamber_entry = (ROOT / "game/Inn/ShedRuinedChamber.rpy").read_text(encoding="utf-8-sig")
+    assert "rooms.current.build_action_items() + rooms.current.build_exit_items()" in washroom_entry
+    assert 'not tavern.renovation_complete("shed") and not rooms.get("ShedRuinedChamber").is_hidden' in SHED
+    assert "if not shed_ruined_chamber_accessible():" in old_chamber_entry
+
+
 def test_shed_has_one_direct_bath_preparation_action():
     stove = RENOVATIONS.split("label ShedHotWaterStove:", 1)[1].split("\nlabel ", 1)[0]
     assert 'action_id="prepare_shed_bath", label="Подготовить купальню", hook="call", target="ShedHotWaterStove"' in RENOVATIONS

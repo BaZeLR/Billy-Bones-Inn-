@@ -94,7 +94,7 @@ init python:
         if info is None or dress not in FemaleDressCodes:
             return "unavailable"
         if info.wardrobe.owns(dress):
-            return "owned"
+            return "" if info.wardrobe.condition(dress) <= 24 else "owned"
         if dress in ("simplebra", "simplepanties"):
             return "unwanted"
         if dress.endswith("stockings"):
@@ -152,8 +152,16 @@ init python:
             return 0
 
         cost = _gds_dress_cost(d)
+        old_item = girl.wardrobe.day_garment_needing_attention(24, d)
         player.spend_money(cost)
-        girl.wardrobe.add_owned(d)
+        if old_item and set_produced:
+            dress_shop.replacement_old_item = old_item
+            dress_shop.buyer = g
+        elif old_item:
+            if girl.wardrobe.retire_replaced_item(old_item, d):
+                tavern_my_room_store_retired_clothing(old_item)
+        else:
+            girl.wardrobe.add_owned(d)
 
         if set_legsdef:
             girl.set_day_underwear("legs", d, bool(set_legs))
@@ -211,6 +219,20 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         _is_bra = "bra" in _gds_dress_id
         _is_panties = "panties" in _gds_dress_id
         _is_stockings = "stockings" in _gds_dress_id
+
+    if (_is_bra or _is_panties) and people.get_info(GirlName).wardrobe.owns(DressToBuy) and people.get_info(GirlName).wardrobe.condition(DressToBuy) <= 24:
+        vscene irma_measure_picture_path(0)
+        $ scene_runtime.text = "Ирма осматривает старую вещь с прорехами, снимает с %s мерку и подбирает такую же новую. Вы платите ей %d мараведи. Изношенную одежду %s отдаёт вам на лоскуты." % (_rn, _gds_dress_cost(DressToBuy), _rn)
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Забрать старую вещь":
+                pass
+        $ _gds_apply_purchase(GirlName, DressToBuy)
+        call stat
+        call ShowImage("", "", irma_working_picture_path())
+        $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
+        return
 
     if _is_bra:
         if GirlName == "georgett":

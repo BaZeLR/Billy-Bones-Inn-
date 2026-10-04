@@ -23,7 +23,7 @@ init python:
     BREAKFAST_GIRLS_TEASE_PICTURE = "images/breakfast/tavent_girls.jpg"
 
     def tavern_breakfast_available():
-        return int(calendar_v2.hour or 0) < 12 and not bool(player.tavern_management.breakfast.today)
+        return int(calendar_v2.week or 0) != 7 and int(calendar_v2.hour or 0) < 12 and not bool(player.tavern_management.breakfast.today)
 
     def tavern_sunday_dinner_available():
         minute_now = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
@@ -1239,6 +1239,8 @@ label TavernKitchenBreakfast:
         menu:
             "Продолжить":
                 $ _breakfast_line_index += 1
+    if int(player.tavern_management.breakfast.georgett_liza_pending or 0) == 1:
+        call TavernKitchenBreakfastAnnounceGeorgetteLiza
     if story_event_available("TavernKitchen", "breakfast"):
         call checkTriggers("TavernKitchen", "breakfast", 0)
     $ player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")
@@ -1276,6 +1278,8 @@ label story_shed_renovation_breakfast:
 
 label TavernKitchenBreakfastMenu:
     $ renpy.dynamic("_breakfast_soap_girl", "_breakfast_dress_girl", "_breakfast_issue_girl", "_breakfast_issue_name")
+    if int(calendar_v2.week or 0) == 7:
+        jump TavernKitchen
     if not player.tavern_management.breakfast.event_active:
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
@@ -1331,9 +1335,6 @@ label TavernKitchenBreakfastMenu:
 
             "Предложить Жоржетте сходить к Серджио" if household_barber_request_ready("georgett", "breakfast"):
                 call HouseholdBarberRequestEvent("georgett")
-
-            "Объявить о Жоржетте и Лизетте" if int(player.tavern_management.breakfast.georgett_liza_pending or 0) == 1:
-                call TavernKitchenBreakfastAnnounceGeorgetteLiza
 
             "Проверить, почему [_breakfast_issue_name] не вышла к завтраку" if _breakfast_issue_girl != "":
                 call TavernKitchenBreakfastMorningIssue
@@ -1883,25 +1884,42 @@ label TavernKitchenBreakfastBlindPirateStory:
 
 
 label TavernKitchenBreakfastAnnounceGeorgetteLiza:
-    $ player.tavern_management.breakfast.georgett_liza_pending = 0
-    $ scene_runtime.text = "Вы даете за столом договорить всем до конца, а затем коротко объявляете, что Жоржетта с Лизеттой отныне будут жить и работать у вас в трактире.\n\nКогда по кухне проходит первый тяжелый шум, вы тут же пресекаете его и холодно напоминаете, чем закончилась судьба «Слепого Пирата». Если кому-то из присутствующих хочется проверить, не ждет ли ее галера, долговая яма или продажа в блудный дом, вы не станете никого удерживать. Но пока дом держится на вас, порядок здесь решаете вы.\n\nПосле этих слов разговор за столом резко остывает."
+    if int(player.tavern_management.breakfast.georgett_liza_pending or 0) != 1:
+        return
+    $ main_ui_begin_native_scene_state("Новые работницы")
+    show screen main_ui
+    vscene tavern_kitchen_breakfast_picture()
+    n "Перед работой вы зовёте Жоржетту и Лизетту на кухню и просите остальных задержаться за столом."
+    $ renpy.say(player.character, "Жоржетта и Лизетта согласились работать у нас. Мне надоело разбираться с гостями, которые распускают руки, поэтому скажу прямо: кружка эля не даёт права лапать работниц. Без вашего согласия — руки прочь.")
+    $ renpy.say(player.character, "Если кому-то нужны платные услуги, можете направить его к Жоржетте или Лизетте. Подсказывать или нет — ваше дело. И кого подпускать к себе, тоже решаете вы сами. Если гость лезет после отказа, зовите меня или Сандру. Мы его выведем.")
     if "sandra" in list(tavern_breakfast_present_ids() or []):
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nСандра первая берет себя в руки. Она явно недовольна, но вместо скандала только сухо замечает, что тогда новых баб надо сразу встраивать в хозяйственный распорядок и следить, чтобы они не развалили дом изнутри."
+        $ renpy.say(Sandra.character, "Хорошо. Если кто-нибудь забудет это правило, пусть сразу идёт ко мне. В зале работать надо, а не отбиваться от чужих рук.")
     if "melissa" in list(tavern_breakfast_present_ids() or []):
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nМелисса заметно бледнеет от вашей жесткости, но спорить не решается. По ее лицу видно, что она поняла сказанное слишком хорошо и теперь старается только не выдать своего страха лишним словом."
+        $ renpy.say(Melissa.character, "Так мне понятнее. Я могу подсказать, к кому обратиться, но никому не обещаю терпеть приставания.")
     if "amanda" in list(tavern_breakfast_present_ids() or []):
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда сперва открывает рот для колкости, но, встретившись с вашим взглядом, только отводит глаза и начинает нервно вертеть ложку в пальцах."
+        $ renpy.say(Amanda.character, "А если я сама захочу с кем-то пофлиртовать, это уже моё дело. Только пусть не путают разговор с разрешением лапать.")
     if "becky" in list(tavern_breakfast_present_ids() or []):
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nБекки хмуро косится на остальных и, похоже, предпочитает не подливать масла в огонь: вдова слишком хорошо знает, как быстро в городе рушатся дома, где хозяин теряет хватку."
-    $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nЖоржетта держится с показным достоинством, а Лизетта жмется к матери чуть ближе обычного. Вы же на этом обрываете завтрак и даете понять, что разговор окончен."
+        $ renpy.say(Becky.character, "Значит, и гостям это стоит сказать прямо. Тогда меньше будет споров у стойки.")
+    $ renpy.say(Georgett.character, "Клиентов мы с Лизеттой встретим сами. Кто подходит, кто нет — решать нам. А за порядок в общем зале спасибо.")
+    $ renpy.say(Liza.character, "Я покажу дорогу тому, кто спросит. Но если он не спросил и полез с руками, я позову вас.")
+    $ scene_runtime.text = "Правила всем ясны. Жоржетта и Лизетта приступят к работе после завтрака. Тем, кого сегодня нет за столом, вы повторяете то же самое до их смены."
     $ scene_runtime.location_text = scene_runtime.text
-    $ player.change_stat("rebellion", -1)
-    $ Sandra.change_rebellion(-1, "breakfast_georgette_liza_order")
-    $ Melissa.change_rebellion(-1, "breakfast_georgette_liza_order")
-    $ Amanda.change_rebellion(-1, "breakfast_georgette_liza_order")
-    $ player.change_stat("fun", 1)
-    call stat
-    call TavernKitchenBreakfastShowText(scene_runtime.text)
+    menu:
+        "Продолжить завтрак":
+            pass
+    $ tavern.client_touch_policy = "hands_off"
+    python:
+        for girl_id, girl_info in people.girl_items():
+            if (girl_id in household.resident_ids() or tavern.is_team_member(girl_id)) and not girl_info.harass_instruction():
+                girl_info.set_harass_instruction("notallow")
+    $ Georgett.assign_tavern_service("intimate", False)
+    $ Georgett.assign_tavern_service("intimate", True)
+    $ Liza.assign_tavern_service("intimate", False)
+    $ Liza.assign_tavern_service("intimate", True)
+    $ GeorgettStaticData.invalidate_daily_schedule()
+    $ LizaStaticData.invalidate_daily_schedule()
+    $ player.tavern_management.breakfast.georgett_liza_pending = 0
+    $ main_ui_end_native_scene_state()
     return
 
 
@@ -2087,6 +2105,16 @@ label TavernKitchenSundayDinner(serve_spicy=0):
 
                     "Назад к воскресному обеду":
                         pass
+
+            "Рассказать Бекки о новых услугах трактира" if "becky" in _sunday_present_ids and tavern_adult_services_ready() and not Becky.story_value("tavern_adult_services_told", False):
+                $ Becky.set_story_value("tavern_adult_services_told", True)
+                $ scene_runtime.text = "Вы говорите Бекки, что Жоржетта и Лизетта теперь принимают гостей в трактире, а для глорихола отвели отдельную комнату. «Владения растут, — усмехается Бекки. — Главное, чтобы гости не путали платные услуги с правом приставать к любой работнице». Вы подтверждаете: без согласия никого не трогать."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Вернуться к обеду":
+                        pass
+                $ scene_runtime.text = "За воскресным столом продолжается разговор."
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Подарить мыло Сандре" if tavern_sunday_dinner_can_gift_soap_to("sandra", _sunday_present_ids):
                 $ _sunday_gift_target = "sandra"
