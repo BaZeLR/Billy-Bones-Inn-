@@ -470,6 +470,7 @@ screen main_ui():
                 "entity_data": dict(npc_data),
             })
     $ _char_slots = list(_char_entries[:9]) + [None] * max(0, 9 - len(_char_entries[:9]))
+    $ _npc_cell_width = max(1, (int((config.screen_width - 36) * 0.28) - 32) // 3)
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
     $ _chores = get_player_chores_ui_state()
@@ -616,7 +617,7 @@ screen main_ui():
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_player_you"
                                                         alt "main_ui_entity_button_player_you"
-                                                        xminimum 150
+                                                        xsize _npc_cell_width
                                                         text_size 18
                                                         action [
                                                             Function(main_ui_close_inventory_dropdown),
@@ -626,7 +627,7 @@ screen main_ui():
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_dog_dog"
                                                         alt "main_ui_entity_button_dog_dog"
-                                                        xminimum 150
+                                                        xsize _npc_cell_width
                                                         text_size 18
                                                         action [
                                                             Function(main_ui_close_inventory_dropdown),
@@ -636,7 +637,7 @@ screen main_ui():
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_npc_draupnir_repairing"
                                                         alt "main_ui_entity_button_npc_draupnir_repairing"
-                                                        xminimum 150
+                                                        xsize _npc_cell_width
                                                         text_size 18
                                                         sensitive False
                                                         action NullAction()
@@ -644,7 +645,7 @@ screen main_ui():
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_{}_{}".format(_entity_type, _npc_id)
                                                         alt "main_ui_entity_button_{}_{}".format(_entity_type, _npc_id)
-                                                        xminimum 150
+                                                        xsize _npc_cell_width
                                                         text_size 18
                                                         sensitive bool(_talk_label and renpy.has_label(_talk_label))
                                                         action [
@@ -653,7 +654,7 @@ screen main_ui():
                                                         ]
                                             else:
                                                 # Move null outside textbutton block
-                                                null width 150 height 34
+                                                null width _npc_cell_width height 34
                                 else:
                                     text "Никого нет." size 20
 

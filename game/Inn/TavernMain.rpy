@@ -339,7 +339,9 @@ label TavernMain:
         else:
             python:
                 _household_request_type, _household_request_girl = household_pending_request_girl("TavernMain")
-            if str(_household_request_type or "") == "soap":
+            if str(_household_request_type or "") == "critical_care":
+                call HouseholdCriticalCareRequestEvent(_household_request_girl)
+            elif str(_household_request_type or "") == "soap":
                 call HouseholdSoapRequestEvent(_household_request_girl)
 
     while True:

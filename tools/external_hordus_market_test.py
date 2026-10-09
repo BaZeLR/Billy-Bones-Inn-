@@ -128,6 +128,30 @@ testcase external_hordus_first_second_and_recurring_meetings:
     click id (external_hordus_button("Вернуться к своим делам")) pos (0.5, 0.5) until eval (not external_hordus_choices()) timeout 20.0
     assert eval (threads["claraBookletMarket"].completed and Hordus.known) timeout 5.0
 
+testcase external_hordus_hud_visibility_and_layout:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_hordus_prepare(False)
+    $ threads["claraBookletMarket"].abort()
+    $ threads["claraHordusMarket"].abort()
+    run Jump("MarketPlace")
+    advance until eval (rooms.current_code == "MarketPlace" and main_ui_runtime.mode == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval ("hordus" in people.ids_at("MarketPlace") and people.action_data_for_room("hordus", "MarketPlace") is None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_hordus") is None) timeout 5.0
+    run Call("story_clara_hordus_market")
+    advance until eval ("Подойти" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Подойти")) pos (0.5, 0.5)
+    advance until eval ("Познакомиться с торговцем" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Познакомиться с торговцем")) pos (0.5, 0.5)
+    advance until eval (Hordus.known and "Вернуться к своим делам" in external_hordus_choices()) timeout 20.0
+    click id (external_hordus_button("Вернуться к своим делам")) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and main_ui_runtime.mode == "scene") timeout 20.0
+    assert eval (people.action_data_for_room("hordus", "MarketPlace") is not None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_hordus") is not None) timeout 5.0
+    assert eval (3 * renpy.get_screen("main_ui").scope["_npc_cell_width"] + 12 <= int((config.screen_width - 36) * 0.28) - 20) timeout 5.0
+    run Jump("MarketPlace")
+    advance until eval (rooms.current_code == "MarketPlace" and renpy.get_screen("choice") is None) timeout 20.0
+    screenshot "hordus-market-npc-grid.png"
+
 testcase external_hordus_shop_cash_monthly_cap_and_back:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 25.0
@@ -240,6 +264,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=300)
     parser.add_argument("--keep-temp", action="store_true")
     parser.add_argument("--compile-lint", action="store_true")
+    parser.add_argument("--testcase")
     args = parser.parse_args()
     renpy_exe = Path(args.renpy)
     if not renpy_exe.is_file():
@@ -261,6 +286,14 @@ def main() -> int:
                 if result.returncode:
                     isolated.safe_print(result.stdout)
                     return int(result.returncode)
+        if args.testcase:
+            result = subprocess.run(
+                [str(renpy_exe), str(project), "--savedir", str(project / ".test-saves"), "test", args.testcase],
+                text=True, encoding="utf-8", errors="replace", timeout=args.timeout,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            )
+            isolated.safe_print(result.stdout)
+            return int(result.returncode)
         return isolated.run_renpy(renpy_exe, project, args.timeout)
     finally:
         if args.keep_temp:

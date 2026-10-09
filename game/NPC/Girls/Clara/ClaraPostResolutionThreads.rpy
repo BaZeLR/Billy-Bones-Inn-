@@ -56,7 +56,7 @@ label story_clara_legare_revenge_fight_2:
     $ renpy.dynamic("_clara_revenge_outcome")
     $ main_ui_begin_native_scene_state("Последняя угроза Легаре")
     show screen main_ui
-    vscene "images/clara/panishment/panishment1.jpg"
+    vscene "images/clara/punishment/punishment1.jpg"
     $ scene_runtime.text = "Из подвала винной лавки снова доносится голос Легаре. Он загнал Клариссу между столом и стеллажами и требует отказаться от защиты трактира. Но теперь Кларисса не склоняет голову: она прямо говорит, что больше не принадлежит ни его дому, ни его планам. Легаре делает шаг к ней — и вы выходите из-за бочек."
     $ scene_runtime.location_text = scene_runtime.text
     menu:

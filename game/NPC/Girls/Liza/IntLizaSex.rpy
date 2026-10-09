@@ -241,7 +241,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street", SceneTextILSS=""):
                     else:
                         $ sex_scene_set_picture(GirlNameILSS, "sexstreet", "minet" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:minet_street")))
 
-                "Трахать" if _can_player_cum and Liza.can_have_sex_today() and not _liza_busy and _you_arousal >= 20 and _liza_arousal >= 20 and _liza_pussy_visible:
+                "Трахать" if _can_player_cum and Liza.can_have_sex_today() and not _liza_busy and _you_arousal >= 20 and _liza_arousal >= 20 and _liza_pussy_visible and Liza.can_accept_penetration_today():
                     $ sex_scene_begin_text()
                     if Liza.pregnancy_days() < 130:
                         if not Liza.cock_in("pussy"):

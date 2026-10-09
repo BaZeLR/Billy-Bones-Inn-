@@ -267,7 +267,10 @@ init python:
             return self.has_seen_clients and people_to_int(self.rel, 0) >= 5
 
         def can_trigger_after_sermon_event(self):
-            return people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
+            return (
+                people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
+                and self.can_accept_penetration_today()
+            )
 
 define LizaStaticData = LizaData()
 default Liza = LizaInfo()

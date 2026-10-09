@@ -49,7 +49,11 @@ def test_recipe_book_list_uses_catalog_buttons_and_keeps_back_in_actions():
     assert "vscrollbar" not in screen_block
     assert 'id "recipe_book_list_button_" + _recipe_id' in screen_block
     assert 'Call("ReadRecipeBook"' in screen_block
-    assert 'main_ui_runtime.action_items = [MenuItem("Назад"' in list_block
+    assert 'main_ui_runtime.action_items = []' in list_block
+    assert 'recipe_book_can_notice_hidden_note()' in list_block
+    assert 'MenuItem("Достать тонкую вкладку между страницами"' in list_block
+    assert 'MenuItem("Нагреть пергамент и смазать вином"' in list_block
+    assert 'main_ui_runtime.action_items.append(MenuItem("Назад"' in list_block
     assert 'show screen recipe_book_page_list' in list_block
     assert 'hide screen recipe_book_page_list' in read_block
 

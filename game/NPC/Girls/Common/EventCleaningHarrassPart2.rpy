@@ -8,7 +8,7 @@ label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, ha
         $ cur_event_desc_part2 += "\n\n"
     $ cur_event_desc_part2 += str(_girl_reaction_text or "")
 
-    if girl_slapped > 0 and your_reaction1 != 3:
+    if girl_slapped > 0:
         if harass_type == 1:
             call HarassShowImage(girl_name, "tits", 1, eyewitness, "cleaning")
         elif harass_type == 2:
@@ -17,15 +17,16 @@ label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, ha
             call HarassShowImage(girl_name, "dress", 1, eyewitness, "cleaning")
         else:
             call HarassShowImage(girl_name, "ass", 1, eyewitness, "cleaning")
-    elif girl_run_away > 0 and your_reaction1 != 3:
+    elif girl_run_away > 0:
+        $ _picture_reaction = 5 if girl_run_away == 2 else 2
         if harass_type == 1:
-            call HarassShowImage(girl_name, "tits", 2, eyewitness, "cleaning")
+            call HarassShowImage(girl_name, "tits", _picture_reaction, eyewitness, "cleaning")
         elif harass_type == 2:
-            call HarassShowImage(girl_name, "ass", 2, eyewitness, "cleaning")
+            call HarassShowImage(girl_name, "ass", _picture_reaction, eyewitness, "cleaning")
         elif harass_type == 3:
-            call HarassShowImage(girl_name, "dress", 2, eyewitness, "cleaning")
+            call HarassShowImage(girl_name, "dress", _picture_reaction, eyewitness, "cleaning")
         else:
-            call HarassShowImage(girl_name, "ass", 2, eyewitness, "cleaning")
+            call HarassShowImage(girl_name, "ass", _picture_reaction, eyewitness, "cleaning")
 
     if girl_run_away == 0:
         $ cur_event_desc_part2 += "\n"
@@ -70,7 +71,10 @@ label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, ha
     if eyewitness > 0:
         $ scene_runtime.text = format_tavern_event_text(cur_event_desc_part2)
         $ scene_runtime.location_text = scene_runtime.text
-        call PartEventAfterHarrassment(girl_name, girl_slapped, your_reaction1, _event_text=cur_event_desc_part2)
+        menu:
+            "Продолжить":
+                pass
+        call PartEventAfterHarrassment(girl_name, girl_slapped, your_reaction1)
         return scene_runtime.text
 
     return cur_event_desc_part2

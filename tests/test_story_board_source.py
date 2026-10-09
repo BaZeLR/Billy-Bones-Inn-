@@ -7,7 +7,7 @@ MAIN_LAYOUT_PATH = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" /
 DEBUG_TOOLS_PATH = PROJECT_ROOT / "game" / "Utilities" / "General" / "Common" / "DebugTools.rpy"
 
 
-def test_story_board_has_no_thread_mutation_controls():
+def test_story_board_has_no_live_thread_mutation_controls():
     source = BOARD_PATH.read_text(encoding="utf-8-sig")
 
     assert "def story_board_force_enable" not in source
@@ -15,25 +15,39 @@ def test_story_board_has_no_thread_mutation_controls():
     assert "def story_board_reactivate" not in source
     assert "def story_board_reset" not in source
     assert "screen story_thread_control" not in source
-    assert "forceEnable()" not in source
+    assert "tinfo.forceEnable()" not in source
+    assert "replay_thread.forceEnable()" in source
     assert ".abort()" not in source
     assert ".reset()" not in source
 
 
-def test_story_board_is_read_only_for_normal_clicks():
+def test_story_board_replays_events_without_thread_progress_controls():
     source = BOARD_PATH.read_text(encoding="utf-8-sig")
     main_layout = MAIN_LAYOUT_PATH.read_text(encoding="utf-8-sig")
     debug_tools = DEBUG_TOOLS_PATH.read_text(encoding="utf-8-sig")
 
-    assert "renpy.call_replay" not in source
-    assert "ToggleField(tinfo" not in source
+    assert "renpy.call_replay(target, scope)" in source
+    assert 'action Function(story_board_replay, _tinfo, _idx)' in source
+    assert 'action ToggleField(tinfo, "highlight")' in source
     assert "action Show(\"story_thread_control\"" not in source
-    assert "action Function(story_board_show_scene" not in source
     assert "action NullAction()" in source
     assert "def story_board_refresh" not in source
     assert 'on "show" action Function(story_board_refresh)' not in source
     assert "story_board_refresh" not in main_layout
     assert "story_board_refresh" not in debug_tools
+
+
+def test_story_board_uses_thread_cursor_and_keeps_tabs_in_same_panel():
+    source = BOARD_PATH.read_text(encoding="utf-8-sig")
+
+    assert "evt.canTrigger" not in source
+    assert "int(tinfo.order[tinfo.num]) == index" in source
+    assert 'action SetField(main_ui_runtime, "story_board_person", _person)' in source
+    assert 'if person is not None and person in _people:' not in source
+    assert '$ main_ui_runtime.story_board_person = _people[0]' not in source
+    assert '_selected_person = str(main_ui_runtime.story_board_person or "") or (_people[0] if _people else "")' in source
+    assert 'action [Hide("story_thread_board"), Show("story_thread_board", None, _person)]' not in source
+    assert 'on "show" action Function(findBlockedThreads, threads)' in source
 
 
 def test_story_board_conditions_use_familylife_style_rows():
@@ -45,6 +59,21 @@ def test_story_board_conditions_use_familylife_style_rows():
     assert "for _cond_line in story_board_condition_lines(evt.conds):" in source
     assert 'text "Checks:' not in source
     assert "def story_board_show_event_checks" not in source
+
+
+def test_story_board_event_details_group_timing_and_conditions():
+    source = BOARD_PATH.read_text(encoding="utf-8-sig")
+    panel = source.split("screen story_event_screen(tinfo, i, evt):", 1)[1].split(
+        "screen story_event_detail(", 1
+    )[0]
+    left, right = panel.split("                vbox:", 2)[1:]
+
+    assert 'text "Location: "' in left
+    assert 'text "Conditions:"' not in left
+    assert right.index('text "Min.Date: "') < right.index('text "Hour: "')
+    assert right.index('text "Hour: "') < right.index('text "Conditions:"')
+    assert 'text "Action: "' not in panel
+    assert 'text "Weekday: "' in panel
 
 
 def test_story_board_marks_active_threads_with_distinct_color():

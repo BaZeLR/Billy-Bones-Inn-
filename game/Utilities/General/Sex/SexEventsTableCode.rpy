@@ -123,6 +123,18 @@ init -44 python:
     def _SexEventsNormalizeDudeName(dude_name):
         return _sexevents_normalize_dude_name(dude_name)
 
+    def sex_event_type_for_cycle(girl_name="", event_type=0):
+        girl = str(girl_name or "").strip().lower()
+        event_value = _sexevents_int(event_type, 0)
+        girl_info = people.get_info(girl)
+        if girl_info is None or girl_info.can_accept_penetration_today():
+            return event_value
+        if girl == "liza":
+            return 99 if event_value == 99 else 3
+        if girl == "georgett":
+            return 4 if event_value == 4 else 3
+        return event_value
+
     def sex_history_rows(girl_name):
         girl = people.get_info(girl_name)
         rows = list(getattr(girl, "detailed_sex_history", []) or []) if girl is not None else []

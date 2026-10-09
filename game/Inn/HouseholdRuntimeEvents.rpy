@@ -352,15 +352,31 @@ init python:
             return False
         return int(girl_info.openness or 0) >= int(openness_thresholds.get(girl, 99) or 99)
 
+    def household_critical_care_request_ready(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        girl_info = people.get_info(girl)
+        if girl_info is None or not isinstance(girl_info, Girl):
+            return False
+        if not girl_info.is_tavern_team_girl() or not girl_info.critical_days_active():
+            return False
+        if girl_info.critical_hygiene_supplied_today():
+            return False
+        if people_to_int(girl_info.critical_hygiene_request_day, -1) == current_game_day():
+            return int(player.item_count("moss_cloth_pad_001") or 0) > 0
+        return True
+
     def household_pending_request_girl(current_room=""):
         room_code = str(current_room or rooms.current_code or "").strip()
-        room_girls = []
-        if room_code == "TavernMain":
-            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if str(people.location(girl) or "") == "TavernMain"]
-        elif room_code == "TavernKitchen":
-            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if str(people.location(girl) or "") == "TavernKitchen"]
+        room_girls = [
+            girl for girl, girl_info in people.girl_items()
+            if str(people.location(girl) or "") == room_code
+            and girl_info.is_tavern_team_girl()
+        ] if room_code in ("TavernMain", "TavernKitchen") else []
         for girl in room_girls:
-            if household_soap_request_ready(girl):
+            if household_critical_care_request_ready(girl):
+                return ("critical_care", girl)
+        for girl in room_girls:
+            if girl in ("amanda", "melissa", "sandra") and household_soap_request_ready(girl):
                 return ("soap", girl)
         return ("", "")
 
@@ -425,6 +441,48 @@ label HouseholdSoapRequestEvent(girl_name=""):
     return
 
 
+label HouseholdCriticalCareRequestEvent(girl_name=""):
+    $ renpy.dynamic("_care_girl", "_care_info", "_care_name")
+    $ _care_girl = str(girl_name or "").strip().lower()
+    $ _care_info = people.get_info(_care_girl)
+    if _care_info is None or not household_critical_care_request_ready(_care_girl):
+        return
+    $ _care_info.critical_hygiene_request_day = current_game_day()
+    $ _care_name = str(people_display_name(_care_girl) or _care_girl)
+    if _care_girl == "sandra":
+        $ scene_runtime.text = "Сандра отводит вас в сторону. «Стефан, у меня женские дни. На сегодня нужна свежая прокладка: чистый мягкий лоскут, а внутрь — сухой мох. Если остался бодрящий чай, принеси и его; живот тянет»."
+    elif _care_girl == "melissa":
+        $ scene_runtime.text = "Мелисса тихо просит вас задержаться. «У меня начались женские дни. Сделаешь моховую прокладку из чистого лоскута? Одну на сегодня. И горячий бодрящий чай пригодился бы — так легче работать»."
+    elif _care_girl == "amanda":
+        $ scene_runtime.text = "Аманда без долгих предисловий говорит: «Стефан, у меня эти дни. Нужна свежая моховая прокладка — лоскут с сухим мхом внутри. И чай принеси, если есть: живот ноет, а лежать весь день я не собираюсь»."
+    else:
+        $ scene_runtime.text = "%s понижает голос: «У меня начались женские дни. Нужна свежая моховая прокладка из чистого лоскута. Если есть бодрящий чай, он тоже сейчас пригодится»." % _care_name
+    $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Отдать прокладку и бодрящий чай" if int(player.item_count("moss_cloth_pad_001") or 0) > 0 and int(player.item_count("energy_tea_001") or 0) > 0:
+            $ player.remove_item("moss_cloth_pad_001", 1)
+            $ player.remove_item("energy_tea_001", 1)
+            $ _care_info.critical_hygiene_supplied_day = current_game_day()
+            $ _care_info.critical_tea_day = current_game_day()
+            $ scene_runtime.text = "%s принимает свежую прокладку и сразу заваривает чай. На сегодняшний день нужные вещи у неё есть." % _care_name
+
+        "Отдать моховую прокладку" if int(player.item_count("moss_cloth_pad_001") or 0) > 0:
+            $ player.remove_item("moss_cloth_pad_001", 1)
+            $ _care_info.critical_hygiene_supplied_day = current_game_day()
+            $ scene_runtime.text = "%s забирает свежую прокладку и благодарит вас. Завтра, если критические дни ещё не закончатся, понадобится новая." % _care_name
+
+        "Принести пока только бодрящий чай" if int(player.item_count("energy_tea_001") or 0) > 0 and people_to_int(_care_info.critical_tea_day, -1) != current_game_day():
+            $ player.remove_item("energy_tea_001", 1)
+            $ _care_info.critical_tea_day = current_game_day()
+            $ scene_runtime.text = "%s берёт горячий чай. Он немного облегчает неприятные ощущения, но свежая прокладка на сегодня всё ещё нужна." % _care_name
+
+        "Пообещать сделать прокладку":
+            $ scene_runtime.text = "Вы обещаете найти чистый лоскут, высушить мох и сделать прокладку. Просьба останется актуальной до конца сегодняшнего дня."
+    $ scene_runtime.location_text = scene_runtime.text
+    return
+
+
 label HouseholdSoapRequestGiveNow(girl_name="", item_id="soap_001"):
     $ renpy.dynamic("_soap_girl", "_soap_item", "_soap_effect")
     $ _soap_girl = str(girl_name or "").strip().lower()
@@ -483,6 +541,8 @@ label HouseholdBarberRequestEvent(girl_name="", request_context="breakfast"):
         return
     $ household.barber_request_last_day[_barber_girl] = current_game_day()
     $ _barber_info = people.get_info(_barber_girl)
+    if _barber_girl == "amanda":
+        $ scene_runtime.picture = AmandaStaticData.image_path("tavern", "angry") if request_context == "apology" else AmandaStaticData.image_path("portrait", "happy")
     if _barber_info is not None and request_context != "apology":
         $ _barber_info.mark_talked(1)
     if request_context == "apology":
@@ -506,9 +566,13 @@ label HouseholdBarberRequestEvent(girl_name="", request_context="breakfast"):
                 if request_context != "apology":
                     $ _barber_info.change_social(friend_delta=1)
             $ scene_runtime.text = "Вы обещаете, что при первом удобном открытом дне Серджио отведете ее к цирюльнику. Просьбу явно услышали с удовольствием."
+            if _barber_girl == "amanda":
+                $ scene_runtime.picture = AmandaStaticData.image_path("portrait", "thanks")
 
         "Сказать, что пока не до этого":
             $ scene_runtime.text = "Вы отвечаете, что пока у трактира и без того хватает расходов. На этом разговор сворачивается."
+            if _barber_girl == "amanda":
+                $ scene_runtime.picture = AmandaStaticData.image_path("tavern", "angry")
     $ scene_runtime.location_text = scene_runtime.text
     if player.tavern_management.breakfast.event_active:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
@@ -533,6 +597,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
                 $ scene_runtime.text = "Вы обещаете Мелиссе подобрать у Ирмы красивый наряд без всяких условий. Она заметно оживляется и тихо благодарит вас."
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Вы обещаете Аманде, что подберете ей новый наряд просто потому, что хотите ее порадовать. Девушка сияет так, будто обновка уже висит у нее в шкафу."
+                $ scene_runtime.picture = AmandaStaticData.image_path("portrait", "happy")
             else:
                 $ scene_runtime.text = "Вы обещаете %s подобрать у Ирмы красивый наряд без всяких условий. Она тепло благодарит вас." % _outfit_name
 
@@ -544,6 +609,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
                 $ scene_runtime.text = "Вы мягко советуете Мелиссе пока не спешить с обновкой. Девушка кивает, хотя по голосу слышно, что надеялась на другой ответ."
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Вы говорите Аманде, что пока хватит и чужих обновок. Она недовольно надувает губы, но спорить не продолжает."
+                $ scene_runtime.picture = AmandaStaticData.image_path("tavern", "angry")
             else:
                 $ scene_runtime.text = "Вы говорите %s, что сейчас не время покупать обновку. Она принимает отказ и возвращается к своим делам." % _outfit_name
 
@@ -619,7 +685,7 @@ label MelissaDressRequestEvent:
 
 label AmandaDressRequestEvent:
     $ threads["amandaRevealingDressRequest"].complete()
-    $ scene_runtime.picture = girl_card_portrait_path("amanda")
+    $ scene_runtime.picture = AmandaStaticData.image_path("tavern", "angry")
     $ scene_runtime.text = "Аманда сама подскакивает к вам, едва улучив момент. \"Стефан, это нечестно! У Сандры теперь наряд посмелее, Мелиссе ты тоже обещаешь что-то красивое, а я что, хуже? Мне тоже хочется платье, чтобы ахнули, а не только подносы таскать!\"\n\nПохоже, увиденное окончательно раззадорило ее самолюбие."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui

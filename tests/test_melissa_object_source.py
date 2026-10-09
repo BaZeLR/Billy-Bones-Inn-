@@ -284,7 +284,7 @@ def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
     for token in [
         'GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")',
         "girl_info = people.get_info(girl)",
-        "girl in GIRL_DECISION_CORE_IDS",
+        'str(data.get("girl", "") or "").strip().lower() in GIRL_DECISION_CORE_IDS',
         '"mana_bad_probability": girl_info.mana_bad_probability()',
         "in GIRL_DECISION_CORE_IDS:",
     ]:
@@ -383,11 +383,12 @@ def test_melissa_sleepy_wake_tickle_uses_thread_owned_handjob_gate():
     assert 'threads["melissaBatProblem"].completed' in gate
     assert 'threads["claraPaintingsPath"].completed' in gate
     assert 'main_ui_begin_native_scene_state("Разбудить Мелиссу")' in wake
-    assert '"Пощекотать ее под грудью":' in wake
+    assert '"Пощекотать ее под грудью"' in wake
+    assert 'if not Melissa.intimacy_story_ready() or threads["melissaMorningWake"].completed' in wake
     assert '"Пощекотать ее под грудью" if _wake_indecent:' not in wake
     assert 'MelissaStaticData.cycle_image("tavern", "sleep", 4)' in wake
     assert 'player_apply_arousal_trigger("melissa_wake_tickle"' in wake
-    assert '"Предложить помочь рукой" if Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():' in wake
+    assert '"Предложить помочь рукой" if threads["melissaMorningWake"].completed and Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():' in wake
     assert 'Melissa.player_cum("outside")' in wake
     assert 'player.intimacy.set_arousal(0)' in wake
     assert "_wake_started_scene = main_ui_runtime.scene_origin is None" in wake
@@ -406,17 +407,18 @@ def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters
 
     assert 'LThreadData(0, "melissa", "Courtship"' in runtime_source
     assert '"talk_melissa", "melissa_intimacy", 0' not in runtime_source
-    assert runtime_courtship.count('"TavernMyRoom", "bedtime", 0') == 4
+    assert runtime_courtship.count('"TavernMyRoom", "bedtime", 0') == 5
     assert runtime_source.count("None, None, 1,") >= 4
     for stage_label in (
         "story_melissa_courtship_amanda_talk_0",
+        "story_melissa_courtship_moon_opening_0",
         "story_melissa_courtship_storm_1",
         "story_melissa_courtship_mutual_2",
         "story_melissa_courtship_touch_him_3",
         "story_melissa_courtship_taste_4",
     ):
         assert f"label {stage_label}:" in event_source
-    assert courtship_block.count("$ event_runtime.active_thread.advance()") == 5
+    assert courtship_block.count("$ event_runtime.active_thread.advance()") == 6
     assert "$ Melissa.mark_fucked()" not in courtship_block
     assert "#Liza.is_working()" in runtime_source
     assert "#int(Amanda.var_int('lizafriends', 0)) > 0" in runtime_source
@@ -433,7 +435,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 92" in migration_source
+    assert "define currentVersion = 114" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration
@@ -659,13 +661,21 @@ def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
     assert 'call checkTriggers(rooms.current_code, "melissa_talk", 0)' in talk_source
     assert "tavern_amanda_room_locked_for_melissa_booklet" not in amanda_room_source
     assert 'LThreadData(0, "melissa", "AmandaRoomShare"' in runtime_source
-    assert "MelissaAmandaRoomShare," in runtime_source
-    assert "class MelissaAmandaRoomShareEvent(Event):" in event_model_source
-    assert '"TavernAmandaRoom"' in event_model_source
-    assert '"melissa_amanda_locked"' in event_model_source
-    assert "self.repeatable = True" in event_model_source
+    room_share = runtime_source.split('LThreadData(0, "melissa", "AmandaRoomShare"', 1)[1].split(
+        'LThreadData(0, "melissa", "RevealingDressRequest"', 1
+    )[0]
+    assert '"story_melissa_amanda_room_locked"' in room_share
+    assert "None, (21, 5), None" in room_share
+    assert '"#str(people.location(\'amanda\') or \'\') == \'TavernAmandaRoom\'"' in room_share
+    assert '"#str(people.location(\'melissa\') or \'\') == \'TavernAmandaRoom\'"' in room_share
+    assert 'None, "TavernAmandaRoom", "melissa_amanda_locked", 0, True' in room_share
+    assert "class MelissaAmandaRoomShareEvent(Event):\n        pass" in event_model_source
     assert 'story_event_available("TavernAmandaRoom", "melissa_amanda_locked")' in amanda_room_source
     assert 'call checkTriggers("TavernAmandaRoom", "melissa_amanda_locked", 0)' in amanda_room_source
+    door_block = amanda_room_source.split("label TavernAmandaRoomDoor:", 1)[1].split(
+        "label TavernAmandaRoomKnock:", 1
+    )[0]
+    assert 'threads["amandaMorningWindowEpisode"].getAvailableEvents()' not in door_block
     assert "label story_melissa_amanda_room_locked:" in event_source
     assert "Дверь заперта изнутри" in event_source
     assert "breakfast_invited" not in runtime_source + event_source + migration_source

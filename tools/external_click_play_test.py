@@ -3338,12 +3338,40 @@ testcase external_melissa_amanda_locked_room_event:
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     $ Melissa.drawings_found = False
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
     $ npc_interval_schedule_load_all(True)
     $ event_runtime.fired_day = -1
     $ event_runtime.fired_keys_today = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (str(people.location("amanda") or "") == "TavernAmandaRoom" and str(people.location("melissa") or "") == "TavernAmandaRoom") timeout 5.0
+    assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
+    $ npc_interval_schedule_load_all(True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (str(people.location("amanda") or "") == "TavernAmandaRoom" and str(people.location("melissa") or "") == "TavernAmandaRoom") timeout 5.0
+    assert eval (not threads["melissaAmandaRoomShare"].getAvailableEvents()) timeout 5.0
+    assert eval (not story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+    $ rooms.enter("TavernUpstairs")
+    run Call("TavernAmandaRoomDoor")
+    assert eval (str(main_ui_runtime.action_title or "") == "Дверь Аманды" and "Войти в комнату" in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ("Дверь заперта изнутри" not in str(scene_runtime.text or "")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
+    $ npc_interval_schedule_load_all(True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999)])
+    $ npc_interval_schedule_load_all(True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (str(people.location("melissa") or "") == "TavernMain" and not story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
+    $ npc_interval_schedule_load_all(True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
     $ rooms.enter("TavernUpstairs")
     run Call("TavernAmandaRoomDoor")
@@ -7568,25 +7596,30 @@ testcase external_harassment_images_use_exact_existing_paths:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
-    run Call("HarassShowImage", "melissa", "ass", 5, 1, "waitress")
-    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/assOk.png") timeout 5.0
-    assert eval (_media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "melissa", "tits", 2, 1, "cleaning")
-    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/titsShy.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "melissa", "dress", 0, 1, "waitress")
-    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/assAngry.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "amanda", "ass", 2, 1, "waitress")
-    assert eval (str(scene_runtime.picture or "").lower().endswith("/amanda/grope/assshy.jpg") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "amanda", "dress", 5, 1, "waitress")
-    assert eval (str(scene_runtime.picture or "").lower().endswith("/amanda/grope/dresspanties.jpg") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "sandra", "dress", 5, 1, "waitress")
-    assert eval (str(scene_runtime.picture or "") in ("images/sandra/tavern/waitress1.jpg", "images/sandra/tavern/waitress2.jpg", "images/sandra/tavern/waitress3.jpg", "images/sandra/tavern/waitress4.jpg") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassShowImage", "sandra", "ass", 1, 1, "cleaning")
-    assert eval (str(scene_runtime.picture or "") == "images/sandra/tavern/cleaning1.jpg" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassDiscussImage", "melissa", 3)
-    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldAgree.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    run Call("HarassDiscussImage", "amanda", 3)
-    assert eval (str(scene_runtime.picture or "").lower().endswith("/amanda/grope/scold.jpg") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    assert eval (MelissaStaticData.image_path("grope", "ass_ok") == "images/melissa/Grope/assOk.png") timeout 5.0
+    assert eval (MelissaStaticData.image_path("grope", "tits_shy") == "images/melissa/Grope/titsShy.png") timeout 5.0
+    assert eval (MelissaStaticData.image_path("grope", "scold_neutral") == "images/melissa/Grope/scoldNeutral.png") timeout 5.0
+    assert eval (MelissaStaticData.image_sequence("grope", "waitress_rebel") == ["images/melissa/Grope/waiteringrebel_%d.png" % i for i in range(4)]) timeout 5.0
+    assert eval (all(_media_asset_exists(p) for k in ("ass_angry", "ass_ok", "scold_agree", "scold_angry", "scold_disagree", "scold_like", "scold_neutral", "throw_delinquent", "tit_angry", "tits_shy") for p in MelissaStaticData.image_sequence("grope", k))) timeout 5.0
+    assert eval (AmandaStaticData.image_path("grope", "scold").lower().endswith("/amanda/grope/scold.jpg")) timeout 5.0
+
+testcase external_melissa_harassment_picture_flow:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ rooms.enter("TavernMain")
+    $ Melissa.corruption = 5
+    $ Melissa.rel = 0
+    $ Melissa.set_harass_instruction("")
+    run Call("PartEventYourFirstReactionOutcome", "melissa", "event_waitress_harrass_part2", 1, 1, 3)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") in tuple("images/melissa/Grope/waiteringrebel_%d.png" % i for i in range(4)) and "дать ему сдачи" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldNeutral.png" and "дать ему сдачи" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к делам"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldAgree.png") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
 testcase external_harassment_event_picture_sequence:
     run Jump("Intro")
@@ -7600,11 +7633,13 @@ testcase external_harassment_event_picture_sequence:
     $ scene_runtime.picture = ""
     run Call("PartEventYourFirstReactionOutcome", "melissa", "event_waitress_harrass_part2", 1, 1, 3)
     advance until screen "choice" timeout 20.0
-    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldNeutral1.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
-    assert eval ("возвращаясь к работе" in str(scene_runtime.text or "") or "дальше по своим делам" in str(scene_runtime.text or "")) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5)
-    advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") in tuple("images/melissa/Grope/waiteringrebel_%d.png" % i for i in range(4)) and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"] and "дать ему сдачи" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldNeutral.png" and _media_asset_exists(scene_runtime.picture) and "дать ему сдачи" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к делам"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/Grope/scoldAgree.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
     assert eval (str(rooms.current_code or "") == "TavernMain") timeout 5.0
     $ Melissa.corruption = 5
     $ Melissa.anger_with_player = 1
@@ -9907,6 +9942,7 @@ def main() -> int:
             "external_hour_based_room_and_npc_schedule_adjustment",
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
+            "external_melissa_harassment_picture_flow",
             "external_harassment_event_picture_sequence",
             "external_tavern_hired_worker_and_client_buttons",
             "external_inga_v53_migration",
@@ -10126,6 +10162,7 @@ def main() -> int:
             "external_hour_based_room_and_npc_schedule_adjustment",
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
+            "external_melissa_harassment_picture_flow",
             "external_harassment_event_picture_sequence",
             "external_tavern_hired_worker_and_client_buttons",
             "external_inga_v53_migration",

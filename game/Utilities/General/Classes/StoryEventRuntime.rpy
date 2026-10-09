@@ -179,7 +179,19 @@ define melissaCourtshipOpeningConditions = melissaCourtshipBaseConditions + [
 
 define melissaThreadList = [
     LThreadData(0, "melissa", "AmandaRoomShare", None, [[
-        MelissaAmandaRoomShare,
+        (
+            "story_melissa_amanda_room_locked",
+            None, (21, 5), None,
+            1, None,
+            [
+                "#str(Melissa.temp_room_code or '') == 'TavernAmandaRoom'",
+                "#str(people.location('amanda') or '') == 'TavernAmandaRoom'",
+                "#str(people.location('melissa') or '') == 'TavernAmandaRoom'",
+                "#not bool(Melissa.drawings_found)",
+                "#6 <= int(threads['melissaBatProblem'].num or 0) < 9",
+            ],
+            None, "TavernAmandaRoom", "melissa_amanda_locked", 0, True,
+        ),
     ]], highlight=False, threaded=False),
     LThreadData(0, "melissa", "RevealingDressRequest", None, [[
         (
@@ -1173,6 +1185,17 @@ define claraThreadList = [
             6,
         ),
         (
+            "story_clara_paintings_legare_secret_date_7",
+            [1, 3, 6], (19, 21), 1,
+            1,
+            None,
+            ["#not Clara.mongol_case_detained()"],
+            None,
+            "ArtisansQuarter",
+            "enter",
+            7,
+        ),
+        (
             "story_clara_paintings_secret_date_7",
             [1, 3, 6], (19, 21), 1,
             1,
@@ -1217,6 +1240,17 @@ define claraThreadList = [
             "talk_luisa",
             "clara_fiance_case",
             9,
+        ),
+        (
+            "story_clara_paintings_legare_warning_11",
+            None, (8, 18), None,
+            1,
+            None,
+            ["#str(people.location('alber') or '') == 'WineStore'"],
+            None,
+            "WineStore",
+            "enter",
+            11,
         ),
         [
             (
@@ -1313,15 +1347,42 @@ define claraThreadList = [
             ),
         ],
         (
-            "story_clara_paintings_tavern_arrival_13",
-            None, (18, 21), 1,
+            "story_clara_paintings_dance_exposure_15",
+            5, (19, 23), None,
             1,
             None,
-            ["#not Clara.mongol_case_detained()"],
+            [
+                "#bool(Amanda.dancing_with_legare)",
+            ],
             None,
-            "TavernMain",
+            "FridayDance",
+            "clara_legare_expose",
+            15,
+        ),
+        (
+            "story_clara_paintings_amanda_punishment_16",
+            [1, 2, 3, 4, 5, 6], (6, 11), 1,
+            1,
+            None,
+            [
+                "#str(people.location('amanda') or '') == 'TavernKitchen'",
+                "#str(people.location('sandra') or '') == 'TavernKitchen'",
+            ],
+            None,
+            "TavernKitchen",
             "enter",
-            13,
+            16,
+        ),
+        (
+            "story_clara_paintings_winery_rescue_17",
+            None, (8, 18), 1,
+            1,
+            None,
+            ["#str(people.location('alber') or '') == 'WineStore'"],
+            None,
+            "WineStore",
+            "enter",
+            17,
         ),
         (
             "story_clara_paintings_confession_14",
@@ -1619,11 +1680,10 @@ define claraThreadList = [
             5,
         ),
     ], highlight=False, threaded=True),
-    # Post-resolution revenge is a Clara-owned sequence. Amanda and Liza are
+    # Clara's rescue starts the revenge sequence. Amanda and Liza are
     # participants; their schedules and state do not own its cursor.
     LThreadData(0, "clara", "LegareRevenge", [
-        "#bool(threads['claraPaintingsPath'].completed)",
-        "#bool(threads['claraAmandaWarning'].completed)",
+        "#int(threads['claraPaintingsPath'].num or 0) >= 18",
         "#Liza.can_work_tavern()",
     ], [
         (
@@ -2329,7 +2389,7 @@ define cityThreadList = [
         ),
         (
             "story_nostar_rosario_riddle_1", None, (9, 20), None, 1, None,
-            ["#int(threads['claraPaintingsPath'].num or 0) >= 12",
+            ["#int(threads['claraPaintingsPath'].num or 0) >= 14",
              "#rooms.get('NostarHouse').is_open()",
              "#str(people.location('nostar') or '') == 'NostarHouse'"],
             None, "talk_nostar", "rosario_riddle", 40, True,
@@ -2840,6 +2900,7 @@ define georgettThreadList = [
                 "#int(Georgett.story_value('fuckinchurch', 0) or 0) == 0",
                 "#player.intimacy.can_cum()",
                 "#Georgett.can_have_sex_today()",
+                "#Georgett.can_accept_penetration_today()",
                 "#int(Georgett.rel or 0) >= 6",
                 "#int(Georgett.sex_stat('sexacts', 0) or 0) >= 3",
                 "#int(player.economy.money or 0) >= 15",

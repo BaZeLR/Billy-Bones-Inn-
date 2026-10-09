@@ -242,7 +242,7 @@ label story_clara_market_booklet_6:
     $ main_ui_begin_native_scene_state("Монгол в колодках")
     show screen main_ui
 
-    vscene "images/mongolStock.png"
+    vscene ("mongol stocks night" if calendar_v2.time_slot() >= 4 else "mongol stocks day")
     $ scene_runtime.text = "На рыночной площади, возле караулки, стоят тяжелые колодки. В них вместе с еще парой помятых головорезов сидит и Монгол. От прежней ярмарочной ухмылки в нем мало что осталось: губа разбита, рубаха грязная, но глаза все еще бегают живо.\n\nЗаметив вас, он дергается и шипит сквозь зубы: \"Стефан, брат, не губи. Я тут с голоду загнусь раньше, чем меня судить начнут. Принеси ночью пожрать, а там, может, и поговорим. Я добро помню. И про Клариссу тоже помню.\""
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -264,7 +264,7 @@ label story_clara_market_booklet_7:
     $ main_ui_begin_native_scene_state("Монгол в колодках")
     show screen main_ui
 
-    vscene "images/mongolStock.png"
+    vscene "mongol stocks night"
     $ scene_runtime.text = "Ночью у караулки тихо, только где-то внутри переговариваются сонные стражи. Монгол в колодках шевелится и, увидев вас, сразу подается вперед.\n\n\"Ну что, принес чего-нибудь?\" шепчет он. \"Я тут второй день на одной воде. Помоги сейчас, и я потом не забуду.\""
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -279,7 +279,7 @@ label story_clara_market_booklet_7:
 
 
 label story_clara_market_booklet_feed_mongol:
-    vscene "images/mongolStock.png"
+    vscene "mongol stocks night"
     $ scene_runtime.text = "Вы незаметно протягиваете Монголу завернутую в тряпицу еду из трактирной кухни. Тот жадно хватается за нее обеими руками, давится первыми кусками и тут же начинает шептать благодарности.\n\n\"Вот это по-людски, Стефан. Еще бы отмычки добыть, да стражу чем-нибудь отвлечь... Тогда я не просто вылезу, а еще и твой долг запомню. Если потом занесет к людям Робина, скажу им, кто ты такой.\""
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -338,7 +338,7 @@ label story_clara_market_booklet_9:
     $ main_ui_begin_native_scene_state("Освобождение Монгола")
     show screen main_ui
 
-    vscene "images/mongolStock.png"
+    vscene "mongol stocks night"
     $ scene_runtime.text = "Следующей ночью вы возвращаетесь к караулке уже подготовленным. Монгол сразу понимает это по вашему лицу и только сильнее вжимается в колодки, чтобы не привлекать лишних взглядов.\n\nТеперь все упирается в одно: если вы хотите вытащить его отсюда, надо сперва умаслить стражу и отвлечь ее чем-то приятнее ночного дежурства."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -356,7 +356,7 @@ label story_clara_market_booklet_9:
 
 
 label story_clara_market_booklet_release_mongol:
-    vscene "images/mongolStock.png"
+    vscene "mongol stocks night"
     $ scene_runtime.text = "Вы заранее посылаете к караулке кувшин вина и хороший ужин из трактира с вежливой припиской: мол, \"Дикий Жеребец\" благодарит городскую стражу за поимку конокрадов. Стража мгновенно добреет к такой заботе. Сам десятник Циммерман замечает, что вот это уже разговор с уважаемым трактирщиком, который умеет ценить порядок в городе.\n\nКогда угощение делает свое дело и дежурные окончательно расслабляются, вы выбираете момент, приседаете к колодкам и пускаете в ход заказанные у Драупнира отмычки. Замок поддается не сразу, но все же тихо щелкает. Монгол выскальзывает из дерева, как уж, шепотом сыплет вам благодарностями и обещает, что люди Робина в Шервуде узнают, кому он обязан свободой.\n\nЕще до рассвета его и след простыл."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -391,7 +391,7 @@ label story_clara_market_booklet_release_mongol:
 
 label story_clara_market_booklet_leave_mongol:
     show screen main_ui
-    vscene "images/mongolStock.png"
+    vscene "mongol stocks night"
     $ scene_runtime.text = "Вы убираете отмычки и прямо говорите Монголу, что вытаскивать его после организованного конокрадства не станете. Он сначала ругается, потом обещает золотые горы, но вы уходите, не оборачиваясь.\n\nУтром Циммерман узнает, что вы не вмешались в работу стражи. Десятник запоминает это как редкий для города случай, когда личная выгода не перевесила порядок. Люди Робина, напротив, не получат от Монгола доброго слова о вас."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"

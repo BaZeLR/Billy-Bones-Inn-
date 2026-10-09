@@ -73,6 +73,9 @@ init python:
             self.data = HordusStaticData
             return self
 
+        def interaction_visible(self, room_code=""):
+            return bool(self.known) and super(HordusInfo, self).interaction_visible(room_code)
+
 define HordusStaticData = HordusData()
 default Hordus = HordusInfo()
 

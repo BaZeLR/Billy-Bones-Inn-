@@ -293,7 +293,10 @@ init python:
             )
 
         def can_trigger_after_sermon_event(self):
-            return people_to_int(self.story_value("churchgeorgettadmit", 0), 0) > 0
+            return (
+                people_to_int(self.story_value("churchgeorgettadmit", 0), 0) > 0
+                and self.can_accept_penetration_today()
+            )
 
 define GeorgettStaticData = GeorgettData()
 default Georgett = GeorgettInfo()

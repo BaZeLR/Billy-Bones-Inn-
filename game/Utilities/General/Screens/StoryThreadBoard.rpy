@@ -17,6 +17,10 @@ init -10 python:
     STORY_BOARD_CELL_SIZE = 24
 
 init python:
+    import copy
+    import renpy.ast as story_board_renpy_ast
+    import renpy.store as story_board_store
+
     STORY_BOARD_PERSON_ORDER = [
         "melissa",
         "sandra",
@@ -167,7 +171,6 @@ init python:
         "done": "#32c46a",
         "active": "#38bdf8",
         "available": "#ffffff",
-        "waiting": "#d7a925",
         "future": "#666666",
         "blocked": "#7c3aed",
         "aborted": "#d43f3f",
@@ -180,14 +183,20 @@ init python:
 
     def story_board_people():
         people = []
+        catalog_names = set()
         try:
+            live_threads = dict(threads or {})
             for key, data_rows in dict(threadListsByGirl or {}).items():
-                if list(data_rows or []):
+                names = [str(getattr(row, "name", "") or "") for row in list(data_rows or [])]
+                if any(name not in catalog_names and name in live_threads for name in names):
                     people.append(str(key or ""))
+                catalog_names.update(names)
         except Exception:
             pass
         try:
-            for tinfo in list(dict(threads or {}).values()):
+            for name, tinfo in live_threads.items():
+                if name in catalog_names:
+                    continue
                 person = str(getattr(getattr(tinfo, "data", None), "person", "") or "")
                 if person and person not in people:
                     people.append(person)
@@ -200,11 +209,15 @@ init python:
         key = str(person or "").strip()
         rows = []
         ordered_names = []
+        catalog_names = set()
         try:
-            for tdata in list(dict(threadListsByGirl or {}).get(key, []) or []):
-                tname = str(getattr(tdata, "name", "") or "")
-                if tname and tname not in ordered_names:
-                    ordered_names.append(tname)
+            for category, data_rows in dict(threadListsByGirl or {}).items():
+                for tdata in list(data_rows or []):
+                    tname = str(getattr(tdata, "name", "") or "")
+                    if tname:
+                        if category == key and tname not in catalog_names:
+                            ordered_names.append(tname)
+                        catalog_names.add(tname)
         except Exception:
             ordered_names = []
         try:
@@ -215,7 +228,7 @@ init python:
             rows = []
         try:
             for name, tinfo in sorted(dict(threads or {}).items()):
-                if name in ordered_names:
+                if name in catalog_names:
                     continue
                 if str(getattr(getattr(tinfo, "data", None), "person", "") or "") == key:
                     rows.append((name, tinfo))
@@ -313,12 +326,6 @@ init python:
         }
         return labels.get(status, "Unknown")
 
-    def story_board_event_available(tinfo, index):
-        try:
-            return any([evt.canTrigger(getattr(tinfo, "day", 0)) for evt in list(tinfo.data.triggers[index] or [])])
-        except Exception:
-            return False
-
     def story_board_event_status(tinfo, index):
         try:
             if index < len(tinfo.done) and bool(tinfo.done[index]):
@@ -329,13 +336,15 @@ init python:
                 return "blocked"
             if bool(getattr(tinfo, "completed", False)):
                 return "done"
-            if isinstance(tinfo, UThreadInfo) and tinfo.checkActive():
-                return "available" if story_board_event_available(tinfo, index) else "waiting"
-            if int(getattr(tinfo, "num", 0) or 0) == int(index or 0) and tinfo.checkActive():
-                return "available" if story_board_event_available(tinfo, index) else "waiting"
-            if int(index or 0) > int(getattr(tinfo, "num", 0) or 0):
-                return "future"
-            return "waiting"
+            if isinstance(tinfo, UThreadInfo):
+                current = True
+            elif isinstance(tinfo, RThreadInfo):
+                current = tinfo.num < len(tinfo.order) and int(tinfo.order[tinfo.num]) == index
+            else:
+                current = int(tinfo.num) == index
+            if current and tinfo.checkActive():
+                return "available"
+            return "future"
         except Exception:
             return "unknown"
 
@@ -507,6 +516,31 @@ init python:
             return ["None"]
         return rows
 
+    def story_board_replay(tinfo, index):
+        """Replay an authored event in Ren'Py's isolated memory context."""
+        if getattr(story_board_store, "_in_replay", False) or not tinfo.data.triggers[index]:
+            return
+        target = str(tinfo.getTarget(index) or "")
+        if not target or not renpy.has_label(target):
+            return
+        current = {
+            statement.varname: getattr(story_board_store, statement.varname)
+            for statement in story_board_renpy_ast.default_statements
+            if statement.store == "store"
+            and ("/game/" in statement.filename.replace("\\", "/")
+                 or statement.filename.replace("\\", "/").startswith("game/"))
+            and hasattr(story_board_store, statement.varname)
+        }
+        scope = copy.deepcopy(current)
+        replay_thread = scope["threads"][tinfo.data.name]
+        replay_thread.num = replay_thread.order.index(index) if isinstance(replay_thread, RThreadInfo) else index
+        replay_thread.forceEnable()
+        scope["event_runtime"].active_thread = replay_thread
+        scope["main_ui_runtime"].overlay = ""
+        renpy.hide_screen("story_event_screen")
+        renpy.hide_screen("story_thread_screen")
+        renpy.call_replay(target, scope)
+
 init -5:
     style scene is button
     style scene:
@@ -549,21 +583,20 @@ init -5:
 
 
 screen story_thread_board(person=None):
-    use story_thread_board_panel(person, True)
+    on "show" action SetField(main_ui_runtime, "story_board_person", person if person in story_board_people() else main_ui_runtime.story_board_person)
+    use story_thread_board_panel(True)
 
 
-screen story_thread_board_panel(person=None, standalone=False):
+screen story_thread_board_panel(standalone=False):
     modal True
     zorder 210
     style_prefix "board"
+    on "show" action Function(findBlockedThreads, threads)
 
     $ _people = story_board_people()
-    if person is not None and person in _people:
-        $ main_ui_runtime.story_board_person = person
-    if main_ui_runtime.story_board_person not in _people and _people:
-        $ main_ui_runtime.story_board_person = _people[0]
-    $ person = main_ui_runtime.story_board_person
-    $ _rows = story_board_rows(person)
+    # Screen redraws are speculative; only a tab action may change the saved selection.
+    $ _selected_person = str(main_ui_runtime.story_board_person or "") or (_people[0] if _people else "")
+    $ _rows = story_board_rows(_selected_person)
 
     add Solid("#000000")
 
@@ -591,8 +624,9 @@ screen story_thread_board_panel(person=None, standalone=False):
         hbox:
             for _person in _people:
                 textbutton story_board_person_title(_person):
-                    selected (_person == person)
-                    action [Hide("story_thread_board"), Show("story_thread_board", None, _person)]
+                    id "story_board_tab_%s" % _person
+                    selected (_person == _selected_person)
+                    action SetField(main_ui_runtime, "story_board_person", _person)
 
         viewport:
             xsize 1760
@@ -624,9 +658,13 @@ screen story_thread_board_panel(person=None, standalone=False):
                             for _idx in range(len(_tinfo.data.triggers)):
                                 if _tinfo.data.triggers[_idx]:
                                     button style "scene":
+                                        id "story_board_event_%s_%d" % (_thread_name, _idx)
                                         idle_background Solid(story_board_event_color(_tinfo, _idx))
                                         hover_background Solid("#ffff00")
-                                        action NullAction()
+                                        if _tinfo.getTarget(_idx) and renpy.has_label(_tinfo.getTarget(_idx)):
+                                            action Function(story_board_replay, _tinfo, _idx)
+                                        else:
+                                            action NullAction()
                                         hovered Show("story_event_screen", None, _tinfo, _idx, _tinfo.getevent(_idx))
                                         unhovered Hide("story_event_screen")
                                 else:
@@ -638,7 +676,10 @@ screen story_thread_board_panel(person=None, standalone=False):
 
 
 screen story_board_toggle_highlight(tinfo):
-    text ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]") size STORY_BOARD_ROW_TEXT_SIZE xsize 40
+    textbutton ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]"):
+        xsize 40
+        text_size STORY_BOARD_ROW_TEXT_SIZE
+        action ToggleField(tinfo, "highlight")
 
 
 screen story_thread_screen(tinfo):
@@ -666,29 +707,32 @@ screen story_event_screen(tinfo, i, evt):
         ypos 50
         background Solid("#000000")
         xsize STORY_BOARD_DETAIL_WIDTH
-        ysize 200
-        vbox:
+        ysize 600
+        viewport:
+            ysize 600
+            mousewheel True
+            draggable True
             hbox:
                 spacing 20
                 vbox:
-                    xminimum 400
+                    xsize 380
                     text "Event: " + story_board_show_target(evt.target)
                     text "Location: " + story_board_show_location(tinfo.data.person, evt.location, evt.action)
                     text "Item: " + story_board_show_item(evt.item)
                     text "Label: " + story_board_safe_text(evt.target)
-                    text "Action: " + story_board_safe_text(evt.action)
                     if evt.target in STORY_BOARD_TARGET_FILES:
                         text "File: " + STORY_BOARD_TARGET_FILES[evt.target]
                 vbox:
+                    xsize 380
                     text "Min.Date: " + story_board_show_min_date(evt.evtDay, tinfo.day)
-                    text "Day: " + story_board_show_day(evt.day)
+                    text "Weekday: " + story_board_show_day(evt.day)
                     text "Hour: " + story_board_show_hour(evt.hour)
-            text "Stats: " + story_board_show_stats(evt.reqs)
-            text "Conditions:"
-            for _cond_line in story_board_condition_lines(evt.conds):
-                text _cond_line
-            if evt.prob is not None and evt.prob < 1:
-                text "Random: %d%%" % int(evt.prob * 100)
+                    text "Stats: " + story_board_show_stats(evt.reqs)
+                    text "Conditions:"
+                    for _cond_line in story_board_condition_lines(evt.conds):
+                        text _cond_line
+                    if evt.prob is not None and evt.prob < 1:
+                        text "Random: %d%%" % int(evt.prob * 100)
 
 
 screen story_event_detail(tinfo, event_index=0):
@@ -716,4 +760,5 @@ screen story_board_help():
         spacing 10
         text "Threads are story lines. Each row is a thread, and each box is one event in that thread." size 24 color "#cc9900"
         text "Hover a thread name to see thread conditions. Hover an event box to see the event fields: target, location/action, item, minimum date, day, hour, stats, conditions, and random chance." size 24 color "#cc9900"
-        text "Thread colors: active blue, complete green, blocked purple, aborted red, future gray. Event boxes: available white, waiting gold, done green." size 24 color "#cc9900"
+        text "Click an event box to replay its scene in a separate memory context. Replay does not advance your saved story; unreached scenes may rely on prerequisites that are not yet met." size 24 color "#cc9900"
+        text "Click the box beside a thread to toggle story hints for it. Thread colors: active blue, complete green, blocked purple, aborted red, future gray. Event boxes: current stage white, future gray, done green." size 24 color "#cc9900"

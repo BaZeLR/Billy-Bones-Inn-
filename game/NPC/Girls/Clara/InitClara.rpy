@@ -196,7 +196,7 @@ init python:
             thread_info = threads.get("claraPaintingsPath")
             if thread_info is None or bool(thread_info.completed):
                 return False
-            return 8 <= int(thread_info.num or 0) <= 11
+            return 9 <= int(thread_info.num or 0) <= 13
 
         def tavern_resident(self):
             if bool(threads["claraMongolAccusation"].completed):
@@ -204,7 +204,7 @@ init python:
             thread_info = threads.get("claraPaintingsPath")
             if thread_info is None:
                 return False
-            return bool(thread_info.completed) or int(thread_info.num or 0) >= 14
+            return bool(thread_info.completed) or int(thread_info.num or 0) >= 18
 
         def is_tavern_worker(self):
             return self.tavern_resident()
@@ -251,6 +251,8 @@ init python:
 
         def intimacy_action_allowed(self, action_code=""):
             action_key = str(action_code or "").strip().lower()
+            if not super(ClaraInfo, self).intimacy_action_allowed(action_key):
+                return False
             if action_key == "anal":
                 return self.relationship_allows("sex")
             if action_key == "vaginal":

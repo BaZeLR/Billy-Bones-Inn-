@@ -312,7 +312,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         vscene scene_runtime.picture
                     call ShowCurrentSex(GirlNameASDS)
 
-                "Трахать" if _cametoday < _cancumdaily and not Amanda.sex_busy() and _ias_arousal("You") >= 20 and _ias_arousal(GirlNameASDS) >= 20 and Amanda.pussy_visible() and not Amanda.cock_in("pussy", "eddie") and GirlModeASDS != "minet":
+                "Трахать" if _cametoday < _cancumdaily and not Amanda.sex_busy() and _ias_arousal("You") >= 20 and _ias_arousal(GirlNameASDS) >= 20 and Amanda.pussy_visible() and not Amanda.cock_in("pussy", "eddie") and GirlModeASDS != "minet" and Amanda.can_accept_penetration_today():
                     $ _was_fucking_amanda = int(Amanda.cock_in("pussy") or 0)
                     $ _ias_text_parts = []
                     if GirlLocASDS == "street":

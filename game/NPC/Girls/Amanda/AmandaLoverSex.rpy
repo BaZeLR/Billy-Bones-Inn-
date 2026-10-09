@@ -125,6 +125,9 @@ label AmandaLoverSex:
 # Supporting functions and scene code
 label amanda_lover_show_sex_scene(scene_type, guy_name):
     $ renpy.dynamic("amanda_lover_build", "amanda_lover_build_cum_in", "amanda_lover_build_get_in", "amanda_scene_discipline", "amanda_scene_discipline_started", "amanda_scene_service_unlocked")
+    if scene_type != "minet" and not Amanda.can_accept_penetration_today():
+        "Аманда предупреждает ухажёра, что сегодня трахаться не станет, но предлагает ему удовольствие без проникновения."
+        $ scene_type = "minet"
     python:
         amanda_lover_build = Amanda.dynamic_roll(1, 2, "lover_build")
         amanda_lover_build_get_in = Amanda.dynamic_roll(1, 3, "lover_build_get_in")

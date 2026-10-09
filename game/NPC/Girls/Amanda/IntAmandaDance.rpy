@@ -266,6 +266,10 @@ label IntAmandaDance():
                 "Музыка доиграла и Аманда с мессиром Легаре разошлись."
             jump IntAmandaDance
             
+        "Рассказать Аманде правду о Легаре, Серджио и Леонарде" if story_event_available("FridayDance", "clara_legare_expose"):
+            call checkTriggers("FridayDance", "clara_legare_expose", 0)
+            jump FridayDance
+
         "Вмешаться и разогнать их" if rooms.get("FridayDance").step >= 1 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step + 2 and Amanda.dancing_with_legare:
             "Нежелая больше смотреть на это непотребство вы решительно подошли к парочке и заявили:\n'Мессир! Что вы себе позволяете?! У вас же есть дети старше Аманды, да и вы женаты! А ты что возомнила?! Разве ты не видишь, что он ей по возрасту годится в опекуны! А ну, кыш отседа и чтобы больше я такого не видел!'"
             

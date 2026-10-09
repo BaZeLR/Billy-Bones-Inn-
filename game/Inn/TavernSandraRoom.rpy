@@ -110,7 +110,7 @@ init 6 python:
 
     def tavern_sandra_ledger_picture():
         for picture_path in (
-            "images/sandra/sandra_room_booking.png",
+            "images/sandra/room/ledger_realistic.png",
             "images/sandra/talk_0.png",
             "images/sandra/player_room_sandra_0.jpg",
         ):

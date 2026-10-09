@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 113
+define currentVersion = 114
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -847,6 +847,9 @@ init -100 python:
         if loaded_version < 113:
             updateSave_V112()
             loaded_version = 113
+        if loaded_version < 114:
+            updateSave_V113()
+            loaded_version = 114
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -3484,6 +3487,41 @@ init -100 python:
         for girl_id, girl_info in people.girl_items():
             if (girl_id in household.resident_ids() or tavern.is_team_member(girl_id)) and not girl_info.harass_instruction():
                 girl_info.set_harass_instruction("notallow")
+
+    def updateSave_V113():
+        # Clarissa's existing paintings thread gained the Alber/Sergio witness,
+        # winery warning, dance exposure, household consequence, and rescue.
+        # Map by completed story meaning so loaded saves do not replay the
+        # fiancé case, pay Zimmer twice, or lose established tavern residency.
+        paintings = threads.get("claraPaintingsPath")
+        old_state = None
+        if paintings is not None:
+            old_state = (
+                int(paintings.num or 0),
+                bool(paintings.completed),
+                bool(paintings.aborted),
+                bool(paintings.metconds),
+                int(paintings.day or 0),
+            )
+
+        initThreads()
+        paintings = threads.get("claraPaintingsPath")
+        if paintings is None or old_state is None:
+            return
+
+        old_num, was_completed, was_aborted, was_active, old_day = old_state
+        if was_completed:
+            paintings.advanceTo(paintings.data.length, complete_at_end=True)
+        else:
+            stage_map = {
+                0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
+                7: 7, 8: 9, 9: 10, 10: 11, 11: 13, 12: 14,
+                13: 15, 14: 18, 15: 19,
+            }
+            mapped_num = stage_map.get(old_num, paintings.data.length)
+            paintings.advanceTo(mapped_num, force_active=bool(was_active or mapped_num > 0))
+            paintings.aborted = bool(was_aborted)
+        paintings.day = old_day
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

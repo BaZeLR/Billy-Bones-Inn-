@@ -50,7 +50,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _discussion_text = "\"{}!\" сказали вы. Ты не должна позволять себя никому лапать. Будь вежлива с посетителями, но держи дистанцию.".format(people_display_name(GirlNameMHD))
 
         if _girl_corruption >= 40:
-            call HarassDiscussImage(GirlNameMHD, 1)
+            call HarassDiscussImage(GirlNameMHD, 4)
             $ _discussion_text += "\n\n{} восприняла ваши слова с удивлением и даже некоторым разочарованием.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
                 $ _girl_info.change_mana(-1, "harass_forbid_attention")
@@ -77,7 +77,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
                 $ _girl_info.change_mana(1, "harass_allow_attention")
                 $ _girl_info.change_rebellion(-1, "harass_allow_attention")
         else:
-            call HarassDiscussImage(GirlNameMHD, 0)
+            call HarassDiscussImage(GirlNameMHD, 4)
             $ _discussion_text += "\n\n{} слушала вас с грустным и обиженным выражением лица, но в конце концов согласилась с вашей аргументацией и пообещала стараться.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
                 $ _girl_info.change_mana(-1, "harass_allow_attention")
@@ -95,7 +95,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
                 $ _girl_info.change_mana(1, "harass_allow_attention_repeat")
                 $ _girl_info.change_rebellion(-1, "harass_allow_attention_repeat")
         else:
-            call HarassDiscussImage(GirlNameMHD, 0)
+            call HarassDiscussImage(GirlNameMHD, 4)
             $ _discussion_text += "\n\n{} слушала вас с грустным и обиженным выражением лица, но в конце концов согласилась с вашей аргументацией и пообещала стараться.".format(people_display_name(GirlNameMHD))
             if _girl_info is not None:
                 $ _girl_info.change_mana(-1, "harass_allow_attention_repeat")
@@ -116,7 +116,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _discussion_text = "Вы сказали {}, что вы решили что сколько она позволяет посетителям должно быть полностью ее решением. Если она хочет позволять им многое - то пускай, а если она расценивает распущенные руки как наглость - то может раздавать пощечины, не стесняясь. Вы поддержите ее в любом случае, но решение как поступать - должно быть ее, вы не хотите навязывать своего мнения.".format(people_name(GirlNameMHD, 'dative'))
             if _girl_info is not None:
                 $ _girl_info.set_harass_instruction("")
-        call HarassDiscussImage(GirlNameMHD, 2)
+        call HarassDiscussImage(GirlNameMHD, 5)
         $ _discussion_text += "\n\n{} восприняла ваши слова с благодарностью за оказанное ей доверие.".format(people_display_name(GirlNameMHD))
         if _girl_info is not None:
             $ _girl_info.change_social(friend_delta=1)
@@ -124,7 +124,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _girl_info.change_rebellion(-1, "harass_free_choice")
     elif choice_code == 6:
         $ _discussion_text = "Вы не стали отделываться приказом и пообещали {}, что обдумаете, как защитить девушек от наглых рук, не превращая трактир в постоянное поле боя. Пока решение не принято, вы попросили сразу звать вас, если посетитель снова перейдет черту.".format(people_name(GirlNameMHD, 'dative'))
-        call HarassDiscussImage(GirlNameMHD, 2)
+        call HarassDiscussImage(GirlNameMHD, 5)
         if _girl_info is not None:
             $ _girl_info.change_social(friend_delta=1)
             $ _girl_info.change_mana(1, "harass_promised_solution")
@@ -148,9 +148,10 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
                 $ _girl_info.change_mana(1, "harass_separate_workers")
             else:
                 $ _discussion_text += "\n\n{} усмехается: чаевых жаль, но она предпочитает сама выбирать, кому позволять вольности, а гостям обещает показывать дорогу к отдельным работницам.".format(people_display_name(GirlNameMHD))
-        call HarassDiscussImage(GirlNameMHD, 2)
+        call HarassDiscussImage(GirlNameMHD, 5 if _girl_corruption >= 40 else 2)
     else:
         $ _discussion_text = "Вы решили ничего не говорить {}, а пойти лучше дальше по своим делам.".format(people_name(GirlNameMHD, 'dative'))
+        call HarassDiscussImage(GirlNameMHD, 1)
 
     $ scene_runtime.text = format_tavern_event_text(_discussion_text)
     $ scene_runtime.location_text = scene_runtime.text

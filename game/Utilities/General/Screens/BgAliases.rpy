@@ -27,3 +27,10 @@ image Robin portrait2 = "images/Robin/portrait2.jpg"
 image Robin robin = "images/Robin/robin.png"
 image Robin robin1 = "images/Robin/robin1.png"
 image Robin robin2 = "images/Robin/robin2.png"
+
+# Mongol portraits share the identity established by the stocks close-up.
+image mongol portrait1 = "images/mongol/portrait1.png"
+image mongol portrait2 = "images/mongol/portrait2.png"
+image mongol portrait3 = "images/mongol/portrait3.png"
+image mongol stocks day = "images/mongol/stocks_day_bruised.png"
+image mongol stocks night = "images/mongol/stocks_night_bruised.png"

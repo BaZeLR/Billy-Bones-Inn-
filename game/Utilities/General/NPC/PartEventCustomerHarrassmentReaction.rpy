@@ -28,7 +28,10 @@ label PartEventCustomerHarrassmentReaction(GirlNamePECHR, girl_run_away=0, girl_
                     $ _girl_info.change_rebellion(1, "harass_customer_pressure")
     elif girl_run_away == 1 and girl_slapped > 0:
         if procedural_randint(1,2, key="procedural:Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy:procedural_randint:30:4") == 1:
-            $ result += 'Неудачливому приставале пощечина понравилась мало. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
+            if GirlNamePECHR == "melissa":
+                $ result += 'Неудачливому приставале отпор понравился мало. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
+            else:
+                $ result += 'Неудачливому приставале пощечина понравилась мало. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
             $ player.change_tavern_fame(-1)
             if _girl_info is not None:
                 $ _girl_info.skills["waitress"] = max(20, int(_girl_info.skills.get("waitress", 0) or 0) - 1)

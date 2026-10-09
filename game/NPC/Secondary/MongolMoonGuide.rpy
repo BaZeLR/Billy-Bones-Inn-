@@ -4,7 +4,7 @@
 label story_mongol_moon_sabbath_guide_0:
     $ main_ui_begin_native_scene_state("Лесная тропа Монгола")
     show screen main_ui
-    vscene "images/mongol/portrait1.jpg"
+    vscene "mongol portrait1"
     $ scene_runtime.text = "Монгол опускает голос: «Сегодня суббота, мастер, и луна круглая. На старой поляне опять соберутся те, кого добрые горожане днем предпочитают не знать. Я покажу тропу, но у костров не шуми: нас там никто не звал»."
     $ scene_runtime.location_text = scene_runtime.text
     menu:

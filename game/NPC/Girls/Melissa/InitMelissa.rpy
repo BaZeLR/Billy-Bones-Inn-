@@ -54,6 +54,7 @@ init python:
                     ],
                 },
                 "tavern": {
+                    "stable_grooming": ["images/melissa/stable/grooming_short_nighty_morning.png"],
                     "hall_cleaning": [
                         "images/melissa/tavern/clean_0.png",
                         "images/melissa/tavern/clean_1.png",
@@ -103,6 +104,8 @@ init python:
                     "laundry": [
                         "images/melissa/making laundry.png",
                         "images/melissa/hanging laundry.png",
+                        "images/melissa/backyard/laundry_short_nighty.png",
+                        "images/melissa/backyard/laundry_flirt_nighty.png",
                     ],
                 },
                 "bedroom_search": {
@@ -119,15 +122,11 @@ init python:
                 "grope": {
                     "ass_angry": ["images/melissa/Grope/assAngry.png"],
                     "ass_ok": ["images/melissa/Grope/assOk.png"],
-                    "georgette": ["images/melissa/Grope/Georgette.jpg"],
                     "scold_agree": ["images/melissa/Grope/scoldAgree.png"],
                     "scold_angry": ["images/melissa/Grope/scoldAngry.png"],
                     "scold_disagree": ["images/melissa/Grope/scoldDisagree.png"],
                     "scold_like": ["images/melissa/Grope/scoldLike.png"],
-                    "scold_neutral": [
-                        "images/melissa/Grope/scoldNeutral1.png",
-                        "images/melissa/Grope/scoldNeutral2.png",
-                    ],
+                    "scold_neutral": ["images/melissa/Grope/scoldNeutral.png"],
                     "throw_delinquent": ["images/melissa/Grope/throwdeliquient.png"],
                     "tit_angry": ["images/melissa/Grope/titAngry.png"],
                     "tit_ok": [
@@ -136,10 +135,10 @@ init python:
                     ],
                     "tits_shy": ["images/melissa/Grope/titsShy.png"],
                     "waitress_rebel": [
-                        "images/melissa/Grope/waiteringrebel1.png",
-                        "images/melissa/Grope/waiteresRebel2.png",
-                        "images/melissa/Grope/waiteressrebel3.png",
-                        "images/melissa/Grope/waitressrebel4.png",
+                        "images/melissa/Grope/waiteringrebel_0.png",
+                        "images/melissa/Grope/waiteringrebel_1.png",
+                        "images/melissa/Grope/waiteringrebel_2.png",
+                        "images/melissa/Grope/waiteringrebel_3.png",
                     ],
                 },
                 "sexy_times": {
@@ -363,6 +362,8 @@ init python:
 
         def intimacy_action_allowed(self, action_code=""):
             action_key = str(action_code or "").strip().lower()
+            if not super(MelissaInfo, self).intimacy_action_allowed(action_key):
+                return False
             if action_key == "anal":
                 return bool(threads["melissaAnalSolution"].completed)
             if action_key == "vaginal":

@@ -56,7 +56,7 @@ def test_harassment_event_state_is_passed_between_returnable_labels():
     assert "GirlSlapped" not in customer
     assert "_girl_reaction_text, girl_run_away, girl_slapped = _return" in source
     assert 'pass (GirlNamePEYFR, Eyewitness, reaction_code, HarassType, _player_reaction_text)' in REACTION.read_text(encoding="utf-8-sig")
-    assert "_event_text=cur_event_desc_part2" in source
+    assert "call PartEventAfterHarrassment(girl_name, girl_slapped, your_reaction1)" in source
     assert "PartEventCustomerHarrassmentReaction(girl_name, girl_run_away, girl_slapped)" in source
     for retired in ("CurEventDescPart2", "$ HarassType =", "$ Eyewitness =", "$ YourReaction1 ="):
         assert retired not in source
@@ -88,6 +88,9 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
     assert 'MelissaStaticData.image_path("grope", "tits_shy")' in show_image
     assert 'MelissaStaticData.image_path("grope", "ass_angry")' in show_image
     assert 'MelissaStaticData.image_path("grope", "tit_angry")' in show_image
+    assert 'MelissaStaticData.cycle_image("grope", "tit_ok"' in show_image
+    assert '_hsi_reaction in (2, 4)' in show_image
+    assert 'MelissaStaticData.cycle_image("grope", "waitress_rebel"' in show_image
     for amanda_single_picture in (
         "intro",
         "ass_shy",
@@ -114,14 +117,24 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
         "dressnakedangry.jpg",
         "dressnaked1.jpg",
         "dressnaked2.jpg",
-        "scold.jpg",
+        "scold_blue_mc_v2.png",
+        "scold_agree_blue.png",
+        "scold_disagree_blue.png",
+        "scold_neutral_blue.png",
+        "scold_angry_blue.png",
+        "scold_thankful_blue.png",
     ):
         assert '"images/amanda/grope/%s"' % amanda_asset in amanda_data
-    assert 'AmandaStaticData.image_path("grope", "scold")' in discuss_image
+    for amanda_reaction in (
+        "scold_agree", "scold_disagree", "scold_neutral", "scold_angry", "scold_thankful"
+    ):
+        assert 'AmandaStaticData.image_path("grope", "%s")' % amanda_reaction in discuss_image
     assert 'MelissaStaticData.image_path("grope", "scold_agree")' in discuss_image
     assert 'MelissaStaticData.image_path("grope", "throw_delinquent")' in discuss_image
+    assert 'MelissaStaticData.image_path("grope", "scold_disagree")' in discuss_image
+    assert 'MelissaStaticData.image_path("grope", "scold_like")' in discuss_image
     assert 'call HarassDiscussImage(GirlNameMHD, 3)' in discussion
-    assert discuss_image.index("if _hdi_value == 3:") < discuss_image.index('elif _hdi_girl == "melissa":')
+    assert discuss_image.index('if _hdi_girl == "melissa":') < discuss_image.index('elif _hdi_girl == "amanda":')
     for retired_asset in ("assok1", "assok2", "titshy1", "titshy2", "scoldok"):
         assert retired_asset not in show_image + discuss_image
 
@@ -141,8 +154,28 @@ def test_harassment_picture_text_and_choices_share_one_event_context():
         assert '"[scene_runtime.text]"' not in event
 
     assert '"[scene_runtime.text]"' not in reaction + after + discussion
-    assert '_event_text + "\\n\\n" + result' in after
+    assert "format_tavern_event_text(result)" in after
+    for path in (
+        ROOT / "game/NPC/Girls/Common/EventWaitressHarrassPart2.rpy",
+        ROOT / "game/NPC/Girls/Common/EventCleaningHarrassPart2.rpy",
+    ):
+        event = path.read_text(encoding="utf-8-sig")
+        assert '"Продолжить":' in event
+        assert event.index('"Продолжить":') < event.index("call PartEventAfterHarrassment")
     assert 'elif GirlNamePEAH == "amanda":' not in after
+
+
+def test_melissa_harassment_manifest_uses_existing_reaction_art():
+    melissa = (ROOT / "game/NPC/Girls/Melissa/InitMelissa.rpy").read_text(encoding="utf-8-sig")
+    for name in (
+        "scoldAgree.png", "scoldAngry.png", "scoldDisagree.png", "scoldLike.png",
+        "scoldNeutral.png", "throwdeliquient.png", "assAngry.png", "assOk.png",
+        "titAngry.png", "titok1.png", "titsok2.png", "titsShy.png",
+        "waiteringrebel_0.png", "waiteringrebel_1.png",
+        "waiteringrebel_2.png", "waiteringrebel_3.png",
+    ):
+        assert '"images/melissa/Grope/%s"' % name in melissa
+        assert (ROOT / "game/images/melissa/Grope" / name).is_file()
 
 
 def test_rejected_customer_can_be_redirected_to_an_available_tavern_worker():

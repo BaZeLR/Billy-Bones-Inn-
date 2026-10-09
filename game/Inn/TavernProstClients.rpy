@@ -57,6 +57,7 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
     $ main_ui_runtime.action_title = "Потайное окошко"
     $ main_ui_runtime.action_content = None
     $ SexEventType = int(GetSexEventFromTable(girl_name, client_time, "Prostitution") or 0)
+    $ SexEventType = sex_event_type_for_cycle(girl_name, SexEventType)
 
     if SexEventType <= 0:
         if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == girl_name:

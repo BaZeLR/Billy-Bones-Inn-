@@ -70,6 +70,7 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
             prostitution_max_type = 3 if _wnd_girl_name == "liza" else 4
             while created < generated_clients:
                 event_type = procedural_randint(1, prostitution_max_type, "port_client_type_%s_%s_%s" % (_wnd_girl_name, day_value, created))
+                event_type = sex_event_type_for_cycle(_wnd_girl_name, event_type)
                 TodaySexEvents_Add(_wnd_girl_name, 3, event_type, "Prostitution")
                 created += 1
     return

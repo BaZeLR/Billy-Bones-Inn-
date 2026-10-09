@@ -12,6 +12,7 @@ label street_clients_watch(client_type=1, girl_name="", event_time=None):
     $ main_ui_runtime.action_title = "Подворотня"
     $ main_ui_runtime.action_content = None
     $ SexEventType = int(GetSexEventFromTable(girl_name, 3, "Prostitution") or 0)
+    $ SexEventType = sex_event_type_for_cycle(girl_name, SexEventType)
     if SexEventType <= 0:
         $ scene_runtime.text = "Вы осторожно проверяете переулок, но сегодня здесь уже нечего увидеть."
         $ scene_runtime.location_text = scene_runtime.text

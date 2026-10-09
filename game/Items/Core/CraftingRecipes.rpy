@@ -572,7 +572,12 @@ label RecipeBookList(where_id="", object_id=""):
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Книга рецептов"
     $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = [MenuItem("Назад", [Hide("recipe_book_page_list"), Call("RecipeBookClose", where_id, object_id or "recipe_book_001")])]
+    $ main_ui_runtime.action_items = []
+    if recipe_book_can_notice_hidden_note():
+        $ main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", [Hide("recipe_book_page_list"), Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "book")]))
+    elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
+        $ main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", [Hide("recipe_book_page_list"), Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "book")]))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [Hide("recipe_book_page_list"), Call("RecipeBookClose", where_id, object_id or "recipe_book_001")]))
     show screen recipe_book_page_list(where_id, object_id or "recipe_book_001")
     $ renpy.restart_interaction()
     return

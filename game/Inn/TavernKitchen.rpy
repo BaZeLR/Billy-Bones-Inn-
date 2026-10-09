@@ -440,7 +440,9 @@ label TavernKitchen:
     else:
         python:
             _kitchen_request_type, _kitchen_request_girl = household_pending_request_girl("TavernKitchen")
-        if str(_kitchen_request_type or "") == "soap":
+        if str(_kitchen_request_type or "") == "critical_care":
+            call HouseholdCriticalCareRequestEvent(_kitchen_request_girl)
+        elif str(_kitchen_request_type or "") == "soap":
             call HouseholdSoapRequestEvent(_kitchen_request_girl)
     while True:
         call screen main_ui

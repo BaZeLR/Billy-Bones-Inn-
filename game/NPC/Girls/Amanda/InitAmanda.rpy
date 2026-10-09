@@ -22,17 +22,33 @@ init python:
             self.card_image = "images/amanda/amanda_card.jpg"
             self.schedule_source = "schedules/amanda.json"
             self.image_manifest = {
+                "room": {
+                    "door": ["images/amanda/Room/door/door_closed.png"],
+                    "keyhole_open": ["images/amanda/Room/door/keyhole_open_overlay.png"],
+                    "keyhole_blocked": ["images/amanda/Room/door/keyhole_cloth_overlay.png"],
+                },
+                "portrait": {
+                    "happy": ["images/amanda/portraits/happy_blue.png"],
+                    "thanks": ["images/amanda/portraits/thankful_blue.png"],
+                },
+                "backyard": {
+                    "laundry": ["images/amanda/backyard/laundry_short_nighty.png"],
+                },
                 "morning": {
                     "sickness": ["images/amanda/morning_sickness/amanda_morning_sickness.png"],
                 },
                 "tavern": {
-                    "angry": ["images/amanda/tavern/angry.jpg"],
+                    "angry": ["images/amanda/portraits/angry_blue.png"],
                     "bar": ["images/amanda/tavern/amanda_bar_new.png"],
                     "tipsy": ["images/amanda/tavern/amanda_tipsy_new.png"],
+                    "stable_grooming": ["images/amanda/stable/grooming_short_nighty_morning.png"],
                     "hall_cleaning": [
-                        "images/amanda/tavern/cleaner.webp",
-                        "images/amanda/tavern/cleaning1.jpg",
-                        "images/amanda/tavern/cleaning2.jpg",
+                        "images/amanda/tavern/cleaning/blue_01_sweeping.png",
+                        "images/amanda/tavern/cleaning/blue_02_table.png",
+                        "images/amanda/tavern/cleaning/blue_03_dusting.png",
+                        "images/amanda/tavern/cleaning/blue_04_polishing.png",
+                        "images/amanda/tavern/cleaning/blue_05_bending.png",
+                        "images/amanda/tavern/cleaning/blue_06_ladder_below.png",
                     ],
                     "waitress": [
                         "images/amanda/tavern/waitress.png",
@@ -70,7 +86,12 @@ init python:
                         "images/amanda/grope/dressnaked1.jpg",
                         "images/amanda/grope/dressnaked2.jpg",
                     ],
-                    "scold": ["images/amanda/grope/scold.jpg"],
+                    "scold": ["images/amanda/grope/scold_blue_mc_v2.png"],
+                    "scold_agree": ["images/amanda/grope/scold_agree_blue.png"],
+                    "scold_disagree": ["images/amanda/grope/scold_disagree_blue.png"],
+                    "scold_neutral": ["images/amanda/grope/scold_neutral_blue.png"],
+                    "scold_angry": ["images/amanda/grope/scold_angry_blue.png"],
+                    "scold_thankful": ["images/amanda/grope/scold_thankful_blue.png"],
                 },
                 "outfit_reward": {
                     "show": ["images/amanda/grope/dressFlirt1.png"],
@@ -685,6 +706,8 @@ init python:
             )
 
         def legare_sex_type(self):
+            if not self.can_accept_penetration_today():
+                return 1
             if not self.performed_oral_with_legare:
                 sex_type = 0
             elif not self.had_sex_with_legare:
@@ -714,6 +737,9 @@ init python:
                 sex_type = self.legare_sex_type()
                 if sex_type == 2 and self.dynamic_roll(1, 6, "legare_let_go_type_2") <= 5:
                     sex_type = 1
+
+            if not self.can_accept_penetration_today() and sex_type > 1:
+                sex_type = 1
 
             if sex_type <= 1:
                 self.performed_oral_with_legare = True
@@ -807,6 +833,8 @@ init python:
                 sex_type = people_to_int(forced_type, 0)
             if sex_type == 2 and self.dynamic_roll(1, 2, "lover_calc_variant") == 1:
                 sex_type = 3
+            if not self.can_accept_penetration_today() and sex_type in (2, 3):
+                sex_type = 1
 
             if sex_type == 3:
                 pregnancy_check("amanda", "outside", 1, guy, 0, "Соседский парень")

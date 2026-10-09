@@ -51,6 +51,8 @@ TEST_RPY += r'''
         Amanda.attic_window_favor_stage = 0
         Amanda.set_harass_instruction("notallow" if argument else "allow")
         Melissa.drawings_found = booklet
+        for girl_info in (Amanda, Melissa, Sandra):
+            girl_info.critical_hygiene_request_day = 40
         player.tavern_management.breakfast.today = stage == 0
         player.tavern_management.breakfast.event_active = False
         player.tavern_management.breakfast.present_ids = None

@@ -79,6 +79,9 @@ label AmandaLegareSexFinish(tmpLegareSexType):
 label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
     $ renpy.dynamic("MaxStep", "AmandaNesluh")
     $ main_ui_begin_native_scene_state("Аманда и Легаре")
+    if tmpLegareSexType > 1 and not Amanda.can_accept_penetration_today():
+        "Аманда сразу предупреждает Легаре, что сегодня проникновение исключено. Тот ворчит, но соглашается ограничиться её ртом."
+        $ tmpLegareSexType = 1
     if CurSexStep == 0 and tmpLegareSexType < 0:
         $ tmpLegareSexType = Amanda.legare_sex_type()
         if tmpLegareSexType == 4 and Amanda.sex_stat("pregnancy", 0) <= 120 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:96:5") <= 3:

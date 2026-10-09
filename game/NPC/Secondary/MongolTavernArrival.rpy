@@ -5,7 +5,7 @@ label story_mongol_tavern_arrival_0:
     $ renpy.dynamic("_mongol_reward_horse")
     $ main_ui_begin_native_scene_state("Монгол возвращается")
     show screen main_ui
-    vscene "images/mongol/portrait1.jpg"
+    vscene "mongol portrait1"
     $ scene_runtime.text = "У ворот «Дикого жеребца» раздаётся стук копыт. Монгол придерживает жеребца, а за ним стоит дорожная карета. «Три дня искал, чем отплатить, мастер Стефан. Дорога теперь свободна — пусть и у тебя в конюшне будет прибавление. Конь, карета и мои руки к твоим услугам»."
     $ scene_runtime.location_text = scene_runtime.text
     menu:

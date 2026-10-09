@@ -18,7 +18,10 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
             $ result = 'Оттолкнув похотливые ручонки, вы отчитали охальника, указав ему, что у вас официанток не лапают.'
         $ girl_run_away = 1
         if _girl_slut <= 10:
-            $ result += f'\nА пунцовая как рак {_girl_name} не замедлила влепить ему смачную пощечину, от всех щедрот. '
+            if GirlNamePEGHR == "melissa" and JobTypePEGHR == "waitress":
+                $ result += f'\nА пунцовая как рак {_girl_name} не замедлила дать ему сдачи. '
+            else:
+                $ result += f'\nА пунцовая как рак {_girl_name} не замедлила влепить ему смачную пощечину, от всех щедрот. '
             $ girl_slapped = 1
             if _girl_friend < 5 and procedural_randint(1,2, key="procedural:NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy:procedural_randint:25:1") == 1:
                 $ result += f'\nА потом, когда вы отошли в сторону, {_girl_name} поблагодарила вас за помощь.'
@@ -41,13 +44,15 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
                 $ _girl_info.change_social(friend_delta=1)
                 $ _girl_info.change_mana(1, "harass_player_help")
                 $ _girl_info.change_rebellion(-1, "harass_player_help")
-        call HarassShowImage(GirlNamePEGHR, "tits", 0, EyewitnessPEGHR, JobTypePEGHR)
     elif your_reaction1 == 2:
         if _harass_instruction == 'notallow' or (_harass_instruction == '' and _girl_slut < 18):
             $ result += f'{_girl_name} с трудом вырвалась из цепких объятий'
             $ girl_run_away = 1
             if _girl_slut <= 10:
-                $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и пошла по своим делам.'
+                if GirlNamePEGHR == "melissa" and JobTypePEGHR == "waitress":
+                    $ result += '. A вырвавшись, дала охальнику сдачи и пошла по своим делам.'
+                else:
+                    $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и пошла по своим делам.'
                 $ girl_slapped = 1
             else:
                 $ result += ' и вернулась к работе.'
@@ -59,7 +64,10 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
             elif _girl_slut < 18:
                 $ result += f'На личике {_girl_name2} отразилась гримаска страха. Она посмотрела на вас но, судя по ее дальнейшим дествиям, либо не вспомнила что вы ей говорили, либо решила все равно поступить по своему. С визгом {_girl_name} вырвалась '
                 if procedural_randint(1,5, key="procedural:NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy:procedural_randint:64:5") == 1:
-                    $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и припустила прочь.'
+                    if GirlNamePEGHR == "melissa" and JobTypePEGHR == "waitress":
+                        $ result += '. A вырвавшись, дала охальнику сдачи и припустила прочь.'
+                    else:
+                        $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и припустила прочь.'
                     $ girl_slapped = 1
                 else:
                     $ result += ' и вернулась к работе.'
@@ -73,7 +81,10 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
             $ result += f'{_girl_name} с трудом вырвалась из цепких объятий'
             $ girl_run_away = 1
             if _girl_slut <= 10:
-                $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и пошла по своим делам.'
+                if GirlNamePEGHR == "melissa" and JobTypePEGHR == "waitress":
+                    $ result += '. A вырвавшись, дала охальнику сдачи и пошла по своим делам.'
+                else:
+                    $ result += '. A вырвавшись, залепила охальнику звонкую пощечину и пошла по своим делам.'
                 $ girl_slapped = 1
             else:
                 $ result += ' и вернулась к работе.'
@@ -83,7 +94,10 @@ label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPE
             elif _girl_slut < 18:
                 $ result += f'На личике {_girl_name2} отразилась гримаска страха. Она и не вспомнила про ваши слова, немедленно вырвавшись из лап охальника с громким визгом. A вырвавшись,'
                 if procedural_randint(1,5, key="procedural:NPC/Girls/Common/PartEventGirlHarrassmentReaction.rpy:procedural_randint:88:7") == 1:
-                    $ result += ' залепила охальнику звонкую пощечину и припустила прочь.'
+                    if GirlNamePEGHR == "melissa" and JobTypePEGHR == "waitress":
+                        $ result += ' дала охальнику сдачи и припустила прочь.'
+                    else:
+                        $ result += ' залепила охальнику звонкую пощечину и припустила прочь.'
                     $ girl_slapped = 1
                 else:
                     $ result += ' вернулась к работе.'

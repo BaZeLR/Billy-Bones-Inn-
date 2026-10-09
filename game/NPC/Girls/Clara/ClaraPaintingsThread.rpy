@@ -21,35 +21,35 @@ label story_clara_paintings_melissa_0:
 label story_clara_paintings_cellar_1:
     $ main_ui_begin_native_scene_state("Кларисса и Легаре")
     show screen main_ui
-    vscene "images/clara/panishment/panishment1.jpg"
-    $ scene_runtime.text = "Из дальнего подвала винной лавки доносится резкий голос Легаре. Вы останавливаетесь у стеллажей и слышите, как он отчитывает Клариссу за проваленную затею с Мелиссой и Амандой. Его слова звучат не как отцовская забота, а как холодный расчет человека, который привык распоряжаться чужими слабостями."
+    vscene "images/clara/punishment/punishment1.jpg"
+    $ scene_runtime.text = "Из  подвала винной лавки доносится резкий голос Легаре. Вы останавливаетесь у стеллажей и слышите, как он отчитывает Клариссу за проваленную затею с Мелиссой и Амандой. Его слова звучат не как отцовская забота, а как холодный расчет человека, который привык распоряжаться чужими слабостями."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
-    vscene "images/clara/panishment/panishment2.jpg"
+    vscene "images/clara/punishment/punishment2.jpg"
     $ scene_runtime.text = "Потом раздается короткий хлопок ладони по ткани, и Кларисса сдавленно выдыхает."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
-    vscene "images/clara/panishment/panishment3.jpg"
+    vscene "images/clara/punishment/punishment3.jpg"
     $ scene_runtime.text = "Легаре зло напоминает ей, что уже много раз говорил: в нужный момент благовоспитанные дамы должны выглядеть так, будто лишняя скромность им только мешает."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
-    vscene "images/clara/panishment/panishment4.jpg"
+    vscene "images/clara/punishment/punishment4.jpg"
     $ scene_runtime.text = "Вы можете ворваться сейчас, но тогда Легаре точно станет вашим врагом."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
-    vscene "images/clara/panishment/panishment5.jpg"
+    vscene "images/clara/punishment/punishment5.jpg"
     $ scene_runtime.text = "Можно отступить и поговорить с Клариссой позже, когда она сама сможет сказать больше."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
@@ -186,6 +186,60 @@ label story_clara_paintings_church_6:
     return
 
 
+label story_clara_paintings_legare_secret_date_7:
+    $ main_ui_begin_native_scene_state("Тайный визит Легаре к Серджио")
+    show screen main_ui
+    $ scene_runtime.text = "Поздним вечером вы замечаете, как Альбер Легаре оглядывает пустую улицу и стучит в боковую дверь цирюльни. Серджио выглядывает наружу, узнаёт его и сразу впускает внутрь. Через минуту у соседней стены появляется Кларисса. Она знаком показывает вам молчать и припадает к щели между ставнями."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Заглянуть вместе с Клариссой":
+            $ calendar_v2.advance_minutes(15)
+            if int(player.stats.exploration or 0) < 200:
+                $ scene_runtime.text = "Вы обходите цирюльню, но сегодня ставни закрыты слишком плотно. Кларисса сердито качает головой и уходит. Придётся вернуться в другой вечер и выбрать место получше."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+                $ main_ui_end_native_scene_state()
+                return True
+
+            vscene "images/barber shop/alber_sergio_secret_date_underwear.png"
+            $ scene_runtime.text = "Через щель видно, как Серджио держит камзол Легаре, пока тот, оставшись в одной рубашке и нижних штанах, усаживается возле ширмы. Обычным бритьём здесь и не пахнет. Серджио кладёт ладонь ему на плечо; Альбер перехватывает его руку и тянет к себе. Вскоре оба исчезают за ширмой, откуда доносятся скрип кушетки, приглушённые стоны и довольный смех."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Не отводить взгляда":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_watches_window.png"
+            $ scene_runtime.text = "Кларисса прижимается к ставне ещё ближе. В полоске света белеет её серебристая прядь; она смотрит на отчима и Серджио, будто наконец увидела объяснение слишком многим его тайным отлучкам."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Посмотреть на Клариссу":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_laughing_closeup.png"
+            $ scene_runtime.text = "За ширмой Серджио насмешливо спрашивает, надолго ли сегодня задержался почтенный семьянин. Кларисса зажимает рот ладонью, но плечи всё равно начинают дрожать от беззвучного смеха."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Не выдавать её":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_blushing_closeup.png"
+            $ scene_runtime.text = "Она замечает ваш взгляд и вспыхивает до самых ушей. «Только не смейте сейчас задавать вопросы, — шепчет Кларисса. — Я ещё не решила, смеяться мне или провалиться сквозь землю»."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Отойти от окна вместе":
+                    pass
+            $ event_runtime.active_thread.advance()
+            $ main_ui_end_native_scene_state()
+            return True
+
+        "Не вмешиваться и уйти":
+            $ calendar_v2.advance_minutes(15)
+            $ main_ui_end_native_scene_state()
+            return True
+
+
 label story_clara_paintings_secret_date_7:
     $ main_ui_begin_native_scene_state("Тайный визит к Серджио")
     show screen main_ui
@@ -203,10 +257,38 @@ label story_clara_paintings_secret_date_7:
                 $ main_ui_end_native_scene_state()
                 return True
 
-            $ scene_runtime.text = "Через щель между ставней и рамой вы видите, что Серджио и столичный гость говорят совсем не как мастер и клиент. Осторожные прикосновения быстро становятся откровенными. Теперь вы точно знаете: будущий брак Клариссы держится на лжи, которую можно обратить в её защиту."
+            $ scene_runtime.text = "Через щель между ставней и рамой вы видите, как Серджио целует жениха Клариссы. Тот отвечает на поцелуй и увлекает цирюльника за ширму. Вскоре оттуда доносятся частый скрип кушетки, сбившееся дыхание, приглушённые мужские стоны и короткие смешки.\n\nСерджио шепчет: «Тише, Джеймс, нас услышат». Жених тихо смеётся: «Тогда не заставляй меня просить ещё»."
             $ scene_runtime.location_text = scene_runtime.text
             menu:
-                "Продолжить":
+                "Не отводить взгляда":
+                    pass
+
+            vscene "images/barber shop/leonard_sergio_secret_date.png"
+            $ scene_runtime.text = "Наконец ширма отодвигается. Джеймс выходит в распахнутой рубашке, белых нижних штанах и чулках; его камзол и верхние штаны лежат на кресле. Он просовывает ногу в штанину, пока Серджио держит его чёрный камзол и придерживает за плечо. Оба раскраснелись и то и дело давятся довольным смехом.\n\nСерджио: «Ты опять обещал, что только на минуту».\n\nДжеймс: «И ты опять первым снял с меня штаны».\n\nСерджио хихикает: «Зато теперь застегну их сам», — поправляет ему воротник и быстро целует на прощание. Теперь вы точно знаете: будущий брак Клариссы держится на лжи, которую можно обратить в её защиту."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Запомнить увиденное":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_watches_window.png"
+            $ scene_runtime.text = "Вы уже собираетесь отойти, когда у соседней щели между ставнями замечаете серебристую прядь. Закутавшись в тёмный плащ, Кларисса тоже приникла к окну. Она не сводит глаз с жениха и Серджио и, судя по выражению лица, увидела достаточно."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Проследить за её реакцией":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_laughing_closeup.png"
+            $ scene_runtime.text = "Когда Джеймс напоминает Серджио, кто первым снял с него штаны, Кларисса зажимает рот ладонью. Её плечи начинают дрожать: она изо всех сил старается не рассмеяться вслух и не выдать вас обоих."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Не выдавать её":
+                    pass
+
+            vscene "images/clara/secret_date/clarissa_blushing_closeup.png"
+            $ scene_runtime.text = "Кларисса поворачивает голову и встречается с вами взглядом. Смех обрывается, щёки вспыхивают.\n\nКларисса шепчет: «Ни слова. Ни ему, ни Серджио. Я хотела узнать, за кого меня собираются выдать... Теперь узнала даже больше, чем собиралась»."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Отойти от окна вместе":
                     pass
             $ event_runtime.active_thread.advance()
             $ main_ui_end_native_scene_state()
@@ -242,12 +324,14 @@ label story_clara_paintings_luisa_report_9:
         "Продолжить":
             pass
 
+    vscene "images/Alber/james_leonard_found.jpg"
     $ scene_runtime.text = "«Утром его обнаружила прислуга: лежал бездыханный, без панталон, а в заднице — огромная деревяшка. Теперь стража трясёт всех, кто с ним встречался. До Клариссы и Серджио добрались первыми»."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
+    vscene rooms.get("HunterClub").bg_picture
     $ scene_runtime.text = "MC: И что теперь будет?\n\nЛуиза: А что теперь? Зная Циммера, он отправит обоих на герцогские галеры, а то и хуже — продаст оркам в рабство."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
@@ -258,6 +342,28 @@ label story_clara_paintings_luisa_report_9:
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Вернуться к разговору с Луизой":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_legare_warning_11:
+    $ main_ui_begin_native_scene_state("Разговор с Легаре")
+    show screen main_ui
+    vscene wine_store_scene_picture()
+    $ scene_runtime.text = "В винном погребке за прилавком стоит Легаре. Вы без приветствия спрашиваете, что он сделал для освобождения Клариссы. Затем требуете оставить в покое и её, и Аманду: никаких тайных поручений, угроз и попыток заманить девушку после танцев."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Потребовать ответа":
+            pass
+
+    $ Alber.add_relation(-4)
+    $ Alber.amanda_conflict_stage = 2
+    $ scene_runtime.text = "Легаре медленно выходит из-за прилавка и указывает тростью на дверь. «Вы пришли в мой дом учить меня обращаться с моей семьёй и с девкой из вашего трактира? Вон. Кларисса сама выбрала позор, а до Аманды вам ещё придётся дорасти». Он распахивает дверь и обещает, что следующая встреча будет короче."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Выйти из погребка":
             pass
     $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
@@ -297,7 +403,7 @@ label story_clara_paintings_zimmer_wine_10:
 
 label story_clara_paintings_zimmer_puzzle_11:
     $ renpy.dynamic("_clara_case_answer")
-    $ story_event_mark_fired_today(event_runtime.active_thread.getevent(11))
+    $ story_event_mark_fired_today(event_runtime.active_thread.getevent(13))
     $ main_ui_begin_native_scene_state("Показания по делу Джеймса Леонарда")
     show screen main_ui
     vscene "images/zimmer/talk.png"
@@ -370,27 +476,125 @@ label story_clara_paintings_sergio_followup_12:
     return True
 
 
-label story_clara_paintings_tavern_arrival_13:
-    $ main_ui_begin_native_scene_state("Кларисса просит защиты")
+label story_clara_paintings_dance_exposure_15:
+    $ renpy.dynamic("_clara_dance_fight_outcome")
+    $ main_ui_begin_native_scene_state("Разоблачение Легаре")
     show screen main_ui
-    vscene "images/clara/tavern_visit.png"
-    $ scene_runtime.text = "Вечером Кларисса появляется в общем зале с небольшим узлом вещей. Вся прежняя уверенность исчезает, когда она просит выполнить обещание и позволить ей остаться под вашей защитой."
+    vscene "images/market/LocFridayDance.jpg"
+    $ scene_runtime.text = "Вы подходите к танцующей паре и громко спрашиваете Легаре, рассказал ли он Аманде о своих вечерних визитах к Серджио. Музыка вокруг ещё играет, но ближайшие танцующие уже прислушиваются."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Продолжить":
+        "Рассказать всё при Аманде":
             pass
 
-    $ scene_runtime.text = "Кларисса: «К Легаре я не вернусь. После ареста в городе мне тоже небезопасно. Если вы не передумали, разрешите пожить здесь. Я могу делить комнату с Мелиссой и помогать трактиру»."
+    $ scene_runtime.text = "Вы говорите прямо: сначала через щель в ставнях видели самого Легаре полураздетым с Серджио, а в другой вечер — Серджио с Джеймсом Леонардом, женихом Клариссы. Теперь понятны и их тайные встречи, и бешенство Легаре после ареста."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Позволить Клариссе поселиться у Мелиссы":
-            $ event_runtime.active_thread.advance()
-            $ main_ui_end_native_scene_state()
-            return True
+        "Посмотреть на реакцию Аманды":
+            pass
 
-        "Попросить её вернуться к разговору позже":
-            $ main_ui_end_native_scene_state()
-            return True
+    vscene AmandaStaticData.image_path("tavern", "angry")
+    $ scene_runtime.text = "Аманда сперва прыскает со смеху, потом отдёргивает руку от Легаре. «Так это ты с Серджио? И жених Клариссы тоже с ним? Как ты вообще мог совать свой член в чужую задницу, а потом строить из себя важного господина? Извращенец! Мудак!» Она объявляет, что больше никуда с ним не пойдёт."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Встать между ними":
+            pass
+
+    $ Amanda.legare_affection = 0
+    $ Amanda.legare_forbidden = True
+    $ Amanda.dancing_with_legare = False
+    $ Amanda.left_friday_dance = True
+    $ Amanda.legare_departure_code = 0
+    $ GirlDance_DeleteGirl("amanda")
+    $ Alber.amanda_conflict_stage = 1
+    $ fight_begin("legare", 1, "FridayDance", "images/Alber/fight/streetdraw.jpg", "Легаре бросается на вас прежде, чем Аманда успевает отойти. Он уже не пытается сохранить достоинство: трость летит вам в голову, и толпа расступается вокруг драки.")
+    call FightLoop
+    $ _clara_dance_fight_outcome = str(fight.last_result.get("outcome", "") or "")
+    if _clara_dance_fight_outcome == "victory":
+        $ Alber.add_relation(-5)
+        $ scene_runtime.text = "Вы выбиваете трость из руки Легаре и заставляете его отступить. Аманда смеётся ему в лицо, подхватывает юбку и уходит с площади одна."
+    elif _clara_dance_fight_outcome == "defeat":
+        $ Alber.add_relation(-3)
+        $ scene_runtime.text = "Легаре сбивает вас на мостовую, но победой насладиться не успевает: Аманда при всех называет его лживым старым извращенцем и уходит одна. За ним она больше не следует."
+    else:
+        $ Alber.add_relation(-4)
+        $ scene_runtime.text = "Стражники и танцующие растаскивают вас прежде, чем драка заканчивается. Аманда отталкивает Легаре и уходит одна, оставив его посреди шепчущейся толпы."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться к танцам":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_amanda_punishment_16:
+    $ main_ui_begin_native_scene_state("Разговор Сандры с Амандой")
+    show screen main_ui
+    vscene tavern_kitchen_breakfast_picture()
+    $ scene_runtime.text = "За завтраком Сандра уже знает о драке на площади. Она выслушивает рассказ Аманды до конца, затем велит ей встать из-за стола. «Над Легаре можешь смеяться сколько хочешь. Но тайком путаться с ним после всех предупреждений и доводить дело до уличной драки — за это ответишь дома»."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Не вмешиваться в решение Сандры":
+            pass
+
+    $ scene_runtime.text = "Сандра уводит Аманду в её комнату. Вскоре за дверью слышны свист розги, возмущённые вскрики и спор о том, кто имел право распоряжаться её личной жизнью. Вернувшись, Аманда садится осторожно, но повторяет, что к Легаре больше не пойдёт — не из-за наказания, а потому что теперь знает, кем он оказался."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Закончить завтрак":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_paintings_winery_rescue_17:
+    $ main_ui_begin_native_scene_state("Забрать Клариссу у Легаре")
+    show screen main_ui
+    vscene "images/clara/punishment/punishment1.jpg"
+    $ scene_runtime.text = "При следующем визите в погребок из подвала доносится голос Легаре. Он обвиняет Клариссу в том, что она опозорила семью, позволила арестовать себя и Серджио, помогла разоблачить жениха и настроила против него Аманду. Кларисса отвечает, что ложь разрушил он сам."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Спуститься к подвалу":
+            pass
+
+    vscene "images/clara/punishment/punishment2.jpg"
+    $ scene_runtime.text = "Легаре приказывает Клариссе наклониться над столом и задирает её платье. Она пытается выпрямиться, но он удерживает её за талию и объявляет, что сегодня выбьет из неё непокорность."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Подойти ближе":
+            pass
+
+    vscene "images/clara/punishment/punishment3.jpg"
+    $ scene_runtime.text = "Первый тяжёлый удар розгой оставляет на ягодицах красные полосы. Кларисса стискивает зубы и повторяет, что всё равно не откажется от своих слов."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Не уходить":
+            pass
+
+    vscene "images/clara/punishment/punishment4.jpg"
+    $ scene_runtime.text = "Легаре продолжает порку, пока Кларисса уже не может скрывать боль. Затем отбрасывает розги, расстёгивает штаны и насилует её сзади, называя это последним уроком послушания. Кларисса требует остановиться, но он не слушает."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Остановить Легаре":
+            pass
+
+    vscene "images/clara/punishment/punishment5.jpg"
+    $ scene_runtime.text = "Вы оттаскиваете Легаре и заслоняете Клариссу. Он тянется к трости, но, увидев вашу готовность драться и услышав шаги наверху, отступает. «Забирай её, — выплёвывает он. — Но в мой дом больше не возвращайтесь». На этот раз драки не происходит."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Увести Клариссу":
+            pass
+
+    vscene "images/clara/tavern_visit.png"
+    $ scene_runtime.text = "Вы приводите Клариссу в трактир вместе с её небольшим узлом вещей. Сандра без расспросов освобождает место в комнате Мелиссы. Кларисса принимает защиту и остаётся членом команды «Дикого жеребца». К Легаре она больше не вернётся."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Принять Клариссу в команду":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
 
 
 label story_clara_paintings_confession_14:

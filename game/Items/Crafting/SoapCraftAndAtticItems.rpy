@@ -700,6 +700,20 @@ init 4 python:
         },
     )
 
+    MossClothPadItem = GameItem(
+        object_id="moss_cloth_pad_001",
+        name="моховая прокладка",
+        description="Мягкий чистый лоскут с прокладкой из сухого мха. Нужная в хозяйстве вещь на женские критические дни.",
+        price=3,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "hygiene",
+            "hygiene_kind": "critical_days_pad",
+        },
+    )
+
     SoapItem = GameItem(
         object_id="soap_001",
         name="лавандовое хозяйственное мыло",
@@ -1257,6 +1271,26 @@ init 4 python:
         craft_failure_text="Не удалось взять материалы для бинта.",
         notes=[
             "Чистый лоскут и сухой мох дают простую, но полезную перевязку.",
+        ],
+    )
+
+    MossClothPadRecipePage = RecipePage(
+        recipe_id="moss_cloth_pad_recipe",
+        title="Моховая прокладка",
+        image="images/recipe_book/recipe_book_attick.png",
+        item_result="moss_cloth_pad_001",
+        ingredients={
+            "cloth_scrap_001": {"quantity": 1, "unit": "мягкий лоскут"},
+            "dried_moss_001": {"quantity": 1, "unit": "порция"},
+        },
+        unlock_condition=player_has_soap_recipe_book,
+        result_quantity=1,
+        craft_minutes=10,
+        craft_text="Вы раскладываете сухой мох ровным мягким слоем, заворачиваете его в чистый лоскут и закрепляете края. Получается одна моховая прокладка.",
+        craft_failure_text="Не удалось взять чистый лоскут и сушеный мох.",
+        notes=[
+            "На каждый из трех критических дней нужна свежая прокладка.",
+            "Старую одежду можно порвать на лоскуты, а сырой мох сперва высушить.",
         ],
     )
 

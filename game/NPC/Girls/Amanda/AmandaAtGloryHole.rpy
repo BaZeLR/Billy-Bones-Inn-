@@ -177,7 +177,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("glory_cur_state", 10)
             jump TavernMain
 
-        "Трахнуть Аманду" if _amanda_glory_state == 4 or _amanda_glory_state == 5:
+        "Трахнуть Аманду" if (_amanda_glory_state == 4 or _amanda_glory_state == 5) and Amanda.can_accept_penetration_today():
             
             if Amanda.sex_stat("virginity", True):
                 "Преодолев слабое сопротивление вы уложили Аманду на лавочку. Она поняла, что сейчас произойдет, но и не подумала возразить, наоборот, сама раздвинула ножки, только сказала: \"Стефанчик, я еще девушка, будь нежным\". Лизетта направила своей рукой ваш стоящий колом член прямо в киску своей подруги. Резкий толчок, вскрик Аманды и вот Аманда уже больше не девочка."

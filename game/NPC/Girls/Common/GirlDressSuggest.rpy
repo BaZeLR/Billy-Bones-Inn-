@@ -302,6 +302,9 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
+    if GirlName == "amanda" and _dress_objection in ("top_extreme", "top_open", "top_bold", "bottom_extreme", "bottom_short", "bottom_bold", "too_plain"):
+        vscene AmandaStaticData.image_path("tavern", "angry")
+
     if _dress_objection == "top_extreme":
         '"Не, ну ты чего?" удивилась вашему выбору [_rn]. "Тут же сиськи практически наружу. Да если и не поворачиваться - все равно все будет видно. Я такое не то, что одевать, в комнате своей не хочу хранить."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
@@ -343,6 +346,9 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
         show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
+
+    if GirlName == "amanda":
+        vscene AmandaStaticData.image_path("portrait", "happy")
 
     '"Ой какое миленькое платье!" обрадовалась [_rn]. "Ты хочешь мне такое заказать?"'
     '"Ну да, если оно тебе нравится, то давай я закажу," ответили вы демонстрируя присущую вам щедрость и широту души.'

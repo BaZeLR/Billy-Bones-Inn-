@@ -1,6 +1,6 @@
 label MongolTavernTalk:
     $ main_ui_begin_talk_state("Разговор с Монголом", "mongol")
-    vscene "images/mongol/portrait1.jpg"
+    vscene "mongol portrait1"
     $ scene_runtime.text = "Монгол отрывается от сбруи. «Да, мастер? Коней я накормил. Карета тоже под рукой — только скажи, когда ехать»."
     $ scene_runtime.location_text = scene_runtime.text
     while True:
@@ -18,7 +18,7 @@ label MongolTavernTalk:
                 $ scene_runtime.location_text = scene_runtime.text
             "Спросить о ночной лесной тропе" if story_event_available("talk_mongol", "moon_sabbath_guide"):
                 call checkTriggers("talk_mongol", "moon_sabbath_guide", 0)
-                vscene "images/mongol/portrait1.jpg"
+                vscene "mongol portrait1"
             "Закончить разговор":
                 $ main_ui_end_talk_state()
                 if str(rooms.current_code or "") == "TavernStable":

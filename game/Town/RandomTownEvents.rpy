@@ -54,6 +54,14 @@ init -20 python:
 
         TIME_EVENTS = {
             "morning": (
+                {
+                    "hooks": ("window_waste", "dirty", "laughter"),
+                    "picture": "images/town stories/window_waste_mishap.png",
+                    "wash_days": 3,
+                    "reputation": -1,
+                    "guard_chance": 0.0,
+                    "text": "На [улица] распахивается ставня прямо над вашей головой. «Поберегись!» - кричит хозяйка и выплескивает ночной горшок. Последний слог долетает уже после содержимого. Вы стоите с растопыренными руками, пока прохожие давятся смехом. «Горшок не забирай, он дорогой!» - добавляет хозяйка. Торговец мылом молча подвигает к вам свой лоток.\n\nВы сильно перепачкались. Репутация -1.",
+                },
                 {"hooks": ("bounty", "werewolf", "corpse"), "text": "На [улица] бьет колокол. Городской глашатай в красном камзоле громко зачитывает указ бургомистра: «Всем добрым христианам! За голову лесного оборотня, что уже загрыз трех пастухов и одну девку, - награда 100 золотых и прощение всех грехов!» Толпа шепчется о проклятии, а в канаве лежит обглоданный труп бродяги - кровь еще не свернулась."},
                 {"hooks": ("vampire", "witch", "corpse"), "gender": "male", "text": "Утренний туман на [улица] скрывает страшную находку. [имя] - [занятие] наткнулся на полностью обескровленное тело девушки. «Опять упырь из леса! Или та ведьма, что сбежала с костра прошлой весной!» - кричит он. Прохожие крестятся, а стражники только пожимают плечами и пьют из фляжки."},
                 {"hooks": ("stocks", "moral", "shame"), "gender": "female", "text": "У позорного столба на [улица] стоит голая по пояс [имя] - [занятие], с табличкой «За блуд и содомию». Толпа плюет, бросает гнилые овощи и камни. Рядом глашатай объявляет: «Так будет со всяким, кто нарушит чистоту нравов!»"},
@@ -62,6 +70,14 @@ init -20 python:
                 {"hooks": ("plague", "potion", "ghost"), "gender": "male", "text": "На [улица] [имя] - [занятие] продает «чудодейственное» зелье от французской болезни. «Пейте, пока чума не вернулась!» - орет он. В толпе шепчутся, что вчера ночью видели призрак повешенной ведьмы именно на этой улице."},
             ),
             "noon": (
+                {
+                    "hooks": ("bird_droppings", "dirty", "laughter"),
+                    "picture": "images/town stories/bird_droppings_mishap.png",
+                    "wash_days": 1,
+                    "reputation": -1,
+                    "guard_chance": 0.0,
+                    "text": "На [улица] вы останавливаетесь поправить воротник. Сорока на крыше решает, что лучшего случая не будет: белое пятно шлепается вам на плечо. «К деньгам!» - радостно сообщает лавочник. «Забирайте», - предлагаете вы, протягивая испачканный рукав. Лавочник пятится к двери, а прохожие хохочут. Сорока смотрит сверху с таким видом, будто тоже ждет свою долю.\n\nВы стали грязнее. Репутация -1.",
+                },
                 {"hooks": ("edict", "witch", "smuggling"), "text": "Полдень на [улица] - жара и вонь. Глашатай кричит: «Указ бургомистра! Всех, кто прячет беглых ведьм или оборотней, - на костер вместе с ними!» Рядом [имя] - [занятие] публично порют кнутом за укрывательство контрабанды из леса."},
                 {"hooks": ("fight", "gambling", "fine"), "text": "На площади вспыхивает драка из-за последней бочки эля. Двое мужчин режут друг друга ножами, кровь льется в пыль. Толпа делает ставки, а глашатай спокойно объявляет: «Победитель платит штраф за нарушение тишины!»"},
                 {"hooks": ("horse", "curse", "black_slime"), "text": "Жеребец [stallion] вдруг встает на дыбы и сбрасывает седока. Из его глаз капает черная слизь. «Проклят лесом!» - вопит [имя] - [занятие]. Люди разбегаются, вспоминая прошлогоднюю историю, когда все лошади в городе сошли с ума."},
@@ -70,7 +86,7 @@ init -20 python:
                 {"hooks": ("public_sin", "plague", "guards"), "gender": "male", "text": "На [улица] толстый [имя] - [занятие] публично совокупляется с служанкой прямо у стены, не стесняясь толпы. «Пусть смотрят! После чумы жизнь коротка!» - орет он. Стражники проходят мимо и только ржут."},
             ),
             "weekends": (
-                {"hooks": ("market_day", "witch_bounty", "amulets"), "text": "Базарный день на [улица] - сплошной грех. Глашатай объявляет: «Бургомистр обещает 50 золотых тому, кто принесет доказательство, что ведьма из леса мертва!» Толпа ревет, а рядом уже торгуют «волшебными» амулетами от оборотней."},
+                {"hooks": ("market_day", "witch_bounty", "amulets"), "picture": "images/town stories/market_day_witch_bounty.png", "text": "Базарный день на [улица] - сплошной грех. Глашатай объявляет: «Бургомистр обещает 50 мараведи тому, кто принесет доказательство, что ведьма из леса мертва!» Толпа ревет, а рядом уже торгуют «волшебными» амулетами от оборотней."},
                 {"hooks": ("horse", "curse", "accident"), "text": "Выходной разгул: [имя] - [занятие] после эля пытается оседлать [stallion], но конь сбрасывает его и топчет. Из раны хлещет черная кровь. «Проклятие леса!» - вопит толпа."},
                 {"hooks": ("cockfight", "witch_hunt", "guards"), "text": "На площади устроили петушиный бой, но вдруг кто-то кричит: «Ведьма! Она здесь!» Начинается охота на нищую старуху. Стражники делают ставки, кто первый поймает."},
                 {"hooks": ("barrel_dance", "sin_tax", "crowd"), "text": "Пышная девица танцует на бочке, юбки задраны. Мужики лезут руками, она бьет каблуком в зубы. Глашатай кричит: «Так будет со всеми блудницами, если не заплатят налог на грех!»"},
@@ -242,13 +258,19 @@ init -20 python:
             gender = self._gender_key(entry.get("gender", None) if isinstance(entry, dict) else None)
             if procedural_random(key="procedural:Town/RandomTownEvents.rpy:procedural_random:349:1") < float(entry.get("guard_chance", 0.45) if isinstance(entry, dict) else 0.45):
                 text += procedural_choice(self.PASSIVE_GUARDS, key="procedural:Town/RandomTownEvents.rpy:procedural_choice:350:7")
-            return (
+            text = (
                 text
                 .replace("[улица]", self.street_display())
                 .replace("[имя]", self._call_name(gender))
                 .replace("[занятие]", self._call_occupation(gender))
                 .replace("[stallion]", self._call_stallion())
             )
+            return {
+                "text": text,
+                "picture": str(entry.get("picture", "") if isinstance(entry, dict) else ""),
+                "wash_days": self._int(entry.get("wash_days", 0) if isinstance(entry, dict) else 0),
+                "reputation": self._int(entry.get("reputation", 0) if isinstance(entry, dict) else 0),
+            }
 
         def interactive_allowed(self, location_name=""):
             location_key = str(location_name or rooms.current_code or "")
@@ -346,12 +368,18 @@ default TownStreet = TownStreetRuntime()
 
 
 label TownRandomChronicleEvent:
+    $ renpy.dynamic("_town_chronicle")
     $ main_ui_begin_native_scene_state("Случайное событие")
     $ TownStreet.events_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownRandomChronicleEvent")
-    $ scene_runtime.picture = "images/general/harbor_street.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/general/LocMarketPlace1.jpg"
+    $ _town_chronicle = TownStreet.random_chronicle(TownStreet.time_event_key())
+    $ scene_runtime.picture = _town_chronicle["picture"] or ("images/general/harbor_street.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/general/LocMarketPlace1.jpg")
+    if _town_chronicle["wash_days"]:
+        $ player.appearance.increment_wash_days(_town_chronicle["wash_days"])
+    if _town_chronicle["reputation"]:
+        $ player.change_stat("reputation", _town_chronicle["reputation"])
     vscene scene_runtime.picture
-    $ scene_runtime.text = TownStreet.random_chronicle(TownStreet.time_event_key())
+    $ scene_runtime.text = _town_chronicle["text"]
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:

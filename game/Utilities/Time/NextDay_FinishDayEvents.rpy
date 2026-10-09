@@ -24,7 +24,7 @@ init python:
             tmpArray = TodaySexEvents_PopFirst()
             girl = str(tmpArray.get("GirlName", "") or "")
             place = str(tmpArray.get("Place", "") or "")
-            event_type = _ndf_int(tmpArray.get("EventType", 0), 0)
+            event_type = sex_event_type_for_cycle(girl, _ndf_int(tmpArray.get("EventType", 0), 0))
 
             if not tavern_sex_work_day_allowed(week_val) and place in ("Prostitution", "Glory"):
                 continue
@@ -42,13 +42,14 @@ init python:
                 glory_hole_inside = "mouth"
                 girl_info = people.get_info(girl)
                 corruption_val = _ndf_int(getattr(girl_info, "corruption", 0), 0) if girl_info is not None else 0
-                if corruption_val >= 80:
+                penetration_allowed = bool(girl_info is None or girl_info.can_accept_penetration_today())
+                if penetration_allowed and corruption_val >= 80:
                     if procedural_randint(1, 15, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:72:2") == 1:
                         glory_hole_inside = "inside"
-                elif corruption_val >= 60:
+                elif penetration_allowed and corruption_val >= 60:
                     if procedural_randint(1, 30, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:75:3") == 1:
                         glory_hole_inside = "inside"
-                elif corruption_val >= 50:
+                elif penetration_allowed and corruption_val >= 50:
                     if procedural_randint(1, 60, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:78:4") == 1:
                         glory_hole_inside = "inside"
                 if event_type == 1:

@@ -143,7 +143,7 @@ label GeorgettSexMenu:
                 call GeorgettSexBlowjob
             "Трахать между грудей" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.tits_visible() and Georgett.pregnancy_days() < 150:
                 call GeorgettSexTitfuck
-            "Трахать" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.arousal_value() >= 20 and Georgett.pussy_visible():
+            "Трахать" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.arousal_value() >= 20 and Georgett.pussy_visible() and Georgett.can_accept_penetration_today():
                 call GeorgettSexFuck
             "Продолжить" if Georgett.sex_busy():
                 $ Georgett.set_sex_busy(0)

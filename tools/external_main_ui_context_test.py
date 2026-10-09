@@ -18,6 +18,81 @@ init python:
     def external_ui_items():
         return [str(item.caption) for item in main_ui_runtime.action_items]
 
+    def external_ui_board_replay_scope_probe():
+        captured = []
+        original = renpy.call_replay
+        renpy.call_replay = lambda target, scope: captured.append((target, scope))
+        try:
+            story_board_replay(threads["churchFullMoonBats"], 0)
+        finally:
+            renpy.call_replay = original
+        assert len(captured) == 1
+        target, scope = captured[0]
+        assert target == "story_church_full_moon_bats_0"
+        assert scope["threads"] is not threads
+        assert scope["event_runtime"].active_thread is scope["threads"]["churchFullMoonBats"]
+        assert scope["event_runtime"].active_thread.num == 0
+        assert not scope["event_runtime"].active_thread.aborted
+        assert scope["main_ui_runtime"].overlay == ""
+        assert main_ui_runtime.overlay == "story"
+        scope["threads"]["churchFullMoonBats"].advance()
+        assert scope["threads"]["churchFullMoonBats"].num != threads["churchFullMoonBats"].num
+
+    def external_ui_board_state_probe():
+        line = copy.deepcopy(threads["melissaMoonStoveRitual"])
+        line.done = [False] * line.data.length
+        line.blocks = [False] * line.data.length
+        line.num = 1
+        line.metconds = True
+        line.aborted = False
+        line.completed = False
+        line.blocked = False
+        assert story_board_thread_status(line) == "active"
+        assert story_board_event_status(line, 1) == "available"
+        assert story_board_event_status(line, 2) == "future"
+        line.done[0] = True
+        assert story_board_event_status(line, 0) == "done"
+        line.blocks[1] = True
+        assert story_board_event_status(line, 1) == "blocked"
+        line.blocks[1] = False
+        line.aborted = True
+        assert story_board_thread_status(line) == "aborted"
+        assert story_board_event_status(line, 1) == "aborted"
+        line.aborted = False
+        line.completed = True
+        assert story_board_thread_status(line) == "complete"
+        assert story_board_event_status(line, 1) == "done"
+
+    def external_ui_board_all_tabs_probe():
+        screen = renpy.get_screen("main_ui")
+        for person in story_board_people():
+            tab = screen.base_widgets["story_board_tab_%s" % person]
+            renpy.run(tab.action)
+            renpy.display.screen.updated_screens.discard(screen)
+            screen.update()
+            assert main_ui_runtime.story_board_person == person, person
+            candidate = next(((name, info, index) for name, info in story_board_rows(person) for index, alternatives in enumerate(info.data.triggers) if alternatives), None)
+            if candidate is None:
+                continue
+            name, info, index = candidate
+            event_cell = screen.base_widgets["story_board_event_%s_%d" % (name, index)]
+            renpy.run(event_cell.hovered)
+            event_screen = renpy.get_screen("story_event_screen")
+            event_screen.update()
+            assert event_screen.scope["tinfo"] is info, person
+            assert main_ui_runtime.story_board_person == person, person
+
+    def external_ui_board_unique_threads_probe():
+        tabs = story_board_people()
+        shown = {}
+        for person in tabs:
+            for name, _info in story_board_rows(person):
+                assert name not in shown, (name, shown.get(name), person)
+                shown[name] = person
+        assert set(shown) == set(threads)
+        assert shown["systemGiveBirth"] == "birth"
+        assert "system" not in tabs
+
     def external_ui_clara_church_ready_on_sunday():
         previous = (calendar_v2.week, calendar_v2.hour, calendar_v2.minute)
         try:
@@ -703,6 +778,97 @@ testcase external_ui_clara_fiance_church_when_ready:
     assert eval (scene_runtime.picture == "images/Alber/church/cermon_fiance1_clara.png" and renpy.loadable(scene_runtime.picture))
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (threads["claraPaintingsPath"].num == 7) timeout 20.0
+
+testcase external_ui_story_board_replay:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    $ main_ui_runtime.story_board_person = "church"
+    $ main_ui_runtime.overlay = "story"
+    $ _before = (rooms.current_code, calendar_v2.daysInGame, calendar_v2.hour, calendar_v2.minute, threads["churchFullMoonBats"].num, Gerhard.var_value("church_full_moon_bats_seen", False))
+    $ external_ui_board_state_probe()
+    $ external_ui_board_replay_scope_probe()
+    assert eval ((rooms.current_code, calendar_v2.daysInGame, calendar_v2.hour, calendar_v2.minute, threads["churchFullMoonBats"].num, Gerhard.var_value("church_full_moon_bats_seen", False)) == _before)
+    assert eval (main_ui_runtime.overlay == "story" and story_board_rows("church"))
+
+testcase external_ui_story_board_tab_survives_hover:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run SetField(main_ui_runtime, "overlay", "story")
+    advance until eval (main_ui_runtime.overlay == "story") timeout 20.0
+    click id "story_board_tab_sandra" pos (0.5, 0.5)
+    assert eval (main_ui_runtime.story_board_person == "sandra")
+    $ _sandra_board_thread_name = next(name for name, info in story_board_rows("sandra") if info.data.triggers[0])
+    move id ("story_board_event_%s_0" % _sandra_board_thread_name) pos (0.5, 0.5)
+    advance until screen "story_event_screen" timeout 20.0
+    assert eval (renpy.get_screen("story_event_screen").scope["tinfo"].data.person == "sandra")
+    click id "story_board_tab_amanda" pos (0.5, 0.5)
+    assert eval (main_ui_runtime.story_board_person == "amanda")
+    $ _amanda_board_thread_name = next(name for name, info in story_board_rows("amanda") if info.data.triggers[0])
+    move id ("story_board_event_%s_0" % _amanda_board_thread_name) pos (0.5, 0.5)
+    advance until screen "story_event_screen" timeout 20.0
+    assert eval (main_ui_runtime.story_board_person == "amanda" and main_ui_runtime.overlay == "story")
+    assert eval (renpy.get_screen("story_event_screen").scope["tinfo"].data.person == "amanda")
+
+testcase external_ui_story_board_real_replay_returns_to_selection:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run SetField(main_ui_runtime, "overlay", "story")
+    advance until eval (main_ui_runtime.overlay == "story") timeout 20.0
+    click id "story_board_tab_church" pos (0.5, 0.5)
+    assert eval (main_ui_runtime.story_board_person == "church")
+    click id "story_board_event_churchFullMoonBats_0" pos (0.5, 0.5)
+    advance until eval (external_ui_choices() == ["Понаблюдать за карнизом", "Продолжить путь"]) timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5)
+    advance until eval (main_ui_runtime.overlay == "story" and main_ui_runtime.story_board_person == "church") timeout 20.0
+
+testcase external_ui_story_board_render_must_not_reset_tab:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run SetField(main_ui_runtime, "overlay", "story")
+    advance until eval (main_ui_runtime.overlay == "story") timeout 20.0
+    click id "story_board_tab_amanda" pos (0.5, 0.5)
+    assert eval (main_ui_runtime.story_board_person == "amanda")
+    $ _amanda_board_thread_name = next(name for name, info in story_board_rows("amanda") if info.data.triggers[0])
+    $ _original_story_board_people = story_board_people
+    $ renpy.store.story_board_people = lambda: ["melissa"]
+    move id ("story_board_event_%s_0" % _amanda_board_thread_name) pos (0.5, 0.5)
+    advance until screen "story_event_screen" timeout 20.0
+    assert eval (main_ui_runtime.story_board_person == "amanda")
+    assert eval (renpy.get_screen("story_event_screen").scope["tinfo"].data.person == "amanda")
+    $ renpy.store.story_board_people = _original_story_board_people
+    run SetField(main_ui_runtime, "story_board_person", "amanda")
+    move id ("story_board_event_%s_0" % _amanda_board_thread_name) pos (0.5, 0.5)
+    advance until screen "story_event_screen" timeout 20.0
+    assert eval (renpy.get_screen("story_event_screen").scope["tinfo"].data.person == "amanda")
+    screenshot "board-amanda-after-catalog-gap.png"
+
+testcase external_ui_story_board_all_tabs_keep_details:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_prepare()
+    run Jump("TavernMyRoom")
+    advance until eval (rooms.current_code == "TavernMyRoom" and main_ui_runtime.mode == "scene") timeout 20.0
+    run SetField(main_ui_runtime, "overlay", "story")
+    advance until eval (main_ui_runtime.overlay == "story") timeout 20.0
+    $ external_ui_board_all_tabs_probe()
+
+testcase external_ui_story_board_unique_threads:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 25.0
+    $ external_ui_board_unique_threads_probe()
+
 '''
 
 

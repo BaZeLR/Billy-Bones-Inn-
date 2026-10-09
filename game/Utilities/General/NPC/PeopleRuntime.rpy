@@ -1592,6 +1592,9 @@ init -999 python:
             self.skin_quality = 65
             self.temporary_fertility = {"item_id": "", "until_day": -1}
             self.bathday_day = -1
+            self.critical_hygiene_request_day = -1
+            self.critical_hygiene_supplied_day = -1
+            self.critical_tea_day = -1
 
         def update(self):
             super(Girl, self).update()
@@ -1601,6 +1604,9 @@ init -999 python:
             self.__dict__.setdefault("reaction_log", [])
             self.__dict__.setdefault("renovation_requests", {})
             self.__dict__.setdefault("bathday_day", -1)
+            self.__dict__.setdefault("critical_hygiene_request_day", -1)
+            self.__dict__.setdefault("critical_hygiene_supplied_day", -1)
+            self.__dict__.setdefault("critical_tea_day", -1)
             base_clothing = getattr(getattr(self, "data", None), "base_clothing", {})
             self.wardrobe = GirlWardrobeState.from_saved(
                 getattr(self, "wardrobe", None),
@@ -1683,6 +1689,21 @@ init -999 python:
         def can_have_sex_today(self):
             return people_to_int(self.fucked_today, 0) < max(0, people_to_int(self.daily_sex_limit, 0))
 
+        def cycle_state(self):
+            return dict(girl_decision_cycle_state(self.name) or {})
+
+        def critical_days_active(self):
+            return str(self.cycle_state().get("phase", "") or "") == "critical"
+
+        def critical_hygiene_supplied_today(self):
+            return people_to_int(self.critical_hygiene_supplied_day, -1) == current_game_day()
+
+        def is_tavern_team_girl(self):
+            return self.name in tuple(household.resident_ids() or ()) or tavern.is_team_member(self.name)
+
+        def can_accept_penetration_today(self):
+            return not (self.is_tavern_team_girl() and self.critical_days_active())
+
         def date_intimacy_available(self):
             return False
 
@@ -1690,6 +1711,8 @@ init -999 python:
             return 0
 
         def intimacy_action_allowed(self, action_code=""):
+            if str(action_code or "").strip().lower() in ("vaginal", "anal"):
+                return self.can_accept_penetration_today()
             return True
 
         def intimacy_room_allowed(self, room_code=""):

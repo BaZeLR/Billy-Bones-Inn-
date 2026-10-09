@@ -12,7 +12,9 @@ label HarassShowImage(GirlNameHSI="", ActionHSI="", ReactionHSI=0, EyewitnessHSI
 
     if _hsi_eyewitness > 0:
         if _hsi_girl == "melissa":
-            if _hsi_reaction == 0:
+            if _hsi_reaction == 1 and JobTypeHSI == "waitress":
+                $ _hsi_picture = MelissaStaticData.cycle_image("grope", "waitress_rebel", procedural_randint(0, 3, "harass_melissa_waitress_rebel_%s" % _hsi_action))
+            elif _hsi_reaction == 0:
                 if _hsi_action in ("ass", "dress"):
                     $ _hsi_picture = MelissaStaticData.image_path("grope", "ass_angry")
                 else:
@@ -23,9 +25,9 @@ label HarassShowImage(GirlNameHSI="", ActionHSI="", ReactionHSI=0, EyewitnessHSI
                 else:
                     $ _hsi_picture = MelissaStaticData.image_path("grope", "ass_angry")
             else:
-                if _hsi_reaction >= 3:
-                    $ _hsi_picture = MelissaStaticData.image_path("grope", "tit_ok")
-                elif _hsi_reaction == 2:
+                if _hsi_reaction >= 5:
+                    $ _hsi_picture = MelissaStaticData.cycle_image("grope", "tit_ok", procedural_randint(0, 1, "harass_melissa_tit_ok_%s" % _hsi_action))
+                elif _hsi_reaction in (2, 4):
                     $ _hsi_picture = MelissaStaticData.image_path("grope", "tits_shy")
                 else:
                     $ _hsi_picture = MelissaStaticData.image_path("grope", "tit_angry")

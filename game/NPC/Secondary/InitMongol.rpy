@@ -12,7 +12,7 @@ init python:
                 default_location="",
                 description="Монгол - торговец лошадьми на рынке.",
                 birth_date={"day": 1, "period": 1, "cycle": 1061},
-                portrait="images/mongol/portrait1.jpg",
+                portrait="images/mongol/portrait1.png",
             )
 
     def mongol_tavern_stable_active():

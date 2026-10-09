@@ -627,6 +627,12 @@ init -998 python:
             self.inside_once = 0
             if not self.works or self.amanda_present or not self.girl_name:
                 return
+            worker_info = people.get_info(self.girl_name)
+            if worker_info is not None and not worker_info.can_accept_penetration_today():
+                self.player_line1 = "Вы просовываете член в отверстие, и с другой стороны его сразу принимают губами. Сегодня работница не предлагает ничего, кроме оральных ласк."
+                self.player_line2 = "Невидимая девушка продолжает минет, меняя темп и помогая себе рукой. Вы уже близки к разрядке."
+                self.player_line3 = "Она доводит вас ртом до оргазма, проглатывает сперму и напоследок вылизывает головку. Вы застёгиваете штаны."
+                return
 
             corruption = max(0, player_to_int(worker_corruption, 0))
             if corruption >= 80:

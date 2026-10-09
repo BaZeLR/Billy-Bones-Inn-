@@ -6,17 +6,30 @@ label HarassDiscussImage(girl="", value=0, _hdi_girl="", _hdi_value=0, _hdi_pict
     $ _hdi_girl = str(girl or "")
     $ _hdi_value = int(value or 0)
     $ _hdi_picture = ""
-    if _hdi_value == 3:
-        $ _hdi_picture = MelissaStaticData.image_path("grope", "throw_delinquent")
-    elif _hdi_girl == "melissa":
+    if _hdi_girl == "melissa":
         if _hdi_value == 0:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_angry")
         elif _hdi_value == 1:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_neutral")
-        else:
+        elif _hdi_value == 2:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_agree")
+        elif _hdi_value == 3:
+            $ _hdi_picture = MelissaStaticData.image_path("grope", "throw_delinquent")
+        elif _hdi_value == 4:
+            $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_disagree")
+        elif _hdi_value == 5:
+            $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_like")
     elif _hdi_girl == "amanda":
-        $ _hdi_picture = AmandaStaticData.image_path("grope", "scold")
+        if _hdi_value == 0:
+            $ _hdi_picture = AmandaStaticData.image_path("grope", "scold_angry")
+        elif _hdi_value == 4:
+            $ _hdi_picture = AmandaStaticData.image_path("grope", "scold_disagree")
+        elif _hdi_value == 2:
+            $ _hdi_picture = AmandaStaticData.image_path("grope", "scold_agree")
+        elif _hdi_value in (3, 5):
+            $ _hdi_picture = AmandaStaticData.image_path("grope", "scold_thankful")
+        else:
+            $ _hdi_picture = AmandaStaticData.image_path("grope", "scold_neutral")
 
     if str(_hdi_picture or "").strip():
         $ scene_runtime.picture = str(_hdi_picture or "")
