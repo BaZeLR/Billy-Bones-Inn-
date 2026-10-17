@@ -283,5 +283,100 @@
     "complete": true,
     "individual_pngs": 160,
     "missing": []
+  },
+  "anatomy_corrections": {
+    "generator": "built-in image_gen",
+    "base_commit": "555cb96db6aef14831c9edca53f1e63a0b3f3bc9",
+    "amanda_body_guide": "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+    "sprites": [
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "kneeling",
+        "source_filename": "exec-6502aa08-4012-4b94-9cb7-8f7393e158ff.png",
+        "references": [
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+          "exec-c761bfce-30c2-4737-901f-945375e1af74.png"
+        ],
+        "prompt": "Use image 1 as the authoritative body model and image 2 as the pose, facial-expression and outfit reference. Draw the same adult Amanda in image 2's pose and ivory short lace-trim chemise with shoulder ties, using the slender petite proportions of image 1, especially its small natural bust. Match that modest chest silhouette and volume without enlargement. Preserve her grown adult proportions, blonde fringe and braided pinned-up hair, blue eyes, and the existing comic illustration style. Keep her waist, hips and thighs consistent with image 1. The light chemise drapes naturally over this small build. Correct human joints, hands and feet. Exactly one complete full-body figure, with all hair and limbs included inside generous margins, on a true transparent RGBA background. No furniture, text or shadow patch. Pose: relaxed three-quarter front kneeling on her heels, hands lightly clasped in her lap, head tilted with an amused smile. Both knees and both folded lower legs connect naturally, with normal feet resting behind her."
+      },
+      {
+        "npc_id": "sandra",
+        "group": "boudoir",
+        "state": "kneeling",
+        "source_filename": "exec-37713d6f-5d89-4d59-9f6e-bd1e4cac7154.png",
+        "references": [
+          "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+          "game/images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_kneeling.png"
+        ],
+        "prompt": "Repair the kneeling anatomy of this adult Sandra sprite. Image 1 is her established body guide. Image 2 is the edit target: preserve its mature face, green eyes, copper hair, fuller adult build, deep green short lace-trim chemise, burgundy robe, one hand on hip and one hand on her thigh. Redraw the pelvis and folded legs as a clear natural three-quarter kneeling-on-heels pose. Both knees are next to each other, each shin folds back beneath its own thigh, and each foot connects to its own ankle behind her. Show normal overlapping feet, not one stretched or fused foot, and keep the pelvis balanced over the folded legs. Correct finger lengths and wrist joints while preserving the gestures. Natural adult torso, shoulders and hips, no added bulk or extreme waist pinch. Match the existing comic drawing style. One complete isolated character, all limbs inside generous margins, true transparent RGBA background, no text, furniture or shadow blob."
+      },
+      {
+        "npc_id": "sandra",
+        "group": "boudoir",
+        "state": "lying_front",
+        "source_filename": "exec-bd92cfdf-004f-4a98-bf6c-3365ec571b42.png",
+        "references": [
+          "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+          "game/images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png"
+        ],
+        "prompt": "Repair the anatomy of adult Sandra in the front-lying pose. Image 1 is her established body-proportion guide. Image 2 is the edit target. Preserve the mature face, green eyes, copper hair, fuller adult build, deep green short lace-trim chemise and burgundy robe. Keep her lying on her stomach, head at left and feet toward right, upper torso comfortably supported on forearms, hands resting together under her chin. Redraw the trunk, pelvis and both legs coherently: a natural spine line, one thigh/knee/calf/ankle/foot chain for each hip, with relaxed legs lying parallel and the two feet slightly staggered so their outlines remain distinct. Correct the target's stretched, blended lower-leg and foot forms. Keep normal foot arches and toes, natural fingers and wrists, no duplicate or fused limbs. Clothing drapes over the hips and along the arms as in the target. Match the polished comic style. Complete horizontal full-body cutout with hair, elbows, fingers and toes generously inset from the edges. True transparent RGBA background, no furniture, words or shadow patch."
+      },
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "lying_front",
+        "source_filename": "exec-c9eee2e2-b22c-4c91-96a1-f2dab59f7ab5.png",
+        "references": [
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+          "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png"
+        ],
+        "prompt": "Use image 1 as the authoritative body model and image 2 as the pose, facial-expression and outfit reference. Draw the same adult Amanda in image 2's pose and ivory short lace-trim chemise with shoulder ties, using the slender petite proportions of image 1, especially its small natural bust. Match that modest chest silhouette and volume without enlargement. Preserve her grown adult proportions, blonde fringe and braided pinned-up hair, blue eyes, and the existing comic illustration style. Keep her waist, hips and thighs consistent with image 1. The light chemise drapes naturally over this small build. Correct human joints, hands and feet. Exactly one complete full-body figure, with all hair and limbs included inside generous margins, on a true transparent RGBA background. No furniture, text or shadow patch. Pose: lying on her stomach, head at right and feet toward left, chin resting on folded forearms, gentle smile. Keep the pelvis and spine natural, two relaxed legs running from their own hip through knee and ankle to separate feet. Avoid the target's inflated torso and stretched leg construction."
+      },
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "over_shoulder",
+        "source_filename": "exec-9dd58dd9-e596-4f1d-b796-b518c96f305b.png",
+        "references": [
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+          "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_over_shoulder.png"
+        ],
+        "prompt": "Use image 1 as the authoritative body model and image 2 as the pose, facial-expression and outfit reference. Draw the same adult Amanda in image 2's pose and ivory short lace-trim chemise with shoulder ties, using the slender petite proportions of image 1, especially its small natural bust. Match that modest chest silhouette and volume without enlargement. Preserve her grown adult proportions, blonde fringe and braided pinned-up hair, blue eyes, and the existing comic illustration style. Keep her waist, hips and thighs consistent with image 1. The light chemise drapes naturally over this small build. Correct human joints, hands and feet. Exactly one complete full-body figure, with all hair and limbs included inside generous margins, on a true transparent RGBA background. No furniture, text or shadow patch. Pose: standing three-quarter back and looking over her shoulder, same light ivory chemise and shoulder ties. Correct the pelvis, knees and feet into a stable relaxed stance with the weight-bearing foot fully flat and the other heel lightly raised. Preserve a natural spine rotation, slender hips and adult leg proportions; let the hem hang naturally."
+      },
+      {
+        "npc_id": "sandra",
+        "group": "boudoir",
+        "state": "over_shoulder",
+        "source_filename": "exec-ee214376-09cb-4ce2-b966-8546bc6a32df.png",
+        "references": [
+          "exec-37713d6f-5d89-4d59-9f6e-bd1e4cac7154.png",
+          "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png"
+        ],
+        "prompt": "Draw the same mature adult Sandra from image 1 as a new full-body standing over-shoulder sprite, using the natural standing anatomy in image 2 as the body guide. Preserve the face, green eyes, freckles, copper-auburn hair, fuller adult build and exactly image 1's deep green short lace-trim chemise and loose burgundy robe. Show three-quarter back, head turned over her right shoulder with a warm amused smile. Her left foot is planted completely flat and bears her weight; her right foot rests slightly behind with its heel only gently raised. Connect the pelvis, thighs, knees, calves, ankles and feet naturally, with a stable center of gravity and normal foot arches and toes. One hand holds the robe at her waist and the other makes a relaxed small open gesture, with natural wrist and fingers. Keep the robe and chemise draped over her torso and hips. Match the existing comic illustration. Exactly one complete figure on a true transparent RGBA background, generous margins around all hair, hands and feet, no furniture, words, floor patch or shadow blob."
+      },
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "sitting_legs_crossed",
+        "source_filename": "exec-5cb34ac1-93a1-4399-bab5-4c8d1339248a.png",
+        "references": [
+          "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png",
+          "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png"
+        ],
+        "prompt": "Create a corrected full-body sprite of the same adult Amanda. Image 1 is the authoritative character, body-build and costume reference: preserve her slender petite adult body, small natural bust, blonde updo and fringe, blue eyes, face and light ivory lace-trim short chemise. Use image 2 only for the pose. Do not copy image 2's fuller torso or exaggerated curves; keep the chest silhouette and body proportions of image 1. Same polished comic illustration style. Exactly one complete figure with all hair, elbows, hands, knees and feet inside generous margins. Genuinely transparent RGBA background, no furniture, writing, frame or shadow patch. Pose: comfortably seated with one leg crossed over the other at the knee, hands relaxed on the unseen seat at either side. Keep a natural pelvis and spine and correctly connected thighs, knees, shins, ankles and feet. Garment drapes naturally from her small chest and over her hips, exactly the design in image 1. Gentle amused expression."
+      },
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "lying_side",
+        "source_filename": "exec-cf9e1311-b1b4-4de2-82c9-35471122f147.png",
+        "references": [
+          "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png",
+          "exec-5cb34ac1-93a1-4399-bab5-4c8d1339248a.png"
+        ],
+        "prompt": "Draw one new transparent full-body comic sprite of the SAME ADULT AMANDA shown in these two corrected character references. Both references define her identity and body: blue eyes, blonde fringe with braided pinned-up hair, a slender petite adult build and a very small natural A-size bust. Preserve that small chest volume exactly; it should have very little projection, including in this reclining view. Same ivory light lace-trim chemise with shoulder ties, softly draped rather than shaped into rounded bra cups. New pose: lying comfortably on her side, head toward the LEFT, body and legs toward the RIGHT, resting on one forearm while the other hand lightly touches a strand of her hair. Natural narrow ribcage, slender waist and hips. The lower leg is extended; the upper knee is slightly bent so its foot ends a little before the lower foot. Draw two clearly separate, normally articulated legs, knees, ankles and feet, with distinct foot outlines rather than fused or exactly stacked feet. Gentle amused expression, relaxed household resting pose. Preserve the existing polished comic drawing style. Exactly one complete figure, including every elbow and foot, with generous transparent margins on all sides. True transparent RGBA background, no bed, room, text or shadow patch."
+      }
+    ]
   }
 }

@@ -16,6 +16,25 @@ The completion update adds the five previously unavailable poses:
 The manifest has `complete: true` and an empty `missing` list. All new frames
 have individual artwork; there are no duplicate substitutes or placeholders.
 
+## Drawing revision
+
+The latest revision replaces all five Amanda bedroom poses using her existing
+standing home sprite as the petite body guide and her A-size description in
+`InitAmanda.rpy`. Her seated, kneeling, front-lying, side-lying and over-shoulder
+sprites use the smaller chest silhouette and revised body construction.
+
+Sandra's kneeling, front-lying and over-shoulder sprites are replaced to clarify
+the folded legs, knees, ankles and feet. The over-shoulder pose now has a
+weight-bearing foot planted flat. Face identity, copper hair, green chemise and
+burgundy robe are retained.
+
+The selected replacements were inspected at full size before export, followed
+by inspection of the final RGBA PNGs on light/dark backgrounds. The
+[before/after board](previews/body_corrections.jpg) compares actual exported
+files. Automated PNG/hash checks verify file integrity and image bindings;
+they do not certify drawn anatomy. This revision changes no Ren'Py source,
+image names or canvas dimensions.
+
 ## Passed checks
 
 - Ren'Py **8.5.2.26010301**: project `compile` command completed with exit 0.

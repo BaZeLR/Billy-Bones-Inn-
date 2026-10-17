@@ -16,6 +16,11 @@ her own complete library, with no placeholders or missing categories.
 The body categories follow the reference names, with character-specific
 posture, gestures and acting. All five previously unavailable poses are included.
 
+The current drawing revision replaces Amanda's five bedroom poses to follow her
+petite, small-bust model, and Sandra's kneeling, front-lying and over-shoulder
+poses to repair the leg/foot construction and standing stance. The
+[before/after preview](previews/body_corrections.jpg) shows actual PNG exports.
+
 ## Files
 
 `game/images/npc_sprites/v1/<npc>/` contains individual RGBA PNGs:

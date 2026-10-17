@@ -904,20 +904,24 @@
         800
       ],
       "visible_bounds": [
-        124,
-        168,
-        515,
+        130,
+        158,
+        509,
         768
       ],
       "source_index": 2,
       "source_box": [
-        132,
-        11,
-        528,
-        619
+        0,
+        0,
+        1122,
+        1402
       ],
-      "sha256": "ac389f7d0f5db9e6ad5f756ea984d57574606e5ec62dbe4714f9148947b253d1",
-      "overlay_name": "npc_overlay_amanda_boudoir_sitting_legs_crossed"
+      "sha256": "406f37a097f3e0869139c47b2c219c50d58d5f6f1b3c7307ae370c632d696855",
+      "overlay_name": "npc_overlay_amanda_boudoir_sitting_legs_crossed",
+      "override_source": {
+        "filename": "exec-5cb34ac1-93a1-4399-bab5-4c8d1339248a.png",
+        "sha256": "a7631c5343b4fea6f3042061ccc8b6f107d43f996eb2d4582c3a923f70402ac9"
+      }
     },
     {
       "npc_id": "amanda",
@@ -931,9 +935,9 @@
         800
       ],
       "visible_bounds": [
-        144,
+        149,
         158,
-        495,
+        490,
         768
       ],
       "source_index": 2,
@@ -943,11 +947,11 @@
         1122,
         1402
       ],
-      "sha256": "f933dfaf9de65a3c90ec3e9323c07c3051847856121e8c972cc371618e35fea2",
+      "sha256": "ddd1a2b4394a88a8597d2ee348e627aeaa1ca33427743cc6d46d92b9acf60699",
       "overlay_name": "npc_overlay_amanda_boudoir_kneeling",
       "override_source": {
-        "filename": "exec-78c06841-5415-464b-81fb-87850b1240a9.png",
-        "sha256": "10f475804a1cbd5ebbc93087c605facbc85ebad59f3e21f9151077f729fcff4b"
+        "filename": "exec-6502aa08-4012-4b94-9cb7-8f7393e158ff.png",
+        "sha256": "7463113ce438f7b12f05ba4b65a405c4611093b81369a6b943c4d0495624713e"
       }
     },
     {
@@ -963,7 +967,7 @@
       ],
       "visible_bounds": [
         16,
-        564,
+        569,
         624,
         768
       ],
@@ -974,11 +978,11 @@
         1774,
         887
       ],
-      "sha256": "6ac5a802e671f7872fa11111fcb0282d41170c78c387263e2b78ac5fa0787996",
+      "sha256": "ef756654bcf3d19a0a56b4c4a2f111059a677ef9f2411003f45cd741b8ebefba",
       "overlay_name": "npc_overlay_amanda_boudoir_lying_front",
       "override_source": {
-        "filename": "exec-0e0f1f8a-ef3e-4601-913e-54be2f8763f4.png",
-        "sha256": "d222cb873d2438202744f7859977bd7fc86412389f38fa8275c4959b367529cd"
+        "filename": "exec-c9eee2e2-b22c-4c91-96a1-f2dab59f7ab5.png",
+        "sha256": "0f58ebc65f957b91ba3e31e54fc236e4b8bc0e1ffae7597ea2af16a35216bea0"
       }
     },
     {
@@ -994,19 +998,23 @@
       ],
       "visible_bounds": [
         16,
-        399,
+        455,
         624,
         768
       ],
       "source_index": 2,
       "source_box": [
-        580,
-        102,
-        1196,
-        476
+        0,
+        0,
+        1536,
+        1024
       ],
-      "sha256": "7bbc8811c166ee6ebecb910e7e46ae54d96dc513ed1ccc25f4dfb4548b949947",
-      "overlay_name": "npc_overlay_amanda_boudoir_lying_side"
+      "sha256": "a3eaa618a58094358f506a2a72387c49c614aae7a27864c73895aa87f1df350a",
+      "overlay_name": "npc_overlay_amanda_boudoir_lying_side",
+      "override_source": {
+        "filename": "exec-cf9e1311-b1b4-4de2-82c9-35471122f147.png",
+        "sha256": "a08826351d52bcc5c93dce0e5172d6f3c67c9ebc617624d92a5c18d20ac24d03"
+      }
     },
     {
       "npc_id": "amanda",
@@ -1020,20 +1028,24 @@
         800
       ],
       "visible_bounds": [
-        219,
-        101,
-        421,
+        223,
+        32,
+        417,
         768
       ],
       "source_index": 2,
       "source_box": [
-        241,
-        541,
-        446,
-        1217
+        0,
+        0,
+        1122,
+        1402
       ],
-      "sha256": "170b4f36f362b5bf5e0d4e79cf916396d48c1bb44e7c8f00e45da84b387ef54e",
-      "overlay_name": "npc_overlay_amanda_boudoir_over_shoulder"
+      "sha256": "e461d3dab5f93325e52a423c2f1ced26d570688b0dbb2fefe4b4d5ddb22eca77",
+      "overlay_name": "npc_overlay_amanda_boudoir_over_shoulder",
+      "override_source": {
+        "filename": "exec-9dd58dd9-e596-4f1d-b796-b518c96f305b.png",
+        "sha256": "07dfbee36dd168c5d26dfe3feaff9762c7e9b2100ecbdb65dd2b7bf51b002788"
+      }
     },
     {
       "npc_id": "amanda",
@@ -4097,23 +4109,23 @@
         800
       ],
       "visible_bounds": [
-        136,
+        133,
         158,
-        503,
+        506,
         768
       ],
       "source_index": 14,
       "source_box": [
         0,
         0,
-        1024,
-        1536
+        1122,
+        1402
       ],
-      "sha256": "bae6f1c913422604f2baf22c1188480c6903785f71ae066db55b35819cd2242a",
+      "sha256": "058e1d60b386124637ceaf9de43eb9992c41420ffb826bd9c026518583a5bbab",
       "overlay_name": "npc_overlay_sandra_boudoir_kneeling",
       "override_source": {
-        "filename": "exec-baae6ecf-6eb0-4276-82dd-c516e42088c5.png",
-        "sha256": "5eaeba5bee4c78bc6a96f0b685e9afd64f279b7408cfc19f902afe26ca14feb3"
+        "filename": "exec-37713d6f-5d89-4d59-9f6e-bd1e4cac7154.png",
+        "sha256": "7346d0e892de965ae3409af53f0119066d97a8763cb9ae4aa6b6d59f846e1226"
       }
     },
     {
@@ -4129,7 +4141,7 @@
       ],
       "visible_bounds": [
         16,
-        550,
+        569,
         624,
         768
       ],
@@ -4137,14 +4149,14 @@
       "source_box": [
         0,
         0,
-        1774,
-        887
+        2024,
+        777
       ],
-      "sha256": "9aca1849a42683510f22742908db0cd9abae12e298b2337d2c7d69470b1349a9",
+      "sha256": "05d7df3a4d7c6c19cd2adbb8cb7ac3f14e905d9510593d293372f38d1577d1df",
       "overlay_name": "npc_overlay_sandra_boudoir_lying_front",
       "override_source": {
-        "filename": "exec-ae191434-36b1-441d-9cca-0a883cf0aef8.png",
-        "sha256": "c02d10bc1fef7315fdfa18151e081a25d0f94ab7521527fb3740e6b1e3c58404"
+        "filename": "exec-bd92cfdf-004f-4a98-bf6c-3365ec571b42.png",
+        "sha256": "293ebd69614584955c7ded699693d184304806635559184ee4377a53e7d753f0"
       }
     },
     {
@@ -4186,9 +4198,9 @@
         800
       ],
       "visible_bounds": [
-        184,
+        173,
         32,
-        456,
+        466,
         768
       ],
       "source_index": 14,
@@ -4198,11 +4210,11 @@
         1024,
         1536
       ],
-      "sha256": "5ca5d7972ea18c3f6f60dd897f5356352c9d81bcf681e88fc9e9abd3f04101a2",
+      "sha256": "347fbe2be3810b655c9f4145a68d0bbee65d78b78f113f67da21111c5bb9c74a",
       "overlay_name": "npc_overlay_sandra_boudoir_over_shoulder",
       "override_source": {
-        "filename": "exec-4940db6f-93f9-4bb5-a224-719d2bea6936.png",
-        "sha256": "5e8809b60dba30582b11c84ab995c7553c6e9b46f273131e8a27d5264d7cdeff"
+        "filename": "exec-ee214376-09cb-4ce2-b966-8546bc6a32df.png",
+        "sha256": "a9c145477bcf9729e03dd7893034a2f59004f87fef4997fbc9be794f5ad23298"
       }
     },
     {
