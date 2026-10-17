@@ -707,11 +707,7 @@ screen main_ui_left_panel(room_name, desc, picture, dialogue=False, who=None):
                 background "#000000ff"
 
                 if dialogue:
-                    vbox:
-                        spacing 8
-                        if who is not None:
-                            text who id "who" style "say_label"
-                        text desc id "what" size 20
+                    use npc_sprite_dialogue_line(who, desc, 20)
                 elif str(rooms.current_code or "") == "DebugBuilderRoom":
                     viewport:
                         xfill True
@@ -768,11 +764,7 @@ screen main_ui_talk_panel(girl_name="", room_name="", desc="", dialogue=False, w
                 mousewheel True
 
                 if dialogue:
-                    vbox:
-                        spacing 8
-                        if who is not None:
-                            text who id "who" style "say_label"
-                        text _text id "what" size 20
+                    use npc_sprite_dialogue_line(who, _text, 20)
                 else:
                     text _text size 20
 

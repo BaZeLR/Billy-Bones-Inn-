@@ -33,6 +33,10 @@ Use these as implementation authority:
 - `PROJECT_MAP_AND_DEPENDENCIES.md`
 - `RENpy_ENGINE_PROJECT_KNOWLEDGE_BASE.md`
 
+## Art Assets
+
+- [NPC sprite library v1: expressions, home/boudoir poses and dialogue gestures](art/npc_sprites/v1/README.md)
+
 ## Reference Only
 
 Historical audits, old port plans, TXT/QSP extraction notes, and `characters/full_logic/*` files are not architecture. Use them only to recover story content, original text, or a past bug note. When they mention old names like `AmandaVar`, `MelissaVar`, `GeorgettVar`, `Friends[...]`, or time slots, port that meaning into the current owner class/event/item/room model.
