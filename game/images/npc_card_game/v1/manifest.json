@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "collection": "card_game",
+  "complete": true,
+  "asset_kind": "individual complete static RGBA sprites",
+  "requires": "npc_sprites/v1",
+  "sprites": [
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "tease",
+      "image_name": "npc_amanda cards tease",
+      "overlay_name": "npc_overlay_amanda_cards_tease",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_tease.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        169,
+        158,
+        471,
+        768
+      ],
+      "scale": 0.45218680504077097,
+      "sha256": "9920d10a32e98c5f5579d865bc268400020b7ac09938f45db96de4708d7daa78",
+      "source": {
+        "filename": "exec-f2a1f950-e4af-49bf-9dec-7c175869364c.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "ad74337eb239e2b5f1b1533f1fb4c30c26f39c6c61a259f771fdb8ce3222716d"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "forfeit",
+      "image_name": "npc_amanda cards forfeit",
+      "overlay_name": "npc_overlay_amanda_cards_forfeit",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 736,
+      "visible_bounds": [
+        196,
+        32,
+        444,
+        768
+      ],
+      "scale": 0.550486163051608,
+      "sha256": "e243f76e546d26cd4d7d699f5f5b9536c85bd1da499321a63799cb101f4d144d",
+      "source": {
+        "filename": "exec-7934d489-310b-49cc-b3b1-efec63ed0d7c.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "e0a9ae79c22dfea6d7e9bed173535c537428dbd3311c708e47367d532daf37e5"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "challenge",
+      "image_name": "npc_amanda cards challenge",
+      "overlay_name": "npc_overlay_amanda_cards_challenge",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_challenge.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        211,
+        158,
+        429,
+        768
+      ],
+      "scale": 0.4135593220338983,
+      "sha256": "1ee4ac579825bf1cf80a38898c795a10355c34d66a61a49133f79a08a8dd0c63",
+      "source": {
+        "filename": "exec-c99c87ad-89f1-43d4-b138-abed0d14a0ed.png",
+        "size": [
+          1024,
+          1536
+        ],
+        "sha256": "604cfb4fa1f036150f687240324d2d958a78f24f59d7af76ffc33e91ccab5485"
+      }
+    }
+  ],
+  "notes": [
+    "Amanda extension: tease, forfeit and challenge.",
+    "Cards show decorative backs; ranks belong to game state/UI.",
+    "Furniture-free cutouts; place against the scene's seating.",
+    "No card rules, wardrobe layers or gameplay state are added."
+  ]
+}
