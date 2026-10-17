@@ -378,5 +378,24 @@
         "prompt": "Draw one new transparent full-body comic sprite of the SAME ADULT AMANDA shown in these two corrected character references. Both references define her identity and body: blue eyes, blonde fringe with braided pinned-up hair, a slender petite adult build and a very small natural A-size bust. Preserve that small chest volume exactly; it should have very little projection, including in this reclining view. Same ivory light lace-trim chemise with shoulder ties, softly draped rather than shaped into rounded bra cups. New pose: lying comfortably on her side, head toward the LEFT, body and legs toward the RIGHT, resting on one forearm while the other hand lightly touches a strand of her hair. Natural narrow ribcage, slender waist and hips. The lower leg is extended; the upper knee is slightly bent so its foot ends a little before the lower foot. Draw two clearly separate, normally articulated legs, knees, ankles and feet, with distinct foot outlines rather than fused or exactly stacked feet. Gentle amused expression, relaxed household resting pose. Preserve the existing polished comic drawing style. Exactly one complete figure, including every elbow and foot, with generous transparent margins on all sides. True transparent RGBA background, no bed, room, text or shadow patch."
       }
     ]
+  },
+  "torso_correction": {
+    "base_commit": "4d01fab85fc1e7028644fee5f4b5d60916478ce5",
+    "generator": "built-in image_gen",
+    "sprite": {
+      "npc_id": "amanda",
+      "group": "boudoir",
+      "state": "lying_front",
+      "source_filename": "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png",
+      "references": [
+        "exec-6502aa08-4012-4b94-9cb7-8f7393e158ff.png",
+        "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+      ],
+      "prompt": "Use case: identity-preserve.\nCreate one corrected full-body Ren'Py comic sprite of the SAME ADULT AMANDA in the reference images. They define her face, blonde fringe and braided updo, blue eyes, petite slender adult build, small natural chest and ivory short lace-trim chemise with ribbon shoulder ties. Retain those established features and the polished comic illustration style.\nPose: relaxed lying on her stomach, head to the RIGHT, two straight relaxed legs extending to the LEFT, barefoot. Her upper body is raised comfortably on both elbows and turned slightly toward the viewer, so the front plane of the rib cage and both shoulders are clear. Her forearms rest together in front of her; chin lifted with her gentle smile. The near upper arm hangs outside the rib cage and connects naturally from its shoulder to the elbow. Show a clear natural separation between upper arm and torso.\nDraw the upper torso freshly with correct anatomy and a very small, shallow chest. The side of the ribs behind the near arm is FLAT and slender, tapering into the waist: no round bulge there. The opaque ivory chemise follows the ribs with loose lengthwise folds on its side; all shallow shaping of its bodice is on the front between the arms. Avoid a circular fabric cup, balloon or dome beneath the armpit. No exaggerated chest volume or cleavage. Keep her slim adult proportions and natural neck, shoulders, pelvis, knees, ankles and feet. Both legs connect coherently to their own hips and end in two distinct normal feet.\nOne whole horizontal figure on true transparent RGBA background, generous margins around every extremity, no furniture, shadow patch, text or watermark. Preserve the existing garment length, shoulder ties and lace; no wardrobe redesign.",
+      "generator": "built-in image_gen",
+      "supersedes": "exec-c9eee2e2-b22c-4c91-96a1-f2dab59f7ab5.png",
+      "reason": "Remove the misplaced round contour on the side of the ribcage under the near upper arm; redraw a front-facing upper torso with shallow chest volume."
+    },
+    "review": "The first returned edit retained the faulty side contour and was rejected. The selected redraw removes that contour and makes the front of the chest visible between the arms. Final exported PNG reviewed on light and dark backgrounds."
   }
 }

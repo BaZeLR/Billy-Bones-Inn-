@@ -35,6 +35,22 @@ files. Automated PNG/hash checks verify file integrity and image bindings;
 they do not certify drawn anatomy. This revision changes no Ren'Py source,
 image names or canvas dimensions.
 
+## Follow-up: Amanda front-lying torso
+
+The previous front-lying Amanda sprite still had a misplaced rounded contour
+on the side of the torso below the near upper arm. That drawing was rejected
+and replaced again using her corrected kneeling and existing standing model
+references. The new upper torso faces the viewer more clearly, with shallow
+chest shaping on the front of the ribs and a flat garment side behind the arm.
+Her ivory chemise, character identity and front-lying pose category are kept.
+Only this runtime PNG changes in this follow-up; its image name, 640×800 canvas
+and Ren'Py bindings remain unchanged.
+
+The [comparison](previews/amanda_torso_correction.jpg) uses the exported PNG
+from `4d01fab` and the current export, including light and dark backgrounds.
+The focused 26-test run and 160 asset subtests passed after this replacement;
+these validate integration and file properties, not the drawing's anatomy.
+
 ## Passed checks
 
 - Ren'Py **8.5.2.26010301**: project `compile` command completed with exit 0.

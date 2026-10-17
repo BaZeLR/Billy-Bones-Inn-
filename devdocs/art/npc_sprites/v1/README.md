@@ -21,6 +21,12 @@ petite, small-bust model, and Sandra's kneeling, front-lying and over-shoulder
 poses to repair the leg/foot construction and standing stance. The
 [before/after preview](previews/body_corrections.jpg) shows actual PNG exports.
 
+The following targeted revision redraws Amanda's front-lying upper torso. It
+removes the misplaced rounded chest contour beneath the near upper arm and
+uses a clearer forward-facing ribcage. Her ivory outfit and small-chested
+adult character model are retained. See the
+[exported torso comparison](previews/amanda_torso_correction.jpg).
+
 ## Files
 
 `game/images/npc_sprites/v1/<npc>/` contains individual RGBA PNGs:

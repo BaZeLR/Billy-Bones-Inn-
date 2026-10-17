@@ -967,7 +967,7 @@
       ],
       "visible_bounds": [
         16,
-        569,
+        485,
         624,
         768
       ],
@@ -975,14 +975,14 @@
       "source_box": [
         0,
         0,
-        1774,
-        887
+        1536,
+        1024
       ],
-      "sha256": "ef756654bcf3d19a0a56b4c4a2f111059a677ef9f2411003f45cd741b8ebefba",
+      "sha256": "2b0c17405b52946112705f8e088625ae38351cc17dff2f14cb175d02fea26280",
       "overlay_name": "npc_overlay_amanda_boudoir_lying_front",
       "override_source": {
-        "filename": "exec-c9eee2e2-b22c-4c91-96a1-f2dab59f7ab5.png",
-        "sha256": "0f58ebc65f957b91ba3e31e54fc236e4b8bc0e1ffae7597ea2af16a35216bea0"
+        "filename": "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png",
+        "sha256": "2d810f48af188d4643bf26a212f8b1aeba30c839ec1aee2fdd1ab53b1e3062f8"
       }
     },
     {
