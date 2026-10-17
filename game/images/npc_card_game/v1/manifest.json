@@ -190,12 +190,105 @@
         ],
         "sha256": "b73c816a8cda1ada01bbb42d7da400bfa683bda48297d140d13765ff683b9837"
       }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "floor_deal",
+      "image_name": "npc_melissa cards floor_deal",
+      "overlay_name": "npc_overlay_melissa_cards_floor_deal",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_floor_deal.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        92,
+        158,
+        548,
+        768
+      ],
+      "scale": 0.48221343873517786,
+      "sha256": "3ee9360ed5db0cacd43d8c32931f3cace01ad6a8071ac0f102498bc7809083ce",
+      "source": {
+        "filename": "exec-7645f807-0a26-492d-9507-082cb95b6251.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "23e56d40c241cfa2f9c18b9f90b0e5d3315d0366e62c8acc53d3904ff6d343d8"
+      }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "kneel_forfeit",
+      "image_name": "npc_melissa cards kneel_forfeit",
+      "overlay_name": "npc_overlay_melissa_cards_kneel_forfeit",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_kneel_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        147,
+        158,
+        492,
+        768
+      ],
+      "scale": 0.478806907378336,
+      "sha256": "e9f52d8fb574eb572f2f84902fe5c5d13c168f4db0c259cfaf8dea8f760c4b49",
+      "source": {
+        "filename": "exec-d589952d-2edd-413a-b55e-954fb9da831d.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "133cd74bb713323c749cd6be3c80fdf3b342f060d3f81c58b1ff585ba36fd905"
+      }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "recline_bluff",
+      "image_name": "npc_melissa cards recline_bluff",
+      "overlay_name": "npc_overlay_melissa_cards_recline_bluff",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_recline_bluff.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 480,
+      "visible_bounds": [
+        16,
+        437,
+        624,
+        768
+      ],
+      "scale": 0.412483039348711,
+      "sha256": "d685459b5f1e562125823fa9e16ee83220a37d84609c1ce50ad844578adcabd8",
+      "source": {
+        "filename": "exec-4038d811-637a-46fd-94b5-bb5749ae4028.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "sha256": "d983b06b2f2dd9a805e8d8e37903e9ea8fe51e7a9089736c075a9ba3ea05807a"
+      }
     }
   ],
   "notes": [
     "Character-specific card-game cutouts; see sprites for pose identifiers.",
     "Cards show decorative backs; ranks belong to game state/UI.",
-    "Furniture-free cutouts; place against the scene's seating.",
+    "Furniture-free cutouts; align with the scene's seating or floor.",
     "No card rules, wardrobe layers or gameplay state are added."
   ]
 }
