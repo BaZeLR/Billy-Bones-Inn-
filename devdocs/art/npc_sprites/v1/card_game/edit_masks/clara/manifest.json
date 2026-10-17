@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "kind": "editor_garment_selection_masks",
+  "canvas": [
+    640,
+    800
+  ],
+  "origin": "top-left",
+  "placement": [
+    0,
+    0
+  ],
+  "rgba_convention": "Black selected pixels; transparent unselected pixels.",
+  "selection_convention": "White selects; black preserves; gray is edge antialiasing.",
+  "limitations": "Visible fabric regions only. Hidden anatomy is not inferred.",
+  "masks": [
+    {
+      "state": "forfeit",
+      "region": "upper_fabric",
+      "source": "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+      "source_sha256": "f80e628f63dd7e401921d95bdeb268426fe813bb99fca97b675943a2bc4e6c50",
+      "canvas": [
+        640,
+        800
+      ],
+      "placement": [
+        0,
+        0
+      ],
+      "bounds": [
+        308,
+        406,
+        437,
+        530
+      ],
+      "black_rgba": {
+        "file": "clara_cards_forfeit_upper_fabric_black_rgba.png",
+        "sha256": "f6fee09de125e2b32aa7ae5ef200528220c0d67856af233f00b9bfaeb63767ad"
+      },
+      "selection": {
+        "file": "clara_cards_forfeit_upper_fabric_selection.png",
+        "sha256": "d2f3bf3200e12c513308043a0488d5850e47e2c6b72750a02d2278247943b946"
+      }
+    },
+    {
+      "state": "forfeit",
+      "region": "lower_fabric",
+      "source": "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+      "source_sha256": "f80e628f63dd7e401921d95bdeb268426fe813bb99fca97b675943a2bc4e6c50",
+      "canvas": [
+        640,
+        800
+      ],
+      "placement": [
+        0,
+        0
+      ],
+      "bounds": [
+        322,
+        561,
+        409,
+        595
+      ],
+      "black_rgba": {
+        "file": "clara_cards_forfeit_lower_fabric_black_rgba.png",
+        "sha256": "4f0eaf3d0c2d8301429c5e35b8a6509b8673249ef6c5058b440aa7ee65f672ca"
+      },
+      "selection": {
+        "file": "clara_cards_forfeit_lower_fabric_selection.png",
+        "sha256": "5dfb4340ac9895e6107c182d73cca08ba2daa7fdf7087b64ec973fdbbd3849a0"
+      }
+    },
+    {
+      "state": "counterbet",
+      "region": "upper_fabric",
+      "source": "game/images/npc_card_game/v1/clara/clara_cards_counterbet.png",
+      "source_sha256": "ba765b7e6cd7b8e5b65dcb086d15f28110e81dcdb9aae9499b864ca87f352a9c",
+      "canvas": [
+        640,
+        800
+      ],
+      "placement": [
+        0,
+        0
+      ],
+      "bounds": [
+        266,
+        399,
+        415,
+        532
+      ],
+      "black_rgba": {
+        "file": "clara_cards_counterbet_upper_fabric_black_rgba.png",
+        "sha256": "ed6c6b4aeef1f563462ec1ea12cd723376459023217b45b5db4c4fea4333733c"
+      },
+      "selection": {
+        "file": "clara_cards_counterbet_upper_fabric_selection.png",
+        "sha256": "2bb96e011d3f895782b226dfa15bfd7f50196a7e619790e39bb7532d3b207e9f"
+      }
+    },
+    {
+      "state": "counterbet",
+      "region": "lower_fabric",
+      "source": "game/images/npc_card_game/v1/clara/clara_cards_counterbet.png",
+      "source_sha256": "ba765b7e6cd7b8e5b65dcb086d15f28110e81dcdb9aae9499b864ca87f352a9c",
+      "canvas": [
+        640,
+        800
+      ],
+      "placement": [
+        0,
+        0
+      ],
+      "bounds": [
+        308,
+        561,
+        370,
+        622
+      ],
+      "black_rgba": {
+        "file": "clara_cards_counterbet_lower_fabric_black_rgba.png",
+        "sha256": "067c669aa248929252942879edd34c876c6ebd37fdc9ac294101e64999df3ed3"
+      },
+      "selection": {
+        "file": "clara_cards_counterbet_lower_fabric_selection.png",
+        "sha256": "1ed5dd0db680a8a59d370b6fa1e66a33955ce45f0590a9d4e8cdf1a01ec33252"
+      }
+    }
+  ]
+}

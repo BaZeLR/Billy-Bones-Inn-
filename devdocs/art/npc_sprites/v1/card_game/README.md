@@ -59,6 +59,11 @@ runtime id remains `clara`. See [Clarissa's actual card-playing export preview](
 See [the two clothing-stage exports](previews/clara_cards_clothing.jpg).
 Each final pose holds cards in her hand.
 
+[Clarissa's editor masks](edit_masks/clara/README.md) provide separate,
+pose-aligned black-on-transparent selections and grayscale selection masks
+for visible fabric regions in `forfeit` and `counterbet`. They are authoring
+files, with no anatomical detail, kept outside the runtime image folders.
+
 The previews show the runtime PNGs on light and dark backgrounds. These fourteen poses extend
 the 160-item library; the base checklist and its manifest retain their original
 count. This extension covers all four NPCs. Each asset is a
