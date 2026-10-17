@@ -15,6 +15,7 @@ image npc_clara cards side_recline = "images/npc_card_game/v1/clara/clara_cards_
 image npc_clara cards kneel_play = "images/npc_card_game/v1/clara/clara_cards_kneel_play.png"
 image npc_clara cards forfeit = "images/npc_card_game/v1/clara/clara_cards_forfeit.png"
 image npc_clara cards counterbet = "images/npc_card_game/v1/clara/clara_cards_counterbet.png"
+image npc_clara cards floor_lean = "images/npc_card_game/v1/clara/clara_cards_floor_lean.png"
 
 # Same 1536x1024 BGIMAGE canvas and body placement as NPCSpriteLibrary.
 image npc_overlay_amanda_cards_tease = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/amanda/amanda_cards_tease.png")
@@ -31,3 +32,4 @@ image npc_overlay_clara_cards_side_recline = Composite((1536, 1024), (448, 224),
 image npc_overlay_clara_cards_kneel_play = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_kneel_play.png")
 image npc_overlay_clara_cards_forfeit = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_forfeit.png")
 image npc_overlay_clara_cards_counterbet = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_counterbet.png")
+image npc_overlay_clara_cards_floor_lean = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_floor_lean.png")

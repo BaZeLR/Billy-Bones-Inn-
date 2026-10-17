@@ -1,7 +1,7 @@
 # NPC card-game poses
 
-Fourteen additional, individually exported sprites for playful private card-game
-scenes: three poses each for Amanda, Sandra and Melissa, and five for Clarissa. Amanda retains her blonde
+Fifteen additional, individually exported sprites for playful private card-game
+scenes: three poses each for Amanda, Sandra and Melissa, and six for Clarissa. Amanda retains her blonde
 braided updo, blue eyes, petite adult build and ivory homewear. Sandra retains
 her copper-red hair, green eyes, mature fuller build and burgundy homewear.
 Melissa retains her long black hair, olive complexion, established adult
@@ -51,20 +51,24 @@ rather than an automatic wardrobe progression.
 | `kneel_play` | Kneeling with folded legs, cards raised near her shoulder and the other hand resting on her knees | `npc_clara cards kneel_play` |
 | `forfeit` | Kneeling with cards raised, holding her removed slip, in matching lavender camisole and briefs | `npc_clara cards forfeit` |
 | `counterbet` | Seated with one knee raised, a supporting palm and cards in hand, in the same camisole and briefs | `npc_clara cards counterbet` |
+| `floor_lean` | Floor-seated lean on one palm, one knee raised and the other leg folded, cards near her shoulder, in her lavender slip | `npc_clara cards floor_lean` |
 
-The first three wear her established short lavender slip with ivory lace.
+The first three and `floor_lean` wear her established short lavender slip
+with ivory lace.
 The two clothing-stage variants wear a matching opaque lavender camisole and
 briefs, and use stronger comic ink outlines. Her
 runtime id remains `clara`. See [Clarissa's actual card-playing export preview](previews/clara_cards.jpg).
 See [the two clothing-stage exports](previews/clara_cards_clothing.jpg).
 Each final pose holds cards in her hand.
+See [the new floor-lean export](previews/clara_cards_floor_lean.jpg) and
+[the accompanying dialogue close-ups](../closeups/README.md).
 
 [Clarissa's editor masks](edit_masks/clara/README.md) provide separate,
 pose-aligned black-on-transparent selections and grayscale selection masks
 for visible fabric regions in `forfeit` and `counterbet`. They are authoring
 files, with no anatomical detail, kept outside the runtime image folders.
 
-The previews show the runtime PNGs on light and dark backgrounds. These fourteen poses extend
+The previews show the runtime PNGs on light and dark backgrounds. These fifteen poses extend
 the 160-item library; the base checklist and its manifest retain their original
 count. This extension covers all four NPCs. Each asset is a
 complete static image with its own facial acting.
@@ -77,8 +81,8 @@ hashes. Each file is RGBA, 640×800, with a baseline at y=768. Seated figures ha
 a smaller visible height than the standing figure. No image processing is
 needed in Ren'Py.
 
-`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers fourteen body
-images and fourteen media-panel overlays. It uses the base library's existing
+`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers fifteen body
+images and fifteen media-panel overlays. It uses the base library's existing
 `npc_sprite_body` transform and dialogue portraits:
 
 ```renpy
@@ -118,6 +122,8 @@ show npc_clara cards forfeit at npc_sprite_body
 npc_clara_voice smiling "You won this round."
 show npc_clara cards counterbet at npc_sprite_body
 npc_clara_voice playful "I raise."
+show npc_clara cards floor_lean at npc_sprite_body
+npc_clara_voice closeup_amused "Your move."
 hide npc_clara
 ```
 
@@ -207,7 +213,8 @@ scipy and create a JSON map such as:
   {"npc_id": "clara", "state": "side_recline", "source": "sources/clara_side_recline.png", "max_height": 480},
   {"npc_id": "clara", "state": "kneel_play", "source": "sources/clara_kneel_play.png", "max_height": 610},
   {"npc_id": "clara", "state": "forfeit", "source": "sources/clara_forfeit.png", "max_height": 610},
-  {"npc_id": "clara", "state": "counterbet", "source": "sources/clara_counterbet.png", "max_height": 610}
+  {"npc_id": "clara", "state": "counterbet", "source": "sources/clara_counterbet.png", "max_height": 610},
+  {"npc_id": "clara", "state": "floor_lean", "source": "sources/clara_floor_lean.png", "max_height": 610}
 ]}
 ```
 
@@ -221,9 +228,9 @@ does not redraw faces, anatomy or clothing, or rebuild the base library.
 
 ## Validation
 
-The fourteen exported files passed checks for unique hashes, manifest SHA-256
+The fifteen exported files passed checks for unique hashes, manifest SHA-256
 matches, RGBA mode, 640×800 canvases, transparent borders, zero RGB at zero
-alpha, recorded visible bounds, fourteen ordinary image declarations and fourteen
+alpha, recorded visible bounds, fifteen ordinary image declarations and fifteen
 media-panel overlay declarations. The actual exports were visually inspected
 on light and dark backgrounds.
 

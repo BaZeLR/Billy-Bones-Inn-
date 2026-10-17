@@ -106,6 +106,24 @@
           ]
         }
       ]
+    },
+    {
+      "state": "floor_lean",
+      "selected_source": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+      "max_height": 610,
+      "observed_pose": "Floor-seated lean supported on a palm, one raised knee and one folded leg. The generator followed the joint guide approximately; this is not an exact skeleton trace.",
+      "stages": [
+        {
+          "source": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one complete transparent full-body card-playing sprite for Ren'Py.\nInput image 1 supplies ADULT CLARISSA's exact face and grey eyes. Image 2 supplies her long silver-platinum hair, adult slender proportions and polished clean comic linework. Image 3 supplies her lavender slip dress with ivory lace trim and front ribbon. Image 4 is ONLY the stick-skeleton pose guide; it is not a character reference.\nPreserve the same grown woman and established proportions. Do not change her identity or enlarge her figure. Use clean dark ink outlines, clear shapes and soft cel shading.\nNew pose: comfortably semi-reclining on the implied floor, head and shoulders toward the LEFT and both feet toward the RIGHT. Her pelvis rests on the surface. The near arm reaches back to support her on its forearm and palm. The other elbow bends so that hand holds a clearly visible fan of dark-red patterned playing cards near her shoulder. Turn her face toward the other player with a confident amused smile.\nBoth knees are comfortably bent, with the nearer shin descending naturally to a bare foot planted on the implied surface. The farther leg sits behind it with correct occlusion. Maintain a continuous torso and connected pelvis, thighs, knees, shins and ankles. Include all fingertips, heels and toes, with natural feet oriented consistently with their knees.\nWear image 3's same short lavender slip dress and ivory lace, with its hem falling naturally over the lap and upper thighs. Preserve its existing fit and coverage.\nOne complete isolated adult character, full hair, fan of cards, hands, legs and feet inside generous clear margins. Genuine transparent RGBA. No room, rug, furniture, ground patch, cast shadow, other person, writing or watermark.",
+          "references": [
+            "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png",
+            "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+            "game/images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+            "devdocs/art/pose_library/v1/png/sandra_recline_knees_bent.png"
+          ]
+        }
+      ]
     }
   ],
   "unselected_attempts": [

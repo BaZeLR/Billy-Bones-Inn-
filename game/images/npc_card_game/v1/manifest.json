@@ -438,6 +438,37 @@
         ],
         "sha256": "8a19bdc330fac808c446ac074cbe526c36342ce0a9e3806581507e85835f7f49"
       }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "floor_lean",
+      "image_name": "npc_clara cards floor_lean",
+      "overlay_name": "npc_overlay_clara_cards_floor_lean",
+      "path": "images/npc_card_game/v1/clara/clara_cards_floor_lean.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        16,
+        170,
+        624,
+        768
+      ],
+      "scale": 0.5671641791044776,
+      "sha256": "93580e6a043db4bdf142abee575cb751f146799f9086fcc10081f30b75054bd4",
+      "source": {
+        "filename": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "5567224afdbc76a0378323222e747a3518cdd375376d13541dc6659f7668f7f4"
+      }
     }
   ],
   "notes": [

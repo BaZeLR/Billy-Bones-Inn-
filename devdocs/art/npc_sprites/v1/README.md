@@ -116,10 +116,10 @@ chair or sofa. All body PNGs share a 640×800 canvas and a consistent baseline.
 No new action dispatcher, event engine, schedule state or NPC state is added.
 
 An additional [card-game collection](card_game/README.md) provides three poses
-each for Amanda, Sandra and Melissa, and five for Clarissa, with its own PNG folder,
+each for Amanda, Sandra and Melissa, and six for Clarissa, with its own PNG folder,
 manifest and Ren'Py declarations. Melissa's floor poses and Clarissa's cozy
 lounge/bedroom poses suit a rug near the fireplace. All hold playing cards.
-These fourteen extend the base 160 assets.
+These fifteen extend the base 160 assets.
 
 Open the light/dark asset browser after starting a game:
 
@@ -171,3 +171,12 @@ distinct standing, seated, kneeling and reclining skeleton references, with
 four suggested poses per NPC. Each has a transparent PNG, editable SVG and
 named joint coordinates. These authoring guides supplement the established
 character identity references; they are not finished runtime sprites.
+
+## Clarissa close-ups and additional floor pose
+
+[The close-up collection](closeups/README.md) adds attentive and amused
+expressions, each with a full portrait and a dialogue-window crop. Use the
+existing `npc_clara_voice` alias with `closeup_attentive` or `closeup_amused`.
+Clarissa's additional `cards floor_lean` pose wears her lavender slip and
+holds cards. The runtime art now comprises 160 base PNGs, 15 card-game PNGs
+and 4 close-up/dialogue PNGs (179 total).
