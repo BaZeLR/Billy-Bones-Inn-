@@ -16,19 +16,19 @@ her own complete library, with no placeholders or missing categories.
 The body categories follow the reference names, with character-specific
 posture, gestures and acting. All five previously unavailable poses are included.
 
-The current drawing revision replaces Amanda's five bedroom poses to follow her
-petite, small-bust model, and Sandra's kneeling, front-lying and over-shoulder
-poses to repair the leg/foot construction and standing stance. The
-[before/after preview](previews/body_corrections.jpg) shows actual PNG exports.
+Amanda's front-lying pose is rebuilt with a low torso, continuous ribcage/waist/
+pelvis axis and slim adult legs. The knees and insteps face the implied support
+with heels upward, and the far leg sits behind the near leg. The leg rotation
+uses the user's exact selected image and a real prone-pose photograph as the
+placement reference. The visible chemise side follows the ribs without a
+misplaced front cup/bow under the arm. Her small-chested adult identity and
+short ivory homewear are retained.
 
-The following targeted revision redraws Amanda's front-lying upper torso. It
-removes the misplaced rounded chest contour beneath the near upper arm and
-uses a clearer forward-facing ribcage. Her ivory outfit and small-chested
-adult character model are retained. See the
-[exported anatomy comparison](previews/amanda_torso_correction.jpg).
-The follow-up limb revision separates her hands, turns the near hand palm-up
-using her existing five-finger stop-gesture reference, and redraws the leg
-contours. The comparison includes hand and leg details from the runtime PNGs.
+The other Amanda and Sandra body revisions remain included. See the
+[export comparison](previews/amanda_torso_correction.jpg),
+[construction guide](references/amanda_prone_construction.png) and the
+[photo reference source](https://www.hospitalsenhedmidt.dk/patientvejledninger/medicinsk-diagnostisk-center/dysfunktionel-vejrtrakning/).
+The reference photo is not redistributed with these assets.
 
 ## Files
 

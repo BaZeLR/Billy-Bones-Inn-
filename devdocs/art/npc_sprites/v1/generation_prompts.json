@@ -443,5 +443,61 @@
       }
     ],
     "supersedes": "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png"
-  }
+  },
+  "whole_pose_rebuild": {
+    "base_commit": "da82601cb43e648776523f1c116d34aa985ce171",
+    "generator": "built-in image_gen",
+    "npc_id": "amanda",
+    "group": "boudoir",
+    "state": "lying_front",
+    "source_filename": "exec-cca2649d-837b-4303-bbdc-f25df1b813f0.png",
+    "construction_guide": "devdocs/art/npc_sprites/v1/references/amanda_prone_construction.png",
+    "steps": [
+      {
+        "stage": "construction_render",
+        "source_filename": "exec-ab0ff30b-6202-4615-936f-56f93d244cd2.png",
+        "references": [
+          "devdocs/art/npc_sprites/v1/references/amanda_prone_construction.png",
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+          "game/images/amanda/amanda_card.jpg"
+        ],
+        "prompt": "Use case: sketch-to-render.\nRender the EXACT LOW PRONE BODY CONSTRUCTION in image 1 as one finished full-body comic sprite of adult Amanda from image 2. Image 3 is her face reference.\nImage 1 is the mandatory pose and joint-placement guide: preserve the positions, lengths and common perspective of its pelvis, two hip joints, thighs, knees, shins, ankles, shoulders, elbows and wrists. Its trunk lies nearly horizontal, with the pelvis and ribcage joined along one continuous low axis. The head is low near the forearms. Do not substitute an upright chest or a large arched back. The same side/three-quarter camera applies to the entire body; only her head turns gently toward the viewer.\n\nReplace the diagram's colored blocks with a normally constructed slender adult female body. Keep both legs naturally connected to the pelvis and each knee between its own thigh and calf. Draw real knees, narrow ankles, relaxed correctly articulated feet and toes, natural forearms and hands. The colored joint dots are guides, not body lumps. The two legs remain visibly separate as in the guide.\nUse image 2's petite adult build, very small natural A-size chest, blue eyes, blonde fringe and braided updo. Dress her in image 2's light ivory short lace-trim chemise, with its ribbon shoulder ties. Cloth follows the coherent ribcage and pelvis underneath. No round breast contour on the side of the ribs or under the armpit. Gentle smile, same comic illustration style, line weight and softly shaded palette as image 2.\nOne complete figure on TRUE TRANSPARENT RGBA, generous margins around every hand and foot. Remove every diagram label, guide line, dot and colored block. No bed, floor, furniture, props, background, shadows or text."
+      },
+      {
+        "stage": "proportions",
+        "source_filename": "exec-50003d75-775f-43dd-a81e-55c34afd4acd.png",
+        "references": [
+          "exec-ab0ff30b-6202-4615-936f-56f93d244cd2.png",
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+        ],
+        "prompt": "Correct the BODY PROPORTIONS of the adult Amanda sprite in image 1 using image 2 as the authoritative body-build reference. Keep image 1's new low prone pose and common side-view perspective.\nHer legs in image 1 are too thick and heavy for the slender adult in image 2, and her torso is pinched too narrow between ribs and hips. Redraw both upper thighs about one-third slimmer in cross-section, with correspondingly slender knees, tapered calves and narrow ankles. Keep the leg bone/joint positions and overall leg lengths consistent with the pose. Show normal subtle kneecap and ankle landmarks, without bulbous joints or swollen calf contours. Each leg must stay clearly connected to its own hip through thigh, knee, shin and foot.\nAt the same time, give the covered waist and abdomen a natural continuous depth between ribcage and pelvis: fill out the pinched hollow at the middle of the trunk. The side-view trunk should be visibly deeper than either individual upper thigh. Maintain a smooth modest spine curve and natural pelvis, without a hip hump. Construct a slim real adult body consistent with image 2 before draping the chemise over it.\nPreserve the petite small-chested adult identity, face, blue eyes, blonde braided updo, gentle smile, low head and shoulders, arms and hands, ivory short lace-trim chemise, style, lighting and colors. Keep the chest shallow, and the side of the ribs behind the near arm free of any round extra chest contour.\nOne complete horizontal character, all limbs and hair inside generous margins, true transparent RGBA background, no furniture, floor, props, guide marks, text or shadow patch."
+      },
+      {
+        "stage": "photo_guided_leg_rotation",
+        "source_filename": "exec-47458b00-a1fc-4092-9912-a2a094286145.png",
+        "references": [
+          "user-selected image-edit-target-923ab02d5a52632f.png",
+          "https://www.hospitalsenhedmidt.dk/globalassets/allepatientinformationer/hem/afdelinger/medicinsk-diagnostisk-center/silkeborg/fysioterapi/billeder/dysfunktionel-vejrtraekning-oevelse-mave.jpg"
+        ],
+        "prompt": "Image 1 is the EXACT EDIT SOURCE: adult Amanda in her ivory chemise.\nImage 2 is a REAL PRONE-POSE REFERENCE, specifically for the hips, knees, lower legs and feet. Both images have the head at right and feet at left.\n\nRedraw Amanda's pelvis-to-feet orientation to match the physical placement in the photograph. Both kneecaps face the support plane DOWN, and the upper visible contours show the backs of her knees and calves. Her ankles point naturally, with the TOPS/INSTEPS OF THE FEET DOWN and HEELS UP as in the photo. Copy the photo's side/plantar foot profiles and toe direction, not a frontal toenail view. Use the same coherent rotation through each hip, knee and ankle.\nMatch the reference's depth overlap: the farther leg is mostly behind the near one, with its heel/foot visible just above and modestly to the right of the near foot. Its leg is not drastically shorter. Keep both legs normally proportioned, close and relaxed, with a believable pelvis and slim thigh/knee/calf/ankle transitions.\n\nPreserve Amanda's selected face, blonde braided updo, eyes, expression, arms, hands, slender adult build, small chest, ivory short chemise, lace and comic drawing style. The photo supplies anatomy and placement ONLY: do not copy the photo person's identity, hair, shirt, trousers, mat, room or background. Keep the same clothing coverage as image 1. Flatten the erroneous little circular cloth pouch below her near upper arm into the plain side drape of the chemise.\nExactly one complete horizontal cutout on genuine transparent RGBA, all fingertips and toes within generous margins, no labels, furniture, floor, mat or shadow patch."
+      },
+      {
+        "stage": "plain_side_panel",
+        "source_filename": "exec-cca2649d-837b-4303-bbdc-f25df1b813f0.png",
+        "references": [
+          "exec-47458b00-a1fc-4092-9912-a2a094286145.png",
+          "amanda_photo_side_panel_guide.jpg"
+        ],
+        "prompt": "Image 1 is the full sprite to edit. Image 2 marks the ONLY area to change in red.\nReplace the hanging pouch-shaped construction inside the red box with a PLAIN FLAT SIDE PANEL of the ivory linen chemise. This is the garment's side along the ribs: draw a smooth continuation of the cloth at the waist, with a few shallow lengthwise folds. Its lower silhouette continues almost straight from the waist to the nearer arm. Remove the rounded pouch silhouette and its cup-like circular shading. The center-front shaping of the dress faces down and is hidden by the near arm in this pose.\nKeep the existing armhole lace and straps, the same opaque fabric and coverage, colors and comic style. Preserve ALL OTHER PARTS EXACTLY, especially the newly corrected downward-facing knees, insteps-down/heels-up foot rotation and far-leg overlap. Do not change any leg length, foot position, face, hand, arm, hip or torso position.\nOne complete character on true transparent RGBA, generous margins, no red box or guide marks, no furniture, floor, text or shadow."
+      }
+    ],
+    "replaces_previous_pose": true,
+    "review_scope": "Low whole-body axis, adult limb proportions, downward knee/instep orientation, raised heels, far-leg depth overlap, plain garment side panel.",
+    "selected_edit_source": {
+      "filename": "image-edit-target-923ab02d5a52632f.png",
+      "sha256": "02f41b839ab92d3b8908ff477e92a761abd31e1296a2c40891f3e0c99cdf0b96"
+    },
+    "pose_reference_url": "https://www.hospitalsenhedmidt.dk/patientvejledninger/medicinsk-diagnostisk-center/dysfunktionel-vejrtrakning/"
+  },
+  "current_amanda_front_lying_source": "exec-cca2649d-837b-4303-bbdc-f25df1b813f0.png"
 }

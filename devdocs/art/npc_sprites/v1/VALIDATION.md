@@ -16,56 +16,27 @@ The completion update adds the five previously unavailable poses:
 The manifest has `complete: true` and an empty `missing` list. All new frames
 have individual artwork; there are no duplicate substitutes or placeholders.
 
-## Drawing revision
+## Current drawing revision
 
-The latest revision replaces all five Amanda bedroom poses using her existing
-standing home sprite as the petite body guide and her A-size description in
-`InitAmanda.rpy`. Her seated, kneeling, front-lying, side-lying and over-shoulder
-sprites use the smaller chest silhouette and revised body construction.
+Amanda's front-lying pose is rebuilt from a low joint/body construction guide,
+using her existing standing model for the adult petite build. The user's
+exact selected image (`image-edit-target-923ab02d5a52632f.png`) is the edit
+source for the leg-orientation correction. A real prone-pose photo from
+Regionshospitalet Silkeborg supplies the knee/instep direction and far-leg
+overlap reference; its URL is retained in the prompt record. The final image
+keeps downward-facing knees and insteps, upward heels, a far leg behind the
+near leg, and a plain side drape beneath the near upper arm.
 
-Sandra's kneeling, front-lying and over-shoulder sprites are replaced to clarify
-the folded legs, knees, ankles and feet. The over-shoulder pose now has a
-weight-bearing foot planted flat. Face identity, copper hair, green chemise and
-burgundy robe are retained.
+The final RGBA export is inspected on solid light and dark backgrounds. The
+[comparison](previews/amanda_torso_correction.jpg) shows the `da82601` runtime
+PNG beside the new export, plus foot and torso details from the user's selected
+source normalized through the same export preparation. The reference photo
+is used for visual guidance and is not redistributed.
 
-The selected replacements were inspected at full size before export, followed
-by inspection of the final RGBA PNGs on light/dark backgrounds. The
-[before/after board](previews/body_corrections.jpg) compares actual exported
-files. Automated PNG/hash checks verify file integrity and image bindings;
-they do not certify drawn anatomy. This revision changes no Ren'Py source,
-image names or canvas dimensions.
-
-## Follow-up: Amanda front-lying torso
-
-The previous front-lying Amanda sprite still had a misplaced rounded contour
-on the side of the torso below the near upper arm. That drawing was rejected
-and replaced again using her corrected kneeling and existing standing model
-references. The new upper torso faces the viewer more clearly, with shallow
-chest shaping on the front of the ribs and a flat garment side behind the arm.
-Her ivory chemise, character identity and front-lying pose category are kept.
-Only this runtime PNG changes in this follow-up; its image name, 640×800 canvas
-and Ren'Py bindings remain unchanged.
-
-The [comparison](previews/amanda_torso_correction.jpg) uses the exported PNG
-from `4d01fab` and the current export, including light and dark backgrounds.
-The focused 26-test run and 160 asset subtests passed after this replacement;
-these validate integration and file properties, not the drawing's anatomy.
-
-## Follow-up: Amanda legs and hands
-
-The front-lying sprite is replaced again after the marked anatomy feedback.
-The two hands now occupy separate positions; the near hand is open and palm-up,
-using the existing Amanda stop-gesture hand as an anatomical reference. Four
-fingers and the thumb have distinct silhouettes. Leg contours are redrawn from
-the covered pelvis through separate thighs, knees, calves, ankles and feet.
-The corrected torso side remains flat behind the near upper arm.
-
-The runtime PNG is inspected on light and dark backgrounds with enlarged hand
-and leg details. The comparison's top row uses the original `4d01fab` full-body
-export; the hand and leg rows compare the `6eb0815` export with this revision.
-The 26 focused tests and 160 asset subtests passed after export. These checks
-verify image integrity and bindings; anatomical review remains visual. This
-revision changes only one runtime PNG, its manifest record, previews and docs.
+Only one runtime PNG, its manifest record, previews and authoring records
+change. Ren'Py source, image names and canvas dimensions are unchanged.
+The 26 focused tests and 160 image subtests passed after export; these checks
+validate file integrity, alpha and bindings, not drawn human anatomy.
 
 ## Passed checks
 
