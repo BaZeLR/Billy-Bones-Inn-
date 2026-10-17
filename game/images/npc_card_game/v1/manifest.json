@@ -283,6 +283,99 @@
         ],
         "sha256": "d983b06b2f2dd9a805e8d8e37903e9ea8fe51e7a9089736c075a9ba3ea05807a"
       }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "floor_sit",
+      "image_name": "npc_clara cards floor_sit",
+      "overlay_name": "npc_overlay_clara_cards_floor_sit",
+      "path": "images/npc_card_game/v1/clara/clara_cards_floor_sit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        48,
+        158,
+        592,
+        768
+      ],
+      "scale": 0.5,
+      "sha256": "6c73c15512c8427058081e685cd9408908c434c2eff07cb61685e0be08e56928",
+      "source": {
+        "filename": "exec-c688ae29-341b-4663-980e-34934d1ee534.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "e4c52537c50274531478ec1ddad0f69809b6461228d0a3899b4dc2a86c755bc1"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "side_recline",
+      "image_name": "npc_clara cards side_recline",
+      "overlay_name": "npc_overlay_clara_cards_side_recline",
+      "path": "images/npc_card_game/v1/clara/clara_cards_side_recline.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 480,
+      "visible_bounds": [
+        16,
+        549,
+        624,
+        768
+      ],
+      "scale": 0.3496262219666475,
+      "sha256": "c90177ffe3b04bc79c3b43c8db12a86993b9d2dcf699807cffbf89dd5d58a3be",
+      "source": {
+        "filename": "exec-1113566c-6fe3-451c-94e0-bc71baf6cbca.png",
+        "size": [
+          1774,
+          887
+        ],
+        "sha256": "602499d9344ed3445fb2658f5c4a179a18f85b3b93d1f3bfb82bf2494e59c809"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "kneel_play",
+      "image_name": "npc_clara cards kneel_play",
+      "overlay_name": "npc_overlay_clara_cards_kneel_play",
+      "path": "images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        102,
+        158,
+        537,
+        768
+      ],
+      "scale": 0.47104247104247104,
+      "sha256": "fbdaddd6fa1d959a8d7ada47c260ffbe73703d4892f6e0e52aeccd22171ccd66",
+      "source": {
+        "filename": "exec-9c3665bc-e23c-497e-a505-cbe31335d3c3.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "87bc17323677fc745baa3d7e2cb7d043238fef1d923b2e7cd0ea94f70eff021c"
+      }
     }
   ],
   "notes": [

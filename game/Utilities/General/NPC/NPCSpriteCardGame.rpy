@@ -10,6 +10,9 @@ image npc_sandra cards raise = "images/npc_card_game/v1/sandra/sandra_cards_rais
 image npc_melissa cards floor_deal = "images/npc_card_game/v1/melissa/melissa_cards_floor_deal.png"
 image npc_melissa cards kneel_forfeit = "images/npc_card_game/v1/melissa/melissa_cards_kneel_forfeit.png"
 image npc_melissa cards recline_bluff = "images/npc_card_game/v1/melissa/melissa_cards_recline_bluff.png"
+image npc_clara cards floor_sit = "images/npc_card_game/v1/clara/clara_cards_floor_sit.png"
+image npc_clara cards side_recline = "images/npc_card_game/v1/clara/clara_cards_side_recline.png"
+image npc_clara cards kneel_play = "images/npc_card_game/v1/clara/clara_cards_kneel_play.png"
 
 # Same 1536x1024 BGIMAGE canvas and body placement as NPCSpriteLibrary.
 image npc_overlay_amanda_cards_tease = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/amanda/amanda_cards_tease.png")
@@ -21,3 +24,6 @@ image npc_overlay_sandra_cards_raise = Composite((1536, 1024), (448, 224), "imag
 image npc_overlay_melissa_cards_floor_deal = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/melissa/melissa_cards_floor_deal.png")
 image npc_overlay_melissa_cards_kneel_forfeit = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/melissa/melissa_cards_kneel_forfeit.png")
 image npc_overlay_melissa_cards_recline_bluff = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/melissa/melissa_cards_recline_bluff.png")
+image npc_overlay_clara_cards_floor_sit = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_floor_sit.png")
+image npc_overlay_clara_cards_side_recline = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_side_recline.png")
+image npc_overlay_clara_cards_kneel_play = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/clara/clara_cards_kneel_play.png")

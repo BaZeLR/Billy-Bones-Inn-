@@ -1,11 +1,13 @@
 # NPC card-game poses
 
-Nine additional, individually exported sprites for playful private strip-card
-scenes: three poses each for Amanda, Sandra and Melissa. Amanda retains her blonde
+Twelve additional, individually exported sprites for playful private card-game
+scenes: three poses each for Amanda, Sandra, Melissa and Clarissa. Amanda retains her blonde
 braided updo, blue eyes, petite adult build and ivory homewear. Sandra retains
 her copper-red hair, green eyes, mature fuller build and burgundy homewear.
 Melissa retains her long black hair, olive complexion, established adult
 proportions and ivory/olive homewear, with comfortable poses at floor level.
+Clarissa retains her silver-platinum hair, grey eyes, slender adult proportions
+and lavender slip with ivory lace. Every delivered pose visibly holds cards.
 
 ## Amanda
 
@@ -40,9 +42,21 @@ also an individual PNG. Her side-reclining chemise pose is an alternative for
 an earlier round; these states are available for scene authors to choose,
 rather than an automatic wardrobe progression.
 
-The previews show the runtime PNGs on light and dark backgrounds. These nine poses extend
+## Clarissa — cozy lounge and bedroom
+
+| State | Acting and wardrobe | Ren'Py image |
+| --- | --- | --- |
+| `floor_sit` | Relaxed on one hip with a supporting palm, holding her cards low above her lap | `npc_clara cards floor_sit` |
+| `side_recline` | Side-reclining with her temple supported, holding cards in front of her on her supported forearm | `npc_clara cards side_recline` |
+| `kneel_play` | Kneeling with folded legs, cards raised near her shoulder and the other hand resting on her knees | `npc_clara cards kneel_play` |
+
+All three wear her established short lavender slip with ivory lace. Her
+runtime id remains `clara`. See [Clarissa's actual card-playing export preview](previews/clara_cards.jpg).
+Each final pose holds cards in her hand.
+
+The previews show the runtime PNGs on light and dark backgrounds. These twelve poses extend
 the 160-item library; the base checklist and its manifest retain their original
-count. This extension currently covers Amanda, Sandra and Melissa. Each asset is a
+count. This extension covers all four NPCs. Each asset is a
 complete static image with its own facial acting.
 
 ## Runtime use
@@ -53,8 +67,8 @@ hashes. Each file is RGBA, 640×800, with a baseline at y=768. Seated figures ha
 a smaller visible height than the standing figure. No image processing is
 needed in Ren'Py.
 
-`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers nine body
-images and nine media-panel overlays. It uses the base library's existing
+`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers twelve body
+images and twelve media-panel overlays. It uses the base library's existing
 `npc_sprite_body` transform and dialogue portraits:
 
 ```renpy
@@ -83,6 +97,14 @@ hide npc_melissa
 show npc_melissa cards recline_bluff at npc_sprite_body
 npc_melissa_voice smiling "Do you think I'm bluffing?"
 hide npc_melissa
+
+show npc_clara cards floor_sit at npc_sprite_body
+npc_clara_voice playful "Shall we play another hand?"
+show npc_clara cards side_recline at npc_sprite_body
+npc_clara_voice smiling "I'm comfortable here. Your move."
+show npc_clara cards kneel_play at npc_sprite_body
+npc_clara_voice wink "Do you think I'm bluffing?"
+hide npc_clara
 ```
 
 For this project's `main_ui` media panel, set the existing scene overlay in
@@ -104,10 +126,12 @@ Sandra's corresponding overlay names are `npc_overlay_sandra_cards_deal`,
 Melissa's are `npc_overlay_melissa_cards_floor_deal`,
 `npc_overlay_melissa_cards_kneel_forfeit` and
 `npc_overlay_melissa_cards_recline_bluff`.
+Clarissa's are `npc_overlay_clara_cards_floor_sit`,
+`npc_overlay_clara_cards_side_recline` and `npc_overlay_clara_cards_kneel_play`.
 
 ### Rug and fireplace placement
 
-Melissa's poses rest on the floor, with no chair-height gap under the pelvis.
+Melissa's and Clarissa's poses rest on the floor, with no chair-height gap under the pelvis.
 They contain no rug, fireplace, floor paint or cast shadow. Place the chosen
 sprite over the room and bearskin layers. Each transparent canvas is 640×800,
 with the bottom of its visible cutout at y=768; the horizontal reclining art
@@ -143,6 +167,8 @@ card minigame or changing relationship state.
 Sandra's. Both retain selected source filenames and canonical reference roles.
 Melissa's prompts and reference poses are in
 [melissa_generation_prompts.json](melissa_generation_prompts.json).
+Clarissa's exact prompts, references and card additions are in
+[clara_generation_prompts.json](clara_generation_prompts.json).
 The artwork was
 created with the built-in image generation tool. The runtime PNGs are the
 selected, alpha-cleaned and normalized exports.
@@ -160,7 +186,10 @@ scipy and create a JSON map such as:
   {"npc_id": "sandra", "state": "raise", "source": "sources/sandra_raise.png", "max_height": 736},
   {"npc_id": "melissa", "state": "floor_deal", "source": "sources/melissa_floor_deal.png", "max_height": 610},
   {"npc_id": "melissa", "state": "kneel_forfeit", "source": "sources/melissa_kneel_forfeit.png", "max_height": 610},
-  {"npc_id": "melissa", "state": "recline_bluff", "source": "sources/melissa_recline_bluff.png", "max_height": 480}
+  {"npc_id": "melissa", "state": "recline_bluff", "source": "sources/melissa_recline_bluff.png", "max_height": 480},
+  {"npc_id": "clara", "state": "floor_sit", "source": "sources/clara_floor_sit.png", "max_height": 610},
+  {"npc_id": "clara", "state": "side_recline", "source": "sources/clara_side_recline.png", "max_height": 480},
+  {"npc_id": "clara", "state": "kneel_play", "source": "sources/clara_kneel_play.png", "max_height": 610}
 ]}
 ```
 
@@ -174,9 +203,9 @@ does not redraw faces, anatomy or clothing, or rebuild the base library.
 
 ## Validation
 
-The nine exported files passed checks for unique hashes, manifest SHA-256
+The twelve exported files passed checks for unique hashes, manifest SHA-256
 matches, RGBA mode, 640×800 canvases, transparent borders, zero RGB at zero
-alpha, recorded visible bounds, nine ordinary image declarations and nine
+alpha, recorded visible bounds, twelve ordinary image declarations and twelve
 media-panel overlay declarations. The actual exports were visually inspected
 on light and dark backgrounds.
 
