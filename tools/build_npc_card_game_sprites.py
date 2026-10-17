@@ -70,7 +70,7 @@ def build(source_map_path):
     manifest = {"version": 1, "collection": "card_game", "complete": True,
                 "asset_kind": "individual complete static RGBA sprites",
                 "requires": "npc_sprites/v1", "sprites": entries,
-                "notes": ["Amanda extension: tease, forfeit and challenge.",
+                "notes": ["Character-specific card-game cutouts; see sprites for pose identifiers.",
                           "Cards show decorative backs; ranks belong to game state/UI.",
                           "Furniture-free cutouts; place against the scene's seating.",
                           "No card rules, wardrobe layers or gameplay state are added."]}

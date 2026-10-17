@@ -4,8 +4,14 @@
 image npc_amanda cards tease = "images/npc_card_game/v1/amanda/amanda_cards_tease.png"
 image npc_amanda cards forfeit = "images/npc_card_game/v1/amanda/amanda_cards_forfeit.png"
 image npc_amanda cards challenge = "images/npc_card_game/v1/amanda/amanda_cards_challenge.png"
+image npc_sandra cards deal = "images/npc_card_game/v1/sandra/sandra_cards_deal.png"
+image npc_sandra cards forfeit = "images/npc_card_game/v1/sandra/sandra_cards_forfeit.png"
+image npc_sandra cards raise = "images/npc_card_game/v1/sandra/sandra_cards_raise.png"
 
 # Same 1536x1024 BGIMAGE canvas and body placement as NPCSpriteLibrary.
 image npc_overlay_amanda_cards_tease = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/amanda/amanda_cards_tease.png")
 image npc_overlay_amanda_cards_forfeit = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/amanda/amanda_cards_forfeit.png")
 image npc_overlay_amanda_cards_challenge = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/amanda/amanda_cards_challenge.png")
+image npc_overlay_sandra_cards_deal = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/sandra/sandra_cards_deal.png")
+image npc_overlay_sandra_cards_forfeit = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/sandra/sandra_cards_forfeit.png")
+image npc_overlay_sandra_cards_raise = Composite((1536, 1024), (448, 224), "images/npc_card_game/v1/sandra/sandra_cards_raise.png")

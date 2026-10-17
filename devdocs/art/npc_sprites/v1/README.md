@@ -115,9 +115,9 @@ furniture-free, so scene authors choose placement to match the specific bed,
 chair or sofa. All body PNGs share a 640×800 canvas and a consistent baseline.
 No new action dispatcher, event engine, schedule state or NPC state is added.
 
-An additional [Amanda card-game collection](card_game/README.md) provides
-three distinct teasing, forfeit and continued-play poses with its own PNG
-folder, manifest and Ren'Py declarations. These extend the base 160 assets.
+An additional [card-game collection](card_game/README.md) provides three
+Amanda poses and three distinct Sandra poses, with its own PNG folder,
+manifest and Ren'Py declarations. These six extend the base 160 assets.
 
 Open the light/dark asset browser after starting a game:
 
