@@ -397,5 +397,51 @@
       "reason": "Remove the misplaced round contour on the side of the ribcage under the near upper arm; redraw a front-facing upper torso with shallow chest volume."
     },
     "review": "The first returned edit retained the faulty side contour and was rejected. The selected redraw removes that contour and makes the front of the chest visible between the arms. Final exported PNG reviewed on light and dark backgrounds."
+  },
+  "limb_correction": {
+    "base_commit": "6eb081552e3ce5962d864c4b3c4e459b66b29624",
+    "generator": "built-in image_gen",
+    "npc_id": "amanda",
+    "group": "boudoir",
+    "state": "lying_front",
+    "source_filename": "exec-b9344a09-ce2e-4e1c-9391-ce9f7ffe2dbb.png",
+    "steps": [
+      {
+        "npc_id": "amanda",
+        "group": "boudoir",
+        "state": "lying_front",
+        "source_filename": "exec-0a4f7c80-3745-4bfc-a0ee-d362e93ef9c3.png",
+        "references": [
+          "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png",
+          "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+        ],
+        "prompt": "Use case: precise-object-edit.\nAsset: production transparent Ren'Py sprite of adult Amanda.\nImage 1 is the edit target. Image 2 is the established adult standing model for limb proportions.\nRepair the LEGS AND HANDS in image 1. Keep the face, blonde braided updo, blue eyes, adult petite build, ivory lace-trim short chemise and shoulder ties, small shallow chest, forward-facing upper torso and polished comic illustration style.\n\nLEG REPAIR: redraw the pelvis-to-feet construction clearly. She lies on her stomach, with head at right and two relaxed legs extending left. The pelvis is inside the dress. Each hip leads into its own thigh, knee, calf, ankle and foot in that order. Keep two normally proportioned adult legs, close and almost parallel with a slight separation so both outlines can be followed. Knees have a subtle natural joint, calves taper to slender ankles, and two distinct relaxed feet have normal heels and toes. Remove the target's extra small flesh nub beneath the middle of the hem and the swollen/merged thigh-to-knee shapes. Make both thighs emerge naturally from the back hem at the hip area. The soft hem drapes over the hip/upper-thigh junction without adding body parts.\n\nHAND REPAIR: replace the overlapping hands with two separate relaxed hands resting palm-down on the same implied support, fingers pointing toward the right. Both elbows support her raised upper body. The forearms rest side by side; the far hand is slightly above and behind the near hand, with a small visible gap so their fingers do not overlap. Each hand has a normal wrist, one coherent palm, four naturally proportioned fingers and one thumb attached at the base of the index finger. Show gentle knuckles, short natural nails, relaxed finger spacing and correct wrist alignment. No doubled fingers, fused hands, sharp wrist kink or missing thumb.\n\nRetain the corrected torso: its garment side behind the near upper arm follows the shallow ribs, with no round mound under the armpit. All shallow bodice shaping remains at the FRONT between the arms. Preserve the ivory dress length, lace trim and opaque fabric; no wardrobe redesign.\nOne complete horizontal full-body figure, with every fingertip, toe and hair tip inside generous transparent margins. True transparent RGBA background, no bed, floor, props, shadow patch, labels or watermark.",
+        "generator": "built-in image_gen",
+        "supersedes": "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png"
+      },
+      {
+        "references": [
+          "exec-0a4f7c80-3745-4bfc-a0ee-d362e93ef9c3.png"
+        ],
+        "prompt": "Edit only the two hands and their wrists in this adult comic game character sprite.\nRedraw them as two SMALL, NATURAL, SEPARATE hands. They must not overlap or touch. Move the farther hand upward enough to leave a full palm-width of empty space between the two hands. The nearer hand rests palm-down in front of her at the lower edge; its thumb is visible on the upper edge of the palm. The farther hand rests palm-down farther back; its thumb is clearly visible on the lower edge of that palm. Each hand has exactly four relaxed fingers plus one thumb, natural knuckles and nails, and a smooth wrist connection. Give the fingers gentle, believable bends without fusing their outlines. Adjust only the wrist/forearm ends as needed for comfortable placement.\nPreserve the face, hair, clothing, torso, hips, legs, feet, body proportions, lighting, colors and illustrated style. Keep the complete figure inside generous margins. Actual transparent RGBA background, no props, text, floor or shadow.",
+        "source_filename": "exec-e02e5b70-a8b7-48f8-9d71-839c3db887b9.png"
+      },
+      {
+        "references": [
+          "exec-e02e5b70-a8b7-48f8-9d71-839c3db887b9.png"
+        ],
+        "prompt": "Make one small anatomical correction to this comic character illustration: redraw only the NEAR HAND at the LOWER RIGHT and rotate its wrist naturally so that hand rests in a relaxed PALM-UP position. Show the palm facing partly toward the viewer, four gently separated fingers and one clearly distinct thumb. Keep the fingers relaxed, not stiff or widely stretched; show normal palm creases, finger joints and short nails where visible. The thumb projects naturally from the thumb pad beside the index finger, with a clear gap. The hand stays small and proportional to the forearm. Preserve the supporting elbow and rotate only the forearm/wrist as needed.\nLeave the farther hand, face, hair, clothing, torso, legs, feet, full-body pose, colors and comic style unchanged. Both hands remain separate without touching. Keep the whole figure inside generous margins on a true transparent RGBA background, without text, props, floor or shadows.",
+        "source_filename": "exec-e0e9ca41-329a-456b-a8e2-fc5f722c2502.png"
+      },
+      {
+        "references": [
+          "exec-e0e9ca41-329a-456b-a8e2-fc5f722c2502.png",
+          "game/images/npc_sprites/v1/amanda/gestures/amanda_gestures_stop.png"
+        ],
+        "prompt": "Image 1 is the edit target. Image 2 is a HAND ANATOMY reference from the same character's existing library.\nChange ONLY the open near hand at the lower-right of image 1. Its curled fingers are ambiguous. Redraw that hand with a relaxed OPEN PALM, using the clearly drawn FIVE DIGITS of the raised palm in image 2 as the anatomical guide: four full-length fingers (index, middle, ring, little) and one shorter thumb. Make all FIVE digit silhouettes and tips individually visible, with slight gaps and no fingers hidden behind another. The hand is small and proportional to her forearm, resting palm-up with fingers extending toward the right and the thumb naturally below them. Use gentle finger bends but keep the palm open enough to count four fingers plus the thumb. Natural finger lengths, creases, nails and wrist connection. Adapt image 2's hand anatomy to this horizontal palm-up orientation; do not copy its raised-arm gesture or clothing.\nPreserve image 1's far hand, elbows, torso, face, hair, costume, legs, feet, proportions, pose, comic style, lighting and colors. Exactly one complete adult character on true transparent RGBA, generous margins, no props, labels, floor or shadow.",
+        "source_filename": "exec-b9344a09-ce2e-4e1c-9391-ce9f7ffe2dbb.png"
+      }
+    ],
+    "supersedes": "exec-b7371418-1597-4cd3-a77f-9604b91fd5b0.png"
   }
 }

@@ -25,7 +25,10 @@ The following targeted revision redraws Amanda's front-lying upper torso. It
 removes the misplaced rounded chest contour beneath the near upper arm and
 uses a clearer forward-facing ribcage. Her ivory outfit and small-chested
 adult character model are retained. See the
-[exported torso comparison](previews/amanda_torso_correction.jpg).
+[exported anatomy comparison](previews/amanda_torso_correction.jpg).
+The follow-up limb revision separates her hands, turns the near hand palm-up
+using her existing five-finger stop-gesture reference, and redraws the leg
+contours. The comparison includes hand and leg details from the runtime PNGs.
 
 ## Files
 

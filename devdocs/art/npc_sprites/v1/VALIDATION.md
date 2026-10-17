@@ -51,6 +51,22 @@ from `4d01fab` and the current export, including light and dark backgrounds.
 The focused 26-test run and 160 asset subtests passed after this replacement;
 these validate integration and file properties, not the drawing's anatomy.
 
+## Follow-up: Amanda legs and hands
+
+The front-lying sprite is replaced again after the marked anatomy feedback.
+The two hands now occupy separate positions; the near hand is open and palm-up,
+using the existing Amanda stop-gesture hand as an anatomical reference. Four
+fingers and the thumb have distinct silhouettes. Leg contours are redrawn from
+the covered pelvis through separate thighs, knees, calves, ankles and feet.
+The corrected torso side remains flat behind the near upper arm.
+
+The runtime PNG is inspected on light and dark backgrounds with enlarged hand
+and leg details. The comparison's top row uses the original `4d01fab` full-body
+export; the hand and leg rows compare the `6eb0815` export with this revision.
+The 26 focused tests and 160 asset subtests passed after export. These checks
+verify image integrity and bindings; anatomical review remains visual. This
+revision changes only one runtime PNG, its manifest record, previews and docs.
+
 ## Passed checks
 
 - Ren'Py **8.5.2.26010301**: project `compile` command completed with exit 0.
