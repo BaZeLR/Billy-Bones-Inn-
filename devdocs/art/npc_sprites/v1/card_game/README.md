@@ -1,13 +1,13 @@
 # NPC card-game poses
 
-Twelve additional, individually exported sprites for playful private card-game
-scenes: three poses each for Amanda, Sandra, Melissa and Clarissa. Amanda retains her blonde
+Fourteen additional, individually exported sprites for playful private card-game
+scenes: three poses each for Amanda, Sandra and Melissa, and five for Clarissa. Amanda retains her blonde
 braided updo, blue eyes, petite adult build and ivory homewear. Sandra retains
 her copper-red hair, green eyes, mature fuller build and burgundy homewear.
 Melissa retains her long black hair, olive complexion, established adult
 proportions and ivory/olive homewear, with comfortable poses at floor level.
 Clarissa retains her silver-platinum hair, grey eyes, slender adult proportions
-and lavender slip with ivory lace. Every delivered pose visibly holds cards.
+and lavender homewear with ivory lace. Every delivered pose visibly holds cards.
 
 ## Amanda
 
@@ -49,12 +49,17 @@ rather than an automatic wardrobe progression.
 | `floor_sit` | Relaxed on one hip with a supporting palm, holding her cards low above her lap | `npc_clara cards floor_sit` |
 | `side_recline` | Side-reclining with her temple supported, holding cards in front of her on her supported forearm | `npc_clara cards side_recline` |
 | `kneel_play` | Kneeling with folded legs, cards raised near her shoulder and the other hand resting on her knees | `npc_clara cards kneel_play` |
+| `forfeit` | Kneeling with cards raised, holding her removed slip, in matching lavender camisole and briefs | `npc_clara cards forfeit` |
+| `counterbet` | Seated with one knee raised, a supporting palm and cards in hand, in the same camisole and briefs | `npc_clara cards counterbet` |
 
-All three wear her established short lavender slip with ivory lace. Her
+The first three wear her established short lavender slip with ivory lace.
+The two clothing-stage variants wear a matching opaque lavender camisole and
+briefs, and use stronger comic ink outlines. Her
 runtime id remains `clara`. See [Clarissa's actual card-playing export preview](previews/clara_cards.jpg).
+See [the two clothing-stage exports](previews/clara_cards_clothing.jpg).
 Each final pose holds cards in her hand.
 
-The previews show the runtime PNGs on light and dark backgrounds. These twelve poses extend
+The previews show the runtime PNGs on light and dark backgrounds. These fourteen poses extend
 the 160-item library; the base checklist and its manifest retain their original
 count. This extension covers all four NPCs. Each asset is a
 complete static image with its own facial acting.
@@ -67,8 +72,8 @@ hashes. Each file is RGBA, 640×800, with a baseline at y=768. Seated figures ha
 a smaller visible height than the standing figure. No image processing is
 needed in Ren'Py.
 
-`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers twelve body
-images and twelve media-panel overlays. It uses the base library's existing
+`game/Utilities/General/NPC/NPCSpriteCardGame.rpy` registers fourteen body
+images and fourteen media-panel overlays. It uses the base library's existing
 `npc_sprite_body` transform and dialogue portraits:
 
 ```renpy
@@ -104,6 +109,10 @@ show npc_clara cards side_recline at npc_sprite_body
 npc_clara_voice smiling "I'm comfortable here. Your move."
 show npc_clara cards kneel_play at npc_sprite_body
 npc_clara_voice wink "Do you think I'm bluffing?"
+show npc_clara cards forfeit at npc_sprite_body
+npc_clara_voice smiling "You won this round."
+show npc_clara cards counterbet at npc_sprite_body
+npc_clara_voice playful "I raise."
 hide npc_clara
 ```
 
@@ -128,6 +137,8 @@ Melissa's are `npc_overlay_melissa_cards_floor_deal`,
 `npc_overlay_melissa_cards_recline_bluff`.
 Clarissa's are `npc_overlay_clara_cards_floor_sit`,
 `npc_overlay_clara_cards_side_recline` and `npc_overlay_clara_cards_kneel_play`.
+The clothing-stage variants use `npc_overlay_clara_cards_forfeit` and
+`npc_overlay_clara_cards_counterbet`.
 
 ### Rug and fireplace placement
 
@@ -189,7 +200,9 @@ scipy and create a JSON map such as:
   {"npc_id": "melissa", "state": "recline_bluff", "source": "sources/melissa_recline_bluff.png", "max_height": 480},
   {"npc_id": "clara", "state": "floor_sit", "source": "sources/clara_floor_sit.png", "max_height": 610},
   {"npc_id": "clara", "state": "side_recline", "source": "sources/clara_side_recline.png", "max_height": 480},
-  {"npc_id": "clara", "state": "kneel_play", "source": "sources/clara_kneel_play.png", "max_height": 610}
+  {"npc_id": "clara", "state": "kneel_play", "source": "sources/clara_kneel_play.png", "max_height": 610},
+  {"npc_id": "clara", "state": "forfeit", "source": "sources/clara_forfeit.png", "max_height": 610},
+  {"npc_id": "clara", "state": "counterbet", "source": "sources/clara_counterbet.png", "max_height": 610}
 ]}
 ```
 
@@ -203,9 +216,9 @@ does not redraw faces, anatomy or clothing, or rebuild the base library.
 
 ## Validation
 
-The twelve exported files passed checks for unique hashes, manifest SHA-256
+The fourteen exported files passed checks for unique hashes, manifest SHA-256
 matches, RGBA mode, 640×800 canvases, transparent borders, zero RGB at zero
-alpha, recorded visible bounds, twelve ordinary image declarations and twelve
+alpha, recorded visible bounds, fourteen ordinary image declarations and fourteen
 media-panel overlay declarations. The actual exports were visually inspected
 on light and dark backgrounds.
 

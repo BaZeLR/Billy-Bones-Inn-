@@ -376,6 +376,68 @@
         ],
         "sha256": "87bc17323677fc745baa3d7e2cb7d043238fef1d923b2e7cd0ea94f70eff021c"
       }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "forfeit",
+      "image_name": "npc_clara cards forfeit",
+      "overlay_name": "npc_overlay_clara_cards_forfeit",
+      "path": "images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        111,
+        158,
+        529,
+        768
+      ],
+      "scale": 0.45590433482810166,
+      "sha256": "f80e628f63dd7e401921d95bdeb268426fe813bb99fca97b675943a2bc4e6c50",
+      "source": {
+        "filename": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "cc7418dd0220e5afc6b5ef60cdd40a48839b0599953015d3c27a698b2a5d4029"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "counterbet",
+      "image_name": "npc_clara cards counterbet",
+      "overlay_name": "npc_overlay_clara_cards_counterbet",
+      "path": "images/npc_card_game/v1/clara/clara_cards_counterbet.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        96,
+        158,
+        543,
+        768
+      ],
+      "scale": 0.4491899852724595,
+      "sha256": "ba765b7e6cd7b8e5b65dcb086d15f28110e81dcdb9aae9499b864ca87f352a9c",
+      "source": {
+        "filename": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "8a19bdc330fac808c446ac074cbe526c36342ce0a9e3806581507e85835f7f49"
+      }
     }
   ],
   "notes": [

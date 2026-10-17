@@ -77,6 +77,35 @@
           ]
         }
       ]
+    },
+    {
+      "state": "forfeit",
+      "selected_source": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+          "prompt": "Use case: identity-preserve.\nCreate one full-body transparent sprite of the SAME ADULT CLARISSA from the references, in polished 2D CARTOON COMIC artwork: confident clean ink outlines, crisp cel shading with two or three deliberate shadow tones, expressive adult face, coherent anatomy and clear readable shapes. Avoid soft airbrushed realism. Preserve her established adult facial structure, grey eyes, very long silver hair and slender adult body proportions.\nUse image 1's exact comfortable low kneeling pose and keep the playing-card fan VISIBLE IN HER RAISED HAND. Preserve its red patterned backs. The hand resting on her knee now holds her folded lavender outer slip as a card-game clothing forfeit.\nHer outfit underneath is a matching opaque lavender camisole and matching opaque briefs, both trimmed in ivory lace. The camisole has narrow straps, a small ivory ribbon and ends at the waist, with the same natural chest volume and full chest coverage as the reference. Keep the same adult build without enlargement or exaggeration.\nShe looks toward the other player with an amused rueful smile after losing the round. One complete character, full hair, cards, hands, held garment, knees and visible bare feet inside generous clear margins. Genuine transparent RGBA background. No room, rug, furniture, floor shadow, other person, writing or watermark.",
+          "references": [
+            "game/images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+            "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "counterbet",
+      "selected_source": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite.\nImage 1 is the exact ADULT CLARISSA identity, clothing and comic-style reference. Keep her grown-up face, grey eyes, very long silver-platinum hair, slender adult build and natural body proportions. Match the clean dark ink outlines, clear shapes and cel shading, using deliberate shadow bands rather than soft airbrushed realism.\n\nNew later-round pose: seated on the implied floor on one hip, ONE knee comfortably raised in front of her while the other leg is folded to the side. Her body is upright and relaxed, with the raised knee and foot naturally connected to the pelvis; the other hand braces on the surface beside her hip. The forearm on her raised knee supports a small fan of dark-red-backed playing cards, clearly held in her fingers near chest height. Her expression is a confident competitive half-smile with one eyebrow raised, looking at the other player as she raises the bet.\nCopy image 1's opaque lavender short camisole, narrow straps, ivory lace edging, tiny ivory front ribbon and matching opaque lavender lace-trim briefs. Preserve the same fit, coverage and chest volume. The removed outer slip is off-scene.\nOne complete isolated adult character, all hair, cards, hands, knees and visible bare feet inside generous margins. Coherent hips, knees, shins and ankles with natural five-finger hands. Genuine transparent RGBA background. No rug, room, furniture, floor patch, cast shadow, extra person, text or watermark. Card backs have patterned dark red designs and ivory borders without ranks or suits.",
+          "references": [
+            "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png"
+          ]
+        }
+      ]
     }
   ],
   "unselected_attempts": [
@@ -88,6 +117,12 @@
         "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png",
         "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
       ]
+    },
+    {
+      "state": "forfeit",
+      "result": "Output blocked; no file generated.",
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite.\nInput image 1 controls the established ADULT CLARISSA identity, proportions, silver hair and lavender palette. Image 2 controls her exact face and grey eyes. Preserve this same slender grown-up woman in her twenties, natural small-medium chest, full lips, very long silver-platinum hair and polished shaded comic illustration style.\n\nNew clothing-forfeit pose: she sits comfortably CROSS-LEGGED on the implied floor, feet tucked naturally under the opposite calves with realistic occlusion, as if on a rug near the fireplace. One hand holds her removed lavender slip dress loosely beside her knee; keep its ivory lace edging visible. Her other hand holds a small fan of dark-red-backed playing cards near her shoulder. She has an amused rueful smile and slightly raised eyebrows after losing a round, looking toward the other player.\nUnder the removed slip she wears a matching opaque LAVENDER short camisole with narrow straps, ivory lace edging and a tiny ivory ribbon, ending at the waist, plus matching lavender briefs with ivory lace trim and opaque fabric. Keep the same natural adult body proportions and chest volume as the references. The camisole covers her chest completely.\nDraw coherent crossed legs connected to the pelvis, natural knees and ankles, realistic five-finger hands holding the cards and garment. One complete isolated character with all hair, hands, cloth and visible bare feet inside generous margins. Genuine transparent RGBA background. No rug, furniture, room, ground patch, cast shadow, other person, text or watermark. Cards show patterned dark-red backs with ivory borders, no ranks or suits."
     }
-  ]
+  ],
+  "style_target_for_clothing_extension": "Clean comic ink outlines and clearer cel shading, using the built-in image tool."
 }
