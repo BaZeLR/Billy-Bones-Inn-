@@ -1,0 +1,1435 @@
+{
+  "version": 1,
+  "canvas": [
+    640,
+    800
+  ],
+  "format": "custom_2d_named_joint_guides",
+  "authorship": "Hand-authored schematic poses; not detector output or biomechanically validated.",
+  "poses": [
+    {
+      "id": "amanda_standing_one_hip",
+      "suggested_npc": "amanda",
+      "title": "Standing / one hip",
+      "view": "three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          323,
+          115
+        ],
+        "neck": [
+          318,
+          173
+        ],
+        "shoulder_far": [
+          352,
+          192
+        ],
+        "elbow_far": [
+          388,
+          284
+        ],
+        "wrist_far": [
+          350,
+          249
+        ],
+        "shoulder_near": [
+          286,
+          189
+        ],
+        "elbow_near": [
+          246,
+          298
+        ],
+        "wrist_near": [
+          285,
+          381
+        ],
+        "pelvis": [
+          314,
+          410
+        ],
+        "hip_far": [
+          344,
+          414
+        ],
+        "knee_far": [
+          358,
+          570
+        ],
+        "ankle_far": [
+          358,
+          722
+        ],
+        "heel_far": [
+          356,
+          740
+        ],
+        "toe_far": [
+          397,
+          740
+        ],
+        "hip_near": [
+          285,
+          411
+        ],
+        "knee_near": [
+          270,
+          567
+        ],
+        "ankle_near": [
+          262,
+          725
+        ],
+        "heel_near": [
+          256,
+          740
+        ],
+        "toe_near": [
+          297,
+          740
+        ]
+      },
+      "notes": "One hand at the hip; the other holds a prop near the chest."
+    },
+    {
+      "id": "clarissa_standing_shoulder_prop",
+      "suggested_npc": "clarissa",
+      "title": "Standing / shoulder prop",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          325,
+          120
+        ],
+        "neck": [
+          326,
+          177
+        ],
+        "shoulder_far": [
+          293,
+          196
+        ],
+        "elbow_far": [
+          262,
+          306
+        ],
+        "wrist_far": [
+          304,
+          330
+        ],
+        "shoulder_near": [
+          360,
+          195
+        ],
+        "elbow_near": [
+          416,
+          257
+        ],
+        "wrist_near": [
+          388,
+          178
+        ],
+        "pelvis": [
+          329,
+          415
+        ],
+        "hip_far": [
+          299,
+          417
+        ],
+        "knee_far": [
+          288,
+          573
+        ],
+        "ankle_far": [
+          302,
+          725
+        ],
+        "heel_far": [
+          300,
+          741
+        ],
+        "toe_far": [
+          261,
+          741
+        ],
+        "hip_near": [
+          357,
+          416
+        ],
+        "knee_near": [
+          365,
+          565
+        ],
+        "ankle_near": [
+          349,
+          722
+        ],
+        "heel_near": [
+          348,
+          740
+        ],
+        "toe_near": [
+          389,
+          740
+        ]
+      },
+      "notes": "Raised hand near the shoulder; relaxed hand at waist height."
+    },
+    {
+      "id": "melissa_standing_offer",
+      "suggested_npc": "melissa",
+      "title": "Standing / gentle offer",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          295,
+          151
+        ],
+        "neck": [
+          309,
+          205
+        ],
+        "shoulder_far": [
+          342,
+          220
+        ],
+        "elbow_far": [
+          385,
+          315
+        ],
+        "wrist_far": [
+          346,
+          385
+        ],
+        "shoulder_near": [
+          276,
+          218
+        ],
+        "elbow_near": [
+          220,
+          324
+        ],
+        "wrist_near": [
+          154,
+          346
+        ],
+        "pelvis": [
+          331,
+          426
+        ],
+        "hip_far": [
+          355,
+          425
+        ],
+        "knee_far": [
+          382,
+          579
+        ],
+        "ankle_far": [
+          399,
+          723
+        ],
+        "heel_far": [
+          398,
+          741
+        ],
+        "toe_far": [
+          437,
+          741
+        ],
+        "hip_near": [
+          302,
+          427
+        ],
+        "knee_near": [
+          278,
+          575
+        ],
+        "ankle_near": [
+          271,
+          722
+        ],
+        "heel_near": [
+          266,
+          741
+        ],
+        "toe_near": [
+          226,
+          741
+        ]
+      },
+      "notes": "Small forward lean from the hips, with one forearm extended."
+    },
+    {
+      "id": "sandra_standing_look_back",
+      "suggested_npc": "sandra",
+      "title": "Standing / look back",
+      "view": "rear three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          321,
+          122
+        ],
+        "neck": [
+          319,
+          177
+        ],
+        "shoulder_far": [
+          352,
+          199
+        ],
+        "elbow_far": [
+          389,
+          295
+        ],
+        "wrist_far": [
+          368,
+          377
+        ],
+        "shoulder_near": [
+          286,
+          198
+        ],
+        "elbow_near": [
+          246,
+          254
+        ],
+        "wrist_near": [
+          278,
+          208
+        ],
+        "pelvis": [
+          323,
+          419
+        ],
+        "hip_far": [
+          353,
+          419
+        ],
+        "knee_far": [
+          373,
+          570
+        ],
+        "ankle_far": [
+          387,
+          723
+        ],
+        "heel_far": [
+          386,
+          741
+        ],
+        "toe_far": [
+          426,
+          741
+        ],
+        "hip_near": [
+          294,
+          421
+        ],
+        "knee_near": [
+          284,
+          575
+        ],
+        "ankle_near": [
+          274,
+          722
+        ],
+        "heel_near": [
+          269,
+          741
+        ],
+        "toe_near": [
+          228,
+          741
+        ]
+      },
+      "notes": "Torso turns gently over a stable standing pelvis."
+    },
+    {
+      "id": "amanda_seat_crossed_ankles",
+      "suggested_npc": "amanda",
+      "title": "Chair / crossed ankles",
+      "view": "three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          321,
+          215
+        ],
+        "neck": [
+          319,
+          272
+        ],
+        "shoulder_far": [
+          349,
+          289
+        ],
+        "elbow_far": [
+          371,
+          385
+        ],
+        "wrist_far": [
+          345,
+          458
+        ],
+        "shoulder_near": [
+          286,
+          289
+        ],
+        "elbow_near": [
+          250,
+          385
+        ],
+        "wrist_near": [
+          278,
+          470
+        ],
+        "pelvis": [
+          320,
+          492
+        ],
+        "hip_far": [
+          343,
+          493
+        ],
+        "knee_far": [
+          389,
+          576
+        ],
+        "ankle_far": [
+          327,
+          720
+        ],
+        "heel_far": [
+          321,
+          739
+        ],
+        "toe_far": [
+          361,
+          739
+        ],
+        "hip_near": [
+          292,
+          494
+        ],
+        "knee_near": [
+          258,
+          575
+        ],
+        "ankle_near": [
+          350,
+          716
+        ],
+        "heel_near": [
+          346,
+          735
+        ],
+        "toe_near": [
+          389,
+          735
+        ]
+      },
+      "notes": "Upright seated trunk with ankles crossing below separate knees."
+    },
+    {
+      "id": "clarissa_floor_knee_up",
+      "suggested_npc": "clarissa",
+      "title": "Floor / one knee raised",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          328,
+          310
+        ],
+        "neck": [
+          329,
+          366
+        ],
+        "shoulder_far": [
+          298,
+          388
+        ],
+        "elbow_far": [
+          271,
+          457
+        ],
+        "wrist_far": [
+          261,
+          404
+        ],
+        "shoulder_near": [
+          362,
+          387
+        ],
+        "elbow_near": [
+          425,
+          550
+        ],
+        "wrist_near": [
+          475,
+          720
+        ],
+        "pelvis": [
+          328,
+          589
+        ],
+        "hip_far": [
+          302,
+          595
+        ],
+        "knee_far": [
+          256,
+          500
+        ],
+        "ankle_far": [
+          290,
+          728
+        ],
+        "heel_far": [
+          289,
+          745
+        ],
+        "toe_far": [
+          331,
+          749
+        ],
+        "hip_near": [
+          355,
+          598
+        ],
+        "knee_near": [
+          425,
+          678
+        ],
+        "ankle_near": [
+          321,
+          702
+        ],
+        "heel_near": [
+          300,
+          718
+        ],
+        "toe_near": [
+          263,
+          724
+        ]
+      },
+      "notes": "One foot planted forward; the other leg folds sideways; one palm supports."
+    },
+    {
+      "id": "melissa_floor_side_deal",
+      "suggested_npc": "melissa",
+      "title": "Floor / side-seated deal",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          308,
+          363
+        ],
+        "neck": [
+          316,
+          419
+        ],
+        "shoulder_far": [
+          350,
+          437
+        ],
+        "elbow_far": [
+          384,
+          533
+        ],
+        "wrist_far": [
+          365,
+          575
+        ],
+        "shoulder_near": [
+          281,
+          439
+        ],
+        "elbow_near": [
+          229,
+          540
+        ],
+        "wrist_near": [
+          166,
+          572
+        ],
+        "pelvis": [
+          329,
+          635
+        ],
+        "hip_far": [
+          350,
+          634
+        ],
+        "knee_far": [
+          250,
+          663
+        ],
+        "ankle_far": [
+          363,
+          706
+        ],
+        "heel_far": [
+          374,
+          704
+        ],
+        "toe_far": [
+          413,
+          720
+        ],
+        "hip_near": [
+          309,
+          640
+        ],
+        "knee_near": [
+          224,
+          688
+        ],
+        "ankle_near": [
+          337,
+          731
+        ],
+        "heel_near": [
+          348,
+          730
+        ],
+        "toe_near": [
+          387,
+          745
+        ]
+      },
+      "notes": "Both legs fold to one side; one forearm reaches toward the table."
+    },
+    {
+      "id": "sandra_chair_forward",
+      "suggested_npc": "sandra",
+      "title": "Chair / forward lean",
+      "view": "front three-quarter",
+      "look_direction": [
+        0,
+        -1
+      ],
+      "joints": {
+        "head": [
+          323,
+          288
+        ],
+        "neck": [
+          327,
+          343
+        ],
+        "shoulder_far": [
+          365,
+          363
+        ],
+        "elbow_far": [
+          404,
+          471
+        ],
+        "wrist_far": [
+          389,
+          535
+        ],
+        "shoulder_near": [
+          287,
+          360
+        ],
+        "elbow_near": [
+          244,
+          472
+        ],
+        "wrist_near": [
+          262,
+          539
+        ],
+        "pelvis": [
+          331,
+          528
+        ],
+        "hip_far": [
+          363,
+          535
+        ],
+        "knee_far": [
+          407,
+          589
+        ],
+        "ankle_far": [
+          410,
+          715
+        ],
+        "heel_far": [
+          410,
+          737
+        ],
+        "toe_far": [
+          453,
+          740
+        ],
+        "hip_near": [
+          299,
+          532
+        ],
+        "knee_near": [
+          249,
+          588
+        ],
+        "ankle_near": [
+          239,
+          716
+        ],
+        "heel_near": [
+          232,
+          736
+        ],
+        "toe_near": [
+          189,
+          740
+        ]
+      },
+      "notes": "Forearms rest near separated knees; both feet stay planted."
+    },
+    {
+      "id": "amanda_low_kneel_lean",
+      "suggested_npc": "amanda",
+      "title": "Low kneel / side lean",
+      "view": "three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          306,
+          317
+        ],
+        "neck": [
+          307,
+          372
+        ],
+        "shoulder_far": [
+          339,
+          388
+        ],
+        "elbow_far": [
+          380,
+          460
+        ],
+        "wrist_far": [
+          346,
+          508
+        ],
+        "shoulder_near": [
+          270,
+          389
+        ],
+        "elbow_near": [
+          228,
+          482
+        ],
+        "wrist_near": [
+          254,
+          556
+        ],
+        "pelvis": [
+          316,
+          560
+        ],
+        "hip_far": [
+          329,
+          560
+        ],
+        "knee_far": [
+          403,
+          653
+        ],
+        "ankle_far": [
+          301,
+          695
+        ],
+        "heel_far": [
+          294,
+          692
+        ],
+        "toe_far": [
+          259,
+          706
+        ],
+        "hip_near": [
+          298,
+          572
+        ],
+        "knee_near": [
+          388,
+          675
+        ],
+        "ankle_near": [
+          273,
+          715
+        ],
+        "heel_near": [
+          267,
+          710
+        ],
+        "toe_near": [
+          235,
+          728
+        ]
+      },
+      "notes": "Hips sit low over folded shins; the torso leans slightly sideways."
+    },
+    {
+      "id": "clarissa_kneel_cards_high",
+      "suggested_npc": "clarissa",
+      "title": "Low kneel / cards high",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          328,
+          293
+        ],
+        "neck": [
+          325,
+          350
+        ],
+        "shoulder_far": [
+          292,
+          369
+        ],
+        "elbow_far": [
+          257,
+          443
+        ],
+        "wrist_far": [
+          274,
+          518
+        ],
+        "shoulder_near": [
+          360,
+          368
+        ],
+        "elbow_near": [
+          412,
+          424
+        ],
+        "wrist_near": [
+          401,
+          347
+        ],
+        "pelvis": [
+          328,
+          535
+        ],
+        "hip_far": [
+          302,
+          541
+        ],
+        "knee_far": [
+          248,
+          639
+        ],
+        "ankle_far": [
+          351,
+          690
+        ],
+        "heel_far": [
+          361,
+          687
+        ],
+        "toe_far": [
+          397,
+          704
+        ],
+        "hip_near": [
+          355,
+          544
+        ],
+        "knee_near": [
+          260,
+          665
+        ],
+        "ankle_near": [
+          376,
+          714
+        ],
+        "heel_near": [
+          386,
+          710
+        ],
+        "toe_near": [
+          424,
+          728
+        ]
+      },
+      "notes": "One hand holds a prop at shoulder level; the other rests on a knee."
+    },
+    {
+      "id": "melissa_tall_kneel",
+      "suggested_npc": "melissa",
+      "title": "Tall kneel / upright",
+      "view": "three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          318,
+          204
+        ],
+        "neck": [
+          320,
+          262
+        ],
+        "shoulder_far": [
+          354,
+          283
+        ],
+        "elbow_far": [
+          390,
+          377
+        ],
+        "wrist_far": [
+          350,
+          444
+        ],
+        "shoulder_near": [
+          285,
+          283
+        ],
+        "elbow_near": [
+          243,
+          345
+        ],
+        "wrist_near": [
+          267,
+          293
+        ],
+        "pelvis": [
+          321,
+          469
+        ],
+        "hip_far": [
+          334,
+          473
+        ],
+        "knee_far": [
+          339,
+          648
+        ],
+        "ankle_far": [
+          455,
+          674
+        ],
+        "heel_far": [
+          467,
+          670
+        ],
+        "toe_far": [
+          506,
+          686
+        ],
+        "hip_near": [
+          308,
+          475
+        ],
+        "knee_near": [
+          308,
+          666
+        ],
+        "ankle_near": [
+          430,
+          694
+        ],
+        "heel_near": [
+          440,
+          689
+        ],
+        "toe_near": [
+          480,
+          706
+        ]
+      },
+      "notes": "Thighs rise over supported knees; shins extend behind the pelvis."
+    },
+    {
+      "id": "sandra_half_kneel",
+      "suggested_npc": "sandra",
+      "title": "Half kneel / one foot planted",
+      "view": "three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          322,
+          237
+        ],
+        "neck": [
+          325,
+          295
+        ],
+        "shoulder_far": [
+          360,
+          316
+        ],
+        "elbow_far": [
+          406,
+          405
+        ],
+        "wrist_far": [
+          368,
+          487
+        ],
+        "shoulder_near": [
+          290,
+          314
+        ],
+        "elbow_near": [
+          242,
+          401
+        ],
+        "wrist_near": [
+          204,
+          396
+        ],
+        "pelvis": [
+          331,
+          499
+        ],
+        "hip_far": [
+          359,
+          504
+        ],
+        "knee_far": [
+          390,
+          645
+        ],
+        "ankle_far": [
+          485,
+          660
+        ],
+        "heel_far": [
+          493,
+          650
+        ],
+        "toe_far": [
+          530,
+          670
+        ],
+        "hip_near": [
+          302,
+          504
+        ],
+        "knee_near": [
+          223,
+          581
+        ],
+        "ankle_near": [
+          212,
+          716
+        ],
+        "heel_near": [
+          201,
+          737
+        ],
+        "toe_near": [
+          158,
+          740
+        ]
+      },
+      "notes": "One knee rests on the surface; the other leg supports a planted foot."
+    },
+    {
+      "id": "amanda_prone_reading",
+      "suggested_npc": "amanda",
+      "title": "Prone / propped forearms",
+      "view": "side",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          493,
+          598
+        ],
+        "neck": [
+          459,
+          641
+        ],
+        "shoulder_far": [
+          440,
+          650
+        ],
+        "elbow_far": [
+          482,
+          697
+        ],
+        "wrist_far": [
+          532,
+          714
+        ],
+        "shoulder_near": [
+          434,
+          669
+        ],
+        "elbow_near": [
+          420,
+          728
+        ],
+        "wrist_near": [
+          472,
+          737
+        ],
+        "pelvis": [
+          256,
+          689
+        ],
+        "hip_far": [
+          254,
+          678
+        ],
+        "knee_far": [
+          156,
+          697
+        ],
+        "ankle_far": [
+          76,
+          707
+        ],
+        "heel_far": [
+          67,
+          711
+        ],
+        "toe_far": [
+          61,
+          730
+        ],
+        "hip_near": [
+          253,
+          704
+        ],
+        "knee_near": [
+          148,
+          719
+        ],
+        "ankle_near": [
+          74,
+          719
+        ],
+        "heel_near": [
+          63,
+          724
+        ],
+        "toe_near": [
+          55,
+          743
+        ]
+      },
+      "notes": "Head to the right, straight relaxed legs behind, toes angled down."
+    },
+    {
+      "id": "clarissa_side_recline_right",
+      "suggested_npc": "clarissa",
+      "title": "Side recline / head right",
+      "view": "side three-quarter",
+      "look_direction": [
+        -1,
+        0
+      ],
+      "joints": {
+        "head": [
+          491,
+          474
+        ],
+        "neck": [
+          460,
+          523
+        ],
+        "shoulder_far": [
+          438,
+          533
+        ],
+        "elbow_far": [
+          481,
+          620
+        ],
+        "wrist_far": [
+          503,
+          527
+        ],
+        "shoulder_near": [
+          423,
+          552
+        ],
+        "elbow_near": [
+          384,
+          625
+        ],
+        "wrist_near": [
+          441,
+          663
+        ],
+        "pelvis": [
+          283,
+          636
+        ],
+        "hip_far": [
+          287,
+          622
+        ],
+        "knee_far": [
+          190,
+          678
+        ],
+        "ankle_far": [
+          81,
+          716
+        ],
+        "heel_far": [
+          66,
+          723
+        ],
+        "toe_far": [
+          35,
+          729
+        ],
+        "hip_near": [
+          282,
+          649
+        ],
+        "knee_near": [
+          204,
+          699
+        ],
+        "ankle_near": [
+          111,
+          731
+        ],
+        "heel_near": [
+          94,
+          739
+        ],
+        "toe_near": [
+          55,
+          742
+        ]
+      },
+      "notes": "Upper body supported by an elbow; the nearer knee bends gently."
+    },
+    {
+      "id": "melissa_side_recline_left",
+      "suggested_npc": "melissa",
+      "title": "Side recline / head left",
+      "view": "side three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          147,
+          488
+        ],
+        "neck": [
+          175,
+          538
+        ],
+        "shoulder_far": [
+          197,
+          544
+        ],
+        "elbow_far": [
+          153,
+          630
+        ],
+        "wrist_far": [
+          131,
+          539
+        ],
+        "shoulder_near": [
+          215,
+          561
+        ],
+        "elbow_near": [
+          248,
+          626
+        ],
+        "wrist_near": [
+          208,
+          656
+        ],
+        "pelvis": [
+          355,
+          640
+        ],
+        "hip_far": [
+          352,
+          626
+        ],
+        "knee_far": [
+          451,
+          686
+        ],
+        "ankle_far": [
+          557,
+          719
+        ],
+        "heel_far": [
+          573,
+          726
+        ],
+        "toe_far": [
+          608,
+          730
+        ],
+        "hip_near": [
+          356,
+          653
+        ],
+        "knee_near": [
+          435,
+          702
+        ],
+        "ankle_near": [
+          531,
+          734
+        ],
+        "heel_near": [
+          549,
+          740
+        ],
+        "toe_near": [
+          588,
+          743
+        ]
+      },
+      "notes": "Opposite-facing relaxed recline; free hand rests in front of the torso."
+    },
+    {
+      "id": "sandra_recline_knees_bent",
+      "suggested_npc": "sandra",
+      "title": "Recline / knees bent",
+      "view": "side three-quarter",
+      "look_direction": [
+        1,
+        0
+      ],
+      "joints": {
+        "head": [
+          161,
+          437
+        ],
+        "neck": [
+          194,
+          485
+        ],
+        "shoulder_far": [
+          211,
+          490
+        ],
+        "elbow_far": [
+          166,
+          557
+        ],
+        "wrist_far": [
+          126,
+          591
+        ],
+        "shoulder_near": [
+          232,
+          511
+        ],
+        "elbow_near": [
+          211,
+          607
+        ],
+        "wrist_near": [
+          163,
+          656
+        ],
+        "pelvis": [
+          345,
+          596
+        ],
+        "hip_far": [
+          349,
+          581
+        ],
+        "knee_far": [
+          432,
+          513
+        ],
+        "ankle_far": [
+          504,
+          665
+        ],
+        "heel_far": [
+          506,
+          684
+        ],
+        "toe_far": [
+          549,
+          692
+        ],
+        "hip_near": [
+          347,
+          611
+        ],
+        "knee_near": [
+          436,
+          559
+        ],
+        "ankle_near": [
+          464,
+          718
+        ],
+        "heel_near": [
+          465,
+          737
+        ],
+        "toe_near": [
+          511,
+          740
+        ]
+      },
+      "notes": "Torso leans back on the forearms; both knees are bent, feet forward."
+    }
+  ]
+}

@@ -164,3 +164,10 @@ subtests). Full in-game click-through remains unverified; see
 
 Ren'Py references: [Side images](https://www.renpy.org/doc/html/side_image.html)
 and [image declarations](https://www.renpy.org/doc/html/displaying_images.html).
+# Stick-pose construction references
+
+[The joint-guide library](../../pose_library/v1/README.md) supplies sixteen
+distinct standing, seated, kneeling and reclining skeleton references, with
+four suggested poses per NPC. Each has a transparent PNG, editable SVG and
+named joint coordinates. These authoring guides supplement the established
+character identity references; they are not finished runtime sprites.
