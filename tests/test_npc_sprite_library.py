@@ -23,16 +23,14 @@ class NPCSpriteLibraryTests(unittest.TestCase):
         cls.manifest = json.loads((ROOT/"game/images/npc_sprites/v1/manifest.json").read_text(encoding="utf-8"))
         cls.rpy = (ROOT/"game/Utilities/General/NPC/NPCSpriteLibrary.rpy").read_text(encoding="utf-8")
 
-    def test_inventory_accounts_for_the_exact_reference_list_and_known_gaps(self):
-        self.assertFalse(self.manifest["complete"])
-        expected_gaps = {("amanda", "boudoir", "kneeling"), ("amanda", "boudoir", "lying_front"),
-                         ("clara", "boudoir", "lying_side"), ("sandra", "boudoir", "lying_front"),
-                         ("sandra", "boudoir", "over_shoulder")}
+    def test_inventory_completes_the_exact_reference_list(self):
+        self.assertTrue(self.manifest["complete"])
+        expected_gaps = set()
         gaps = {(s["npc_id"], s["group"], s["state"]) for s in self.manifest["missing"]}
         self.assertEqual(gaps, expected_gaps)
         sprites = self.manifest["sprites"]
-        self.assertEqual(len(sprites), 155)
-        self.assertEqual(len({s["path"] for s in sprites}), 155)
+        self.assertEqual(len(sprites), 160)
+        self.assertEqual(len({s["path"] for s in sprites}), 160)
         for npc in ("amanda", "clara", "melissa", "sandra"):
             entries = [s for s in sprites if s["npc_id"] == npc]
             self.assertEqual(len(entries)+sum(1 for n, _, _ in gaps if n == npc), 40)
@@ -66,7 +64,7 @@ class NPCSpriteLibraryTests(unittest.TestCase):
     def test_all_standalone_images_and_preview_paths_exist(self):
         declarations = re.findall(r'^image (npc_\w+ \w+ \w+) = "([^"]+)"$', self.rpy, re.M)
         self.assertEqual(set(declarations), {(s["image_name"], s["path"]) for s in self.manifest["sprites"]})
-        self.assertEqual(len(declarations), 155)
+        self.assertEqual(len(declarations), 160)
         preview = ast.literal_eval(self.rpy.split("define NPC_SPRITE_PREVIEW = ", 1)[1])
         paths = [path for groups in preview.values() for entries in groups.values() for _, path in entries]
         self.assertEqual(set(paths), {s["path"] for s in self.manifest["sprites"]})
@@ -95,7 +93,7 @@ class NPCSpriteLibraryTests(unittest.TestCase):
     def test_all_body_poses_have_existing_main_ui_overlay_images(self):
         overlays = re.findall(r'^image (npc_overlay_\w+) = Composite\(\(1536, 1024\), \(448, 224\), "([^"]+)"\)', self.rpy, re.M)
         body = [s for s in self.manifest["sprites"] if s["group"] in ("home", "boudoir")]
-        self.assertEqual(len(overlays), 35)
+        self.assertEqual(len(overlays), 40)
         self.assertEqual(set(overlays), {(s["overlay_name"], s["path"]) for s in body})
 
 

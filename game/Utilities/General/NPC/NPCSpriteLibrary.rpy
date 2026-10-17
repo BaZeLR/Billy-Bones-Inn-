@@ -28,6 +28,8 @@ image npc_amanda home arms_crossed = "images/npc_sprites/v1/amanda/home/amanda_h
 image npc_amanda home leaning_forward = "images/npc_sprites/v1/amanda/home/amanda_home_leaning_forward.png"
 image npc_amanda home sitting_chair = "images/npc_sprites/v1/amanda/home/amanda_home_sitting_chair.png"
 image npc_amanda boudoir sitting_legs_crossed = "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png"
+image npc_amanda boudoir kneeling = "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png"
+image npc_amanda boudoir lying_front = "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png"
 image npc_amanda boudoir lying_side = "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_side.png"
 image npc_amanda boudoir over_shoulder = "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_over_shoulder.png"
 image npc_amanda gestures invite = "images/npc_sprites/v1/amanda/gestures/amanda_gestures_invite.png"
@@ -68,6 +70,7 @@ image npc_clara home sitting_chair = "images/npc_sprites/v1/clara/home/clara_hom
 image npc_clara boudoir sitting_legs_crossed = "images/npc_sprites/v1/clara/boudoir/clara_boudoir_sitting_legs_crossed.png"
 image npc_clara boudoir kneeling = "images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png"
 image npc_clara boudoir lying_front = "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_front.png"
+image npc_clara boudoir lying_side = "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png"
 image npc_clara boudoir over_shoulder = "images/npc_sprites/v1/clara/boudoir/clara_boudoir_over_shoulder.png"
 image npc_clara gestures invite = "images/npc_sprites/v1/clara/gestures/clara_gestures_invite.png"
 image npc_clara gestures tease = "images/npc_sprites/v1/clara/gestures/clara_gestures_tease.png"
@@ -146,7 +149,9 @@ image npc_sandra home leaning_forward = "images/npc_sprites/v1/sandra/home/sandr
 image npc_sandra home sitting_chair = "images/npc_sprites/v1/sandra/home/sandra_home_sitting_chair.png"
 image npc_sandra boudoir sitting_legs_crossed = "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_sitting_legs_crossed.png"
 image npc_sandra boudoir kneeling = "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_kneeling.png"
+image npc_sandra boudoir lying_front = "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png"
 image npc_sandra boudoir lying_side = "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_side.png"
+image npc_sandra boudoir over_shoulder = "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_over_shoulder.png"
 image npc_sandra gestures invite = "images/npc_sprites/v1/sandra/gestures/sandra_gestures_invite.png"
 image npc_sandra gestures tease = "images/npc_sprites/v1/sandra/gestures/sandra_gestures_tease.png"
 image npc_sandra gestures think = "images/npc_sprites/v1/sandra/gestures/sandra_gestures_think.png"
@@ -255,6 +260,8 @@ image npc_overlay_amanda_home_arms_crossed = Composite((1536, 1024), (448, 224),
 image npc_overlay_amanda_home_leaning_forward = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/home/amanda_home_leaning_forward.png")
 image npc_overlay_amanda_home_sitting_chair = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/home/amanda_home_sitting_chair.png")
 image npc_overlay_amanda_boudoir_sitting_legs_crossed = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png")
+image npc_overlay_amanda_boudoir_kneeling = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png")
+image npc_overlay_amanda_boudoir_lying_front = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png")
 image npc_overlay_amanda_boudoir_lying_side = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_side.png")
 image npc_overlay_amanda_boudoir_over_shoulder = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_over_shoulder.png")
 image npc_overlay_clara_home_standing_neutral = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/home/clara_home_standing_neutral.png")
@@ -265,6 +272,7 @@ image npc_overlay_clara_home_sitting_chair = Composite((1536, 1024), (448, 224),
 image npc_overlay_clara_boudoir_sitting_legs_crossed = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/boudoir/clara_boudoir_sitting_legs_crossed.png")
 image npc_overlay_clara_boudoir_kneeling = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png")
 image npc_overlay_clara_boudoir_lying_front = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_front.png")
+image npc_overlay_clara_boudoir_lying_side = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png")
 image npc_overlay_clara_boudoir_over_shoulder = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/clara/boudoir/clara_boudoir_over_shoulder.png")
 image npc_overlay_melissa_home_standing_neutral = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/melissa/home/melissa_home_standing_neutral.png")
 image npc_overlay_melissa_home_hand_on_hip = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/melissa/home/melissa_home_hand_on_hip.png")
@@ -283,7 +291,9 @@ image npc_overlay_sandra_home_leaning_forward = Composite((1536, 1024), (448, 22
 image npc_overlay_sandra_home_sitting_chair = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/home/sandra_home_sitting_chair.png")
 image npc_overlay_sandra_boudoir_sitting_legs_crossed = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_sitting_legs_crossed.png")
 image npc_overlay_sandra_boudoir_kneeling = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_kneeling.png")
+image npc_overlay_sandra_boudoir_lying_front = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png")
 image npc_overlay_sandra_boudoir_lying_side = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_side.png")
+image npc_overlay_sandra_boudoir_over_shoulder = Composite((1536, 1024), (448, 224), "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_over_shoulder.png")
 
 transform npc_sprite_body:
     anchor (0.5, 1.0)
@@ -322,6 +332,8 @@ define NPC_SPRITE_PREVIEW = {
         ),
         "boudoir": (
             ("sitting_legs_crossed", "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png"),
+            ("kneeling", "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png"),
+            ("lying_front", "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png"),
             ("lying_side", "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_side.png"),
             ("over_shoulder", "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_over_shoulder.png"),
         ),
@@ -372,6 +384,7 @@ define NPC_SPRITE_PREVIEW = {
             ("sitting_legs_crossed", "images/npc_sprites/v1/clara/boudoir/clara_boudoir_sitting_legs_crossed.png"),
             ("kneeling", "images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png"),
             ("lying_front", "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_front.png"),
+            ("lying_side", "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png"),
             ("over_shoulder", "images/npc_sprites/v1/clara/boudoir/clara_boudoir_over_shoulder.png"),
         ),
         "gestures": (
@@ -470,7 +483,9 @@ define NPC_SPRITE_PREVIEW = {
         "boudoir": (
             ("sitting_legs_crossed", "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_sitting_legs_crossed.png"),
             ("kneeling", "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_kneeling.png"),
+            ("lying_front", "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png"),
             ("lying_side", "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_side.png"),
+            ("over_shoulder", "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_over_shoulder.png"),
         ),
         "gestures": (
             ("invite", "images/npc_sprites/v1/sandra/gestures/sandra_gestures_invite.png"),

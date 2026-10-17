@@ -2,20 +2,19 @@
 
 Amanda, Clarissa (`clara`), Melissa and Sandra have separate static PNG libraries.
 The requested checklist is **20 expressions, 10 body poses and 10 dialogue
-gestures per character**. This delivery contains **155 of the 160 requested
-PNGs**. All expressions and dialogue gestures are complete. Five body poses
-could not be produced after repeated image-generator rejections; they are
-explicitly listed in `manifest.json.missing` and have no placeholder images.
+gestures per character**. This delivery contains **all 160 requested PNGs**:
+80 expressions, 40 body poses and 40 dialogue gestures. Every character has
+her own complete library, with no placeholders or missing categories.
 
-| Character | Expressions | Body poses | Gestures | Missing body poses |
-| --- | ---: | ---: | ---: | --- |
-| Amanda | 20 | 8 | 10 | kneeling, lying_front |
-| Clarissa (`clara`) | 20 | 9 | 10 | lying_side (edge repair was blocked) |
-| Melissa | 20 | 10 | 10 | None |
-| Sandra | 20 | 8 | 10 | lying_front, over_shoulder |
+| Character | Expressions | Body poses | Gestures | Total |
+| --- | ---: | ---: | ---: | ---: |
+| Amanda | 20 | 10 | 10 | 40 |
+| Clarissa (`clara`) | 20 | 10 | 10 | 40 |
+| Melissa | 20 | 10 | 10 | 40 |
+| Sandra | 20 | 10 | 10 | 40 |
 
 The body categories follow the reference names, with character-specific
-posture, gestures and acting. Missing poses are not filled with duplicates.
+posture, gestures and acting. All five previously unavailable poses are included.
 
 ## Files
 
@@ -23,7 +22,7 @@ posture, gestures and acting. Missing poses are not filled with duplicates.
 
 - `expressions/`: twenty 320×320 dialogue-window portraits.
 - `home/`: five 640×800 full-body poses in light, short private homewear.
-- `boudoir/`: available 640×800 full-body bedroom poses; see the gaps above.
+- `boudoir/`: five 640×800 full-body bedroom poses.
 - `gestures/`: ten 384×512 conversation gesture cutouts.
 
 `manifest.json` records every file, image name, canvas, source crop and SHA-256.
@@ -136,10 +135,10 @@ removes near-invisible alpha residue, preserves antialiased edges, normalizes
 canvases and regenerates plain image declarations. No generative anatomy or
 facial edits are performed during extraction.
 
-The delivery checks account for every reference category and the five declared
-gaps, unique file hashes, RGBA transparency, clean canvas borders, declared paths,
-all 80 side-image bindings and all 35 available media-panel overlays. Ren'Py
-8.5.2 compilation passed. The focused checks passed (26 tests and 155 image
+The delivery checks account for every reference category, unique file hashes,
+RGBA transparency, clean canvas borders, declared paths,
+all 80 side-image bindings and all 40 media-panel overlays. Ren'Py
+8.5.2 compilation passed. The focused checks passed (26 tests and 160 image
 subtests). Full in-game click-through remains unverified; see
 [validation results](VALIDATION.md), including the existing test/lint findings.
 

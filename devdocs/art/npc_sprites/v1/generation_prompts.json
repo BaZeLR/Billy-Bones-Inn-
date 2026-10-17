@@ -236,5 +236,52 @@
       "state": "lying_side",
       "prompt": "Create ONE complete clothed full-body cutout of the exact same grown woman in the supplied character reference. Use only her requested new pose; do not include any of the other figures from the reference. Preserve her face, age, hair color, original body proportions, exact existing short chemise and clothing colors. Same crisp outlined2D comic/cartoon illustration and softly cel-shaded colors.\nPose: reclining on her side with both legs long and comfortably together, one elbow supporting her upper body, the free arm relaxed over her head. Preserve her small B-size slim adult build, loose platinum hair and GREY eyes.\nKeep the existing light chemise naturally draped and fully opaque over her chest and hips; she wears plain underdrawers beneath. Her expression is relaxed, friendly or thoughtful. Draw the entire character including all scalp, complete fingers, elbows, knees, heels and toes. Keep at least80px clear transparent margin on all four sides. Use a wide canvas for horizontal poses and a tall canvas for upright poses; scale the whole figure down to fit rather than cropping anything. No bed, mattress, chair, floor, text, labels, backdrop or cast shadow. Actual alpha transparency; character only."
     }
-  ]
+  ],
+  "completion_prompts": [
+    {
+      "npc_id": "amanda",
+      "group": "boudoir",
+      "state": "kneeling",
+      "reference_source": "amanda_boudoir_sitting_legs_crossed.png",
+      "source_filename": "exec-78c06841-5415-464b-81fb-87850b1240a9.png",
+      "prompt": "Create one clean full-body comic-style game sprite on a truly transparent background. Reference image: the same adult woman; preserve her face, hair, body build, homewear design and colors. Use a simple clothed household resting pose. The light short chemise is made of softly opaque fabric and drapes normally over her torso and hips. Match the reference illustration style. Complete figure with all hands, elbows, hair and feet inside generous transparent margins. No furniture, background, words or additional people. Amanda: petite adult blonde with braided pinned-up hair, fringe and blue eyes, wearing her ivory lace-trim chemise with tied shoulder straps. Kneeling upright on both shins, sitting on her heels, hands loosely clasped in her lap, head tilted with an amused smile. Three-quarter front view. Full kneeling figure."
+    },
+    {
+      "npc_id": "amanda",
+      "group": "boudoir",
+      "state": "lying_front",
+      "reference_source": "exec-78c06841-5415-464b-81fb-87850b1240a9.png",
+      "source_filename": "exec-0e0f1f8a-ef3e-4601-913e-54be2f8763f4.png",
+      "prompt": "Create a single transparent full-body comic character sprite of this same adult Amanda in a new household resting pose. Preserve her established face, blue eyes, blonde fringe and braided pinned-up hair, petite build, and exactly this ivory lace-trim chemise with shoulder ties. The chemise is opaque and rests flat over her hips. Pose: lying on her stomach, head to the right of frame and feet extending left; her head rests sideways on folded arms, smiling gently toward the viewer. Legs lie straight and relaxed along the same level surface, ankles together. A comfortable restful pose. Match the reference comic drawing and colors. Isolated complete figure with no bed or furniture, no background, no text, and generous transparent margins around every part of her body."
+    },
+    {
+      "npc_id": "clara",
+      "group": "boudoir",
+      "state": "lying_side",
+      "reference_source": "clara_boudoir_lying_front.png",
+      "source_filename": "exec-e54221a2-48a6-4950-a231-bb5abe76e609.png",
+      "prompt": "Use case: illustration-story. Asset type: one full-body Ren'Py character sprite, genuinely transparent RGBA background. Use the supplied image as the character identity, body-proportion, costume and illustration-style reference. Draw one new pose of this same adult character, with her established face, build, hair, clothing colors and garment details. Match the polished comic illustration, clean outlines, soft cel shading and natural anatomy. Cozy private household / bedroom relaxation library. Isolated figure, no furniture, no room, no text, no frame, no duplicate figures. Show the complete silhouette, all hair, hands and bare feet, with generous transparent margins on every side. Keep the existing light homewear; the clothing drapes naturally in the new pose.\nSubject: Clarissa, slim adult woman, grey eyes, long loose silver-platinum hair, same lavender lace-trim short chemise, established slender build. Pose: reclining on her side, head at the RIGHT of the composition, bent legs extending toward the LEFT, lower forearm resting along the unseen mattress and cushioning her cheek, upper arm relaxed with fingertips lightly touching her temple, thoughtful half-smile. Both knees are gently bent together. Her long silver hair pools around her shoulders. Horizontal complete silhouette: include the entire supporting elbow, both hands and both feet with generous clear margins."
+    },
+    {
+      "npc_id": "sandra",
+      "group": "boudoir",
+      "state": "lying_front",
+      "reference_source": "sandra_boudoir_kneeling.png",
+      "source_filename": "exec-ae191434-36b1-441d-9cca-0a883cf0aef8.png",
+      "prompt": "Create one clean full-body comic-style game sprite on a truly transparent background. Reference image: the same adult woman; preserve her face, hair, body build, homewear design and colors. Use a simple clothed household resting pose. The light short chemise is made of softly opaque fabric and drapes normally over her torso and hips. Match the reference illustration style. Complete figure with all hands, elbows, hair and feet inside generous transparent margins. No furniture, background, words or additional people. Sandra: mature adult copper-haired woman, green eyes and freckles, same fuller build, deep green lace-trim chemise and burgundy robe. Lying flat on her stomach at rest, head on the LEFT, feet to the RIGHT, elbows resting down and hands stacked below her chin, warm confident smile. Her legs and feet lie relaxed and low. Robe drapes down along both sides. Horizontal full-body composition."
+    },
+    {
+      "npc_id": "sandra",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "reference_source": "exec-ae191434-36b1-441d-9cca-0a883cf0aef8.png",
+      "source_filename": "exec-4940db6f-93f9-4bb5-a224-719d2bea6936.png",
+      "prompt": "Create a single transparent full-length comic character sprite of this same mature adult Sandra, standing and looking back over her right shoulder. Preserve her face, green eyes, freckles, wavy copper hair, fuller build, green lace-trim chemise and burgundy robe. Show her from three-quarter back, weight on left leg, right heel lightly raised. Her left hand holds the robe naturally at the waist, and her right hand makes a small conversational gesture. The short robe and opaque chemise drape normally, covering her torso and hips. Warm amused expression. Same illustration style and colors as the reference. Show her whole standing figure from hair to bare feet with generous transparent margins. No room, furniture, words or additional figures."
+    }
+  ],
+  "delivery": {
+    "complete": true,
+    "individual_pngs": 160,
+    "missing": []
+  }
 }

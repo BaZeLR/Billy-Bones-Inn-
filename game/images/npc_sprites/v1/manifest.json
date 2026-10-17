@@ -1,33 +1,7 @@
 {
   "version": 1,
-  "complete": false,
-  "missing": [
-    {
-      "npc_id": "amanda",
-      "group": "boudoir",
-      "state": "kneeling"
-    },
-    {
-      "npc_id": "amanda",
-      "group": "boudoir",
-      "state": "lying_front"
-    },
-    {
-      "npc_id": "clara",
-      "group": "boudoir",
-      "state": "lying_side"
-    },
-    {
-      "npc_id": "sandra",
-      "group": "boudoir",
-      "state": "lying_front"
-    },
-    {
-      "npc_id": "sandra",
-      "group": "boudoir",
-      "state": "over_shoulder"
-    }
-  ],
+  "complete": true,
+  "missing": [],
   "characters": {
     "amanda": "Amanda",
     "clara": "Clarissa",
@@ -944,6 +918,68 @@
       ],
       "sha256": "ac389f7d0f5db9e6ad5f756ea984d57574606e5ec62dbe4714f9148947b253d1",
       "overlay_name": "npc_overlay_amanda_boudoir_sitting_legs_crossed"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "kneeling",
+      "image_name": "npc_amanda boudoir kneeling",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        144,
+        158,
+        495,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "sha256": "f933dfaf9de65a3c90ec3e9323c07c3051847856121e8c972cc371618e35fea2",
+      "overlay_name": "npc_overlay_amanda_boudoir_kneeling",
+      "override_source": {
+        "filename": "exec-78c06841-5415-464b-81fb-87850b1240a9.png",
+        "sha256": "10f475804a1cbd5ebbc93087c605facbc85ebad59f3e21f9151077f729fcff4b"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_amanda boudoir lying_front",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        564,
+        624,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "6ac5a802e671f7872fa11111fcb0282d41170c78c387263e2b78ac5fa0787996",
+      "overlay_name": "npc_overlay_amanda_boudoir_lying_front",
+      "override_source": {
+        "filename": "exec-0e0f1f8a-ef3e-4601-913e-54be2f8763f4.png",
+        "sha256": "d222cb873d2438202744f7859977bd7fc86412389f38fa8275c4959b367529cd"
+      }
     },
     {
       "npc_id": "amanda",
@@ -1997,6 +2033,37 @@
       "override_source": {
         "filename": "exec-adfff096-215a-4d69-8530-285f3ca1d740.png",
         "sha256": "7025bd2e294813a411bf5e259983b3e39e7853157eccc72871351acb51e2cca3"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "lying_side",
+      "image_name": "npc_clara boudoir lying_side",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        542,
+        624,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "e630021794b85aedb8c628983a3f2f4681898382576c5de275219134fb5323ad",
+      "overlay_name": "npc_overlay_clara_boudoir_lying_side",
+      "override_source": {
+        "filename": "exec-e54221a2-48a6-4950-a231-bb5abe76e609.png",
+        "sha256": "c53b2c71a50bd7f2c13ff966e36fe7c8a5121f7a890c74ac87d54b1aac0f3cae"
       }
     },
     {
@@ -4053,6 +4120,37 @@
       "npc_id": "sandra",
       "display_name": "Sandra",
       "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_sandra boudoir lying_front",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        550,
+        624,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "9aca1849a42683510f22742908db0cd9abae12e298b2337d2c7d69470b1349a9",
+      "overlay_name": "npc_overlay_sandra_boudoir_lying_front",
+      "override_source": {
+        "filename": "exec-ae191434-36b1-441d-9cca-0a883cf0aef8.png",
+        "sha256": "c02d10bc1fef7315fdfa18151e081a25d0f94ab7521527fb3740e6b1e3c58404"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
       "state": "lying_side",
       "image_name": "npc_sandra boudoir lying_side",
       "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_side.png",
@@ -4075,6 +4173,37 @@
       ],
       "sha256": "f8d5719d4cdae5be3ce4a028e2bdb32e279275f004335f691b5055c4e046fbd0",
       "overlay_name": "npc_overlay_sandra_boudoir_lying_side"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "image_name": "npc_sandra boudoir over_shoulder",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_over_shoulder.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        184,
+        32,
+        456,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        0,
+        0,
+        1024,
+        1536
+      ],
+      "sha256": "5ca5d7972ea18c3f6f60dd897f5356352c9d81bcf681e88fc9e9abd3f04101a2",
+      "overlay_name": "npc_overlay_sandra_boudoir_over_shoulder",
+      "override_source": {
+        "filename": "exec-4940db6f-93f9-4bb5-a224-719d2bea6936.png",
+        "sha256": "5e8809b60dba30582b11c84ab995c7553c6e9b46f273131e8a27d5264d7cdeff"
+      }
     },
     {
       "npc_id": "sandra",
