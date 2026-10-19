@@ -1,0 +1,19 @@
+Mode: built-in image generation; background-extraction edit of the supplied reference sheet.
+
+Final prompt:
+Use case: background-extraction.
+Asset type: ONE transparent PNG portrait atlas for a Ren'Py narrator, exported later as individual side-window portraits.
+Input image 1 is the edit target: the user's "Flea Narrator — Expression Reference" sheet. Input image 2 is an identity and costume reference of that SAME flea standing on the table. Preserve the actual character and its illustrated rendering. Do not redesign or humanize it.
+Primary request: isolate the EIGHT head-and-shoulder portraits from the right side of input image 1 and arrange them as a clean production portrait atlas, TWO EQUAL COLUMNS and FOUR EQUAL ROWS, on a fully transparent alpha background. Use a portrait canvas, ideally 1024 by 1536. Each cell is an independent separated cutout with at least 24 pixels of clear transparent padding on every side, so the atlas can be sliced exactly into 2 columns x 4 rows. No part of any portrait may touch a cell boundary or enter another cell.
+Exact row-major order: first row NEUTRAL, MISCHIEVOUS; second row SURPRISED, DEFIANT; third row THOUGHTFUL, DELIGHTED; fourth row SUSPICIOUS, WHISPERING.
+Composition: consistent close portrait size and camera angle, complete hat and red feather visible, complete face, ivory ruff and upper burgundy cloak visible. The lower edge of each portrait may be a natural chest crop. Keep heads similarly positioned and sized within their cells.
+Invariants: golden-brown textured flea chitin; enormous glossy black eyes; insect face and tiny mandibles; battered black broad-brimmed hat with brass buckle and deep red feather; ivory ruff; dark navy embroidered doublet and burgundy cloak with delicate gold trim. Preserve the original artwork's style and each original expression. Thoughtful portrait keeps the hand by the chin, whispering portrait keeps the hand beside the mouth. No human faces or human skin.
+Remove all parchment background, full-body figure, labels, headings, panel lines, swatches, visual notes and decorative separators. Do not include text, frames, grid lines, color squares, scene backgrounds, checkerboard patterns, drop-shadow rectangles or watermarks. Background must be genuinely transparent, including between the portraits and outside feather silhouettes. This is the same established narrator, with eight expressions from the supplied sheet, not eight new character designs.
+
+Export:
+Atlas: 1024 x 1536 RGBA, two columns and four rows.
+Horizontal row cuts: 0, 392, 773, 1141, 1536 (transparent gutters).
+Each cropped portrait is uniformly scaled by 368/512 and placed on a transparent
+400 x 400 canvas with a common lower alignment. The generated alpha is preserved.
+The neutral PNG also replaces game/images/general/narrator.png.
+The full table illustration is copied from the supplied original without pixel edits.
