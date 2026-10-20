@@ -1,0 +1,137 @@
+{
+  "canvas": [
+    640,
+    800
+  ],
+  "count": 16,
+  "poses": [
+    {
+      "id": "amanda_standing_one_hip",
+      "npc": "amanda",
+      "png": "png/amanda_standing_one_hip.png",
+      "svg": "svg/amanda_standing_one_hip.svg",
+      "png_sha256": "300ac7e0fc80e06b8769f1f4b916db4f79e055e363e319951a1df01ac5c24f8c",
+      "svg_sha256": "fdcc8aa89c598ca7545705b1a5ff57b7c43d67f253a5a32e83c33fee18780bc2"
+    },
+    {
+      "id": "clarissa_standing_shoulder_prop",
+      "npc": "clarissa",
+      "png": "png/clarissa_standing_shoulder_prop.png",
+      "svg": "svg/clarissa_standing_shoulder_prop.svg",
+      "png_sha256": "c8aff25d61657cc11968133f2838db4b740ce684c34ba298497178d5e8a0e230",
+      "svg_sha256": "29e19698c3036dde7d3ed9284b56b32fa384670a452038fbb1fdf730877109c5"
+    },
+    {
+      "id": "melissa_standing_offer",
+      "npc": "melissa",
+      "png": "png/melissa_standing_offer.png",
+      "svg": "svg/melissa_standing_offer.svg",
+      "png_sha256": "849c05b32a8ca0e553ad6b3a46b043589e1c65403821aeeea30c88de27f9caa8",
+      "svg_sha256": "412dd18909ca79d1be06d73c518ad8c24de398b02ee47c170724b96a22cf2949"
+    },
+    {
+      "id": "sandra_standing_look_back",
+      "npc": "sandra",
+      "png": "png/sandra_standing_look_back.png",
+      "svg": "svg/sandra_standing_look_back.svg",
+      "png_sha256": "87c955b6137ae03d41937dc0667bd302ab9a1a70558d5f28af48835788795827",
+      "svg_sha256": "bd37f6654bd107b11b05bbf696a4ba9ae9c263579ec9f048aba38f8727fdc593"
+    },
+    {
+      "id": "amanda_seat_crossed_ankles",
+      "npc": "amanda",
+      "png": "png/amanda_seat_crossed_ankles.png",
+      "svg": "svg/amanda_seat_crossed_ankles.svg",
+      "png_sha256": "1384f9559b59d9a4eb3a70dcb64c9e8e30e653758a919a492d5cdfc231242cb0",
+      "svg_sha256": "07db30a04f9d9d7715b9bbd259c2304c5442fb20f571cd8b19bc789b962b62f8"
+    },
+    {
+      "id": "clarissa_floor_knee_up",
+      "npc": "clarissa",
+      "png": "png/clarissa_floor_knee_up.png",
+      "svg": "svg/clarissa_floor_knee_up.svg",
+      "png_sha256": "22170711753eb4775b8d67ae76ed584adca725fb44dcb90240d37ba07b94ada2",
+      "svg_sha256": "316f2dadd6e301fcf5fb46df5e0a5815a041b8dfc52a995b99651da1a1ab0599"
+    },
+    {
+      "id": "melissa_floor_side_deal",
+      "npc": "melissa",
+      "png": "png/melissa_floor_side_deal.png",
+      "svg": "svg/melissa_floor_side_deal.svg",
+      "png_sha256": "65a00bd1531adc90bdb22e000746d254918421e7fd6b8edf3307e485bd4b6d85",
+      "svg_sha256": "98c00d7f56173088fa645e7f35b5cb537802477ac3bb73687d3a610814285ce5"
+    },
+    {
+      "id": "sandra_chair_forward",
+      "npc": "sandra",
+      "png": "png/sandra_chair_forward.png",
+      "svg": "svg/sandra_chair_forward.svg",
+      "png_sha256": "70df39960fa8db0a120e2cdef47bfef2d769d4e47b74700bdf211bd5fe1e10cd",
+      "svg_sha256": "14844f52b85ba38aff3f529e8132417c89472f523063c30a7b793050cdcd6b7f"
+    },
+    {
+      "id": "amanda_low_kneel_lean",
+      "npc": "amanda",
+      "png": "png/amanda_low_kneel_lean.png",
+      "svg": "svg/amanda_low_kneel_lean.svg",
+      "png_sha256": "1f4995a68ac3108bc4082632217a62d0f997d0be29078fbacd29cd22c6cb79e7",
+      "svg_sha256": "036aea4195071e26e255afa4af39a9b8bc544315da74486c63693a949a739549"
+    },
+    {
+      "id": "clarissa_kneel_cards_high",
+      "npc": "clarissa",
+      "png": "png/clarissa_kneel_cards_high.png",
+      "svg": "svg/clarissa_kneel_cards_high.svg",
+      "png_sha256": "a12d8bcb87d17b5dd8e7ca1520902fd1d4529f7b8d95ae63a76cf3698eab31ca",
+      "svg_sha256": "c1274450c42455f2fb726d3d1d4014890b3179579f8e9355237191d623b4f77e"
+    },
+    {
+      "id": "melissa_tall_kneel",
+      "npc": "melissa",
+      "png": "png/melissa_tall_kneel.png",
+      "svg": "svg/melissa_tall_kneel.svg",
+      "png_sha256": "7990bf73fa3c2158b40e83124a4da75d3fc4a5a711ab4fceb95374d395f72182",
+      "svg_sha256": "7a29ad747c66f25a8632d745f62f693f97a73f30c432773c9aee83611a15ff65"
+    },
+    {
+      "id": "sandra_half_kneel",
+      "npc": "sandra",
+      "png": "png/sandra_half_kneel.png",
+      "svg": "svg/sandra_half_kneel.svg",
+      "png_sha256": "989318eb574716aefb7d8803a1982ea3df0675b0499c6099dc4ee6b021c36f99",
+      "svg_sha256": "35cc9546e6e8d2dd94e89d410b406b0277b5718a2131946379776053feaaad87"
+    },
+    {
+      "id": "amanda_prone_reading",
+      "npc": "amanda",
+      "png": "png/amanda_prone_reading.png",
+      "svg": "svg/amanda_prone_reading.svg",
+      "png_sha256": "f065727d6021899136a83cc383fca26273c402e364cfd485aca6697d375e0c3d",
+      "svg_sha256": "52a64b7af52ebc85a7bfdd4a9e1a92b4c37e9e215384cc6a022b148e562e6a9c"
+    },
+    {
+      "id": "clarissa_side_recline_right",
+      "npc": "clarissa",
+      "png": "png/clarissa_side_recline_right.png",
+      "svg": "svg/clarissa_side_recline_right.svg",
+      "png_sha256": "53ed6fe3f71d270c803b71d275fd6aaf25c641e32e22f54ac14f929c17bece18",
+      "svg_sha256": "7d08db4d87437c89110bbf33327ecc1893ca478a77f358f8e820fa2046ffbb81"
+    },
+    {
+      "id": "melissa_side_recline_left",
+      "npc": "melissa",
+      "png": "png/melissa_side_recline_left.png",
+      "svg": "svg/melissa_side_recline_left.svg",
+      "png_sha256": "6baa42bf25f6a0ca9cbda427cfb32b67b55803144c178584358396ece4d361ca",
+      "svg_sha256": "9a06e53833def3312abe639f5931c7a2ca870d6aefbad75f07b191585aaf429a"
+    },
+    {
+      "id": "sandra_recline_knees_bent",
+      "npc": "sandra",
+      "png": "png/sandra_recline_knees_bent.png",
+      "svg": "svg/sandra_recline_knees_bent.svg",
+      "png_sha256": "9432ff4671e4c95f58a52d9bb6c3a5d2f9111806c3410cebc6b20b62c3704826",
+      "svg_sha256": "12cfce3d1527408f562b1785c9062f092e6a871da345430344d5202d8ef6a1d2"
+    }
+  ]
+}

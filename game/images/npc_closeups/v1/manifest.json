@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "collection": "npc_closeups",
+  "requires": "npc_sprites/v1",
+  "complete": true,
+  "sprites": [
+    {
+      "npc_id": "clara",
+      "state": "attentive",
+      "kind": "portrait",
+      "image_name": "npc_clara closeup attentive",
+      "dialogue_attribute": "closeup_attentive",
+      "path": "images/npc_closeups/v1/clara/clara_closeup_attentive.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        29,
+        43,
+        614,
+        759
+      ],
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "placement": [
+        25,
+        32
+      ],
+      "scale": 0.5249643366619116,
+      "sha256": "7d7d85dac2df90b062a6e69be48cabb1b42481e94f817b598c871df3b7b7a253",
+      "source": {
+        "filename": "exec-82699f64-4bf3-4457-b183-68d43bf09556.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "7ba4a36151c704f30ce24c00d32f283e935ccdf17929939d31e8f553202d4c58"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "state": "attentive",
+      "kind": "dialogue",
+      "image_name": "side npcface_clara closeup_attentive",
+      "dialogue_attribute": "closeup_attentive",
+      "path": "images/npc_closeups/v1/clara/clara_closeup_attentive_dialogue.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        32,
+        50,
+        288,
+        300
+      ],
+      "source_box": [
+        180,
+        0,
+        1060,
+        880
+      ],
+      "placement": [
+        32,
+        44
+      ],
+      "scale": 0.2909090909090909,
+      "sha256": "1a5c209dffee80a494ec7c08ff3973950aa8fb95b60ec33dbcababe1cc09ae8a",
+      "source": {
+        "filename": "exec-82699f64-4bf3-4457-b183-68d43bf09556.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "7ba4a36151c704f30ce24c00d32f283e935ccdf17929939d31e8f553202d4c58"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "state": "amused",
+      "kind": "portrait",
+      "image_name": "npc_clara closeup amused",
+      "dialogue_attribute": "closeup_amused",
+      "path": "images/npc_closeups/v1/clara/clara_closeup_amused.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        29,
+        42,
+        614,
+        759
+      ],
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "placement": [
+        25,
+        32
+      ],
+      "scale": 0.5249643366619116,
+      "sha256": "a0de125b5a5d28a2904422cf898bd5b449c2716731b55214a4f68f2463831038",
+      "source": {
+        "filename": "exec-a03e02d8-3836-4556-ad69-70c45487c494.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "3220c4da7f2ba11a66c9ac3eca2a9a9e3015e17ffca83cb0ed6e9860ec1abd3f"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "state": "amused",
+      "kind": "dialogue",
+      "image_name": "side npcface_clara closeup_amused",
+      "dialogue_attribute": "closeup_amused",
+      "path": "images/npc_closeups/v1/clara/clara_closeup_amused_dialogue.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        32,
+        49,
+        288,
+        300
+      ],
+      "source_box": [
+        180,
+        0,
+        1060,
+        880
+      ],
+      "placement": [
+        32,
+        44
+      ],
+      "scale": 0.2909090909090909,
+      "sha256": "c06d8001aeece09ad32522e81dec271f3884fb744922af54554a130be241d8e4",
+      "source": {
+        "filename": "exec-a03e02d8-3836-4556-ad69-70c45487c494.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "3220c4da7f2ba11a66c9ac3eca2a9a9e3015e17ffca83cb0ed6e9860ec1abd3f"
+      }
+    }
+  ],
+  "notes": [
+    "Full portraits and dialogue crops share a camera per expression set.",
+    "Existing npc_*_voice aliases and npcface_* side-image tags are reused."
+  ]
+}

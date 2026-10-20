@@ -1,0 +1,480 @@
+{
+  "version": 1,
+  "collection": "card_game",
+  "complete": true,
+  "asset_kind": "individual complete static RGBA sprites",
+  "requires": "npc_sprites/v1",
+  "sprites": [
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "tease",
+      "image_name": "npc_amanda cards tease",
+      "overlay_name": "npc_overlay_amanda_cards_tease",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_tease.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        169,
+        158,
+        471,
+        768
+      ],
+      "scale": 0.45218680504077097,
+      "sha256": "9920d10a32e98c5f5579d865bc268400020b7ac09938f45db96de4708d7daa78",
+      "source": {
+        "filename": "exec-f2a1f950-e4af-49bf-9dec-7c175869364c.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "ad74337eb239e2b5f1b1533f1fb4c30c26f39c6c61a259f771fdb8ce3222716d"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "forfeit",
+      "image_name": "npc_amanda cards forfeit",
+      "overlay_name": "npc_overlay_amanda_cards_forfeit",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 736,
+      "visible_bounds": [
+        196,
+        32,
+        444,
+        768
+      ],
+      "scale": 0.550486163051608,
+      "sha256": "e243f76e546d26cd4d7d699f5f5b9536c85bd1da499321a63799cb101f4d144d",
+      "source": {
+        "filename": "exec-7934d489-310b-49cc-b3b1-efec63ed0d7c.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "e0a9ae79c22dfea6d7e9bed173535c537428dbd3311c708e47367d532daf37e5"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "cards",
+      "state": "challenge",
+      "image_name": "npc_amanda cards challenge",
+      "overlay_name": "npc_overlay_amanda_cards_challenge",
+      "path": "images/npc_card_game/v1/amanda/amanda_cards_challenge.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        211,
+        158,
+        429,
+        768
+      ],
+      "scale": 0.4135593220338983,
+      "sha256": "1ee4ac579825bf1cf80a38898c795a10355c34d66a61a49133f79a08a8dd0c63",
+      "source": {
+        "filename": "exec-c99c87ad-89f1-43d4-b138-abed0d14a0ed.png",
+        "size": [
+          1024,
+          1536
+        ],
+        "sha256": "604cfb4fa1f036150f687240324d2d958a78f24f59d7af76ffc33e91ccab5485"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "cards",
+      "state": "deal",
+      "image_name": "npc_sandra cards deal",
+      "overlay_name": "npc_overlay_sandra_cards_deal",
+      "path": "images/npc_card_game/v1/sandra/sandra_cards_deal.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 736,
+      "visible_bounds": [
+        187,
+        32,
+        453,
+        768
+      ],
+      "scale": 0.49230769230769234,
+      "sha256": "c2927f2268c5283d5b4e9044aee416cd14c51a08da5b145038d7fc0c250b1e0b",
+      "source": {
+        "filename": "exec-7624311b-0e58-45c1-a965-3599143dce7b.png",
+        "size": [
+          1024,
+          1536
+        ],
+        "sha256": "99a9f0f6c732c29531e8b0bfe78af9e99edb9775ee62ea94fdd91e509dba3bab"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "cards",
+      "state": "forfeit",
+      "image_name": "npc_sandra cards forfeit",
+      "overlay_name": "npc_overlay_sandra_cards_forfeit",
+      "path": "images/npc_card_game/v1/sandra/sandra_cards_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        141,
+        158,
+        498,
+        768
+      ],
+      "scale": 0.4515173945225759,
+      "sha256": "5ce7ba37714e2fecabe90a69934600ae454d683b7895b31198cd4ba6775ce7fb",
+      "source": {
+        "filename": "exec-e29e6f80-5d90-4f1c-bcf5-1bb56b080d1e.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "346539e4481bf7925327706ecc9fd35b2a8f2a94e887f7f8ab0fff242f1ce561"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "cards",
+      "state": "raise",
+      "image_name": "npc_sandra cards raise",
+      "overlay_name": "npc_overlay_sandra_cards_raise",
+      "path": "images/npc_card_game/v1/sandra/sandra_cards_raise.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 736,
+      "visible_bounds": [
+        169,
+        32,
+        471,
+        768
+      ],
+      "scale": 0.48838752488387527,
+      "sha256": "e99258390256fa04c937df6cc76a6d53602441298741982385235fb41576f159",
+      "source": {
+        "filename": "exec-14393d64-1f45-451a-8e85-544e3cc664da.png",
+        "size": [
+          1024,
+          1536
+        ],
+        "sha256": "b73c816a8cda1ada01bbb42d7da400bfa683bda48297d140d13765ff683b9837"
+      }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "floor_deal",
+      "image_name": "npc_melissa cards floor_deal",
+      "overlay_name": "npc_overlay_melissa_cards_floor_deal",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_floor_deal.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        92,
+        158,
+        548,
+        768
+      ],
+      "scale": 0.48221343873517786,
+      "sha256": "3ee9360ed5db0cacd43d8c32931f3cace01ad6a8071ac0f102498bc7809083ce",
+      "source": {
+        "filename": "exec-7645f807-0a26-492d-9507-082cb95b6251.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "23e56d40c241cfa2f9c18b9f90b0e5d3315d0366e62c8acc53d3904ff6d343d8"
+      }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "kneel_forfeit",
+      "image_name": "npc_melissa cards kneel_forfeit",
+      "overlay_name": "npc_overlay_melissa_cards_kneel_forfeit",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_kneel_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        147,
+        158,
+        492,
+        768
+      ],
+      "scale": 0.478806907378336,
+      "sha256": "e9f52d8fb574eb572f2f84902fe5c5d13c168f4db0c259cfaf8dea8f760c4b49",
+      "source": {
+        "filename": "exec-d589952d-2edd-413a-b55e-954fb9da831d.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "133cd74bb713323c749cd6be3c80fdf3b342f060d3f81c58b1ff585ba36fd905"
+      }
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "cards",
+      "state": "recline_bluff",
+      "image_name": "npc_melissa cards recline_bluff",
+      "overlay_name": "npc_overlay_melissa_cards_recline_bluff",
+      "path": "images/npc_card_game/v1/melissa/melissa_cards_recline_bluff.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 480,
+      "visible_bounds": [
+        16,
+        437,
+        624,
+        768
+      ],
+      "scale": 0.412483039348711,
+      "sha256": "d685459b5f1e562125823fa9e16ee83220a37d84609c1ce50ad844578adcabd8",
+      "source": {
+        "filename": "exec-4038d811-637a-46fd-94b5-bb5749ae4028.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "sha256": "d983b06b2f2dd9a805e8d8e37903e9ea8fe51e7a9089736c075a9ba3ea05807a"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "floor_sit",
+      "image_name": "npc_clara cards floor_sit",
+      "overlay_name": "npc_overlay_clara_cards_floor_sit",
+      "path": "images/npc_card_game/v1/clara/clara_cards_floor_sit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        48,
+        158,
+        592,
+        768
+      ],
+      "scale": 0.5,
+      "sha256": "6c73c15512c8427058081e685cd9408908c434c2eff07cb61685e0be08e56928",
+      "source": {
+        "filename": "exec-c688ae29-341b-4663-980e-34934d1ee534.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "e4c52537c50274531478ec1ddad0f69809b6461228d0a3899b4dc2a86c755bc1"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "side_recline",
+      "image_name": "npc_clara cards side_recline",
+      "overlay_name": "npc_overlay_clara_cards_side_recline",
+      "path": "images/npc_card_game/v1/clara/clara_cards_side_recline.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 480,
+      "visible_bounds": [
+        16,
+        549,
+        624,
+        768
+      ],
+      "scale": 0.3496262219666475,
+      "sha256": "c90177ffe3b04bc79c3b43c8db12a86993b9d2dcf699807cffbf89dd5d58a3be",
+      "source": {
+        "filename": "exec-1113566c-6fe3-451c-94e0-bc71baf6cbca.png",
+        "size": [
+          1774,
+          887
+        ],
+        "sha256": "602499d9344ed3445fb2658f5c4a179a18f85b3b93d1f3bfb82bf2494e59c809"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "kneel_play",
+      "image_name": "npc_clara cards kneel_play",
+      "overlay_name": "npc_overlay_clara_cards_kneel_play",
+      "path": "images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        102,
+        158,
+        537,
+        768
+      ],
+      "scale": 0.47104247104247104,
+      "sha256": "fbdaddd6fa1d959a8d7ada47c260ffbe73703d4892f6e0e52aeccd22171ccd66",
+      "source": {
+        "filename": "exec-9c3665bc-e23c-497e-a505-cbe31335d3c3.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "87bc17323677fc745baa3d7e2cb7d043238fef1d923b2e7cd0ea94f70eff021c"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "forfeit",
+      "image_name": "npc_clara cards forfeit",
+      "overlay_name": "npc_overlay_clara_cards_forfeit",
+      "path": "images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        111,
+        158,
+        529,
+        768
+      ],
+      "scale": 0.45590433482810166,
+      "sha256": "f80e628f63dd7e401921d95bdeb268426fe813bb99fca97b675943a2bc4e6c50",
+      "source": {
+        "filename": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "cc7418dd0220e5afc6b5ef60cdd40a48839b0599953015d3c27a698b2a5d4029"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "counterbet",
+      "image_name": "npc_clara cards counterbet",
+      "overlay_name": "npc_overlay_clara_cards_counterbet",
+      "path": "images/npc_card_game/v1/clara/clara_cards_counterbet.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        96,
+        158,
+        543,
+        768
+      ],
+      "scale": 0.4491899852724595,
+      "sha256": "ba765b7e6cd7b8e5b65dcb086d15f28110e81dcdb9aae9499b864ca87f352a9c",
+      "source": {
+        "filename": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "8a19bdc330fac808c446ac074cbe526c36342ce0a9e3806581507e85835f7f49"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "cards",
+      "state": "floor_lean",
+      "image_name": "npc_clara cards floor_lean",
+      "overlay_name": "npc_overlay_clara_cards_floor_lean",
+      "path": "images/npc_card_game/v1/clara/clara_cards_floor_lean.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "baseline": 768,
+      "max_height": 610,
+      "visible_bounds": [
+        16,
+        170,
+        624,
+        768
+      ],
+      "scale": 0.5671641791044776,
+      "sha256": "93580e6a043db4bdf142abee575cb751f146799f9086fcc10081f30b75054bd4",
+      "source": {
+        "filename": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+        "size": [
+          1122,
+          1402
+        ],
+        "sha256": "5567224afdbc76a0378323222e747a3518cdd375376d13541dc6659f7668f7f4"
+      }
+    }
+  ],
+  "notes": [
+    "Character-specific card-game cutouts; see sprites for pose identifiers.",
+    "Cards show decorative backs; ranks belong to game state/UI.",
+    "Furniture-free cutouts; align with the scene's seating or floor.",
+    "No card rules, wardrobe layers or gameplay state are added."
+  ]
+}

@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""Prepare the exact reference checklist as individual Ren'Py PNG assets.
+
+Usage: python tools/build_npc_sprite_library.py --source-map SOURCE_MAP.json
+Source maps contain character ids and atlas paths, relative to the map file.
+Dependencies are for offline preparation only: Pillow, numpy, scipy.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+
+ROOT = Path(__file__).resolve().parents[1]
+OUTPUT = ROOT / "game/images/npc_sprites/v1"
+RPY = ROOT / "game/Utilities/General/NPC/NPCSpriteLibrary.rpy"
+NAMES = {"amanda": "Amanda", "clara": "Clarissa", "melissa": "Melissa", "sandra": "Sandra"}
+OWNERS = {"amanda": "Amanda", "clara": "Clara", "melissa": "Melissa", "sandra": "Sandra"}
+STATES = {
+    "expressions": ("neutral", "happy", "smiling", "wink", "laughing", "playful", "seductive",
+                    "lip_bite", "licking_lips", "surprised", "angry", "annoyed", "sad", "crying",
+                    "terrified", "disgusted", "talking", "arguing", "drunk", "nervous"),
+    "home": ("standing_neutral", "hand_on_hip", "arms_crossed", "leaning_forward", "sitting_chair"),
+    "boudoir": ("sitting_legs_crossed", "kneeling", "lying_front", "lying_side", "over_shoulder"),
+    "gestures": ("invite", "tease", "think", "shy", "point", "stop", "explain", "dismiss", "welcome", "goodbye"),
+}
+GRIDS = {"expressions": (4, 5), "home": (3, 2), "boudoir": (3, 2), "gestures": (5, 2)}
+CANVASES = {"expressions": (320, 320), "home": (640, 800), "boudoir": (640, 800), "gestures": (384, 512)}
+
+
+def atomic_write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".new")
+    with temporary.open("wb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    temporary.replace(path)
+
+
+def clean_alpha(image):
+    pixels = np.array(image.convert("RGBA"), copy=True)
+    alpha = pixels[:, :, 3]
+    alpha[alpha <= 8] = 0
+    alpha[alpha >= 248] = 255
+    pixels[alpha == 0] = 0
+    return pixels
+
+
+def keep_subject(pixels):
+    labels, count = ndimage.label(pixels[:, :, 3] > 32, np.ones((3, 3)))
+    sizes = np.bincount(labels.ravel())
+    sizes[0] = 0
+    if not count or not sizes.max():
+        raise ValueError("Empty sprite cell")
+    distance = ndimage.distance_transform_edt(labels != int(sizes.argmax()))
+    result = pixels.copy()
+    result[distance > 4] = 0
+    return result
+
+
+def grid_tiles(pixels, columns, rows, count):
+    height, width = pixels.shape[:2]
+    result = []
+    for index in range(count):
+        row, col = divmod(index, columns)
+        box = (round(col*width/columns), round(row*height/rows),
+               round((col+1)*width/columns), round((row+1)*height/rows))
+        x0, y0, x1, y1 = box
+        cell = pixels[y0:y1, x0:x1].copy()
+        if columns*rows > 1:
+            # Atlas cells occasionally contain a few boundary pixels from the
+            # adjacent portrait. Remove that extraction gutter before selecting
+            # the subject, otherwise the residue can join the hair silhouette.
+            cell[:4] = cell[-4:] = 0
+            cell[:, :4] = cell[:, -4:] = 0
+        result.append((Image.fromarray(keep_subject(cell)), box))
+    return result
+
+
+def body_tiles(pixels, count=5, columns=3):
+    # Generated silhouettes may cross an ideal atlas grid boundary. Connected
+    # silhouettes preserve the complete hair/hands/feet during extraction.
+    labels, _ = ndimage.label(pixels[:, :, 3] > 32, np.ones((3, 3)))
+    sizes = np.bincount(labels.ravel())
+    sizes[0] = 0
+    ids = sorted(range(1, len(sizes)), key=lambda i: int(sizes[i]), reverse=True)[:count]
+    if len(ids) != count or any(sizes[i] < 5000 for i in ids):
+        raise ValueError("Expected five separate complete body silhouettes")
+    owners = np.zeros(labels.shape, dtype=np.uint8)
+    objects = ndimage.find_objects(labels)
+    boxes = {}
+    for owner, label in enumerate(ids, 1):
+        owners[labels == label] = owner
+        ys, xs = objects[label-1]
+        boxes[owner] = (xs.start, ys.start, xs.stop, ys.stop)
+    distance, nearest = ndimage.distance_transform_edt(owners == 0, return_indices=True)
+    nearest_owner = owners[tuple(nearest)]
+    ordered = sorted(boxes, key=lambda i: (boxes[i][1]+boxes[i][3])/2)
+    ordered = sorted(ordered[:columns], key=lambda i: boxes[i][0]) + sorted(ordered[columns:], key=lambda i: boxes[i][0])
+    result = []
+    for owner in ordered:
+        isolated = pixels.copy()
+        isolated[(nearest_owner != owner) | (distance > 4)] = 0
+        image = Image.fromarray(isolated)
+        box = image.getbbox()
+        if not box:
+            raise ValueError("Empty body silhouette")
+        result.append((image.crop(box), box))
+    return result
+
+
+def write_rpy(entries):
+    lines = ["# Generated by tools/build_npc_sprite_library.py.",
+             "# Ordinary static images, side images and Character aliases; no NPC/story state.",
+             "# Clarissa's canonical runtime id remains clara.", ""]
+    for entry in entries:
+        lines.append('image {} = "{}"'.format(entry["image_name"], entry["path"]))
+    lines += ["", "# Dialogue-window portraits: independent tag from the full-body sprite."]
+    for npc in NAMES:
+        faces = [entry for entry in entries if entry["npc_id"] == npc and entry["group"] == "expressions"]
+        if not faces:
+            continue
+        neutral = next(entry for entry in faces if entry["state"] == "neutral")
+        lines.append('image side npcface_{} = Transform("{}", xysize=(220, 220), fit="contain")'.format(npc, neutral["path"]))
+        for entry in faces:
+            lines.append('image side npcface_{} {} = Transform("{}", xysize=(220, 220), fit="contain")'.format(npc, entry["state"], entry["path"]))
+        lines.append('define npc_{}_voice = Character("{}.display_name()", dynamic=True, image="npcface_{}", who_color=NPC_DIALOGUE_COLORS.get("{}", "#D8DFE9"))'.format(npc, OWNERS[npc], npc, npc))
+    lines += ["", "# The existing BGIMAGE overlay uses a 1536x1024 canvas."]
+    for entry in entries:
+        if entry["group"] in ("home", "boudoir"):
+            lines.append('image {} = Composite((1536, 1024), (448, 224), "{}")'.format(entry["overlay_name"], entry["path"]))
+    lines += ["", "transform npc_sprite_body:", "    anchor (0.5, 1.0)", "    pos (720, 790)",
+              "", "define NPC_SPRITE_PREVIEW = {"]
+    for npc in NAMES:
+        lines.append('    "{}": {{'.format(npc))
+        for group in STATES:
+            lines.append('        "{}": ('.format(group))
+            for entry in entries:
+                if entry["npc_id"] == npc and entry["group"] == group:
+                    lines.append('            ("{}", "{}"),'.format(entry["state"], entry["path"]))
+            lines.append("        ),")
+        lines.append("    },")
+    lines += ["}", ""]
+    atomic_write(RPY, "\n".join(lines).encode("utf-8"))
+
+
+def build(source_map_path):
+    source_map = json.loads(source_map_path.read_text(encoding="utf-8"))
+    entries, sources = [], []
+    for npc in NAMES:
+        for group, states in STATES.items():
+            raw_path = source_map.get(npc, {}).get(group)
+            if not raw_path:
+                continue
+            source = Path(raw_path)
+            if not source.is_absolute():
+                source = source_map_path.parent/source
+            with Image.open(source) as image:
+                source_size = list(image.size)
+                pixels = clean_alpha(image)
+            layout = source_map.get("_layouts", {}).get(npc, {}).get(group, {})
+            tiles = body_tiles(pixels, layout.get("count", 5), layout.get("columns", 3)) if group in ("home", "boudoir") else grid_tiles(pixels, *GRIDS[group], len(states))
+            canvas_size = CANVASES[group]
+            scale = min(1.35, 608/max(tile.width for tile, _ in tiles), 736/max(tile.height for tile, _ in tiles)) if group in ("home", "boudoir") else min(
+                (canvas_size[0]-24)/max(tile.width for tile, _ in tiles),
+                (canvas_size[1]-24)/max(tile.height for tile, _ in tiles))
+            source_index = len(sources)
+            sources.append({"npc_id": npc, "group": group, "filename": source.name, "size": source_size,
+                            "sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "scale": scale})
+            for state_index, state in enumerate(states):
+                override = source_map.get("_overrides", {}).get(npc, {}).get(group, {}).get(state)
+                override_source = None
+                if override:
+                    override_source = Path(override["path"])
+                    if not override_source.is_absolute():
+                        override_source = source_map_path.parent/override_source
+                    with Image.open(override_source) as override_image:
+                        override_pixels = clean_alpha(override_image)
+                    override_grid = override.get("grid", [1, 1])
+                    selected = override.get("index", 0)
+                    tile, box = grid_tiles(override_pixels, *override_grid, override_grid[0]*override_grid[1])[selected]
+                    bounds = tile.getbbox()
+                    if bounds:
+                        tile = tile.crop(bounds)
+                    target_height = 610 if state in ("kneeling", "sitting_legs_crossed") else 736
+                    override_scale = min(1.35, 608/tile.width, target_height/tile.height)
+                else:
+                    tile_index = layout.get("indices", {}).get(state, state_index)
+                    if tile_index is None:
+                        continue
+                    tile, box = tiles[tile_index]
+                    override_scale = scale
+                tile = tile.resize((max(1, round(tile.width*override_scale)), max(1, round(tile.height*override_scale))), Image.Resampling.LANCZOS)
+                tile = Image.fromarray(clean_alpha(tile))
+                canvas = Image.new("RGBA", canvas_size)
+                x = (canvas.width-tile.width)//2
+                y = 768-tile.height if group in ("home", "boudoir") else (canvas.height-tile.height)//2
+                if min(x, y) < 0:
+                    raise ValueError("Sprite exceeds standard canvas")
+                canvas.alpha_composite(tile, (x, y))
+                path = OUTPUT/npc/group/(npc+"_"+group+"_"+state+".png")
+                encoded = io.BytesIO()
+                canvas.save(encoded, format="PNG", optimize=True)
+                payload = encoded.getvalue()
+                atomic_write(path, payload)
+                entry = {"npc_id": npc, "display_name": NAMES[npc], "group": group, "state": state,
+                         "image_name": "npc_{} {} {}".format(npc, group, state),
+                         "path": path.relative_to(ROOT/"game").as_posix(), "canvas": list(canvas_size),
+                         "visible_bounds": list(canvas.getbbox()), "source_index": source_index,
+                         "source_box": list(box), "sha256": hashlib.sha256(payload).hexdigest()}
+                if group in ("home", "boudoir"):
+                    entry["overlay_name"] = "npc_overlay_{}_{}_{}".format(npc, group, state)
+                if override_source is not None:
+                    entry["override_source"] = {"filename": override_source.name, "sha256": hashlib.sha256(override_source.read_bytes()).hexdigest()}
+                entries.append(entry)
+    delivered = {(entry["npc_id"], entry["group"], entry["state"]) for entry in entries}
+    missing = [{"npc_id": npc, "group": group, "state": state}
+               for npc in NAMES for group, states in STATES.items() for state in states
+               if (npc, group, state) not in delivered]
+    manifest = {"version": 1, "complete": not missing, "missing": missing, "characters": NAMES,
+                "reference_checklist": STATES, "sources": sources, "sprites": entries,
+                "asset_kind": "individual complete static RGBA sprites",
+                "notes": ["20 expressions, 10 body categories and 10 dialogue gestures per NPC.",
+                          "Expression art is delivered as dialogue-window side images.",
+                          "Body poses and gestures have individual acting for each NPC.",
+                          "Complete images; no interchangeable body/clothing/face rig."]}
+    atomic_write(OUTPUT/"manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2)+"\n").encode("utf-8"))
+    write_rpy(entries)
+    print("Prepared {} individual RGBA sprites (complete={}).".format(len(entries), manifest["complete"]))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-map", required=True, type=Path)
+    arguments = parser.parse_args()
+    build(arguments.source_map.resolve())

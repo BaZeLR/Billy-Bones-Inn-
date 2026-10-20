@@ -1,0 +1,84 @@
+{
+  "generator": "Built-in image generation",
+  "collection": "Amanda card-game extension",
+  "canonical_references": [
+    {
+      "path": "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+      "role": "adult identity, small-bust body proportions and homewear"
+    },
+    {
+      "path": "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png",
+      "role": "initial seated pose, face and clothing reference"
+    }
+  ],
+  "sources": [
+    {
+      "state": "tease",
+      "selected_source": "exec-f2a1f950-e4af-49bf-9dec-7c175869364c.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-78450491-f621-4b7c-b66b-b9a36254b47c.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one full-body transparent Ren'Py card-game sprite.\nDraw the SAME ADULT AMANDA from these character references, preserving her face, blue eyes, blonde fringe and braided updo, slender petite adult proportions and small natural A-size bust. Match the existing polished comic illustration and shaded colors.\n\nNew acting pose: seated at an unseen card table, three-quarter front, knees angled slightly left and ankles loosely crossed. She holds a fan of FIVE playing cards in one hand near her chest, with patterned dark-red card BACKS facing the viewer. Her other hand toys with the ivory chemise's loosened shoulder ribbon; that strap has slipped onto her upper arm, revealing one bare shoulder while the bodice stays securely over her chest. She has a confident, amused half-smile and one raised eyebrow, as if teasing the other players after winning a hand. Comfortable adult body language, a slight relaxed lean back.\nKeep her existing short ivory lace-trim chemise, soft linen folds and small chest volume, with natural waist, hips, knees, ankles, hands and five fingers per hand. This is a playful private card-game moment in light homewear. Draw the full seated figure including both bare feet; keep all limbs correctly connected and balanced.\n\nExactly one complete isolated character, with cards and every fingertip, hair tip and toe inside generous margins. Genuinely transparent RGBA background. No table, chair, room, other person, floor patch, shadow blob, text or watermark. Do not draw card ranks or suits on their backs.",
+          "references": [
+            "game/images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png",
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        },
+        {
+          "source": "exec-f2a1f950-e4af-49bf-9dec-7c175869364c.png",
+          "prompt": "Use case: identity-preserve.\nAsset: transparent Ren'Py Amanda card-game sprite.\nImage 1 is the edit target. Image 2 is the canonical BODY PROPORTIONS reference.\nKeep the first image's exact pose, face, blonde braided hair, blue eyes, ivory chemise, crossed legs, feet, hands and transparent composition.\nMake only these two corrections: reduce her chest volume to match the small natural A-size bust in image 2, with a shallow soft bodice rather than pronounced rounded cups or deep cleavage. Keep her adult anatomy and original ribcage size. Correct the card fan to exactly FIVE individual cards with the same dark-red patterned backs. Keep one bare shoulder and the loosened ribbon in her other hand.\nDo not alter the body silhouette elsewhere, do not add props, text, furniture or background. One complete adult Amanda, all fingers and toes within the image, genuinely transparent background.",
+          "references": [
+            "exec-78450491-f621-4b7c-b66b-b9a36254b47c.png",
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "forfeit",
+      "selected_source": "exec-7934d489-310b-49cc-b3b1-efec63ed0d7c.png",
+      "max_height": 736,
+      "stages": [
+        {
+          "source": "exec-7934d489-310b-49cc-b3b1-efec63ed0d7c.png",
+          "prompt": "Use case: identity-preserve.\nAsset type: one full-body transparent Ren'Py card-game sprite.\nInput image: canonical Amanda reference for exact identity, face, hair and BODY PROPORTIONS.\nPrimary request: the same adult Amanda has just lost a round of strip cards. A new standing pose, facing three-quarter front with a relaxed hip shift, one knee softly bent and both bare feet naturally planted. Her head tilts to the side with a sheepish amused smile and raised eyebrow, looking at the player.\nWardrobe: the short ivory chemise is now removed and draped from her lowered hand beside her hip. Underneath she wears a matching opaque ivory short camisole with narrow straps, lace edging and tiny front ribbon, ending at the waist, plus matching ivory lace-trim briefs. Her other hand holds a small fan of dark-red-backed playing cards near her shoulder.\nPreserve the reference's petite adult build, SMALL natural A-size chest, slender limbs, blue eyes, blonde fringe and braided updo. The camisole should have shallow natural fabric volume over the small bust. Preserve realistic adult proportions. Tasteful playful confidence in a private home card game, polished illustrated comic style matching the reference.\nOne complete isolated full-body figure, both feet and every finger visible within generous margins. Correct connected shoulders, elbows, wrists, pelvis, knees and ankles; five fingers on each hand. Genuine transparent RGBA background. No table, room, chair, other people, ground shadow, writing or watermark. Card backs have no ranks or suits.",
+          "references": [
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "challenge",
+      "selected_source": "exec-c99c87ad-89f1-43d4-b138-abed0d14a0ed.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-afe1c4e7-4f88-4764-a95e-7ac11669b5c1.png",
+          "prompt": "Use case: identity-preserve.\nAsset type: a new transparent full-body Amanda card-game sprite.\nInput image 1: identity and exact matching ivory camisole-and-briefs wardrobe. Input image 2: canonical adult Amanda body proportions and small A-size bust.\nDraw the same adult Amanda in a DISTINCT NEW seated card-playing pose. She sits on an unseen chair, knees together angled toward the viewer's right, both feet resting naturally with toes and knees aligned. Lean her upper body slightly forward in interest. One hand holds a small fan of dark-red-backed cards low beside her thigh; her other hand extends a single red-backed card toward the unseen table as if making a confident challenge. Her expression is a playful knowing grin, brows slightly raised and direct blue-eyed gaze.\nMatch image 1's opaque short ivory linen camisole, narrow shoulder straps, tiny ribbon, lace edging, and ivory lace-trim briefs. The removed chemise is off-scene. Keep her natural SMALL A-size bust with shallow fabric volume, petite grown-up figure and slender adult limbs, blonde fringe and braided pinned-up hair. Same polished shaded comic illustration style and face.\nFrame her complete body including both bare feet and every fingertip with generous clear margins. Anatomically coherent seated pelvis, connected legs, correctly turned knees, feet and ankles, natural five-finger hands. Exactly one adult character. Genuine transparent RGBA background. No furniture, room, table, floor shadow, other people, text or watermark. Cards display dark-red patterned backs without ranks or suits.",
+          "references": [
+            "exec-7934d489-310b-49cc-b3b1-efec63ed0d7c.png",
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        },
+        {
+          "result": "Output rejected by image tool; no file selected.",
+          "prompt": "Use case: identity-preserve.\nImage 1 is the edit target. Image 2 is canonical Amanda's small-chested adult body reference.\nCorrect ONLY the camisole chest area in image 1 to match Amanda's SMALL A-size bust from image 2: substantially reduce forward projection and rounded cup volume, soften the fabric into a shallow natural contour, and remove the deep center cleavage. Retain the same low lace neckline, straps, tiny ribbon, fabric opacity and full coverage.\nKeep every other part exactly unchanged: same adult face, eyes, hairstyle, playful expression, card-playing hands, card fan, torso lean, seated pelvis, knees, legs, bare feet, briefs, composition and image scale. Do not thicken or shrink the ribcage, waist or limbs.\nOne complete isolated character on genuine transparent RGBA, no furniture, room, background glow, floor shadow, words or watermark.",
+          "references": [
+            "exec-afe1c4e7-4f88-4764-a95e-7ac11669b5c1.png",
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        },
+        {
+          "source": "exec-c99c87ad-89f1-43d4-b138-abed0d14a0ed.png",
+          "prompt": "Use case: identity-preserve.\nAdult Amanda character-consistency edit. Image 1 is the target; image 2 controls the established adult torso proportions.\nChange only the fit of the ivory camisole in image 1: its front contour should follow the same narrow, shallow shape as the dress bodice in image 2. Use relaxed linen folds instead of the strongly rounded cup shaping in image 1. Keep the existing lace neckline, shoulder straps, ribbon, ivory material and opacity.\nPreserve the entire rest of image 1 exactly, including the adult face and figure, hair, smile, seated pose, hands holding playing cards, briefs, knees, legs and feet. Maintain current clothing coverage. All limbs stay in the same locations.\nKeep the transparent background and full-body framing. No furniture, text, room, shadow or backdrop.",
+          "references": [
+            "exec-afe1c4e7-4f88-4764-a95e-7ac11669b5c1.png",
+            "game/images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png"
+          ]
+        }
+      ]
+    }
+  ]
+}

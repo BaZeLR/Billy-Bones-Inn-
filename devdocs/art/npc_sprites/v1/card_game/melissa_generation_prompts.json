@@ -1,0 +1,56 @@
+{
+  "generator": "Built-in image generation",
+  "collection": "Melissa floor card-game poses",
+  "intended_setting": "Separate transparent cutouts for a shared bearskin rug near a fireplace.",
+  "canonical_references": [
+    "game/images/npc_sprites/v1/melissa/home/melissa_home_standing_neutral.png",
+    "game/images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png",
+    "game/images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_kneeling.png",
+    "game/images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_lying_side.png"
+  ],
+  "sources": [
+    {
+      "state": "floor_deal",
+      "selected_source": "exec-7645f807-0a26-492d-9507-082cb95b6251.png",
+      "max_height": 610,
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite of ADULT MELISSA, age 20.\nImage 1 controls her established homewear and body proportions. Image 2 controls her face. Preserve her long raven-black wavy hair, olive skin, green-hazel eyes from the portraits, strong eyebrows, full lips and natural C-size adult build. Match the same polished illustrated comic style and softly shaded colours.\nNew pose: seated comfortably on the FLOOR in a three-quarter view, sitting on one hip with BOTH legs folded together to her side, as if on a soft rug near a fireplace. This is a low side-sitting pose, not sitting on an invisible chair. Her pelvis rests on the implied floor and her calves and feet follow naturally from the folded knees. One hand holds a small deck of dark-red-backed playing cards low beside her lap; the other hand reaches forward with one card to deal it to the unseen shared playing area. Her face has a focused playful half-smile as she looks at the other player.\nKeep image 1's very short ivory lace-trim babydoll, slim shoulder straps, olive-green waist ribbon and matching ivory briefs. Preserve the original fabric properties and adult body proportions. Soft warm neutral light suitable for a fireside scene.\nExactly one complete isolated character, all hair, fingers, cards and bare toes inside generous margins. Natural connected shoulders, elbows, wrists, hips, knees and ankles, five-finger hands. Genuine transparent RGBA background. No rug, bearskin, fireplace, room, floor patch, table, chair, cast shadow, other person, text or watermark. Cards have patterned red backs without ranks or suits.",
+      "references": [
+        "game/images/npc_sprites/v1/melissa/home/melissa_home_standing_neutral.png",
+        "game/images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png"
+      ]
+    },
+    {
+      "state": "kneel_forfeit",
+      "selected_source": "exec-d589952d-2edd-413a-b55e-954fb9da831d.png",
+      "max_height": 610,
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite of ADULT MELISSA, age 20.\nImage 1 is the kneeling pose reference: preserve its comfortable low kneeling pelvis, folded legs, knee positions and foot orientation. Image 2 supplies her established ivory-and-olive homewear colours and adult body proportions. Image 3 supplies her face.\nDraw the SAME adult Melissa, long raven-black hair, olive skin, green-hazel eyes, full lips and the same natural C-size figure. Match the existing polished shaded comic illustration. Keep her sitting back comfortably with her shins and insteps along the implied floor, as in image 1. Preserve anatomically plausible occlusion of the folded feet.\nCard-game forfeit: her short ivory outer babydoll is now removed and held bunched in one lowered hand beside her thigh, its olive-green sash still attached. Underneath she wears a matching opaque IVORY short lace-trim camisole ending at her waist, narrow ruffled straps and a small olive-green front ribbon, plus ivory lace-trim briefs. Her other hand holds a small fan of dark-red-backed playing cards at chest height. Give her a bashful amused grin with slightly pink cheeks, looking toward the player. Preserve natural chest volume without enlargement.\nOne complete isolated adult character; include the full hair, cards, held garment, hands, knees and visible feet with generous transparent margins. Natural five-finger hands. Genuine transparent RGBA. No rug, bearskin, fireplace, room, chair, ground patch, cast shadow, other person, writing or watermark. Card backs have no ranks or suits.",
+      "references": [
+        "game/images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_kneeling.png",
+        "game/images/npc_sprites/v1/melissa/home/melissa_home_standing_neutral.png",
+        "game/images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png"
+      ]
+    },
+    {
+      "state": "recline_bluff",
+      "selected_source": "exec-4038d811-637a-46fd-94b5-bb5749ae4028.png",
+      "max_height": 480,
+      "prompt": "Use case: identity-preserve.\nImage 1 is the edit target: the existing ADULT Melissa side-reclining game sprite. Image 2 is her face reference.\nKeep the target's exact reclining body pose, torso, pelvis, stacked bent legs, knees, feet, hair, ivory boudoir chemise and clothing coverage. Preserve the existing young adult woman's face, olive complexion, green-hazel eyes and raven-black hair. Match the current illustrated comic style.\nChange only her free arm and its hand: lift that hand a little in front of her upper chest and let it hold a small fan of red-backed playing cards. Keep the elbow naturally supported, and leave her other hand supporting her cheek as before. Give her a slightly raised eyebrow and amused smile as she watches another player. The pose should read as comfortable lounging during a friendly game.\nUse the same short ivory chemise with its existing ruffled sleeves and neckline, and a small olive-green ribbon at the front. Frame her complete horizontal silhouette, head left and feet right, with generous transparent margins around all hair, fingers, cards and toes.\nExactly one complete isolated character, natural connected limbs and five-finger hands, true transparent RGBA. No furniture, rug, bearskin, room, floor patch, cast shadow, other person, text or watermark.",
+      "references": [
+        "game/images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_lying_side.png",
+        "game/images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png"
+      ]
+    }
+  ],
+  "unselected_attempts": [
+    {
+      "state": "recline_raise",
+      "result": "Output blocked by the image tool; no file generated.",
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py sprite of ADULT MELISSA, age 20, continuing the fireside card game.\nInput image 1 is the comfortable SIDE-RECLINING POSE reference. Input image 2 controls Melissa's exact ivory camisole-and-briefs wardrobe and adult identity. Input image 3 controls her face.\nPreserve Melissa's long raven-black wavy hair, olive skin, green-hazel eyes, strong brows, full lips and the established natural C-size adult figure. Match the same polished shaded comic illustration.\n\nPose: a relaxed horizontal side-reclining silhouette with her head at the left and feet at the right, at floor level as if lying on a soft rug. Follow image 1's connected torso, hips, comfortably bent stacked legs and natural foot orientation. Her supporting elbow rests on the implied floor and that hand lightly supports her cheek. Her free hand holds a small fan of dark-red-backed playing cards in front of her upper chest. Give her a playful knowing smile and a wink toward the player, inviting the next bet. Keep the body comfortably supported, with the knees and ankles connected naturally and the far leg visibly behind the near leg.\nWardrobe: copy image 2's short opaque ivory lace-trim camisole with ruffled narrow straps, small olive-green front ribbon and matching ivory lace-trim briefs with a green bow. The removed outer babydoll is off-scene. Retain the same garment coverage and natural body proportions.\n\nFrame exactly one complete isolated adult character with all hair, cards, fingers and bare toes fully inside generous margins. Genuine transparent RGBA background. No rug, bearskin, fireplace, bed, cushion, room, ground patch, cast shadow, other person, writing or watermark. Card backs have patterned red backs without ranks or suits.",
+      "references": [
+        "game/images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_lying_side.png",
+        "exec-d589952d-2edd-413a-b55e-954fb9da831d.png",
+        "game/images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png"
+      ]
+    }
+  ]
+}

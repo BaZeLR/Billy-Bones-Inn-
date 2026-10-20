@@ -1,0 +1,42 @@
+{
+  "generator": "Built-in image generation",
+  "npc_id": "clara",
+  "display_name": "Clarissa",
+  "requirements": [
+    "Preserve canonical adult identity, grey eyes, silver hair and lavender/ivory homewear.",
+    "Two separate close-up expressions with matched framing.",
+    "One additional complete card-playing pose; each body pose visibly holds cards.",
+    "Export transparent PNGs and native Ren'Py image declarations."
+  ],
+  "closeups": [
+    {
+      "state": "attentive",
+      "source": "exec-82699f64-4bf3-4457-b183-68d43bf09556.png",
+      "prompt": "Use case: identity-preserve.\nAsset: one transparent dialogue close-up for a Ren'Py visual novel.\nImage 1 is the exact ADULT CLARISSA facial identity reference. Image 2 supplies her current comic linework, silver hair, lavender/ivory clothing palette and adult appearance.\nDraw the SAME grown woman, keeping her grey eyes, established brows, nose, lips, slender face shape and very long silver-platinum hair with subtle side braids. Match polished 2D comic illustration, clean dark ink contours and deliberate soft cel shading.\nFraming: a generous head-and-shoulders portrait, from the complete crown of her hair to the upper chest. Both shoulder edges and the hair surrounding her face stay within clear margins. Her head is turned only slightly in three-quarter view, looking toward the player.\nExpression: attentive and curious, one eyebrow slightly raised, eyes alert, lips gently parted as she listens to a surprising remark. Keep it natural and readable at small dialogue-window size.\nShow the same lavender straps with ivory lace at the lower portrait edge. No hands or props in this close-up. Genuinely transparent RGBA background, no room, panel, lettering or watermark. One portrait only.",
+      "references": [
+        "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png",
+        "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png"
+      ]
+    },
+    {
+      "state": "amused",
+      "source": "exec-a03e02d8-3836-4556-ad69-70c45487c494.png",
+      "prompt": "Use case: identity-preserve.\nEdit the supplied adult Clarissa close-up into a second dialogue expression.\nChange only her facial expression: a warm, confident CLOSED-LIP smile, with the eye on the viewer's LEFT playfully closed in a natural wink and the other grey eye looking toward the player. Keep her facial structure, nose, lip shape, eyebrows and adult identity.\nPreserve the exact head position and tilt, framing, crown, hair silhouette, silver side braid, shoulders, lavender and ivory clothing, light, colors and comic linework. Keep all non-facial elements unchanged so this portrait can switch with the first one in a dialogue window. One head-and-shoulders portrait, same canvas and transparent RGBA background. No props, words, panel or watermark.",
+      "references": [
+        "exec-82699f64-4bf3-4457-b183-68d43bf09556.png"
+      ]
+    }
+  ],
+  "body_pose": {
+    "state": "floor_lean",
+    "source": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+    "prompt": "Use case: identity-preserve.\nAsset: one complete transparent full-body card-playing sprite for Ren'Py.\nInput image 1 supplies ADULT CLARISSA's exact face and grey eyes. Image 2 supplies her long silver-platinum hair, adult slender proportions and polished clean comic linework. Image 3 supplies her lavender slip dress with ivory lace trim and front ribbon. Image 4 is ONLY the stick-skeleton pose guide; it is not a character reference.\nPreserve the same grown woman and established proportions. Do not change her identity or enlarge her figure. Use clean dark ink outlines, clear shapes and soft cel shading.\nNew pose: comfortably semi-reclining on the implied floor, head and shoulders toward the LEFT and both feet toward the RIGHT. Her pelvis rests on the surface. The near arm reaches back to support her on its forearm and palm. The other elbow bends so that hand holds a clearly visible fan of dark-red patterned playing cards near her shoulder. Turn her face toward the other player with a confident amused smile.\nBoth knees are comfortably bent, with the nearer shin descending naturally to a bare foot planted on the implied surface. The farther leg sits behind it with correct occlusion. Maintain a continuous torso and connected pelvis, thighs, knees, shins and ankles. Include all fingertips, heels and toes, with natural feet oriented consistently with their knees.\nWear image 3's same short lavender slip dress and ivory lace, with its hem falling naturally over the lap and upper thighs. Preserve its existing fit and coverage.\nOne complete isolated adult character, full hair, fan of cards, hands, legs and feet inside generous clear margins. Genuine transparent RGBA. No room, rug, furniture, ground patch, cast shadow, other person, writing or watermark.",
+    "references": [
+      "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png",
+      "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+      "game/images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+      "devdocs/art/pose_library/v1/png/sandra_recline_knees_bent.png"
+    ],
+    "observed_pose": "Floor-seated lean supported on a palm, one raised knee and one folded leg. The generator followed the joint guide approximately; this is not an exact skeleton trace."
+  }
+}

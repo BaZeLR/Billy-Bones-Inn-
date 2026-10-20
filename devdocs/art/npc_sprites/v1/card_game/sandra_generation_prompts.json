@@ -1,0 +1,40 @@
+{
+  "generator": "Built-in image generation",
+  "collection": "Sandra card-game extension",
+  "canonical_references": [
+    "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+    "game/images/npc_sprites/v1/sandra/expressions/sandra_expressions_neutral.png"
+  ],
+  "sources": [
+    {
+      "state": "deal",
+      "selected_source": "exec-7624311b-0e58-45c1-a965-3599143dce7b.png",
+      "max_height": 736,
+      "prompt": "Use case: identity-preserve.\nAsset: one complete full-body transparent Ren'Py sprite for a playful card-game scene.\nImage 1 controls the established Sandra body and wardrobe; image 2 controls her face and green eyes. Draw the SAME mature ADULT SANDRA: copper-red wavy hair, green eyes, warm lightly freckled skin, a confident adult face and her established fuller proportions. Match this polished shaded comic illustration and preserve her identity.\nNew pose: standing in a relaxed slight forward lean, a compact deck of red-backed playing cards in one hand near her waist, the other hand offering a single card toward an unseen table. Her elbows and wrists are naturally connected and both bare feet are planted with one foot slightly forward. She wears an amused knowing smile, looking at the player as the dealer.\nKeep her existing short burgundy lace-trim home wrap, dark green waist sash, short sleeves slipped off the shoulder, and black lace briefs from image 1. The bodice stays closed and supported, with the same neckline and coverage as the reference. Preserve her torso, hips and leg proportions.\nExactly one complete isolated adult character, generous margins around hair, cards, all fingers and toes. Correct natural hands, five fingers per hand. Genuinely transparent RGBA background. No table, chair, room, floor patch, cast shadow, text, watermark or other person. Card backs have no ranks or suits.",
+      "references": [
+        "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+        "game/images/npc_sprites/v1/sandra/expressions/sandra_expressions_neutral.png"
+      ]
+    },
+    {
+      "state": "forfeit",
+      "selected_source": "exec-e29e6f80-5d90-4f1c-bcf5-1bb56b080d1e.png",
+      "max_height": 610,
+      "prompt": "Use case: identity-preserve.\nAsset: one complete full-body transparent Ren'Py sprite for a playful card-game scene.\nImage 1 controls the established Sandra body and wardrobe; image 2 controls her face and green eyes. Draw the SAME mature ADULT SANDRA: copper-red wavy hair, green eyes, warm lightly freckled skin, a confident adult face and her established fuller proportions. Match this polished shaded comic illustration and preserve her identity.\nNew pose: seated diagonally toward the viewer's right, knees together and uncrossed, both bare feet naturally resting down. One hand holds her removed burgundy wrap, draped over her lap with the green sash attached; the other hand holds a small fan of red-backed cards beside her shoulder. She tips her chin slightly up with a good-humoured rueful smile after losing a round.\nUnder the removed wrap she wears an opaque burgundy short camisole with lace edging and supportive narrow straps, ending at her waist, plus her established black lace briefs with an opaque lining. Keep the reference's natural chest volume and fuller adult figure. Preserve her mature face, copper-red hair and green eyes.\nOne complete isolated adult figure, including the full hair, cloth hem, cards, both hands and both feet inside generous margins. Natural seated pelvis, connected thighs, knees, shins and ankles. Correct five-finger hands. Genuinely transparent RGBA; no furniture, background, floor shadow, other people, writing or watermark.",
+      "references": [
+        "game/images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+        "game/images/npc_sprites/v1/sandra/expressions/sandra_expressions_neutral.png"
+      ]
+    },
+    {
+      "state": "raise",
+      "selected_source": "exec-14393d64-1f45-451a-8e85-544e3cc664da.png",
+      "max_height": 736,
+      "prompt": "Use case: identity-preserve.\nAsset type: full-body transparent Ren'Py Sandra card-game sprite.\nImage 1 is the identity and exact undergarment wardrobe reference. Image 2 is Sandra's face reference.\nDraw the same mature adult Sandra with copper-red wavy hair, green eyes, lightly freckled skin, the established fuller adult build and the same polished comic illustration style.\n\nNEW ACTING POSE: standing in a gentle three-quarter rear view, looking back over her near shoulder at the player with a confident amused smile. Her head turns naturally with her shoulders rather than twisting the neck sharply. One hand holds a small fan of dark-red-backed cards at shoulder height, and her other hand rests on her waist with elbow out. Her hips and shoulders have a relaxed counter-turn, both bare feet planted, knees and feet aligned with the body's three-quarter direction. This reads as a playful challenge before raising the bet.\nKeep exactly image 1's opaque burgundy short lace-trim camisole and black lace briefs with opaque lining. The camisole has a normal back panel and narrow straps; preserve its colour, length and fabric. The removed wrap is off-scene. Retain Sandra's natural adult anatomy and proportions.\n\nOne complete isolated character on genuine transparent RGBA, including full hair, cards, every fingertip and both bare feet with generous clear margins. Correct shoulders, pelvis, legs, knees, ankles and hands. No furniture, room, floor patch, cast shadow, text, other person or watermark. Cards show patterned red backs without ranks or suits.",
+      "references": [
+        "exec-e29e6f80-5d90-4f1c-bcf5-1bb56b080d1e.png",
+        "game/images/npc_sprites/v1/sandra/expressions/sandra_expressions_neutral.png"
+      ]
+    }
+  ]
+}

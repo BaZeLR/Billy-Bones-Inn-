@@ -1,0 +1,146 @@
+{
+  "generator": "Built-in image generation",
+  "collection": "Clarissa cozy lounge/bedroom card-game set",
+  "requirements": [
+    "Every delivered pose visibly holds playing cards.",
+    "Preserve established adult face, grey eyes, silver hair and lavender/ivory homewear.",
+    "Separate transparent character sprites."
+  ],
+  "canonical_references": {
+    "kneel": "game/images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png",
+    "recline": "game/images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png",
+    "face": "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
+  },
+  "sources": [
+    {
+      "state": "floor_sit",
+      "selected_source": "exec-c688ae29-341b-4663-980e-34934d1ee534.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py cozy lounge sprite.\nImage 1 supplies ADULT CLARISSA's established body proportions, long silver-platinum hair and lavender homewear. Image 2 supplies her exact face and grey eyes. Preserve this same grown-up woman in her twenties, with a slender adult figure, natural small-medium chest, defined brows and full lips. Match the polished illustrated comic style of the references.\n\nNew comfortable lounge pose: sitting on the floor on one hip, with both knees bent and her lower legs relaxed to the side. One palm rests behind her to support a gentle backward lean; the other hand rests loosely on her nearer knee. Her shoulders are relaxed and her head turns toward the player with a warm, confident closed-lip smile. Her pelvis rests on the implied floor, with natural connected knees and feet. This is a relaxed home conversation pose.\nWear her existing short lavender slip dress with ivory lace edging, narrow straps and the same neckline as image 1. Keep its soft fabric folds, hem length and full clothing coverage. Retain her established adult anatomy and proportions; do not copy another NPC's face or hairstyle.\nOne complete isolated adult character with the full hair, all hands, knees and bare feet inside generous clear margins. True transparent RGBA background. No rug, furniture, bed, room, floor patch, cast shadow, other people, text or watermark.",
+          "references": [
+            "game/images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png",
+            "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
+          ]
+        },
+        {
+          "source": "exec-c688ae29-341b-4663-980e-34934d1ee534.png",
+          "prompt": "Use case: identity-preserve.\nImage 1 is the edit target: adult Clarissa's lavender lounge sprite.\nAdd her playing cards. Change only the hand resting on her knee and the minimum necessary wrist/forearm angle so she holds a small fan of FIVE playing cards just above her lap. The cards have dark-red patterned backs with ivory borders facing the viewer. Natural fingers wrap around the lower edges of the fan.\nPreserve EVERYTHING ELSE: her exact adult face, grey eyes, silver hair, body proportions, seated pose, knees and feet, lavender lace-trim slip and its neckline and hem, and the other hand supporting her on the floor. Keep her existing warm smile. One complete isolated character, all cards and fingertips inside generous margins. Preserve genuine transparent RGBA background, no furniture, room, text or shadow.",
+          "references": [
+            "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "side_recline",
+      "selected_source": "exec-1113566c-6fe3-451c-94e0-bc71baf6cbca.png",
+      "max_height": 480,
+      "stages": [
+        {
+          "source": "exec-a0fb84b7-79a9-40ac-afcc-63ba02e6bb99.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py cozy bedroom/lounge sprite of ADULT CLARISSA.\nImage 1 is the side-reclining POSE reference. Image 2 is the exact current identity, long silver hair, grey eyes and lavender slip-dress reference. Keep this same slender grown-up woman in her twenties and the polished shaded comic style.\nCreate a comfortable horizontal side-reclining pose with her head at the RIGHT and bare feet at the LEFT. Follow image 1's connected shoulders, ribcage, pelvis and naturally stacked legs. The lower leg is relaxed along the implied surface and the upper knee is softly bent. One elbow supports her upper body and that hand rests lightly against her temple. Her free forearm rests on the implied surface in front of her, with the palm loosely open. Her face has a relaxed half-smile and softly lowered eyelids, looking toward the player.\nCopy image 2's short lavender slip with ivory lace edging, narrow straps, small front ribbon and the same neckline, hem length and coverage. Keep its soft cloth folds and her established natural adult proportions.\nOne complete isolated character with generous clear margins around the entire horizontal figure, hair, hands and toes. Natural connected limbs and five-finger hands. Genuinely transparent RGBA. No bed, pillows, rug, sofa, room, ground patch, cast shadow, other person, writing or watermark.",
+          "references": [
+            "game/images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png",
+            "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png"
+          ]
+        },
+        {
+          "result": "Output blocked; no file generated.",
+          "prompt": "Use case: identity-preserve.\nImage 1 is the edit target: adult Clarissa's side-reclining lavender lounge sprite.\nAdd her playing cards. Change only the free hand and the minimum necessary wrist/forearm angle: raise the hand currently resting on the surface in front of her so it holds a small fan of FIVE playing cards in front of her upper chest. Keep its elbow naturally supported. Cards have dark-red patterned backs with ivory borders facing the viewer.\nPreserve every other part exactly: her adult face and relaxed expression, grey eyes, silver hair, the hand supporting her temple, shoulders, torso, hips, stacked legs and feet, and lavender lace-trim slip with the same coverage. Keep the full horizontal silhouette head-right and feet-left. Complete isolated character with all cards and fingers within clear margins. True transparent RGBA, no background, furniture, text or shadow.",
+          "references": [
+            "exec-a0fb84b7-79a9-40ac-afcc-63ba02e6bb99.png"
+          ]
+        },
+        {
+          "source": "exec-1113566c-6fe3-451c-94e0-bc71baf6cbca.png",
+          "prompt": "Use case: precise-object-edit.\nEdit the supplied adult Clarissa illustration by adding a small fan of playing cards to the hand resting on the surface in front of her.\nKeep that elbow and forearm in exactly the same supported position. Adjust only the wrist and fingers enough to grip the lower edges of the cards. The card fan sits low in front of her, just above the implied surface; show dark-red patterned backs with ivory borders. The cards must clearly be held in her hand.\nPreserve the entire rest of the image exactly: same adult face and expression, silver hair, grey eyes, lavender slip dress, lace trim, clothing coverage, shoulders, torso, supporting hand at her temple, pelvis, knees, legs, feet and horizontal full-body framing.\nTrue transparent RGBA background. No other props, furniture, room, writing, shadows or watermarks. All fingers, cards, hair and toes remain inside clear margins.",
+          "references": [
+            "exec-a0fb84b7-79a9-40ac-afcc-63ba02e6bb99.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "kneel_play",
+      "selected_source": "exec-9c3665bc-e23c-497e-a505-cbe31335d3c3.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-9c3665bc-e23c-497e-a505-cbe31335d3c3.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one separate transparent Ren'Py card-playing sprite of ADULT CLARISSA.\nImage 1 is her low kneeling pose reference. Image 2 supplies the exact current lavender slip, silver hair, grey eyes and face.\nKeep image 1's comfortable low kneeling pose, pelvis, folded legs, knee positions and foot direction. Her free hand remains resting gently on her knees. Replace the hand touching her hair with a hand holding a small fan of FIVE playing cards near her shoulder, dark-red patterned backs and ivory borders facing the viewer. Give her an attentive amused smile as she listens to the other players.\nPreserve the same slender adult build, natural body proportions, face, very long silver-platinum hair and grey eyes. Wear image 2's short lavender slip, ivory lace edging, narrow straps and small front ribbon with unchanged neckline and coverage. Match the polished illustrated comic style.\nOne complete isolated character, all hair, cards, hands, knees and visible feet inside generous clear margins. Natural five-finger hands and connected limbs. Genuine transparent RGBA background. No furniture, room, rug, floor patch, cast shadow, writing or watermark.",
+          "references": [
+            "game/images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png",
+            "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "forfeit",
+      "selected_source": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png",
+          "prompt": "Use case: identity-preserve.\nCreate one full-body transparent sprite of the SAME ADULT CLARISSA from the references, in polished 2D CARTOON COMIC artwork: confident clean ink outlines, crisp cel shading with two or three deliberate shadow tones, expressive adult face, coherent anatomy and clear readable shapes. Avoid soft airbrushed realism. Preserve her established adult facial structure, grey eyes, very long silver hair and slender adult body proportions.\nUse image 1's exact comfortable low kneeling pose and keep the playing-card fan VISIBLE IN HER RAISED HAND. Preserve its red patterned backs. The hand resting on her knee now holds her folded lavender outer slip as a card-game clothing forfeit.\nHer outfit underneath is a matching opaque lavender camisole and matching opaque briefs, both trimmed in ivory lace. The camisole has narrow straps, a small ivory ribbon and ends at the waist, with the same natural chest volume and full chest coverage as the reference. Keep the same adult build without enlargement or exaggeration.\nShe looks toward the other player with an amused rueful smile after losing the round. One complete character, full hair, cards, hands, held garment, knees and visible bare feet inside generous clear margins. Genuine transparent RGBA background. No room, rug, furniture, floor shadow, other person, writing or watermark.",
+          "references": [
+            "game/images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+            "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "counterbet",
+      "selected_source": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+      "max_height": 610,
+      "stages": [
+        {
+          "source": "exec-388a7379-0fad-49d0-b2d4-4f6a1a353b87.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite.\nImage 1 is the exact ADULT CLARISSA identity, clothing and comic-style reference. Keep her grown-up face, grey eyes, very long silver-platinum hair, slender adult build and natural body proportions. Match the clean dark ink outlines, clear shapes and cel shading, using deliberate shadow bands rather than soft airbrushed realism.\n\nNew later-round pose: seated on the implied floor on one hip, ONE knee comfortably raised in front of her while the other leg is folded to the side. Her body is upright and relaxed, with the raised knee and foot naturally connected to the pelvis; the other hand braces on the surface beside her hip. The forearm on her raised knee supports a small fan of dark-red-backed playing cards, clearly held in her fingers near chest height. Her expression is a confident competitive half-smile with one eyebrow raised, looking at the other player as she raises the bet.\nCopy image 1's opaque lavender short camisole, narrow straps, ivory lace edging, tiny ivory front ribbon and matching opaque lavender lace-trim briefs. Preserve the same fit, coverage and chest volume. The removed outer slip is off-scene.\nOne complete isolated adult character, all hair, cards, hands, knees and visible bare feet inside generous margins. Coherent hips, knees, shins and ankles with natural five-finger hands. Genuine transparent RGBA background. No rug, room, furniture, floor patch, cast shadow, extra person, text or watermark. Card backs have patterned dark red designs and ivory borders without ranks or suits.",
+          "references": [
+            "exec-9d2fa97b-bda0-4925-a027-269abb32c437.png"
+          ]
+        }
+      ]
+    },
+    {
+      "state": "floor_lean",
+      "selected_source": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+      "max_height": 610,
+      "observed_pose": "Floor-seated lean supported on a palm, one raised knee and one folded leg. The generator followed the joint guide approximately; this is not an exact skeleton trace.",
+      "stages": [
+        {
+          "source": "exec-99bbe61f-8108-4329-886f-b0381b2a2294.png",
+          "prompt": "Use case: identity-preserve.\nAsset: one complete transparent full-body card-playing sprite for Ren'Py.\nInput image 1 supplies ADULT CLARISSA's exact face and grey eyes. Image 2 supplies her long silver-platinum hair, adult slender proportions and polished clean comic linework. Image 3 supplies her lavender slip dress with ivory lace trim and front ribbon. Image 4 is ONLY the stick-skeleton pose guide; it is not a character reference.\nPreserve the same grown woman and established proportions. Do not change her identity or enlarge her figure. Use clean dark ink outlines, clear shapes and soft cel shading.\nNew pose: comfortably semi-reclining on the implied floor, head and shoulders toward the LEFT and both feet toward the RIGHT. Her pelvis rests on the surface. The near arm reaches back to support her on its forearm and palm. The other elbow bends so that hand holds a clearly visible fan of dark-red patterned playing cards near her shoulder. Turn her face toward the other player with a confident amused smile.\nBoth knees are comfortably bent, with the nearer shin descending naturally to a bare foot planted on the implied surface. The farther leg sits behind it with correct occlusion. Maintain a continuous torso and connected pelvis, thighs, knees, shins and ankles. Include all fingertips, heels and toes, with natural feet oriented consistently with their knees.\nWear image 3's same short lavender slip dress and ivory lace, with its hem falling naturally over the lap and upper thighs. Preserve its existing fit and coverage.\nOne complete isolated adult character, full hair, fan of cards, hands, legs and feet inside generous clear margins. Genuine transparent RGBA. No room, rug, furniture, ground patch, cast shadow, other person, writing or watermark.",
+          "references": [
+            "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png",
+            "game/images/npc_card_game/v1/clara/clara_cards_forfeit.png",
+            "game/images/npc_card_game/v1/clara/clara_cards_kneel_play.png",
+            "devdocs/art/pose_library/v1/png/sandra_recline_knees_bent.png"
+          ]
+        }
+      ]
+    }
+  ],
+  "unselected_attempts": [
+    {
+      "state": "upright_kneel",
+      "result": "Output blocked; no file generated.",
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py cozy lounge/bedroom sprite of ADULT CLARISSA.\nImage 1 supplies her exact current face, body proportions, very long silver-platinum hair and lavender homewear. Image 2 supplies her grey eyes and facial details. Keep the same grown-up woman in her twenties, slender adult figure, full lips and polished shaded comic style.\nA distinct new pose: kneeling UPRIGHT on both knees, with her thighs near vertical and hips lifted above her heels, lower legs resting naturally behind her. Her knees rest on the implied surface and her insteps point back along it; allow the farther foot to be naturally partly hidden. Turn her shoulders gently toward the player, one hand resting lightly at her waist and the other tucking a strand of her long hair behind her ear. Her head tilts a little with a bright friendly open smile, as if greeting someone joining her.\nPreserve the exact short lavender slip with ivory lace trim, narrow straps, small front ribbon, neckline and coverage from image 1. Let the soft hem and fabric fall naturally in the new pose without changing her proportions. Keep the adult anatomy coherent, with the torso balanced over the knees, correct connected shins and ankles and natural hands.\nFrame one complete isolated character including full hair, both hands, knees and visible bare feet, all inside generous margins. True transparent RGBA background. No furniture, room, rug, floor patch, cast shadow, other people, text or watermark.",
+      "references": [
+        "exec-1f945635-a5ad-4da3-88f9-515eaa321583.png",
+        "game/images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png"
+      ]
+    },
+    {
+      "state": "forfeit",
+      "result": "Output blocked; no file generated.",
+      "prompt": "Use case: identity-preserve.\nAsset: one separate full-body transparent Ren'Py card-game sprite.\nInput image 1 controls the established ADULT CLARISSA identity, proportions, silver hair and lavender palette. Image 2 controls her exact face and grey eyes. Preserve this same slender grown-up woman in her twenties, natural small-medium chest, full lips, very long silver-platinum hair and polished shaded comic illustration style.\n\nNew clothing-forfeit pose: she sits comfortably CROSS-LEGGED on the implied floor, feet tucked naturally under the opposite calves with realistic occlusion, as if on a rug near the fireplace. One hand holds her removed lavender slip dress loosely beside her knee; keep its ivory lace edging visible. Her other hand holds a small fan of dark-red-backed playing cards near her shoulder. She has an amused rueful smile and slightly raised eyebrows after losing a round, looking toward the other player.\nUnder the removed slip she wears a matching opaque LAVENDER short camisole with narrow straps, ivory lace edging and a tiny ivory ribbon, ending at the waist, plus matching lavender briefs with ivory lace trim and opaque fabric. Keep the same natural adult body proportions and chest volume as the references. The camisole covers her chest completely.\nDraw coherent crossed legs connected to the pelvis, natural knees and ankles, realistic five-finger hands holding the cards and garment. One complete isolated character with all hair, hands, cloth and visible bare feet inside generous margins. Genuine transparent RGBA background. No rug, furniture, room, ground patch, cast shadow, other person, text or watermark. Cards show patterned dark-red backs with ivory borders, no ranks or suits."
+    }
+  ],
+  "style_target_for_clothing_extension": "Clean comic ink outlines and clearer cel shading, using the built-in image tool."
+}

@@ -139,9 +139,7 @@ screen say(who, what):
                 ypos 10
                 xmaximum _say_inner_w
                 spacing 8
-                if who is not None:
-                    text who id "who" style "say_label"
-                text what id "what"
+                use npc_sprite_dialogue_line(who, what)
 
 
         #if who is not None:
@@ -156,7 +154,7 @@ screen say(who, what):
 
     ## If there's a side image, display it above the text. Do not display on the
     ## phone variant - there's no room.
-    if not intro_cinematic_active and not renpy.variant("small"):
+    if not intro_cinematic_active and not renpy.variant("small") and not str(renpy.get_say_image_tag() or "").startswith("npcface_"):
         add SideImage() xalign 0.0 yalign 1.0
 
 

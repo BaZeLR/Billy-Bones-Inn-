@@ -1,0 +1,4488 @@
+{
+  "version": 1,
+  "complete": true,
+  "missing": [],
+  "characters": {
+    "amanda": "Amanda",
+    "clara": "Clarissa",
+    "melissa": "Melissa",
+    "sandra": "Sandra"
+  },
+  "reference_checklist": {
+    "expressions": [
+      "neutral",
+      "happy",
+      "smiling",
+      "wink",
+      "laughing",
+      "playful",
+      "seductive",
+      "lip_bite",
+      "licking_lips",
+      "surprised",
+      "angry",
+      "annoyed",
+      "sad",
+      "crying",
+      "terrified",
+      "disgusted",
+      "talking",
+      "arguing",
+      "drunk",
+      "nervous"
+    ],
+    "home": [
+      "standing_neutral",
+      "hand_on_hip",
+      "arms_crossed",
+      "leaning_forward",
+      "sitting_chair"
+    ],
+    "boudoir": [
+      "sitting_legs_crossed",
+      "kneeling",
+      "lying_front",
+      "lying_side",
+      "over_shoulder"
+    ],
+    "gestures": [
+      "invite",
+      "tease",
+      "think",
+      "shy",
+      "point",
+      "stop",
+      "explain",
+      "dismiss",
+      "welcome",
+      "goodbye"
+    ]
+  },
+  "sources": [
+    {
+      "npc_id": "amanda",
+      "group": "expressions",
+      "filename": "exec-264c3194-889c-49c8-93a5-85bee75e7961.png",
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "df345e68a58ee5e08deb55d893cf9cfba016d167782aa173803f00477a697243",
+      "scale": 1.0533807829181494
+    },
+    {
+      "npc_id": "amanda",
+      "group": "home",
+      "filename": "exec-e804e4a1-beb6-40ca-92a2-f4383d67d5eb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cf5cd00001daf95cd6c29befa90a48fcb719ec60d5af58d72ca4dcbc32bf3a55",
+      "scale": 1.1271056661562022
+    },
+    {
+      "npc_id": "amanda",
+      "group": "boudoir",
+      "filename": "exec-e2445880-3556-40af-8d6b-603f525242e2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c5c346caddf42c012ac873e8a83eb36ccecf5ecb0dfca3777826c257e35f0df8",
+      "scale": 0.987012987012987
+    },
+    {
+      "npc_id": "amanda",
+      "group": "gestures",
+      "filename": "exec-1ca7e222-978e-4831-ac99-7e503a5dd8fa.png",
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "93faa95263673abc4ed35346e99c918ec5462618e71ca4d03fd845c8969c57c0",
+      "scale": 0.906801007556675
+    },
+    {
+      "npc_id": "clara",
+      "group": "expressions",
+      "filename": "exec-7bf51842-47cb-4b4f-baf8-00f6598483e8.png",
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "dba375e04bd70a8866697fdabe5f7274b3b9f88291ee14be6f72b7256ee76bcd",
+      "scale": 1.0533807829181494
+    },
+    {
+      "npc_id": "clara",
+      "group": "home",
+      "filename": "exec-3f1cae25-c8c7-4385-a850-a3e73aeb2fa9.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3f1d7e15041aa60231e5ffb60a594f8ae7577324e3dcf905e58c587d4ba3acfc",
+      "scale": 1.1428571428571428
+    },
+    {
+      "npc_id": "clara",
+      "group": "boudoir",
+      "filename": "exec-a1d7e816-a794-4d4d-bcaa-c1ec88e36c4e.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ec93f336b150f2f43a89af6c1d9b285072db4034b59d6fb9c0cfccc207ee64f9",
+      "scale": 0.8648648648648649
+    },
+    {
+      "npc_id": "clara",
+      "group": "gestures",
+      "filename": "exec-ca1adbf9-c2e3-479b-95f5-9e6910a51c11.png",
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "24baf7528da663601c099e302f56169876771de3dbd5d799aaf9cc23a08e07e4",
+      "scale": 0.906801007556675
+    },
+    {
+      "npc_id": "melissa",
+      "group": "expressions",
+      "filename": "exec-d73acd48-f2fe-494e-8086-7f846f0b9d01.png",
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "358826764553bad205e89500787506a4e4bf564d51abc21c998b92a5b539cf26",
+      "scale": 1.0533807829181494
+    },
+    {
+      "npc_id": "melissa",
+      "group": "home",
+      "filename": "exec-7c8de2da-6fad-44e8-90e1-1a6656caf329.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "d0cf6745a090c542c5ca0e08a6fb365ae05cc25a571f3ca207349a50c320fb92",
+      "scale": 0.8888888888888888
+    },
+    {
+      "npc_id": "melissa",
+      "group": "boudoir",
+      "filename": "exec-06934d9d-5ed8-49a4-8c37-b5cffdd33025.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9b86d60b5b7d6754c27aa53ebc0f1cde8bf67a0fada82b050699d7b6624c0465",
+      "scale": 1.064798598949212
+    },
+    {
+      "npc_id": "melissa",
+      "group": "gestures",
+      "filename": "exec-e87b643d-4f94-4962-9c60-4e6d3f2ddfe2.png",
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "408f135e093bd082b7f695249a297f3b7ddf2dd1d9b0123ebf0bb559a18fc6a1",
+      "scale": 0.906801007556675
+    },
+    {
+      "npc_id": "sandra",
+      "group": "expressions",
+      "filename": "exec-d7f00cf9-8e26-46b4-802f-014d4a7b83e0.png",
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "cc566be938f12ff4545440e3adc4188df6b4a46602b9f801e260d6a8cee55c28",
+      "scale": 1.0533807829181494
+    },
+    {
+      "npc_id": "sandra",
+      "group": "home",
+      "filename": "exec-46f2f4f4-3f38-4377-837a-09cc514273ef.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3eee24c18cec7cd032bd5b2d5bcbccada2a75bf6a581b2af7a9becaf84b87cd5",
+      "scale": 1.0887573964497042
+    },
+    {
+      "npc_id": "sandra",
+      "group": "boudoir",
+      "filename": "exec-e8b32eb3-5112-4516-a7a8-d9ac3fb2f22f.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "612cb8791ca9f62352314e36de77613bcbb0d5a1267b1f2f9063c8d9c4b5c537",
+      "scale": 0.8397790055248618
+    },
+    {
+      "npc_id": "sandra",
+      "group": "gestures",
+      "filename": "exec-e1c32581-6211-4d2b-b0e2-a2990ff0f15e.png",
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "6805f014de681874829eda084be29ca5a3c0c97d44165f2e939bd3dd8b915007",
+      "scale": 0.906801007556675
+    }
+  ],
+  "sprites": [
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "neutral",
+      "image_name": "npc_amanda expressions neutral",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_neutral.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        29,
+        18,
+        303,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        0,
+        0,
+        280,
+        280
+      ],
+      "sha256": "593e0bec3371249cde95eee81064fc32904f8e6c927ec01f3737cdde396437e7"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "happy",
+      "image_name": "npc_amanda expressions happy",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_happy.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        28,
+        18,
+        304,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        280,
+        0,
+        561,
+        280
+      ],
+      "sha256": "ef2d8d2ee617d9811cd6b8323c51b999093fea7e845b2122da558ee212a9790e"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "smiling",
+      "image_name": "npc_amanda expressions smiling",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_smiling.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        20,
+        16,
+        298,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        561,
+        0,
+        842,
+        280
+      ],
+      "sha256": "55907cca7355da1fb23ba0d0489fa3e37985a8902142e4cbb20d59b41b39a379"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "wink",
+      "image_name": "npc_amanda expressions wink",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_wink.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        18,
+        300,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        842,
+        0,
+        1122,
+        280
+      ],
+      "sha256": "ad486d1b0d304e0edbce46e205684493a40e9052e477d544e03bd170daa6708b"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "laughing",
+      "image_name": "npc_amanda expressions laughing",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_laughing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        27,
+        16,
+        303,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        0,
+        280,
+        280,
+        561
+      ],
+      "sha256": "694aaa8d0887445256f1fe085a67abbb5804dd35f07f8e11e17e3f984ad73798"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "playful",
+      "image_name": "npc_amanda expressions playful",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_playful.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        25,
+        16,
+        304,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        280,
+        280,
+        561,
+        561
+      ],
+      "sha256": "e3b655d8f10db5164ad9892b87877201838597ec550bfe327265117b0b3cd2ba"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "seductive",
+      "image_name": "npc_amanda expressions seductive",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_seductive.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        19,
+        16,
+        299,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        561,
+        280,
+        842,
+        561
+      ],
+      "sha256": "c0d7f3f63b6382affae8abbab9b81bcba12512ecd28fe7d3b425a5f2992b6a13"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "lip_bite",
+      "image_name": "npc_amanda expressions lip_bite",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_lip_bite.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        294,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        842,
+        280,
+        1122,
+        561
+      ],
+      "sha256": "10b492e7d4c9b6ee762fd7b531c89db5cfa63110ca1749e189ee93cfa6a05736"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "licking_lips",
+      "image_name": "npc_amanda expressions licking_lips",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_licking_lips.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        28,
+        16,
+        303,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        0,
+        561,
+        280,
+        841
+      ],
+      "sha256": "e9420063634bf2b6df02dda6c0ea0fab07c5b2dc0fd3afaa01e2681838734ddd"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "surprised",
+      "image_name": "npc_amanda expressions surprised",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_surprised.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        25,
+        16,
+        304,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        280,
+        561,
+        561,
+        841
+      ],
+      "sha256": "883ea1a50638216e82de363a89f44fcbf558366e681ebdc6e8650aabb9e3754e"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "angry",
+      "image_name": "npc_amanda expressions angry",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_angry.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        19,
+        16,
+        300,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        561,
+        561,
+        842,
+        841
+      ],
+      "sha256": "18426a31525c449f495a4d25c712dd5dcd5bdeb67298bdf0f1f4653bb3f5f8e7"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "annoyed",
+      "image_name": "npc_amanda expressions annoyed",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_annoyed.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        24,
+        16,
+        294,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        842,
+        561,
+        1122,
+        841
+      ],
+      "sha256": "62d20c236dbf6bc090f5b8a6b0dac214e0d2928fc99b3b5b00601cdefb4c7519"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "sad",
+      "image_name": "npc_amanda expressions sad",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_sad.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        26,
+        16,
+        303,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        0,
+        841,
+        280,
+        1122
+      ],
+      "sha256": "5883df58acb31d73b80aa8223c91a800ccf46a5a3bccb3b7990d9976bbd8f774"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "crying",
+      "image_name": "npc_amanda expressions crying",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_crying.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        32,
+        16,
+        304,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        280,
+        841,
+        561,
+        1122
+      ],
+      "sha256": "4d81fdc84b328d98255c2144af6ee80adc7b9541e95ce1244accc550f92c2f59"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "terrified",
+      "image_name": "npc_amanda expressions terrified",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_terrified.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        295,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        561,
+        841,
+        842,
+        1122
+      ],
+      "sha256": "f2c7cd88dc6809337f21ebb0dae9f748dd957dc7ae15f9bf60b5b2d39d1cff6d"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "disgusted",
+      "image_name": "npc_amanda expressions disgusted",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_disgusted.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        20,
+        16,
+        300,
+        304
+      ],
+      "source_index": 0,
+      "source_box": [
+        842,
+        841,
+        1122,
+        1122
+      ],
+      "sha256": "f76405b8cab7fb1c80590dc3bcebe35ded908e29abe80a1e929af3cf47afca19"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "talking",
+      "image_name": "npc_amanda expressions talking",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_talking.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        26,
+        16,
+        303,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        0,
+        1122,
+        280,
+        1402
+      ],
+      "sha256": "b2b0e08e317eb22a17cfb69724825aebce50abed7a6742fd508cbffa7ac56217"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "arguing",
+      "image_name": "npc_amanda expressions arguing",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_arguing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        20,
+        16,
+        304,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        280,
+        1122,
+        561,
+        1402
+      ],
+      "sha256": "fbded57f0a54d8675d126a8f1c95e032a447b5211245595192179d43c3daaaf5"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "drunk",
+      "image_name": "npc_amanda expressions drunk",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_drunk.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        561,
+        1122,
+        842,
+        1402
+      ],
+      "sha256": "9dce790375980ea91d9ff0526f61a13a4224679a6634315b31fcff18a417ba42"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "expressions",
+      "state": "nervous",
+      "image_name": "npc_amanda expressions nervous",
+      "path": "images/npc_sprites/v1/amanda/expressions/amanda_expressions_nervous.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        300,
+        303
+      ],
+      "source_index": 0,
+      "source_box": [
+        842,
+        1122,
+        1122,
+        1402
+      ],
+      "sha256": "12a18453291dac7a286d4578fd6bb13ef416718a39fd58df8ae7e77443ccd283"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "home",
+      "state": "standing_neutral",
+      "image_name": "npc_amanda home standing_neutral",
+      "path": "images/npc_sprites/v1/amanda/home/amanda_home_standing_neutral.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        223,
+        43,
+        417,
+        768
+      ],
+      "source_index": 1,
+      "source_box": [
+        179,
+        7,
+        351,
+        650
+      ],
+      "sha256": "6313545339e81c105e5d0eca70e769b91df5eabbee4effd74565b70462cb9c1b",
+      "overlay_name": "npc_overlay_amanda_home_standing_neutral"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "home",
+      "state": "hand_on_hip",
+      "image_name": "npc_amanda home hand_on_hip",
+      "path": "images/npc_sprites/v1/amanda/home/amanda_home_hand_on_hip.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        185,
+        47,
+        454,
+        768
+      ],
+      "source_index": 1,
+      "source_box": [
+        545,
+        10,
+        784,
+        650
+      ],
+      "sha256": "69f1bf2f060414721d5d5fc265bfff365f94674d3e001a8a28e6c0a1b288ea02",
+      "overlay_name": "npc_overlay_amanda_home_hand_on_hip"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "home",
+      "state": "arms_crossed",
+      "image_name": "npc_amanda home arms_crossed",
+      "path": "images/npc_sprites/v1/amanda/home/amanda_home_arms_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        186,
+        32,
+        453,
+        768
+      ],
+      "source_index": 1,
+      "source_box": [
+        889,
+        5,
+        1126,
+        658
+      ],
+      "sha256": "4ccbce1eb94b374e58506310a89ad8b50280d0585fdf1e78ab8ff54251ed3b85",
+      "overlay_name": "npc_overlay_amanda_home_arms_crossed"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "home",
+      "state": "leaning_forward",
+      "image_name": "npc_amanda home leaning_forward",
+      "path": "images/npc_sprites/v1/amanda/home/amanda_home_leaning_forward.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        137,
+        120,
+        502,
+        768
+      ],
+      "source_index": 1,
+      "source_box": [
+        100,
+        649,
+        424,
+        1224
+      ],
+      "sha256": "e96cbb6dc6abe83299e6fac8d021633b37da5d4c90c24a09b31e193300b69c5f",
+      "overlay_name": "npc_overlay_amanda_home_leaning_forward"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "home",
+      "state": "sitting_chair",
+      "image_name": "npc_amanda home sitting_chair",
+      "path": "images/npc_sprites/v1/amanda/home/amanda_home_sitting_chair.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        143,
+        127,
+        496,
+        768
+      ],
+      "source_index": 1,
+      "source_box": [
+        531,
+        652,
+        844,
+        1221
+      ],
+      "sha256": "a1644545f68aa1651c132f4fee9db68d8f6dd2a517071f3a37fcc555ee37d22b",
+      "overlay_name": "npc_overlay_amanda_home_sitting_chair"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "sitting_legs_crossed",
+      "image_name": "npc_amanda boudoir sitting_legs_crossed",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_sitting_legs_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        130,
+        158,
+        509,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "sha256": "406f37a097f3e0869139c47b2c219c50d58d5f6f1b3c7307ae370c632d696855",
+      "overlay_name": "npc_overlay_amanda_boudoir_sitting_legs_crossed",
+      "override_source": {
+        "filename": "exec-5cb34ac1-93a1-4399-bab5-4c8d1339248a.png",
+        "sha256": "a7631c5343b4fea6f3042061ccc8b6f107d43f996eb2d4582c3a923f70402ac9"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "kneeling",
+      "image_name": "npc_amanda boudoir kneeling",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_kneeling.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        149,
+        158,
+        490,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "sha256": "ddd1a2b4394a88a8597d2ee348e627aeaa1ca33427743cc6d46d92b9acf60699",
+      "overlay_name": "npc_overlay_amanda_boudoir_kneeling",
+      "override_source": {
+        "filename": "exec-6502aa08-4012-4b94-9cb7-8f7393e158ff.png",
+        "sha256": "7463113ce438f7b12f05ba4b65a405c4611093b81369a6b943c4d0495624713e"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_amanda boudoir lying_front",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        627,
+        624,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1899,
+        828
+      ],
+      "sha256": "5075c3a73e2a35967e95008bf5dab56ee082627ffb89cd4ff4d1f60c8aad9993",
+      "overlay_name": "npc_overlay_amanda_boudoir_lying_front",
+      "override_source": {
+        "filename": "exec-cca2649d-837b-4303-bbdc-f25df1b813f0.png",
+        "sha256": "1fb1e607ba63831b12d35c0d036fa810a121b465057a50e64e7ae5724920cf0f"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "lying_side",
+      "image_name": "npc_amanda boudoir lying_side",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_lying_side.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        455,
+        624,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "sha256": "a3eaa618a58094358f506a2a72387c49c614aae7a27864c73895aa87f1df350a",
+      "overlay_name": "npc_overlay_amanda_boudoir_lying_side",
+      "override_source": {
+        "filename": "exec-cf9e1311-b1b4-4de2-82c9-35471122f147.png",
+        "sha256": "a08826351d52bcc5c93dce0e5172d6f3c67c9ebc617624d92a5c18d20ac24d03"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "image_name": "npc_amanda boudoir over_shoulder",
+      "path": "images/npc_sprites/v1/amanda/boudoir/amanda_boudoir_over_shoulder.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        223,
+        32,
+        417,
+        768
+      ],
+      "source_index": 2,
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "sha256": "e461d3dab5f93325e52a423c2f1ced26d570688b0dbb2fefe4b4d5ddb22eca77",
+      "overlay_name": "npc_overlay_amanda_boudoir_over_shoulder",
+      "override_source": {
+        "filename": "exec-9dd58dd9-e596-4f1d-b796-b518c96f305b.png",
+        "sha256": "07dfbee36dd168c5d26dfe3feaff9762c7e9b2100ecbdb65dd2b7bf51b002788"
+      }
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "invite",
+      "image_name": "npc_amanda gestures invite",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_invite.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        75,
+        79,
+        317,
+        432
+      ],
+      "source_index": 3,
+      "source_box": [
+        0,
+        0,
+        397,
+        396
+      ],
+      "sha256": "144276f08cf290dc8538ae839c9678723bc993abb919614e38c364fbdb71b34e"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "tease",
+      "image_name": "npc_amanda gestures tease",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_tease.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        86,
+        80,
+        352,
+        432
+      ],
+      "source_index": 3,
+      "source_box": [
+        397,
+        0,
+        793,
+        396
+      ],
+      "sha256": "7d0a62ed3ced2bef173b97fead4f301615d8d87e829efc506f6432b6a4a5a781"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "think",
+      "image_name": "npc_amanda gestures think",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_think.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        92,
+        79,
+        316,
+        432
+      ],
+      "source_index": 3,
+      "source_box": [
+        793,
+        0,
+        1190,
+        396
+      ],
+      "sha256": "de1a393da4095a8e297b59ba945c3551ad3ad843758852f142a9d380654fa4c7"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "shy",
+      "image_name": "npc_amanda gestures shy",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_shy.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        88,
+        79,
+        301,
+        432
+      ],
+      "source_index": 3,
+      "source_box": [
+        1190,
+        0,
+        1586,
+        396
+      ],
+      "sha256": "2664d1a88a33c0950dbe70899ca4cb415626e800af3b1e3ae8025e9e1624f7ab"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "point",
+      "image_name": "npc_amanda gestures point",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_point.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        80,
+        79,
+        273,
+        432
+      ],
+      "source_index": 3,
+      "source_box": [
+        1586,
+        0,
+        1983,
+        396
+      ],
+      "sha256": "0e1cdb94f6a2dcd5b9753c005116644719541a4cc3db3c30cd99acb6d35d4a94"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "stop",
+      "image_name": "npc_amanda gestures stop",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_stop.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        51,
+        79,
+        350,
+        433
+      ],
+      "source_index": 3,
+      "source_box": [
+        0,
+        396,
+        397,
+        793
+      ],
+      "sha256": "130b37430ee1c4bb01e8fbdc9811f7e4a1a22c0bb26d27c5e874605a0507b289"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "explain",
+      "image_name": "npc_amanda gestures explain",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_explain.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        73,
+        79,
+        368,
+        433
+      ],
+      "source_index": 3,
+      "source_box": [
+        397,
+        396,
+        793,
+        793
+      ],
+      "sha256": "a0ea8239f38dff82f2eab05ac1e4bb4a4e99c6fff200177184320778cbfc0274"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "dismiss",
+      "image_name": "npc_amanda gestures dismiss",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_dismiss.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        24,
+        79,
+        321,
+        433
+      ],
+      "source_index": 3,
+      "source_box": [
+        793,
+        396,
+        1190,
+        793
+      ],
+      "sha256": "b0b00c263c587440bdfb2b7ce337928a0a506228c29cc24cf5b4c17b8c33cd30"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "welcome",
+      "image_name": "npc_amanda gestures welcome",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_welcome.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        368,
+        433
+      ],
+      "source_index": 3,
+      "source_box": [
+        1190,
+        396,
+        1586,
+        793
+      ],
+      "sha256": "30a72c01d1adcfe5e96b912d74bfc45830a15b2945d7a70bfa89e1f203638f71"
+    },
+    {
+      "npc_id": "amanda",
+      "display_name": "Amanda",
+      "group": "gestures",
+      "state": "goodbye",
+      "image_name": "npc_amanda gestures goodbye",
+      "path": "images/npc_sprites/v1/amanda/gestures/amanda_gestures_goodbye.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        77,
+        79,
+        334,
+        433
+      ],
+      "source_index": 3,
+      "source_box": [
+        1586,
+        396,
+        1983,
+        793
+      ],
+      "sha256": "e24c8b8977caf8c2922260ee954655b740c28f8aab97a3ce66d5bf68376e57e1"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "neutral",
+      "image_name": "npc_clara expressions neutral",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_neutral.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        29,
+        16,
+        303,
+        303
+      ],
+      "source_index": 4,
+      "source_box": [
+        0,
+        0,
+        280,
+        280
+      ],
+      "sha256": "2da3ff911eea23dba54435b52243185f34b0364a387269a9c0375d214a3915b5"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "happy",
+      "image_name": "npc_clara expressions happy",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_happy.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        33,
+        16,
+        304,
+        303
+      ],
+      "source_index": 4,
+      "source_box": [
+        280,
+        0,
+        561,
+        280
+      ],
+      "sha256": "374289528a644836f484a6486fc9f1f27c0e2b567e33023233b296cb82aef6b5"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "smiling",
+      "image_name": "npc_clara expressions smiling",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_smiling.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        298,
+        303
+      ],
+      "source_index": 4,
+      "source_box": [
+        561,
+        0,
+        842,
+        280
+      ],
+      "sha256": "7b62c333881bb90b03f820902d95eef54fc9c3828141818b07e0ed49c1c04e6c"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "wink",
+      "image_name": "npc_clara expressions wink",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_wink.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        290,
+        302
+      ],
+      "source_index": 4,
+      "source_box": [
+        842,
+        0,
+        1122,
+        280
+      ],
+      "sha256": "46df4898985db94d825b4f7e92ec08497d27c226684fb569f5ceddf670956d39"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "laughing",
+      "image_name": "npc_clara expressions laughing",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_laughing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        26,
+        16,
+        303,
+        301
+      ],
+      "source_index": 4,
+      "source_box": [
+        0,
+        280,
+        280,
+        561
+      ],
+      "sha256": "66ae07bce5834475b23eca4e6de9e1b6c4f2fbdf028c77e29de167e3cfb07e5f"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "playful",
+      "image_name": "npc_clara expressions playful",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_playful.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        30,
+        16,
+        304,
+        299
+      ],
+      "source_index": 4,
+      "source_box": [
+        280,
+        280,
+        561,
+        561
+      ],
+      "sha256": "5cc1aba15e44105fae435b4877bd9e1e3e545ab2ca9963194e24ac70e83da816"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "seductive",
+      "image_name": "npc_clara expressions seductive",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_seductive.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        17,
+        16,
+        302,
+        300
+      ],
+      "source_index": 4,
+      "source_box": [
+        561,
+        280,
+        842,
+        561
+      ],
+      "sha256": "04f8fe3aefc8aaa0a32399d1ded66c53891532fdb461a778dccbd0248198d559"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "lip_bite",
+      "image_name": "npc_clara expressions lip_bite",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_lip_bite.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        290,
+        301
+      ],
+      "source_index": 4,
+      "source_box": [
+        842,
+        280,
+        1122,
+        561
+      ],
+      "sha256": "29cddce552c9940301e5ec20acdc5cf49398b82da4287691843b108fdc5611db"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "licking_lips",
+      "image_name": "npc_clara expressions licking_lips",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_licking_lips.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        34,
+        16,
+        303,
+        294
+      ],
+      "source_index": 4,
+      "source_box": [
+        0,
+        561,
+        280,
+        841
+      ],
+      "sha256": "3970feef961a3d7998a1b7759cc2ac2ce6e196505002481e3ce8e8e6fc2419b0"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "surprised",
+      "image_name": "npc_clara expressions surprised",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_surprised.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        25,
+        16,
+        304,
+        296
+      ],
+      "source_index": 4,
+      "source_box": [
+        280,
+        561,
+        561,
+        841
+      ],
+      "sha256": "fba995d12ad019f33bc2e75f4d0e540f010c2177574b9450c8e391568a86027c"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "angry",
+      "image_name": "npc_clara expressions angry",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_angry.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        298,
+        294
+      ],
+      "source_index": 4,
+      "source_box": [
+        561,
+        561,
+        842,
+        841
+      ],
+      "sha256": "0c072a708f9e607ee12d3a6e7c684432329d2df6a5e90d44c8503e4c0bd27dd5"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "annoyed",
+      "image_name": "npc_clara expressions annoyed",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_annoyed.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        290,
+        294
+      ],
+      "source_index": 4,
+      "source_box": [
+        842,
+        561,
+        1122,
+        841
+      ],
+      "sha256": "a9dd29e53be597ee006e7ebf0f38b7d644cdb34f377e7b5a8560fb559fe8eb33"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "sad",
+      "image_name": "npc_clara expressions sad",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_sad.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        30,
+        16,
+        303,
+        289
+      ],
+      "source_index": 4,
+      "source_box": [
+        0,
+        841,
+        280,
+        1122
+      ],
+      "sha256": "0909651fb59566b6ebc6972b5853a8c2b9eeaeb7b45adfe707fdd4d8e52fa7e1"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "crying",
+      "image_name": "npc_clara expressions crying",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_crying.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        24,
+        16,
+        304,
+        304
+      ],
+      "source_index": 4,
+      "source_box": [
+        280,
+        841,
+        561,
+        1122
+      ],
+      "sha256": "3c750d38d98b21a08f9692cbfa3c6d65e706519c15b449b62056062966910268"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "terrified",
+      "image_name": "npc_clara expressions terrified",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_terrified.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        301,
+        289
+      ],
+      "source_index": 4,
+      "source_box": [
+        561,
+        841,
+        842,
+        1122
+      ],
+      "sha256": "d50a7cdd6836fc17cc5dd8a9863c666420cdbc8f2ebf18cde9db0af455a40d85"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "disgusted",
+      "image_name": "npc_clara expressions disgusted",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_disgusted.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        290,
+        289
+      ],
+      "source_index": 4,
+      "source_box": [
+        842,
+        841,
+        1122,
+        1122
+      ],
+      "sha256": "7880521107677c61d262792072d7a9cf3265197c5045ee18b227a507028dbebf"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "talking",
+      "image_name": "npc_clara expressions talking",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_talking.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        31,
+        16,
+        303,
+        283
+      ],
+      "source_index": 4,
+      "source_box": [
+        0,
+        1122,
+        280,
+        1402
+      ],
+      "sha256": "c6b697401f130f766a4bf71469ca1da03a6bbdce6130fe00542a9754cbe789ff"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "arguing",
+      "image_name": "npc_clara expressions arguing",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_arguing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        27,
+        16,
+        304,
+        284
+      ],
+      "source_index": 4,
+      "source_box": [
+        280,
+        1122,
+        561,
+        1402
+      ],
+      "sha256": "9c4cb0922186629a569b6fac88fa78f3c1d2aa96d5ccf5eb102a2c91790fb3be"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "drunk",
+      "image_name": "npc_clara expressions drunk",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_drunk.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        299,
+        284
+      ],
+      "source_index": 4,
+      "source_box": [
+        561,
+        1122,
+        842,
+        1402
+      ],
+      "sha256": "98a68b81a08447c1a9a0edca22220a1de7ce3bc73c979af80191641fd028a654"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "expressions",
+      "state": "nervous",
+      "image_name": "npc_clara expressions nervous",
+      "path": "images/npc_sprites/v1/clara/expressions/clara_expressions_nervous.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        290,
+        284
+      ],
+      "source_index": 4,
+      "source_box": [
+        842,
+        1122,
+        1122,
+        1402
+      ],
+      "sha256": "36f6a73759d5d57a6393cd4c9053d173eabe1e341dedb6d0ba96b4de03f67964"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "home",
+      "state": "standing_neutral",
+      "image_name": "npc_clara home standing_neutral",
+      "path": "images/npc_sprites/v1/clara/home/clara_home_standing_neutral.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        193,
+        32,
+        446,
+        768
+      ],
+      "source_index": 5,
+      "source_box": [
+        130,
+        7,
+        351,
+        651
+      ],
+      "sha256": "66743c4f8e80a7735882344955830bac992d0f8fcb13355b03b2e9ef419542a6",
+      "overlay_name": "npc_overlay_clara_home_standing_neutral"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "home",
+      "state": "hand_on_hip",
+      "image_name": "npc_clara home hand_on_hip",
+      "path": "images/npc_sprites/v1/clara/home/clara_home_hand_on_hip.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        137,
+        39,
+        503,
+        768
+      ],
+      "source_index": 5,
+      "source_box": [
+        488,
+        9,
+        808,
+        647
+      ],
+      "sha256": "b6ab7e04b67114d2fcaa151a90b91c818d14f9fc180d75a610f89345c5220164",
+      "overlay_name": "npc_overlay_clara_home_hand_on_hip"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "home",
+      "state": "arms_crossed",
+      "image_name": "npc_clara home arms_crossed",
+      "path": "images/npc_sprites/v1/clara/home/clara_home_arms_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        209,
+        33,
+        430,
+        768
+      ],
+      "source_index": 5,
+      "source_box": [
+        928,
+        7,
+        1121,
+        650
+      ],
+      "sha256": "4f65a4036080e30a7d674f202b2f9d20a74a0959ef5070acc25b52b18188b931",
+      "overlay_name": "npc_overlay_clara_home_arms_crossed"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "home",
+      "state": "leaning_forward",
+      "image_name": "npc_clara home leaning_forward",
+      "path": "images/npc_sprites/v1/clara/home/clara_home_leaning_forward.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        140,
+        99,
+        499,
+        768
+      ],
+      "source_index": 5,
+      "source_box": [
+        75,
+        657,
+        389,
+        1242
+      ],
+      "sha256": "569fbf06693c992c0870028cea161f007f9ce61438dda08287c98f564958a4ee",
+      "overlay_name": "npc_overlay_clara_home_leaning_forward"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "home",
+      "state": "sitting_chair",
+      "image_name": "npc_clara home sitting_chair",
+      "path": "images/npc_sprites/v1/clara/home/clara_home_sitting_chair.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        136,
+        103,
+        502,
+        768
+      ],
+      "source_index": 5,
+      "source_box": [
+        531,
+        658,
+        852,
+        1240
+      ],
+      "sha256": "63afce37fbb696d8cfc73b8f5609a6cb053556cb375900834e6432d1e3437adf",
+      "overlay_name": "npc_overlay_clara_home_sitting_chair"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "sitting_legs_crossed",
+      "image_name": "npc_clara boudoir sitting_legs_crossed",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_sitting_legs_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        153,
+        154,
+        486,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        30,
+        1,
+        415,
+        711
+      ],
+      "sha256": "5caf50a194ce10753c782dfc4733db22ff72091d7c85c6d81ce1acc0d957db5c",
+      "overlay_name": "npc_overlay_clara_boudoir_sitting_legs_crossed"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "kneeling",
+      "image_name": "npc_clara boudoir kneeling",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_kneeling.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        171,
+        262,
+        468,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        425,
+        1,
+        768,
+        586
+      ],
+      "sha256": "981623067be633150d317de17ae73093d2b60f66d7768384c59fe95c9b8f168a",
+      "overlay_name": "npc_overlay_clara_boudoir_kneeling"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_clara boudoir lying_front",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        462,
+        624,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "d81c34db57d6cfd6c09a80e55dba7838061542780f3ba0c454bf2ebb8c11ce6d",
+      "overlay_name": "npc_overlay_clara_boudoir_lying_front",
+      "override_source": {
+        "filename": "exec-adfff096-215a-4d69-8530-285f3ca1d740.png",
+        "sha256": "7025bd2e294813a411bf5e259983b3e39e7853157eccc72871351acb51e2cca3"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "lying_side",
+      "image_name": "npc_clara boudoir lying_side",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_lying_side.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        542,
+        624,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        0,
+        0,
+        1774,
+        887
+      ],
+      "sha256": "e630021794b85aedb8c628983a3f2f4681898382576c5de275219134fb5323ad",
+      "overlay_name": "npc_overlay_clara_boudoir_lying_side",
+      "override_source": {
+        "filename": "exec-e54221a2-48a6-4950-a231-bb5abe76e609.png",
+        "sha256": "c53b2c71a50bd7f2c13ff966e36fe7c8a5121f7a890c74ac87d54b1aac0f3cae"
+      }
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "image_name": "npc_clara boudoir over_shoulder",
+      "path": "images/npc_sprites/v1/clara/boudoir/clara_boudoir_over_shoulder.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        136,
+        250,
+        504,
+        768
+      ],
+      "source_index": 6,
+      "source_box": [
+        659,
+        633,
+        1085,
+        1232
+      ],
+      "sha256": "01053a1776665e5187a73adb304f1dc1c233702e0119849d46a73c4cebd70fe2",
+      "overlay_name": "npc_overlay_clara_boudoir_over_shoulder"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "invite",
+      "image_name": "npc_clara gestures invite",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_invite.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        91,
+        79,
+        340,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        0,
+        0,
+        397,
+        396
+      ],
+      "sha256": "998a7ea019e0ee5d3204658992cf9caef0c2a1268c27caf9bd425ab8ddcff081"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "tease",
+      "image_name": "npc_clara gestures tease",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_tease.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        89,
+        79,
+        335,
+        430
+      ],
+      "source_index": 7,
+      "source_box": [
+        397,
+        0,
+        793,
+        396
+      ],
+      "sha256": "4b1cec12a457a5b7802068908c94092602c4a444974eb191749a4295589f1923"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "think",
+      "image_name": "npc_clara gestures think",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_think.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        93,
+        79,
+        299,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        793,
+        0,
+        1190,
+        396
+      ],
+      "sha256": "695937ee398aa50dfa83ad19ddb0d33bbef5f5d09e46acf8b88608bc62f1e7b6"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "shy",
+      "image_name": "npc_clara gestures shy",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_shy.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        70,
+        79,
+        299,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        1190,
+        0,
+        1586,
+        396
+      ],
+      "sha256": "364e390d628145e8cbf27948c2cffa43efa17142eb4fa9289cc3a2a416ae285e"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "point",
+      "image_name": "npc_clara gestures point",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_point.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        72,
+        79,
+        321,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        1586,
+        0,
+        1983,
+        396
+      ],
+      "sha256": "a065d126c3b39eb484638a2068cd863eb6440afde30f6868bfa42550ee667b7f"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "stop",
+      "image_name": "npc_clara gestures stop",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_stop.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        90,
+        79,
+        354,
+        433
+      ],
+      "source_index": 7,
+      "source_box": [
+        0,
+        396,
+        397,
+        793
+      ],
+      "sha256": "259d6a03f75b14090c80dd24c36dca8522f7102aaae58ffc8605f7c4c752f343"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "explain",
+      "image_name": "npc_clara gestures explain",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_explain.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        40,
+        79,
+        326,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        397,
+        396,
+        793,
+        793
+      ],
+      "sha256": "99fd532186377aef17a352e06f7dee4018f8f75dec50a59105b99644b74fb704"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "dismiss",
+      "image_name": "npc_clara gestures dismiss",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_dismiss.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        346,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        793,
+        396,
+        1190,
+        793
+      ],
+      "sha256": "0bcad8b0515f2da21c8a620c885e4c92ec9078f27a74f0a7d094a905016ddc6e"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "welcome",
+      "image_name": "npc_clara gestures welcome",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_welcome.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        368,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        1190,
+        396,
+        1586,
+        793
+      ],
+      "sha256": "6e82cc7035a199679c067de0af91d4cc65a123e17ddd9ee5d7871ca27b3b65e8"
+    },
+    {
+      "npc_id": "clara",
+      "display_name": "Clarissa",
+      "group": "gestures",
+      "state": "goodbye",
+      "image_name": "npc_clara gestures goodbye",
+      "path": "images/npc_sprites/v1/clara/gestures/clara_gestures_goodbye.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        76,
+        79,
+        314,
+        432
+      ],
+      "source_index": 7,
+      "source_box": [
+        1586,
+        396,
+        1983,
+        793
+      ],
+      "sha256": "cb8a0aef8e2b460bf33bf4db7359e4982bfcb48912f5974783c8c983ac349f20"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "neutral",
+      "image_name": "npc_melissa expressions neutral",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_neutral.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        0,
+        0,
+        280,
+        280
+      ],
+      "sha256": "e887f3d1256034da210276052b318ccb01f218025dd3b2456e1ba5bb4f875078"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "happy",
+      "image_name": "npc_melissa expressions happy",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_happy.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        280,
+        0,
+        561,
+        280
+      ],
+      "sha256": "1cd27ebfc48e8be40555a2648c96d62f5411e20aca0318e49f094890dd281a35"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "smiling",
+      "image_name": "npc_melissa expressions smiling",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_smiling.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        561,
+        0,
+        842,
+        280
+      ],
+      "sha256": "19bd6f9ec4b20605a40a42391824a41579ee5735864891aaf3e5a69fb369ad68"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "wink",
+      "image_name": "npc_melissa expressions wink",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_wink.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        842,
+        0,
+        1122,
+        280
+      ],
+      "sha256": "fa3cefe6292466ef649f16e7f9f3427eed18dd971ba919a39b0611d8597c13ba"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "laughing",
+      "image_name": "npc_melissa expressions laughing",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_laughing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        0,
+        280,
+        280,
+        561
+      ],
+      "sha256": "dfd100e174daa0e4cf21e5030fbbb15feb02f7b57e7a100916466232eb44c01e"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "playful",
+      "image_name": "npc_melissa expressions playful",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_playful.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        280,
+        280,
+        561,
+        561
+      ],
+      "sha256": "1ecfd6092c42ca70b5da58bdaeef518eb3f66d58b797011c8d59b8766477f982"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "seductive",
+      "image_name": "npc_melissa expressions seductive",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_seductive.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        561,
+        280,
+        842,
+        561
+      ],
+      "sha256": "1e7bfe1157e9fad1bca56901f8e8a2d0e4c01357c0f5a6a2ebaed9c048023912"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "lip_bite",
+      "image_name": "npc_melissa expressions lip_bite",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_lip_bite.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        842,
+        280,
+        1122,
+        561
+      ],
+      "sha256": "347777a5d900828c8f2578ad9634ee9899862cd64fb46e03b0ac6ab4f57261d4"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "licking_lips",
+      "image_name": "npc_melissa expressions licking_lips",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_licking_lips.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        0,
+        561,
+        280,
+        841
+      ],
+      "sha256": "df2d9ad19af67b4868bd29fc079c06fb5a38c655ff9144394d76d924ec0a9a6e"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "surprised",
+      "image_name": "npc_melissa expressions surprised",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_surprised.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        280,
+        561,
+        561,
+        841
+      ],
+      "sha256": "217887752cfe1b19bbd1f57a0b7ffd5a8704b95ee255381b3cf91565ae8846dd"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "angry",
+      "image_name": "npc_melissa expressions angry",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_angry.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        561,
+        561,
+        842,
+        841
+      ],
+      "sha256": "38fa1a3b41d482919217b6f3fdf4378b9ea8db6b5cd46a80fc28f76ce73424f0"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "annoyed",
+      "image_name": "npc_melissa expressions annoyed",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_annoyed.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        303
+      ],
+      "source_index": 8,
+      "source_box": [
+        842,
+        561,
+        1122,
+        841
+      ],
+      "sha256": "3a7572165d658edef4d59f98291c06d7ce2e630f8960b45e2716faf7a83e00ee"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "sad",
+      "image_name": "npc_melissa expressions sad",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_sad.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        303,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        0,
+        841,
+        280,
+        1122
+      ],
+      "sha256": "2b27bceb973797d98fff6a6633d3bcc66b9c01e089416c5ad7e67d7db685dc2e"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "crying",
+      "image_name": "npc_melissa expressions crying",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_crying.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        280,
+        841,
+        561,
+        1122
+      ],
+      "sha256": "bef600f3267a726b1a5ef4eb09fa9db84c8bb4a3a731a9b1f79498d0dc62db98"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "terrified",
+      "image_name": "npc_melissa expressions terrified",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_terrified.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        561,
+        841,
+        842,
+        1122
+      ],
+      "sha256": "91d47081302afed99acc8d47a0f2db10296ebd9bb7c0af819bee68d0d9ba6203"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "disgusted",
+      "image_name": "npc_melissa expressions disgusted",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_disgusted.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        304
+      ],
+      "source_index": 8,
+      "source_box": [
+        842,
+        841,
+        1122,
+        1122
+      ],
+      "sha256": "5cbd177204c163ab2ea0d355f0781b3af72757fd5ffa0edadd31ea1bde40a8c0"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "talking",
+      "image_name": "npc_melissa expressions talking",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_talking.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        290
+      ],
+      "source_index": 8,
+      "source_box": [
+        0,
+        1122,
+        280,
+        1402
+      ],
+      "sha256": "f7f2ddf37122c7a99b0ffad5aa36a1a3e52da9fcab52f2406c44ca959e231286"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "arguing",
+      "image_name": "npc_melissa expressions arguing",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_arguing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        290
+      ],
+      "source_index": 8,
+      "source_box": [
+        280,
+        1122,
+        561,
+        1402
+      ],
+      "sha256": "1c29ee613ccf08314139d6b40d401db3ee174711594ad67a8c723f5fa15deebc"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "drunk",
+      "image_name": "npc_melissa expressions drunk",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_drunk.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        290
+      ],
+      "source_index": 8,
+      "source_box": [
+        561,
+        1122,
+        842,
+        1402
+      ],
+      "sha256": "64957258fe59a4b6d560a5db8f9d3d85a389fbaf89ac26dc1a3d3b87e66b5782"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "expressions",
+      "state": "nervous",
+      "image_name": "npc_melissa expressions nervous",
+      "path": "images/npc_sprites/v1/melissa/expressions/melissa_expressions_nervous.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        290
+      ],
+      "source_index": 8,
+      "source_box": [
+        842,
+        1122,
+        1122,
+        1402
+      ],
+      "sha256": "f69ae2fcfc393fd8957b8aa34466eac178418f0dfcb0b8596da09db798add632"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "home",
+      "state": "standing_neutral",
+      "image_name": "npc_melissa home standing_neutral",
+      "path": "images/npc_sprites/v1/melissa/home/melissa_home_standing_neutral.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        189,
+        32,
+        451,
+        768
+      ],
+      "source_index": 9,
+      "source_box": [
+        52,
+        8,
+        347,
+        836
+      ],
+      "sha256": "9fb2e8ef7be008055c62eae3796a1954cf7116d6853e9bf827cb5fe7af8c5997",
+      "overlay_name": "npc_overlay_melissa_home_standing_neutral"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "home",
+      "state": "hand_on_hip",
+      "image_name": "npc_melissa home hand_on_hip",
+      "path": "images/npc_sprites/v1/melissa/home/melissa_home_hand_on_hip.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        175,
+        36,
+        464,
+        768
+      ],
+      "source_index": 9,
+      "source_box": [
+        380,
+        8,
+        705,
+        831
+      ],
+      "sha256": "16fde965b6c960287db40631bf13b62a1aeae7d7ea68360eb3ae5c7d67cf2e23",
+      "overlay_name": "npc_overlay_melissa_home_hand_on_hip"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "home",
+      "state": "arms_crossed",
+      "image_name": "npc_melissa home arms_crossed",
+      "path": "images/npc_sprites/v1/melissa/home/melissa_home_arms_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        201,
+        35,
+        438,
+        768
+      ],
+      "source_index": 9,
+      "source_box": [
+        755,
+        10,
+        1023,
+        835
+      ],
+      "sha256": "3d30c6cf121246f4f75e0ad14cb8a4cc4557be8aafae919156f19d3dd5ba9612",
+      "overlay_name": "npc_overlay_melissa_home_arms_crossed"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "home",
+      "state": "leaning_forward",
+      "image_name": "npc_melissa home leaning_forward",
+      "path": "images/npc_sprites/v1/melissa/home/melissa_home_leaning_forward.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        168,
+        190,
+        472,
+        768
+      ],
+      "source_index": 9,
+      "source_box": [
+        40,
+        860,
+        382,
+        1510
+      ],
+      "sha256": "de5ac6ef6e21ed605df36f6f8aabba08ac8b1ff039f645b40ec0a3862f25887b",
+      "overlay_name": "npc_overlay_melissa_home_leaning_forward"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "home",
+      "state": "sitting_chair",
+      "image_name": "npc_melissa home sitting_chair",
+      "path": "images/npc_sprites/v1/melissa/home/melissa_home_sitting_chair.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        193,
+        169,
+        446,
+        768
+      ],
+      "source_index": 9,
+      "source_box": [
+        423,
+        837,
+        708,
+        1512
+      ],
+      "sha256": "2be7c5dbf625d01c9beb93683fc78dc71562c16a42bc4fdc0fadef2624342839",
+      "overlay_name": "npc_overlay_melissa_home_sitting_chair"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "boudoir",
+      "state": "sitting_legs_crossed",
+      "image_name": "npc_melissa boudoir sitting_legs_crossed",
+      "path": "images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_sitting_legs_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        127,
+        78,
+        512,
+        768
+      ],
+      "source_index": 10,
+      "source_box": [
+        50,
+        12,
+        412,
+        660
+      ],
+      "sha256": "7de081b793a9b99714c9799b66db79db5459c7895879f5205979ac2f66e18dfe",
+      "overlay_name": "npc_overlay_melissa_boudoir_sitting_legs_crossed"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "boudoir",
+      "state": "kneeling",
+      "image_name": "npc_melissa boudoir kneeling",
+      "path": "images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_kneeling.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        145,
+        268,
+        494,
+        768
+      ],
+      "source_index": 10,
+      "source_box": [
+        437,
+        75,
+        765,
+        545
+      ],
+      "sha256": "aa4586f09ddb0b3b61bec1ad9d54dd2188f591b888abde56556d8636f36b6369",
+      "overlay_name": "npc_overlay_melissa_boudoir_kneeling"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_melissa boudoir lying_front",
+      "path": "images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        87,
+        411,
+        553,
+        768
+      ],
+      "source_index": 10,
+      "source_box": [
+        789,
+        187,
+        1227,
+        522
+      ],
+      "sha256": "f79d1a512f48b9f9df8e799e52d2275b8631f39461d8de43f50ed2c3f977f84c",
+      "overlay_name": "npc_overlay_melissa_boudoir_lying_front"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "boudoir",
+      "state": "lying_side",
+      "image_name": "npc_melissa boudoir lying_side",
+      "path": "images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_lying_side.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        409,
+        624,
+        768
+      ],
+      "source_index": 10,
+      "source_box": [
+        18,
+        805,
+        589,
+        1142
+      ],
+      "sha256": "6813379f27a0dd66373c6576262ddc4b925ed14f0d7023d774c471fa01b27d34",
+      "overlay_name": "npc_overlay_melissa_boudoir_lying_side"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "image_name": "npc_melissa boudoir over_shoulder",
+      "path": "images/npc_sprites/v1/melissa/boudoir/melissa_boudoir_over_shoulder.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        197,
+        83,
+        443,
+        768
+      ],
+      "source_index": 10,
+      "source_box": [
+        594,
+        576,
+        825,
+        1219
+      ],
+      "sha256": "3165978d948a45d925d686fb0b9ffb99e749de9dfcf39efa410fc5bb7893645a",
+      "overlay_name": "npc_overlay_melissa_boudoir_over_shoulder"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "invite",
+      "image_name": "npc_melissa gestures invite",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_invite.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        114,
+        79,
+        369,
+        432
+      ],
+      "source_index": 11,
+      "source_box": [
+        0,
+        0,
+        397,
+        396
+      ],
+      "sha256": "1d85cf3492bc77e46c416dde6afa3798c9d7fed474a5581d5efc9d3bc5c10af8"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "tease",
+      "image_name": "npc_melissa gestures tease",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_tease.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        99,
+        79,
+        367,
+        432
+      ],
+      "source_index": 11,
+      "source_box": [
+        397,
+        0,
+        793,
+        396
+      ],
+      "sha256": "12ed1603256bee0d36615bc23263a3d6eb79573cf3ed2bd2a4d580b2808fa7c6"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "think",
+      "image_name": "npc_melissa gestures think",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_think.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        63,
+        79,
+        335,
+        432
+      ],
+      "source_index": 11,
+      "source_box": [
+        793,
+        0,
+        1190,
+        396
+      ],
+      "sha256": "68d4972cb1b05b87c4c6d007feb1b91cb4eeb10cbfe63e2c72e78e2c8a7bc143"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "shy",
+      "image_name": "npc_melissa gestures shy",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_shy.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        54,
+        79,
+        300,
+        432
+      ],
+      "source_index": 11,
+      "source_box": [
+        1190,
+        0,
+        1586,
+        396
+      ],
+      "sha256": "2782e889da63069cfc983f5831c67b611adf0e1a57e38f1df769cc20cf83ce9e"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "point",
+      "image_name": "npc_melissa gestures point",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_point.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        21,
+        79,
+        330,
+        432
+      ],
+      "source_index": 11,
+      "source_box": [
+        1586,
+        0,
+        1983,
+        396
+      ],
+      "sha256": "70f7e70c68ec75b70921223669a19e32b6205e3c752a88ce272bae6da20f2eb2"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "stop",
+      "image_name": "npc_melissa gestures stop",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_stop.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        55,
+        79,
+        369,
+        433
+      ],
+      "source_index": 11,
+      "source_box": [
+        0,
+        396,
+        397,
+        793
+      ],
+      "sha256": "489a6e8bfe9f3055e7ce89953a215796fd9b3aad72239609cbf3d701cc704ec6"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "explain",
+      "image_name": "npc_melissa gestures explain",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_explain.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        30,
+        79,
+        367,
+        433
+      ],
+      "source_index": 11,
+      "source_box": [
+        397,
+        396,
+        793,
+        793
+      ],
+      "sha256": "ddf597d80491d6eac784ff40bb75d439a75ee7e43f63988a8f06d322546407d1"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "dismiss",
+      "image_name": "npc_melissa gestures dismiss",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_dismiss.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        29,
+        79,
+        324,
+        433
+      ],
+      "source_index": 11,
+      "source_box": [
+        793,
+        396,
+        1190,
+        793
+      ],
+      "sha256": "a557fc7c2fc87f0d6ee9e304c548d4f17b37c0025c32b5f9b91053767c16fa1d"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "welcome",
+      "image_name": "npc_melissa gestures welcome",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_welcome.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        368,
+        433
+      ],
+      "source_index": 11,
+      "source_box": [
+        1190,
+        396,
+        1586,
+        793
+      ],
+      "sha256": "42b0adf2d5f5b252b7399a0ada7eb215325cb810793d5c7a16efd7cc1eb202be"
+    },
+    {
+      "npc_id": "melissa",
+      "display_name": "Melissa",
+      "group": "gestures",
+      "state": "goodbye",
+      "image_name": "npc_melissa gestures goodbye",
+      "path": "images/npc_sprites/v1/melissa/gestures/melissa_gestures_goodbye.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        55,
+        79,
+        328,
+        433
+      ],
+      "source_index": 11,
+      "source_box": [
+        1586,
+        396,
+        1983,
+        793
+      ],
+      "sha256": "1d5f9bd7d1206f7f2b460b03712263077d50baa3ab6c5875f81d5013d33b30e1"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "neutral",
+      "image_name": "npc_sandra expressions neutral",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_neutral.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        21,
+        21,
+        303,
+        303
+      ],
+      "source_index": 12,
+      "source_box": [
+        0,
+        0,
+        280,
+        280
+      ],
+      "sha256": "07de36c5a9a536f415436f29d4e3858b5a248e996b5a50b58187ce31fad61e78"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "happy",
+      "image_name": "npc_sandra expressions happy",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_happy.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        18,
+        304,
+        303
+      ],
+      "source_index": 12,
+      "source_box": [
+        280,
+        0,
+        561,
+        280
+      ],
+      "sha256": "65c4e5c17f3d55bc7db752068f97735a0ba3be89da40d764072c08385efb35b5"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "smiling",
+      "image_name": "npc_sandra expressions smiling",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_smiling.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        22,
+        304,
+        303
+      ],
+      "source_index": 12,
+      "source_box": [
+        561,
+        0,
+        842,
+        280
+      ],
+      "sha256": "c2e959dbe08698d42d3849b2bf45c799aaa32275919f87edcf78811c99d3ed76"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "wink",
+      "image_name": "npc_sandra expressions wink",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_wink.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        19,
+        303,
+        303
+      ],
+      "source_index": 12,
+      "source_box": [
+        842,
+        0,
+        1122,
+        280
+      ],
+      "sha256": "bbf872816679dfc7e1fdde9ec029c82de9f85c56d5be75a5a0fec77922b1a610"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "laughing",
+      "image_name": "npc_sandra expressions laughing",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_laughing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        20,
+        16,
+        303,
+        297
+      ],
+      "source_index": 12,
+      "source_box": [
+        0,
+        280,
+        280,
+        561
+      ],
+      "sha256": "7dc0fb5f6d980947e336c83343d96a4ba61741850208e67e09180537714a0e6a"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "playful",
+      "image_name": "npc_sandra expressions playful",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_playful.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        304,
+        297
+      ],
+      "source_index": 12,
+      "source_box": [
+        280,
+        280,
+        561,
+        561
+      ],
+      "sha256": "5bd9a5da0df37f398d45b836cce7697b0c4a8f43f77ab03169972a85dde30a9d"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "seductive",
+      "image_name": "npc_sandra expressions seductive",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_seductive.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        17,
+        16,
+        304,
+        297
+      ],
+      "source_index": 12,
+      "source_box": [
+        561,
+        280,
+        842,
+        561
+      ],
+      "sha256": "843a4b1265d671a04004e76fa92d72cb7dc3ad6f1bc789ddb7b8e6166c68544d"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "lip_bite",
+      "image_name": "npc_sandra expressions lip_bite",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_lip_bite.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        297
+      ],
+      "source_index": 12,
+      "source_box": [
+        842,
+        280,
+        1122,
+        561
+      ],
+      "sha256": "cd934c85fa7a19b4363d2339f8204801992e2f7d32b5d2ece35620eab00d1514"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "licking_lips",
+      "image_name": "npc_sandra expressions licking_lips",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_licking_lips.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        303,
+        294
+      ],
+      "source_index": 12,
+      "source_box": [
+        0,
+        561,
+        280,
+        841
+      ],
+      "sha256": "ae2d9c5aebf48adf431cd6ecf8670a8eac4365f165d0b4d91d92534861b39221"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "surprised",
+      "image_name": "npc_sandra expressions surprised",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_surprised.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        304,
+        294
+      ],
+      "source_index": 12,
+      "source_box": [
+        280,
+        561,
+        561,
+        841
+      ],
+      "sha256": "932890966156119c0051dab83b700d16fa01323c5bad33b959c0da8e7386b47a"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "angry",
+      "image_name": "npc_sandra expressions angry",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_angry.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        292
+      ],
+      "source_index": 12,
+      "source_box": [
+        561,
+        561,
+        842,
+        841
+      ],
+      "sha256": "15206ab1e31d9461fa86154f12461189ef6d2f1c78340638f785e8fa8b118f0f"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "annoyed",
+      "image_name": "npc_sandra expressions annoyed",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_annoyed.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        294
+      ],
+      "source_index": 12,
+      "source_box": [
+        842,
+        561,
+        1122,
+        841
+      ],
+      "sha256": "dde0eab907fbec6d45ec8a5dbc0305be27eeaf843cbf652afe0520600fdfcb84"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "sad",
+      "image_name": "npc_sandra expressions sad",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_sad.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        21,
+        16,
+        303,
+        288
+      ],
+      "source_index": 12,
+      "source_box": [
+        0,
+        841,
+        280,
+        1122
+      ],
+      "sha256": "bc99918c7bfb7e03300928b2faeb83b69990cc812fc4e1d6fb43808f75de33bf"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "crying",
+      "image_name": "npc_sandra expressions crying",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_crying.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        18,
+        16,
+        304,
+        288
+      ],
+      "source_index": 12,
+      "source_box": [
+        280,
+        841,
+        561,
+        1122
+      ],
+      "sha256": "35101351b55183d6147423085fce3d35add5dafe6886ddaf1cdcf410332292e0"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "terrified",
+      "image_name": "npc_sandra expressions terrified",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_terrified.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        288
+      ],
+      "source_index": 12,
+      "source_box": [
+        561,
+        841,
+        842,
+        1122
+      ],
+      "sha256": "d5fa2ba0d1a22a5d958f6f2de51efeb58028b6364f434556e847a8cf6f577439"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "disgusted",
+      "image_name": "npc_sandra expressions disgusted",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_disgusted.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        288
+      ],
+      "source_index": 12,
+      "source_box": [
+        842,
+        841,
+        1122,
+        1122
+      ],
+      "sha256": "e15cf7b1d31d08eb17f8f2aaec1f18be834a33ec9c9bc919b13570cb69d4faab"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "talking",
+      "image_name": "npc_sandra expressions talking",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_talking.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        20,
+        16,
+        303,
+        281
+      ],
+      "source_index": 12,
+      "source_box": [
+        0,
+        1122,
+        280,
+        1402
+      ],
+      "sha256": "87ca96ad4f86003bede2538e4da8c90b67820fa32a7c4af4c9ed98a616b766bf"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "arguing",
+      "image_name": "npc_sandra expressions arguing",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_arguing.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        17,
+        16,
+        304,
+        281
+      ],
+      "source_index": 12,
+      "source_box": [
+        280,
+        1122,
+        561,
+        1402
+      ],
+      "sha256": "a89ea62fac649791496988165bf3ae4963ab62c4faf8e1f89ec8d248808197c8"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "drunk",
+      "image_name": "npc_sandra expressions drunk",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_drunk.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        304,
+        281
+      ],
+      "source_index": 12,
+      "source_box": [
+        561,
+        1122,
+        842,
+        1402
+      ],
+      "sha256": "523f8a196c497a32b738f3c7ca3d26c2866d01aa9fdd785b1bd631eb726206ea"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "expressions",
+      "state": "nervous",
+      "image_name": "npc_sandra expressions nervous",
+      "path": "images/npc_sprites/v1/sandra/expressions/sandra_expressions_nervous.png",
+      "canvas": [
+        320,
+        320
+      ],
+      "visible_bounds": [
+        16,
+        16,
+        303,
+        281
+      ],
+      "source_index": 12,
+      "source_box": [
+        842,
+        1122,
+        1122,
+        1402
+      ],
+      "sha256": "58cd6ebf8bb7067cce4674768c1f9e228d1c1a8ee169ecb4d187a94c65ba899f"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "home",
+      "state": "standing_neutral",
+      "image_name": "npc_sandra home standing_neutral",
+      "path": "images/npc_sprites/v1/sandra/home/sandra_home_standing_neutral.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        160,
+        43,
+        480,
+        768
+      ],
+      "source_index": 13,
+      "source_box": [
+        125,
+        4,
+        419,
+        670
+      ],
+      "sha256": "3c378f6e29147c156b237059e976297ae81e5a7e7efb5ba1adf5f72556c4114a",
+      "overlay_name": "npc_overlay_sandra_home_standing_neutral"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "home",
+      "state": "hand_on_hip",
+      "image_name": "npc_sandra home hand_on_hip",
+      "path": "images/npc_sprites/v1/sandra/home/sandra_home_hand_on_hip.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        136,
+        52,
+        503,
+        768
+      ],
+      "source_index": 13,
+      "source_box": [
+        481,
+        9,
+        818,
+        667
+      ],
+      "sha256": "96e145026a732bbc45457cfc4d25f7eb558796a5225b651cd991c5071178d043",
+      "overlay_name": "npc_overlay_sandra_home_hand_on_hip"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "home",
+      "state": "arms_crossed",
+      "image_name": "npc_sandra home arms_crossed",
+      "path": "images/npc_sprites/v1/sandra/home/sandra_home_arms_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        186,
+        33,
+        454,
+        768
+      ],
+      "source_index": 13,
+      "source_box": [
+        893,
+        11,
+        1139,
+        687
+      ],
+      "sha256": "754595cb7afe959834666e5c57f5cc24ba0da56c3a50efb54f65c42f5fcbbfad",
+      "overlay_name": "npc_overlay_sandra_home_arms_crossed"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "home",
+      "state": "leaning_forward",
+      "image_name": "npc_sandra home leaning_forward",
+      "path": "images/npc_sprites/v1/sandra/home/sandra_home_leaning_forward.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        142,
+        148,
+        497,
+        768
+      ],
+      "source_index": 13,
+      "source_box": [
+        107,
+        675,
+        433,
+        1244
+      ],
+      "sha256": "3325239142003e03c6dd1de33d9c441deb1cfec888c3fae8bd6f0293efa28550",
+      "overlay_name": "npc_overlay_sandra_home_leaning_forward"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "home",
+      "state": "sitting_chair",
+      "image_name": "npc_sandra home sitting_chair",
+      "path": "images/npc_sprites/v1/sandra/home/sandra_home_sitting_chair.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        113,
+        150,
+        526,
+        768
+      ],
+      "source_index": 13,
+      "source_box": [
+        486,
+        676,
+        865,
+        1244
+      ],
+      "sha256": "d32177171f71a572c1b8a6e5a180fd184d3e34cbf7a1d6658008aad2807b4300",
+      "overlay_name": "npc_overlay_sandra_home_sitting_chair"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "sitting_legs_crossed",
+      "image_name": "npc_sandra boudoir sitting_legs_crossed",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_sitting_legs_crossed.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        83,
+        210,
+        557,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        24,
+        10,
+        589,
+        675
+      ],
+      "sha256": "2a2b03767b7ee2d5a3ea9b5b4d49ed9061ba542610eb043c056600e7b7090bbd",
+      "overlay_name": "npc_overlay_sandra_boudoir_sitting_legs_crossed"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "kneeling",
+      "image_name": "npc_sandra boudoir kneeling",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_kneeling.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        133,
+        158,
+        506,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        0,
+        0,
+        1122,
+        1402
+      ],
+      "sha256": "058e1d60b386124637ceaf9de43eb9992c41420ffb826bd9c026518583a5bbab",
+      "overlay_name": "npc_overlay_sandra_boudoir_kneeling",
+      "override_source": {
+        "filename": "exec-37713d6f-5d89-4d59-9f6e-bd1e4cac7154.png",
+        "sha256": "7346d0e892de965ae3409af53f0119066d97a8763cb9ae4aa6b6d59f846e1226"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "lying_front",
+      "image_name": "npc_sandra boudoir lying_front",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_front.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        569,
+        624,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        0,
+        0,
+        2024,
+        777
+      ],
+      "sha256": "05d7df3a4d7c6c19cd2adbb8cb7ac3f14e905d9510593d293372f38d1577d1df",
+      "overlay_name": "npc_overlay_sandra_boudoir_lying_front",
+      "override_source": {
+        "filename": "exec-bd92cfdf-004f-4a98-bf6c-3365ec571b42.png",
+        "sha256": "293ebd69614584955c7ded699693d184304806635559184ee4377a53e7d753f0"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "lying_side",
+      "image_name": "npc_sandra boudoir lying_side",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_lying_side.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        16,
+        436,
+        623,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        508,
+        119,
+        1232,
+        514
+      ],
+      "sha256": "f8d5719d4cdae5be3ce4a028e2bdb32e279275f004335f691b5055c4e046fbd0",
+      "overlay_name": "npc_overlay_sandra_boudoir_lying_side"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "boudoir",
+      "state": "over_shoulder",
+      "image_name": "npc_sandra boudoir over_shoulder",
+      "path": "images/npc_sprites/v1/sandra/boudoir/sandra_boudoir_over_shoulder.png",
+      "canvas": [
+        640,
+        800
+      ],
+      "visible_bounds": [
+        173,
+        32,
+        466,
+        768
+      ],
+      "source_index": 14,
+      "source_box": [
+        0,
+        0,
+        1024,
+        1536
+      ],
+      "sha256": "347fbe2be3810b655c9f4145a68d0bbee65d78b78f113f67da21111c5bb9c74a",
+      "overlay_name": "npc_overlay_sandra_boudoir_over_shoulder",
+      "override_source": {
+        "filename": "exec-ee214376-09cb-4ce2-b966-8546bc6a32df.png",
+        "sha256": "a9c145477bcf9729e03dd7893034a2f59004f87fef4997fbc9be794f5ad23298"
+      }
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "invite",
+      "image_name": "npc_sandra gestures invite",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_invite.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        54,
+        79,
+        323,
+        432
+      ],
+      "source_index": 15,
+      "source_box": [
+        0,
+        0,
+        397,
+        396
+      ],
+      "sha256": "742cd647b1cbebad92bba757255375622be68aeaa3fa571a3b3f7f492d2e1844"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "tease",
+      "image_name": "npc_sandra gestures tease",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_tease.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        47,
+        79,
+        319,
+        432
+      ],
+      "source_index": 15,
+      "source_box": [
+        397,
+        0,
+        793,
+        396
+      ],
+      "sha256": "532a1cff2c7e4928ac196e7df854394a84971265913bfb047ed93b078d589c47"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "think",
+      "image_name": "npc_sandra gestures think",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_think.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        60,
+        79,
+        331,
+        432
+      ],
+      "source_index": 15,
+      "source_box": [
+        793,
+        0,
+        1190,
+        396
+      ],
+      "sha256": "251e1c60d2102121ebf8e6c5b082e908223928b56edf30be6353e8028d4c1578"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "shy",
+      "image_name": "npc_sandra gestures shy",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_shy.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        71,
+        79,
+        330,
+        432
+      ],
+      "source_index": 15,
+      "source_box": [
+        1190,
+        0,
+        1586,
+        396
+      ],
+      "sha256": "9300f2cb7ed9921cc177f72590527150eadd78ca6d00a1874e56a142268baf1d"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "point",
+      "image_name": "npc_sandra gestures point",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_point.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        65,
+        79,
+        365,
+        432
+      ],
+      "source_index": 15,
+      "source_box": [
+        1586,
+        0,
+        1983,
+        396
+      ],
+      "sha256": "4dadc7816202a4bb5a58fc5cefbbc1daa4cddd72b2bdd4ce93cb7bcbec6527b7"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "stop",
+      "image_name": "npc_sandra gestures stop",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_stop.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        50,
+        79,
+        348,
+        433
+      ],
+      "source_index": 15,
+      "source_box": [
+        0,
+        396,
+        397,
+        793
+      ],
+      "sha256": "d8a5950a85b5ba68e9b654fc970a3d26534b077cefe3441675e738b0f8f425fe"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "explain",
+      "image_name": "npc_sandra gestures explain",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_explain.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        343,
+        433
+      ],
+      "source_index": 15,
+      "source_box": [
+        397,
+        396,
+        793,
+        793
+      ],
+      "sha256": "cfdba594b3f8b1602c4cbe77717b274673dd736b56fefb92fa3805446363f444"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "dismiss",
+      "image_name": "npc_sandra gestures dismiss",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_dismiss.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        20,
+        79,
+        329,
+        433
+      ],
+      "source_index": 15,
+      "source_box": [
+        793,
+        396,
+        1190,
+        793
+      ],
+      "sha256": "b5bb548e6356e13a9f95c694a2c586441e85b89e304d31c92da3f0656156b1b9"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "welcome",
+      "image_name": "npc_sandra gestures welcome",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_welcome.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        15,
+        79,
+        368,
+        433
+      ],
+      "source_index": 15,
+      "source_box": [
+        1190,
+        396,
+        1586,
+        793
+      ],
+      "sha256": "447f1b5d18369bcf81c9b25b4e8c2415f1e234997e0a6f8126b067d530fb38df"
+    },
+    {
+      "npc_id": "sandra",
+      "display_name": "Sandra",
+      "group": "gestures",
+      "state": "goodbye",
+      "image_name": "npc_sandra gestures goodbye",
+      "path": "images/npc_sprites/v1/sandra/gestures/sandra_gestures_goodbye.png",
+      "canvas": [
+        384,
+        512
+      ],
+      "visible_bounds": [
+        76,
+        79,
+        350,
+        433
+      ],
+      "source_index": 15,
+      "source_box": [
+        1586,
+        396,
+        1983,
+        793
+      ],
+      "sha256": "4c23329a8fb55e6ddd35ad1a88d1a72be80660b501251af75e03175e1102ed02"
+    }
+  ],
+  "asset_kind": "individual complete static RGBA sprites",
+  "notes": [
+    "20 expressions, 10 body categories and 10 dialogue gestures per NPC.",
+    "Expression art is delivered as dialogue-window side images.",
+    "Body poses and gestures have individual acting for each NPC.",
+    "Complete images; no interchangeable body/clothing/face rig."
+  ]
+}
